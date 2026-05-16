@@ -1,0 +1,96 @@
+module github.com/koblas/besops
+
+go 1.26.2
+
+require (
+	github.com/aarondl/opt v0.0.0-20250607033636-982744e1bd65
+	github.com/bufbuild/protocompile v0.14.1
+	github.com/coder/websocket v1.8.12
+	github.com/eclipse/paho.mqtt.golang v1.5.1
+	github.com/go-faster/errors v0.7.1
+	github.com/go-faster/jx v1.2.0
+	github.com/go-sql-driver/mysql v1.10.0
+	github.com/golang-jwt/jwt/v5 v5.3.1
+	github.com/golang-migrate/migrate/v4 v4.19.1
+	github.com/google/uuid v1.6.0
+	github.com/jaswdr/faker/v2 v2.9.1
+	github.com/knadh/koanf/providers/env v1.1.0
+	github.com/knadh/koanf/providers/posflag v1.0.1
+	github.com/knadh/koanf/providers/structs v1.0.0
+	github.com/knadh/koanf/v2 v2.3.4
+	github.com/lib/pq v1.12.3
+	github.com/ogen-go/ogen v1.20.3
+	github.com/prometheus-community/pro-bing v0.8.0
+	github.com/redis/go-redis/v9 v9.19.0
+	github.com/robfig/cron/v3 v3.0.1
+	github.com/spf13/pflag v1.0.10
+	github.com/stephenafamo/bob v0.43.0
+	github.com/stephenafamo/scan v0.7.0
+	github.com/stretchr/testify v1.11.1
+	go.opentelemetry.io/otel v1.43.0
+	go.opentelemetry.io/otel/metric v1.43.0
+	go.opentelemetry.io/otel/trace v1.43.0
+	golang.org/x/crypto v0.51.0
+	golang.org/x/sync v0.20.0
+	golang.org/x/time v0.15.0
+	google.golang.org/grpc v1.81.0
+	google.golang.org/protobuf v1.36.11
+	modernc.org/sqlite v1.50.1
+	tailscale.com v1.98.1
+)
+
+require (
+	filippo.io/edwards25519 v1.2.0 // indirect
+	github.com/akutz/memconn v0.1.0 // indirect
+	github.com/cespare/xxhash/v2 v2.3.0 // indirect
+	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
+	github.com/dblohm7/wingoes v0.0.0-20240119213807-a09d6be7affa // indirect
+	github.com/dlclark/regexp2 v1.11.5 // indirect
+	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/fatih/color v1.19.0 // indirect
+	github.com/fatih/structs v1.1.0 // indirect
+	github.com/fxamacker/cbor/v2 v2.9.0 // indirect
+	github.com/ghodss/yaml v1.0.0 // indirect
+	github.com/go-faster/yaml v0.4.6 // indirect
+	github.com/go-json-experiment/json v0.0.0-20250813024750-ebf49471dced // indirect
+	github.com/go-logr/logr v1.4.3 // indirect
+	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
+	github.com/google/go-cmp v0.7.0 // indirect
+	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674 // indirect
+	github.com/hdevalence/ed25519consensus v0.2.0 // indirect
+	github.com/jsimonetti/rtnetlink v1.4.0 // indirect
+	github.com/knadh/koanf/maps v0.1.2 // indirect
+	github.com/mattn/go-colorable v0.1.14 // indirect
+	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/mdlayher/netlink v1.7.3-0.20250113171957-fbb4dce95f42 // indirect
+	github.com/mdlayher/socket v0.5.0 // indirect
+	github.com/mitchellh/copystructure v1.2.0 // indirect
+	github.com/mitchellh/go-ps v1.0.0 // indirect
+	github.com/mitchellh/reflectwalk v1.0.2 // indirect
+	github.com/ncruces/go-strftime v1.0.0 // indirect
+	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
+	github.com/qdm12/reprint v0.0.0-20200326205758-722754a53494 // indirect
+	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
+	github.com/segmentio/asm v1.2.1 // indirect
+	github.com/shopspring/decimal v1.4.0 // indirect
+	github.com/tailscale/go-winio v0.0.0-20231025203758-c4f33415bf55 // indirect
+	github.com/x448/float16 v0.8.4 // indirect
+	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
+	go.uber.org/atomic v1.11.0 // indirect
+	go.uber.org/multierr v1.11.0 // indirect
+	go.uber.org/zap v1.27.1 // indirect
+	go4.org/mem v0.0.0-20240501181205-ae6ca9944745 // indirect
+	go4.org/netipx v0.0.0-20231129151722-fdeea329fbba // indirect
+	golang.org/x/exp v0.0.0-20250620022241-b7579e27df2b // indirect
+	golang.org/x/net v0.53.0 // indirect
+	golang.org/x/sys v0.44.0 // indirect
+	golang.org/x/text v0.37.0 // indirect
+	golang.zx2c4.com/wireguard/windows v0.5.3 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260226221140-a57be14db171 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
+	modernc.org/libc v1.72.3 // indirect
+	modernc.org/mathutil v1.7.1 // indirect
+	modernc.org/memory v1.11.0 // indirect
+)

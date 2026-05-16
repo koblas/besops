@@ -1,0 +1,79 @@
+run:
+  timeout: 5m
+  go: "1.23"
+
+linters:
+  enable:
+    # Bugs & correctness
+    - errcheck
+    - govet
+    - staticcheck
+    - bodyclose
+    - nilerr
+    - sqlclosecheck
+    - contextcheck
+
+    # Style & consistency
+    - gofmt
+    - goimports
+    - revive
+    - misspell
+    - unconvert
+
+    # Performance
+    - prealloc
+    - ineffassign
+
+    # Security
+    - gosec
+
+    # Error handling
+    - wrapcheck
+
+    # Complexity
+    - cyclop
+    - gocognit
+
+linters-settings:
+  cyclop:
+    max-complexity: 20
+
+  gocognit:
+    min-complexity: 30
+
+  revive:
+    rules:
+      - name: blank-imports
+      - name: context-as-argument
+      - name: dot-imports
+      - name: error-return
+      - name: error-strings
+      - name: exported
+      - name: increment-decrement
+      - name: indent-error-flow
+      - name: range
+      - name: receiver-naming
+      - name: time-naming
+      - name: unexported-return
+      - name: var-declaration
+      - name: var-naming
+
+  gosec:
+    excludes:
+      - G104  # unhandled errors (covered by errcheck)
+
+  govet:
+    enable-all: true
+    disable:
+      - fieldalignment
+
+issues:
+  exclude-dirs:
+    - internal/api/oas_generated
+    - internal/database/bobgen
+
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - gosec
+        - errcheck

@@ -1,0 +1,46 @@
+sqlite:
+  dsn: ./data/besops.db
+  output: models
+  pkgname: models
+  no-tests: false
+  concurrency: 5
+  wipe: true
+  struct-tag-casing: snake
+  relation-tag: "-"
+  enum:
+    - name: monitor_type
+      type: string
+      values:
+        - http
+        - port
+        - ping
+        - keyword
+        - json-query
+        - grpc-keyword
+        - dns
+        - docker
+        - push
+        - steam
+        - gamedig
+        - mqtt
+        - sqlserver
+        - postgres
+        - mysql
+        - mongodb
+        - radius
+        - redis
+        - group
+        - snmp
+        - rabbitmq
+        - tailscale-ping
+        - real-browser
+        - manual
+    - name: maintenance_strategy
+      type: string
+      values:
+        - manual
+        - single
+        - recurring-interval
+        - recurring-weekday
+        - recurring-day-of-month
+        - cron
