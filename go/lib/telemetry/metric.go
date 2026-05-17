@@ -7,8 +7,8 @@ type MonitorInfo interface {
 	MonitorID() string
 	MonitorName() string
 	MonitorType() string
-	GroupID() string
 	GroupName() string
+	Tags() []string
 }
 
 // Observer receives every check result for metrics/telemetry export.

@@ -17,6 +17,7 @@ import { GroupFields } from './fields/GroupFields';
 import { TimingFields } from './fields/TimingFields';
 import { AlertFields } from './fields/AlertFields';
 import { NotificationSelector } from './fields/NotificationSelector';
+import { TagSelector } from '../../components/TagSelector';
 
 const { Title, Text } = Typography;
 
@@ -106,6 +107,12 @@ export function MonitorForm({ mode }: { mode?: 'clone' }) {
         <Card size="small" style={{ marginBottom: 16 }}>
           <GeneralFields excludeId={isEdit ? id : undefined} />
         </Card>
+
+        {isEdit && id && existing && (
+          <Card title="Tags" size="small" style={{ marginBottom: 16 }}>
+            <TagSelector monitorId={id} assignedTags={existing.tags ?? []} />
+          </Card>
+        )}
 
         {type && type !== 'group' && (
           <Card title="Connection" size="small" style={{ marginBottom: 16 }}>

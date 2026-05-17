@@ -45,6 +45,7 @@ type Config struct {
 	PushToken     string
 	ParentID      string
 	ParentName    string
+	Tags          []string
 
 	HTTP  HTTPConfig
 	DNS   DNSConfig

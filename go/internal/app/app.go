@@ -172,7 +172,10 @@ func (a *App) Start(ctx context.Context) error {
 	maintRepo := maintenance.NewRepository(db)
 	maintChecker := maintenance.NewChecker(maintRepo)
 
+	tagRepo := tag.NewRepository(db)
+
 	var managerOpts []monitor.ManagerOption
+	managerOpts = append(managerOpts, monitor.WithManagerTags(&tagProviderAdapter{tagRepo: tagRepo}))
 	if a.Config.OTelEndpoint != "" {
 		metrics, metricsErr := appotel.NewMetricsExporter(ctx, a.Config.OTelEndpoint)
 		if metricsErr != nil {
@@ -195,14 +198,14 @@ func (a *App) Start(ctx context.Context) error {
 
 	// Composed handler from domain handlers
 	handler := api.NewComposedHandler(
-		api.WithTags(tag.NewHandler(tag.NewRepository(db))),
+		api.WithTags(tag.NewHandler(tagRepo)),
 		api.WithAPIKeys(apikey.NewHandler(apikey.NewRepository(db))),
 		api.WithSettings(settings.NewHandler(settings.NewRepository(db))),
 		api.WithHeartbeats(heartbeat.NewHandler(heartbeatRepo, pushFinder, chartAdapter)),
 		api.WithNotifications(domainnotification.NewHandler(notifRepo)),
 		api.WithMaintenance(maintenance.NewHandler(maintRepo)),
 		api.WithUsers(user.NewHandler(userRepo, authProvider, a.Config.Bootstrap)),
-		api.WithMonitors(domainmonitor.NewHandler(monitorRepo, a.monitors, heartbeatRepo)),
+		api.WithMonitors(domainmonitor.NewHandler(monitorRepo, a.monitors, heartbeatRepo, &tagReaderAdapter{tagRepo: tagRepo})),
 		api.WithSystem(system.NewHandler(db, statsHandler)),
 		api.WithProxies(proxy.NewHandler(proxy.NewRepository(db))),
 		api.WithDockerHosts(dockerhost.NewHandler(dockerhost.NewRepository(db))),
@@ -469,4 +472,55 @@ func (a *monitorNotificationAdapter) Dispatch(ctx context.Context, monitorID str
 	fullMsg := fmt.Sprintf("[%s] %s - %s", direction, mon.Name, msg)
 
 	a.dispatcher.Dispatch(ctx, monitorID, monInfo, hbInfo, fullMsg)
+}
+
+// tagProviderAdapter bridges the tag repository to the monitor.TagProvider interface (telemetry).
+type tagProviderAdapter struct {
+	tagRepo tag.Repository
+}
+
+func (a *tagProviderAdapter) GetTagsForMonitor(ctx context.Context, monitorID string) ([]string, error) {
+	mts, err := a.tagRepo.GetForMonitor(ctx, monitorID)
+	if err != nil {
+		return nil, err
+	}
+
+	names := make([]string, 0, len(mts))
+	for _, mt := range mts {
+		t, tagErr := a.tagRepo.FindByID(ctx, mt.TagID)
+		if tagErr != nil {
+			slog.WarnContext(ctx, "tag not found for monitor, skipping", slog.String("tag_id", mt.TagID), slog.String("monitor_id", monitorID), slog.Any("error", tagErr))
+			continue
+		}
+		names = append(names, t.Name)
+	}
+	return names, nil
+}
+
+// tagReaderAdapter bridges the tag repository to the domainmonitor.TagReader interface (API responses).
+type tagReaderAdapter struct {
+	tagRepo tag.Repository
+}
+
+func (a *tagReaderAdapter) GetMonitorTags(ctx context.Context, monitorID string) ([]domainmonitor.MonitorTagInfo, error) {
+	mts, err := a.tagRepo.GetForMonitor(ctx, monitorID)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]domainmonitor.MonitorTagInfo, 0, len(mts))
+	for _, mt := range mts {
+		t, tagErr := a.tagRepo.FindByID(ctx, mt.TagID)
+		if tagErr != nil {
+			slog.WarnContext(ctx, "tag not found for monitor, skipping", slog.String("tag_id", mt.TagID), slog.String("monitor_id", monitorID), slog.Any("error", tagErr))
+			continue
+		}
+		result = append(result, domainmonitor.MonitorTagInfo{
+			TagID: mt.TagID,
+			Name:  t.Name,
+			Color: t.Color,
+			Value: mt.Value,
+		})
+	}
+	return result, nil
 }

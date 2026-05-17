@@ -77,6 +77,7 @@ type Scheduler struct {
 	publisher broadcast.Publisher
 	maint     MaintenanceChecker
 	metrics   MetricsObserver
+	tags      TagProvider
 
 	workerSem chan struct{} // bounded worker pool semaphore
 	ctx       context.Context
@@ -98,6 +99,13 @@ func WithMaxWorkers(n int) SchedulerOption {
 func WithMetrics(m MetricsObserver) SchedulerOption {
 	return func(s *Scheduler) {
 		s.metrics = m
+	}
+}
+
+// WithTags attaches a tag provider to enrich telemetry with monitor tags.
+func WithTags(t TagProvider) SchedulerOption {
+	return func(s *Scheduler) {
+		s.tags = t
 	}
 }
 
@@ -220,6 +228,12 @@ func (s *Scheduler) loadAndSchedule(id string, immediate bool) error {
 	if cfg.ParentID != "" {
 		if parent, parentErr := s.store.FindByID(s.ctx, cfg.ParentID); parentErr == nil {
 			cfg.ParentName = parent.Name
+		}
+	}
+
+	if s.tags != nil {
+		if tags, tagErr := s.tags.GetTagsForMonitor(s.ctx, id); tagErr == nil {
+			cfg.Tags = tags
 		}
 	}
 
@@ -395,6 +409,7 @@ func (s *Scheduler) executeCheck(cfg *Config, retry int) {
 			monitorType: cfg.Type,
 			groupID:     cfg.ParentID,
 			groupName:   cfg.ParentName,
+			tags:        cfg.Tags,
 		}
 		handler.HandleResult(s.ctx, cfg.ID, result, retry)
 		s.scheduleNext(cfg.ID, priorityScheduled, 0)

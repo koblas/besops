@@ -34,6 +34,11 @@ type NotificationDispatcher interface {
 // MetricsObserver receives every check result for metrics/telemetry export.
 type MetricsObserver = telemetry.Observer
 
+// TagProvider loads tag names for a monitor.
+type TagProvider interface {
+	GetTagsForMonitor(ctx context.Context, monitorID string) ([]string, error)
+}
+
 // MaintenanceChecker determines if a monitor is currently in a maintenance window.
 type MaintenanceChecker interface {
 	IsMonitorInMaintenance(ctx context.Context, monitorID string) (bool, error)
@@ -49,6 +54,7 @@ type ManagerOption func(*managerOpts)
 type managerOpts struct {
 	maxWorkers int
 	metrics    MetricsObserver
+	tags       TagProvider
 }
 
 func WithManagerMaxWorkers(n int) ManagerOption {
@@ -57,6 +63,10 @@ func WithManagerMaxWorkers(n int) ManagerOption {
 
 func WithManagerMetrics(m MetricsObserver) ManagerOption {
 	return func(o *managerOpts) { o.metrics = m }
+}
+
+func WithManagerTags(t TagProvider) ManagerOption {
+	return func(o *managerOpts) { o.tags = t }
 }
 
 func NewManager(store Store, hbStore HeartbeatStore, registry *Registry, notify NotificationDispatcher, publisher broadcast.Publisher, maint MaintenanceChecker, opts ...ManagerOption) *Manager {
@@ -68,6 +78,9 @@ func NewManager(store Store, hbStore HeartbeatStore, registry *Registry, notify 
 	schedOpts := []SchedulerOption{WithMaxWorkers(o.maxWorkers)}
 	if o.metrics != nil {
 		schedOpts = append(schedOpts, WithMetrics(o.metrics))
+	}
+	if o.tags != nil {
+		schedOpts = append(schedOpts, WithTags(o.tags))
 	}
 
 	sched := NewScheduler(store, hbStore, registry, notify, publisher, maint, schedOpts...)
@@ -203,6 +216,7 @@ type resultRecorder struct {
 	monitorType string
 	groupID     string
 	groupName   string
+	tags        []string
 }
 
 func (r *resultRecorder) HandleResult(ctx context.Context, monitorID string, result CheckResult, retries int) {
@@ -257,8 +271,8 @@ func (r *resultRecorder) HandleResult(ctx context.Context, monitorID string, res
 			id:        monitorID,
 			name:      r.monitorName,
 			typ:       r.monitorType,
-			groupID:   r.groupID,
 			groupName: r.groupName,
+			tags:      r.tags,
 		}, result.Status == status.Up, latency)
 	}
 
@@ -291,12 +305,12 @@ type monitorMetricInfo struct {
 	id        string
 	name      string
 	typ       string
-	groupID   string
 	groupName string
+	tags      []string
 }
 
 func (m *monitorMetricInfo) MonitorID() string   { return m.id }
 func (m *monitorMetricInfo) MonitorName() string { return m.name }
 func (m *monitorMetricInfo) MonitorType() string { return m.typ }
-func (m *monitorMetricInfo) GroupID() string     { return m.groupID }
 func (m *monitorMetricInfo) GroupName() string   { return m.groupName }
+func (m *monitorMetricInfo) Tags() []string      { return m.tags }

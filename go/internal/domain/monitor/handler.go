@@ -26,14 +26,28 @@ type UptimeProvider interface {
 	GetUptime(ctx context.Context, monitorID string, hours int) (float64, error)
 }
 
+// MonitorTagInfo holds resolved tag data for API responses.
+type MonitorTagInfo struct {
+	TagID string
+	Name  string
+	Color string
+	Value string
+}
+
+// TagReader loads tags for monitors in API responses.
+type TagReader interface {
+	GetMonitorTags(ctx context.Context, monitorID string) ([]MonitorTagInfo, error)
+}
+
 type Handler struct {
 	repo      Repository
 	scheduler MonitorScheduler
 	uptimes   UptimeProvider
+	tags      TagReader
 }
 
-func NewHandler(repo Repository, scheduler MonitorScheduler, uptimes UptimeProvider) *Handler {
-	return &Handler{repo: repo, scheduler: scheduler, uptimes: uptimes}
+func NewHandler(repo Repository, scheduler MonitorScheduler, uptimes UptimeProvider, tags TagReader) *Handler {
+	return &Handler{repo: repo, scheduler: scheduler, uptimes: uptimes, tags: tags}
 }
 
 func (h *Handler) ListMonitors(ctx context.Context) ([]oas.Monitor, error) {
@@ -49,7 +63,11 @@ func (h *Handler) ListMonitors(ctx context.Context) ([]oas.Monitor, error) {
 
 	result := make([]oas.Monitor, 0, len(monitors))
 	for _, m := range monitors {
-		result = append(result, monitorToOAS(m))
+		om := monitorToOAS(m)
+		if h.tags != nil {
+			om.Tags = h.loadOASTags(ctx, m.ID)
+		}
+		result = append(result, om)
 	}
 	return result, nil
 }
@@ -63,6 +81,9 @@ func (h *Handler) GetMonitor(ctx context.Context, params oas.GetMonitorParams) (
 		return nil, fmt.Errorf("finding monitor: %w", err)
 	}
 	result := monitorToOAS(m)
+	if h.tags != nil {
+		result.Tags = h.loadOASTags(ctx, m.ID)
+	}
 	return &result, nil
 }
 
@@ -156,6 +177,23 @@ func (h *Handler) CheckDomain(ctx context.Context, params oas.CheckDomainParams)
 	// TODO: implement domain/TLS check
 	_ = params.MonitorId
 	return &oas.CheckDomainOK{}, nil
+}
+
+func (h *Handler) loadOASTags(ctx context.Context, monitorID string) []oas.MonitorTag {
+	tags, err := h.tags.GetMonitorTags(ctx, monitorID)
+	if err != nil {
+		return nil
+	}
+	result := make([]oas.MonitorTag, 0, len(tags))
+	for _, t := range tags {
+		result = append(result, oas.MonitorTag{
+			TagId: oas.NewOptUUID(oasutil.MustParseUUID(t.TagID)),
+			Name:  oas.NewOptString(t.Name),
+			Color: oas.NewOptString(t.Color),
+			Value: oas.NewOptString(t.Value),
+		})
+	}
+	return result
 }
 
 func monitorToOAS(m *Monitor) oas.Monitor {

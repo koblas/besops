@@ -12,4 +12,10 @@ export default defineConfig({
       '/.well-known': { target: 'http://localhost:8080', changeOrigin: true },
     },
   },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./src/test/setup.ts'],
+    exclude: ['e2e/**', 'node_modules/**'],
+  },
 })

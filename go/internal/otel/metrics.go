@@ -73,11 +73,11 @@ func (m *MetricsExporter) Record(ctx context.Context, monitor telemetry.MonitorI
 		attribute.String("monitor.name", monitor.MonitorName()),
 		attribute.String("monitor.type", monitor.MonitorType()),
 	}
-	if gid := monitor.GroupID(); gid != "" {
-		kvs = append(kvs, attribute.String("monitor.group_id", gid))
-	}
 	if gname := monitor.GroupName(); gname != "" {
-		kvs = append(kvs, attribute.String("monitor.group_name", gname))
+		kvs = append(kvs, attribute.String("monitor.group", gname))
+	}
+	for _, tag := range monitor.Tags() {
+		kvs = append(kvs, attribute.String("monitor.tag."+tag, "true"))
 	}
 	attrSet := otelmetric.WithAttributeSet(attribute.NewSet(kvs...))
 
