@@ -36,6 +36,7 @@ import (
 	monitortypes "github.com/koblas/besops/internal/monitor/types"
 	corenotification "github.com/koblas/besops/internal/notification"
 	"github.com/koblas/besops/internal/notification/providers"
+	appotel "github.com/koblas/besops/internal/otel"
 	"github.com/koblas/besops/internal/uptime"
 	"github.com/koblas/besops/lib/status"
 	"golang.org/x/sync/errgroup"
@@ -47,6 +48,7 @@ type App struct {
 	Server    *http.Server
 	scheduler *jobs.Scheduler
 	monitors  *monitor.Manager
+	metrics   *appotel.MetricsExporter
 }
 
 func New(cfg Config) *App {
@@ -169,7 +171,19 @@ func (a *App) Start(ctx context.Context) error {
 	hub := broadcast.NewHub(64)
 	maintRepo := maintenance.NewRepository(db)
 	maintChecker := maintenance.NewChecker(maintRepo)
-	a.monitors = monitor.NewManager(monitorRepo, heartbeatRepo, registry, monitorNotifier, hub, maintChecker)
+
+	var managerOpts []monitor.ManagerOption
+	if a.Config.OTelEndpoint != "" {
+		metrics, metricsErr := appotel.NewMetricsExporter(ctx, a.Config.OTelEndpoint)
+		if metricsErr != nil {
+			return fmt.Errorf("initializing OTel metrics exporter: %w", metricsErr)
+		}
+		a.metrics = metrics
+		managerOpts = append(managerOpts, monitor.WithManagerMetrics(metrics))
+		slog.InfoContext(ctx, "OpenTelemetry metrics enabled", slog.String("endpoint", a.Config.OTelEndpoint))
+	}
+
+	a.monitors = monitor.NewManager(monitorRepo, heartbeatRepo, registry, monitorNotifier, hub, maintChecker, managerOpts...)
 	if monErr := a.monitors.Start(ctx); monErr != nil {
 		return fmt.Errorf("starting monitor manager: %w", monErr)
 	}
@@ -273,6 +287,12 @@ func (a *App) shutdown(ctx context.Context) error {
 
 	if a.monitors != nil {
 		a.monitors.Stop()
+	}
+
+	if a.metrics != nil {
+		if metricsErr := a.metrics.Shutdown(ctx); metricsErr != nil {
+			slog.Error("error shutting down OTel metrics", slog.Any("error", metricsErr))
+		}
 	}
 
 	if a.scheduler != nil {

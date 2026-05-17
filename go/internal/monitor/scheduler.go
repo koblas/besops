@@ -76,6 +76,7 @@ type Scheduler struct {
 	notify    NotificationDispatcher
 	publisher broadcast.Publisher
 	maint     MaintenanceChecker
+	metrics   MetricsObserver
 
 	workerSem chan struct{} // bounded worker pool semaphore
 	ctx       context.Context
@@ -90,6 +91,13 @@ type SchedulerOption func(*Scheduler)
 func WithMaxWorkers(n int) SchedulerOption {
 	return func(s *Scheduler) {
 		s.workerSem = make(chan struct{}, n)
+	}
+}
+
+// WithMetrics attaches a metrics observer to record telemetry for every check.
+func WithMetrics(m MetricsObserver) SchedulerOption {
+	return func(s *Scheduler) {
+		s.metrics = m
 	}
 }
 
@@ -208,6 +216,12 @@ func (s *Scheduler) loadAndSchedule(id string, immediate bool) error {
 	}
 
 	cfg := modelToConfig(mon)
+
+	if cfg.ParentID != "" {
+		if parent, parentErr := s.store.FindByID(s.ctx, cfg.ParentID); parentErr == nil {
+			cfg.ParentName = parent.Name
+		}
+	}
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -372,10 +386,15 @@ func (s *Scheduler) executeCheck(cfg *Config, retry int) {
 	// Aggregate checkers (groups) never retry — their result is deterministic.
 	if isAggregate || result.Status == status.Up || retry >= cfg.MaxRetries {
 		handler := &resultRecorder{
-			hbStore:   s.hbStore,
-			notify:    s.notify,
-			publisher: s.publisher,
-			maint:     s.maint,
+			hbStore:     s.hbStore,
+			notify:      s.notify,
+			publisher:   s.publisher,
+			maint:       s.maint,
+			metrics:     s.metrics,
+			monitorName: cfg.Name,
+			monitorType: cfg.Type,
+			groupID:     cfg.ParentID,
+			groupName:   cfg.ParentName,
 		}
 		handler.HandleResult(s.ctx, cfg.ID, result, retry)
 		s.scheduleNext(cfg.ID, priorityScheduled, 0)

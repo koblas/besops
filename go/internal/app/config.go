@@ -27,6 +27,7 @@ type Config struct {
 	Bootstrap          bool   `koanf:"bootstrap"`
 	LogLevel           string `koanf:"log_level"`
 	JWTSecret          string `koanf:"jwt_secret"`
+	OTelEndpoint       string `koanf:"otel_endpoint"`
 }
 
 func DefaultConfig() Config {
@@ -59,6 +60,7 @@ var flagToKoanf = map[string]string{
 	"bootstrap":           "bootstrap",
 	"log-level":           "log_level",
 	"jwt-secret":          "jwt_secret",
+	"otel-endpoint":       "otel_endpoint",
 }
 
 // registerFlags creates the FlagSet with all recognized flags.
@@ -77,6 +79,7 @@ func registerFlags() *flag.FlagSet {
 	fs.Bool("bootstrap", false, "auto-create users on login")
 	fs.String("log-level", "", "log level: debug, info, warn, error")
 	fs.String("jwt-secret", "", "stable secret for deriving JWT signing key (random per-start if empty)")
+	fs.String("otel-endpoint", "", "OpenTelemetry OTLP endpoint for metrics export (e.g. localhost:4318)")
 
 	return fs
 }

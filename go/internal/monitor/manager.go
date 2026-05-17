@@ -11,6 +11,7 @@ import (
 	"github.com/koblas/besops/internal/domain/heartbeat"
 	domainmonitor "github.com/koblas/besops/internal/domain/monitor"
 	"github.com/koblas/besops/lib/status"
+	"github.com/koblas/besops/lib/telemetry"
 )
 
 // Store loads monitor configuration from the database.
@@ -30,6 +31,9 @@ type NotificationDispatcher interface {
 	Dispatch(ctx context.Context, monitorID string, current status.Status, previous status.Status, msg string)
 }
 
+// MetricsObserver receives every check result for metrics/telemetry export.
+type MetricsObserver = telemetry.Observer
+
 // MaintenanceChecker determines if a monitor is currently in a maintenance window.
 type MaintenanceChecker interface {
 	IsMonitorInMaintenance(ctx context.Context, monitorID string) (bool, error)
@@ -44,10 +48,15 @@ type ManagerOption func(*managerOpts)
 
 type managerOpts struct {
 	maxWorkers int
+	metrics    MetricsObserver
 }
 
 func WithManagerMaxWorkers(n int) ManagerOption {
 	return func(o *managerOpts) { o.maxWorkers = n }
+}
+
+func WithManagerMetrics(m MetricsObserver) ManagerOption {
+	return func(o *managerOpts) { o.metrics = m }
 }
 
 func NewManager(store Store, hbStore HeartbeatStore, registry *Registry, notify NotificationDispatcher, publisher broadcast.Publisher, maint MaintenanceChecker, opts ...ManagerOption) *Manager {
@@ -56,7 +65,12 @@ func NewManager(store Store, hbStore HeartbeatStore, registry *Registry, notify 
 		opt(o)
 	}
 
-	sched := NewScheduler(store, hbStore, registry, notify, publisher, maint, WithMaxWorkers(o.maxWorkers))
+	schedOpts := []SchedulerOption{WithMaxWorkers(o.maxWorkers)}
+	if o.metrics != nil {
+		schedOpts = append(schedOpts, WithMetrics(o.metrics))
+	}
+
+	sched := NewScheduler(store, hbStore, registry, notify, publisher, maint, schedOpts...)
 	return &Manager{scheduler: sched}
 }
 
@@ -106,6 +120,11 @@ func (m *Manager) RunningCount() int {
 }
 
 func modelToConfig(mon *domainmonitor.Monitor) *Config {
+	var parentID string
+	if mon.ParentID != nil {
+		parentID = *mon.ParentID
+	}
+
 	cfg := &Config{
 		ID:            mon.ID,
 		Type:          mon.Type,
@@ -115,6 +134,7 @@ func modelToConfig(mon *domainmonitor.Monitor) *Config {
 		Interval:      time.Duration(mon.Interval) * time.Second,
 		Timeout:       time.Duration(mon.Timeout) * time.Second,
 		MaxRetries:    mon.MaxRetries,
+		ParentID:      parentID,
 		RetryInterval: time.Duration(mon.RetryInterval) * time.Second,
 		IgnoreTLS:     mon.IgnoreTLS,
 		Keyword:       mon.Keyword,
@@ -174,10 +194,15 @@ func modelToConfig(mon *domainmonitor.Monitor) *Config {
 
 // resultRecorder implements ResultHandler by persisting heartbeats and dispatching notifications.
 type resultRecorder struct {
-	hbStore   HeartbeatStore
-	notify    NotificationDispatcher
-	publisher broadcast.Publisher
-	maint     MaintenanceChecker
+	hbStore     HeartbeatStore
+	notify      NotificationDispatcher
+	publisher   broadcast.Publisher
+	maint       MaintenanceChecker
+	metrics     MetricsObserver
+	monitorName string
+	monitorType string
+	groupID     string
+	groupName   string
 }
 
 func (r *resultRecorder) HandleResult(ctx context.Context, monitorID string, result CheckResult, retries int) {
@@ -223,6 +248,20 @@ func (r *resultRecorder) HandleResult(ctx context.Context, monitorID string, res
 		return
 	}
 
+	if r.metrics != nil {
+		var latency int64
+		if hb.Ping != nil {
+			latency = *hb.Ping
+		}
+		r.metrics.Record(ctx, &monitorMetricInfo{
+			id:        monitorID,
+			name:      r.monitorName,
+			typ:       r.monitorType,
+			groupID:   r.groupID,
+			groupName: r.groupName,
+		}, result.Status == status.Up, latency)
+	}
+
 	if r.publisher != nil {
 		r.publisher.Publish(broadcast.Event{
 			Type: "heartbeat",
@@ -247,3 +286,17 @@ func truncateMessage(s string, maxLen int) string {
 	}
 	return s[:maxLen]
 }
+
+type monitorMetricInfo struct {
+	id        string
+	name      string
+	typ       string
+	groupID   string
+	groupName string
+}
+
+func (m *monitorMetricInfo) MonitorID() string   { return m.id }
+func (m *monitorMetricInfo) MonitorName() string { return m.name }
+func (m *monitorMetricInfo) MonitorType() string { return m.typ }
+func (m *monitorMetricInfo) GroupID() string     { return m.groupID }
+func (m *monitorMetricInfo) GroupName() string   { return m.groupName }

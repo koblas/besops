@@ -43,6 +43,8 @@ type Config struct {
 	ExpectedValue string
 	ProxyID       *string
 	PushToken     string
+	ParentID      string
+	ParentName    string
 
 	HTTP  HTTPConfig
 	DNS   DNSConfig
