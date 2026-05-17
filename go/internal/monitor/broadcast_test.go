@@ -58,7 +58,7 @@ func TestManagerPublishesOnCheck(t *testing.T) {
 	registry := NewRegistry()
 	registry.Register(&alwaysUpChecker{})
 
-	mgr := NewManager(store, hbStore, registry, nil, hub)
+	mgr := NewManager(store, hbStore, registry, nil, hub, nil)
 	require.NoError(t, mgr.Start(t.Context()))
 
 	select {

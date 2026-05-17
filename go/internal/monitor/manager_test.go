@@ -111,7 +111,7 @@ func TestManagerStartAndStop(t *testing.T) {
 	registry := NewRegistry()
 	registry.Register(&alwaysUpChecker{})
 
-	mgr := NewManager(store, hbStore, registry, notify, nil)
+	mgr := NewManager(store, hbStore, registry, notify, nil, nil)
 
 	ctx := t.Context()
 	if err := mgr.Start(ctx); err != nil {
@@ -149,7 +149,7 @@ func TestManagerStopMonitor(t *testing.T) {
 	registry := NewRegistry()
 	registry.Register(&alwaysUpChecker{})
 
-	mgr := NewManager(store, hbStore, registry, nil, nil)
+	mgr := NewManager(store, hbStore, registry, nil, nil, nil)
 	if err := mgr.Start(t.Context()); err != nil {
 		t.Fatal(err)
 	}
@@ -175,7 +175,7 @@ func TestManagerRestartMonitor(t *testing.T) {
 	registry := NewRegistry()
 	registry.Register(&alwaysUpChecker{})
 
-	mgr := NewManager(store, hbStore, registry, nil, nil)
+	mgr := NewManager(store, hbStore, registry, nil, nil, nil)
 	if err := mgr.Start(t.Context()); err != nil {
 		t.Fatal(err)
 	}
@@ -202,7 +202,7 @@ func TestManagerNotifiesOnStatusChange(t *testing.T) {
 	registry := NewRegistry()
 	registry.Register(&alwaysUpChecker{})
 
-	mgr := NewManager(store, hbStore, registry, notify, nil)
+	mgr := NewManager(store, hbStore, registry, notify, nil, nil)
 	if err := mgr.Start(t.Context()); err != nil {
 		t.Fatal(err)
 	}
@@ -244,7 +244,7 @@ func TestManagerUnknownType(t *testing.T) {
 	hbStore := &memHeartbeatStore{heartbeats: make(map[string][]*heartbeat.Heartbeat)}
 	registry := NewRegistry()
 
-	mgr := NewManager(store, hbStore, registry, nil, nil)
+	mgr := NewManager(store, hbStore, registry, nil, nil, nil)
 	err := mgr.Start(t.Context())
 	if err != nil {
 		t.Fatal("Start should not fail for individual monitor errors")

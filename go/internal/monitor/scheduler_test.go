@@ -91,7 +91,7 @@ func (c *mockCheckerSched) callCount() int {
 func newTestScheduler(store *mockStore, hbStore *mockHBStore, checker *mockCheckerSched) *Scheduler {
 	registry := NewRegistry()
 	registry.Register(checker)
-	return NewScheduler(store, hbStore, registry, nil, (*noopPublisher)(nil), WithMaxWorkers(4))
+	return NewScheduler(store, hbStore, registry, nil, (*noopPublisher)(nil), nil, WithMaxWorkers(4))
 }
 
 type noopPublisher struct{}

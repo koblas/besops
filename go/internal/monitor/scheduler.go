@@ -75,6 +75,7 @@ type Scheduler struct {
 	registry  *Registry
 	notify    NotificationDispatcher
 	publisher broadcast.Publisher
+	maint     MaintenanceChecker
 
 	workerSem chan struct{} // bounded worker pool semaphore
 	ctx       context.Context
@@ -92,7 +93,7 @@ func WithMaxWorkers(n int) SchedulerOption {
 	}
 }
 
-func NewScheduler(store Store, hbStore HeartbeatStore, registry *Registry, notify NotificationDispatcher, publisher broadcast.Publisher, opts ...SchedulerOption) *Scheduler {
+func NewScheduler(store Store, hbStore HeartbeatStore, registry *Registry, notify NotificationDispatcher, publisher broadcast.Publisher, maint MaintenanceChecker, opts ...SchedulerOption) *Scheduler {
 	s := &Scheduler{
 		queue:     make(schedHeap, 0),
 		configs:   make(map[string]*Config),
@@ -103,6 +104,7 @@ func NewScheduler(store Store, hbStore HeartbeatStore, registry *Registry, notif
 		registry:  registry,
 		notify:    notify,
 		publisher: publisher,
+		maint:     maint,
 		workerSem: make(chan struct{}, 32),
 	}
 	for _, opt := range opts {
@@ -373,6 +375,7 @@ func (s *Scheduler) executeCheck(cfg *Config, retry int) {
 			hbStore:   s.hbStore,
 			notify:    s.notify,
 			publisher: s.publisher,
+			maint:     s.maint,
 		}
 		handler.HandleResult(s.ctx, cfg.ID, result, retry)
 		s.scheduleNext(cfg.ID, priorityScheduled, 0)

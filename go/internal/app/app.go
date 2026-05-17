@@ -166,7 +166,9 @@ func (a *App) Start(ctx context.Context) error {
 	monitorNotifier := &monitorNotificationAdapter{dispatcher: notifDispatcher, monitorRepo: monitorRepo}
 
 	hub := broadcast.NewHub(64)
-	a.monitors = monitor.NewManager(monitorRepo, heartbeatRepo, registry, monitorNotifier, hub)
+	maintRepo := maintenance.NewRepository(db)
+	maintChecker := maintenance.NewChecker(maintRepo)
+	a.monitors = monitor.NewManager(monitorRepo, heartbeatRepo, registry, monitorNotifier, hub, maintChecker)
 	if monErr := a.monitors.Start(ctx); monErr != nil {
 		return fmt.Errorf("starting monitor manager: %w", monErr)
 	}
@@ -183,7 +185,7 @@ func (a *App) Start(ctx context.Context) error {
 		api.WithSettings(settings.NewHandler(settings.NewRepository(db))),
 		api.WithHeartbeats(heartbeat.NewHandler(heartbeatRepo, pushFinder, chartAdapter)),
 		api.WithNotifications(domainnotification.NewHandler(notifRepo)),
-		api.WithMaintenance(maintenance.NewHandler(maintenance.NewRepository(db))),
+		api.WithMaintenance(maintenance.NewHandler(maintRepo)),
 		api.WithUsers(user.NewHandler(userRepo, authProvider, a.Config.Bootstrap)),
 		api.WithMonitors(domainmonitor.NewHandler(monitorRepo, a.monitors, heartbeatRepo)),
 		api.WithSystem(system.NewHandler(db, statsHandler)),

@@ -30,6 +30,11 @@ type NotificationDispatcher interface {
 	Dispatch(ctx context.Context, monitorID string, current status.Status, previous status.Status, msg string)
 }
 
+// MaintenanceChecker determines if a monitor is currently in a maintenance window.
+type MaintenanceChecker interface {
+	IsMonitorInMaintenance(ctx context.Context, monitorID string) (bool, error)
+}
+
 // Manager controls the lifecycle of all monitor runners via a priority-queue scheduler.
 type Manager struct {
 	scheduler *Scheduler
@@ -45,13 +50,13 @@ func WithManagerMaxWorkers(n int) ManagerOption {
 	return func(o *managerOpts) { o.maxWorkers = n }
 }
 
-func NewManager(store Store, hbStore HeartbeatStore, registry *Registry, notify NotificationDispatcher, publisher broadcast.Publisher, opts ...ManagerOption) *Manager {
+func NewManager(store Store, hbStore HeartbeatStore, registry *Registry, notify NotificationDispatcher, publisher broadcast.Publisher, maint MaintenanceChecker, opts ...ManagerOption) *Manager {
 	o := &managerOpts{maxWorkers: 32}
 	for _, opt := range opts {
 		opt(o)
 	}
 
-	sched := NewScheduler(store, hbStore, registry, notify, publisher, WithMaxWorkers(o.maxWorkers))
+	sched := NewScheduler(store, hbStore, registry, notify, publisher, maint, WithMaxWorkers(o.maxWorkers))
 	return &Manager{scheduler: sched}
 }
 
@@ -170,10 +175,26 @@ type resultRecorder struct {
 	hbStore   HeartbeatStore
 	notify    NotificationDispatcher
 	publisher broadcast.Publisher
+	maint     MaintenanceChecker
 }
 
 func (r *resultRecorder) HandleResult(ctx context.Context, monitorID string, result CheckResult, retries int) {
 	slog.DebugContext(ctx, "recording result", slog.String("monitor", monitorID), slog.String("status", result.Status.String()), slog.Int64("ping", result.Ping), slog.Int("retries", retries))
+
+	// Check if monitor is in a maintenance window — if so, override status and suppress notifications.
+	inMaintenance := false
+	if r.maint != nil {
+		var err error
+		inMaintenance, err = r.maint.IsMonitorInMaintenance(ctx, monitorID)
+		if err != nil {
+			slog.WarnContext(ctx, "maintenance check failed, proceeding normally", slog.String("monitor", monitorID), slog.Any("error", err))
+		}
+	}
+
+	recordedStatus := result.Status
+	if inMaintenance {
+		recordedStatus = status.Maintenance
+	}
 
 	prev, prevErr := r.hbStore.GetLatest(ctx, monitorID)
 
@@ -184,11 +205,11 @@ func (r *resultRecorder) HandleResult(ctx context.Context, monitorID string, res
 
 	hb := &heartbeat.Heartbeat{
 		MonitorID: monitorID,
-		Status:    int(result.Status),
+		Status:    int(recordedStatus),
 		Time:      heartbeat.RFC3339Time(time.Now()),
 		Msg:       truncateMessage(result.Message, 255),
 		Retries:   retries,
-		Important: prevErr != nil || prevStatus != result.Status,
+		Important: prevErr != nil || prevStatus != recordedStatus,
 	}
 	if result.Ping > 0 {
 		ping := result.Ping
@@ -207,9 +228,13 @@ func (r *resultRecorder) HandleResult(ctx context.Context, monitorID string, res
 		})
 	}
 
-	if prevStatus != result.Status && prevErr == nil && r.notify != nil {
-		slog.DebugContext(ctx, "status changed, dispatching notification", slog.String("monitor", monitorID), slog.String("from", prevStatus.String()), slog.String("to", result.Status.String()))
-		r.notify.Dispatch(ctx, monitorID, result.Status, prevStatus, result.Message)
+	if inMaintenance {
+		return
+	}
+
+	if prevStatus != recordedStatus && prevErr == nil && r.notify != nil {
+		slog.DebugContext(ctx, "status changed, dispatching notification", slog.String("monitor", monitorID), slog.String("from", prevStatus.String()), slog.String("to", recordedStatus.String()))
+		r.notify.Dispatch(ctx, monitorID, recordedStatus, prevStatus, result.Message)
 	}
 }
 
