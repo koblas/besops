@@ -1,4 +1,4 @@
-import { Input, Button, Empty, Spin, Tooltip } from 'antd';
+import { Input, Button, Empty, Spin } from 'antd';
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMemo, useState } from 'react';
@@ -53,7 +53,7 @@ export function MonitorListSidebar() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '12px 8px' }}>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+      <div style={{ marginBottom: 16 }}>
         <Input
           prefix={<SearchOutlined />}
           placeholder="Search..."
@@ -62,14 +62,17 @@ export function MonitorListSidebar() {
           allowClear
           size="small"
         />
-        <Tooltip title="Add Monitor">
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => navigate('/add')}
-            size="small"
-          />
-        </Tooltip>
+      </div>
+      <div style={{ marginBottom: 16 }}>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => navigate('/add')}
+          size="small"
+          block
+        >
+          Add Monitor
+        </Button>
       </div>
       <div style={{ flex: 1, overflow: 'auto' }}>
         {isError ? (
