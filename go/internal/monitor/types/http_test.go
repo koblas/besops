@@ -201,6 +201,168 @@ func TestHTTPCheckerHeaders(t *testing.T) {
 	}
 }
 
+func TestHTTPCheckerJsonPathMatch(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"status":"ok","version":"1.2.3"}`))
+	}))
+	defer srv.Close()
+
+	checker := NewHTTPChecker()
+	cfg := &monitor.Config{
+		URL:           srv.URL,
+		HTTP:          monitor.HTTPConfig{Method: "GET"},
+		Timeout:       5 * time.Second,
+		JsonPath:      "status",
+		ExpectedValue: "ok",
+	}
+
+	result, err := checker.Check(t.Context(), cfg)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if result.Status != status.Up {
+		t.Errorf("expected Up (JSON path matches), got %v: %s", result.Status, result.Message)
+	}
+}
+
+func TestHTTPCheckerJsonPathMismatch(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"status":"error","code":500}`))
+	}))
+	defer srv.Close()
+
+	checker := NewHTTPChecker()
+	cfg := &monitor.Config{
+		URL:           srv.URL,
+		HTTP:          monitor.HTTPConfig{Method: "GET"},
+		Timeout:       5 * time.Second,
+		JsonPath:      "status",
+		ExpectedValue: "ok",
+	}
+
+	result, err := checker.Check(t.Context(), cfg)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if result.Status != status.Down {
+		t.Errorf("expected Down (JSON path mismatch), got %v: %s", result.Status, result.Message)
+	}
+	if !contains(result.Message, `expected "ok"`) {
+		t.Errorf("expected error message to mention expected value, got: %s", result.Message)
+	}
+}
+
+func TestHTTPCheckerJsonPathNotFound(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"name":"test"}`))
+	}))
+	defer srv.Close()
+
+	checker := NewHTTPChecker()
+	cfg := &monitor.Config{
+		URL:      srv.URL,
+		HTTP:     monitor.HTTPConfig{Method: "GET"},
+		Timeout:  5 * time.Second,
+		JsonPath: "status",
+	}
+
+	result, err := checker.Check(t.Context(), cfg)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if result.Status != status.Down {
+		t.Errorf("expected Down (JSON path not found), got %v: %s", result.Status, result.Message)
+	}
+}
+
+func TestHTTPCheckerJsonPathExistsWithoutExpected(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"alive":true}`))
+	}))
+	defer srv.Close()
+
+	checker := NewHTTPChecker()
+	cfg := &monitor.Config{
+		URL:      srv.URL,
+		HTTP:     monitor.HTTPConfig{Method: "GET"},
+		Timeout:  5 * time.Second,
+		JsonPath: "alive",
+	}
+
+	result, err := checker.Check(t.Context(), cfg)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if result.Status != status.Up {
+		t.Errorf("expected Up (JSON path exists, no expected value), got %v: %s", result.Status, result.Message)
+	}
+}
+
+func TestHTTPCheckerJsonPathNestedObject(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"data":{"db":{"connected":true},"version":"2.0"}}`))
+	}))
+	defer srv.Close()
+
+	checker := NewHTTPChecker()
+	cfg := &monitor.Config{
+		URL:           srv.URL,
+		HTTP:          monitor.HTTPConfig{Method: "GET"},
+		Timeout:       5 * time.Second,
+		JsonPath:      "data.db.connected",
+		ExpectedValue: "true",
+	}
+
+	result, err := checker.Check(t.Context(), cfg)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if result.Status != status.Up {
+		t.Errorf("expected Up (nested JSON path matches), got %v: %s", result.Status, result.Message)
+	}
+}
+
+func TestHTTPCheckerJsonPathInvalidJson(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Write([]byte("not json at all"))
+	}))
+	defer srv.Close()
+
+	checker := NewHTTPChecker()
+	cfg := &monitor.Config{
+		URL:      srv.URL,
+		HTTP:     monitor.HTTPConfig{Method: "GET"},
+		Timeout:  5 * time.Second,
+		JsonPath: "status",
+	}
+
+	result, err := checker.Check(t.Context(), cfg)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if result.Status != status.Down {
+		t.Errorf("expected Down (invalid JSON), got %v: %s", result.Status, result.Message)
+	}
+}
+
+func contains(s, substr string) bool {
+	return len(s) >= len(substr) && (s == substr || len(s) > 0 && containsSubstring(s, substr))
+}
+
+func containsSubstring(s, substr string) bool {
+	for i := 0; i <= len(s)-len(substr); i++ {
+		if s[i:i+len(substr)] == substr {
+			return true
+		}
+	}
+	return false
+}
+
 func TestHTTPCheckerTimeout(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		time.Sleep(2 * time.Second)

@@ -12,6 +12,7 @@ import (
 
 	"github.com/koblas/besops/internal/monitor"
 	"github.com/koblas/besops/lib/status"
+	"github.com/tidwall/gjson"
 )
 
 type HTTPChecker struct {
@@ -128,6 +129,29 @@ func (c *HTTPChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.C
 			} else {
 				result.Message = fmt.Sprintf("keyword %q not found in response", cfg.Keyword)
 			}
+			return result, nil
+		}
+	}
+
+	// JSON path check
+	if cfg.JsonPath != "" {
+		bodyStr := string(body)
+		if !gjson.Valid(bodyStr) {
+			result.Status = status.Down
+			result.Message = "response body is not valid JSON"
+			return result, nil
+		}
+
+		got := gjson.Get(bodyStr, cfg.JsonPath)
+		if !got.Exists() {
+			result.Status = status.Down
+			result.Message = fmt.Sprintf("JSON path %q not found in response", cfg.JsonPath)
+			return result, nil
+		}
+
+		if cfg.ExpectedValue != "" && got.String() != cfg.ExpectedValue {
+			result.Status = status.Down
+			result.Message = fmt.Sprintf("JSON path %q returned %q, expected %q", cfg.JsonPath, got.String(), cfg.ExpectedValue)
 			return result, nil
 		}
 	}

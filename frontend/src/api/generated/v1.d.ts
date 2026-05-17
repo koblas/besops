@@ -1256,10 +1256,14 @@ export interface components {
              * @default 60
              */
             retryInterval: number;
-            /** @description Text to search for in the response body (keyword/JSON-query monitor types). */
+            /** @description Text to search for in the response body. */
             keyword?: string;
             /** @description If true, the monitor is UP when the keyword is NOT found in the response. */
             invertKeyword?: boolean;
+            /** @description JSONPath expression to evaluate against the response body. */
+            jsonPath?: string;
+            /** @description Expected value to compare against the JSONPath result. */
+            expectedValue?: string;
             /** @description If true, TLS certificate errors are ignored when connecting to the target. */
             ignoreTls?: boolean;
             /**
@@ -1375,6 +1379,8 @@ export interface components {
             retryInterval: number;
             keyword?: string;
             invertKeyword?: boolean;
+            jsonPath?: string;
+            expectedValue?: string;
             ignoreTls?: boolean;
             /** @default 10 */
             maxRedirects: number;

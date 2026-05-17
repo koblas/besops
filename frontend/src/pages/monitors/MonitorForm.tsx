@@ -5,11 +5,10 @@ import { useMonitor, useCreateMonitor, useUpdateMonitor } from '../../hooks/useM
 import type { MonitorInput } from '../../hooks/useMonitors';
 import { GeneralFields } from './fields/GeneralFields';
 import { HttpFields } from './fields/HttpFields';
-import { KeywordFields } from './fields/KeywordFields';
 import { TcpFields } from './fields/TcpFields';
 import { PingFields } from './fields/PingFields';
 import { DnsFields } from './fields/DnsFields';
-import { DockerFields } from './fields/DockerFields';
+import { SmtpFields } from './fields/SmtpFields';
 import { MqttFields } from './fields/MqttFields';
 import { GrpcFields } from './fields/GrpcFields';
 import { DatabaseFields } from './fields/DatabaseFields';
@@ -21,8 +20,7 @@ import { NotificationSelector } from './fields/NotificationSelector';
 
 const { Title, Text } = Typography;
 
-const httpTypes = ['http', 'keyword', 'json-query', 'real-browser'];
-const databaseTypes = ['sqlserver', 'postgres', 'mysql', 'mongodb', 'redis'];
+const httpTypes = ['http'];
 
 export function MonitorForm({ mode }: { mode?: 'clone' }) {
   const { id } = useParams<{ id: string }>();
@@ -143,21 +141,14 @@ export function MonitorForm({ mode }: { mode?: 'clone' }) {
 }
 
 function TypeFields({ type }: { type: string }) {
-  if (httpTypes.includes(type)) {
-    return (
-      <>
-        <HttpFields />
-        {(type === 'keyword' || type === 'json-query') && <KeywordFields />}
-      </>
-    );
-  }
+  if (httpTypes.includes(type)) return <HttpFields />;
   if (type === 'port') return <TcpFields />;
   if (type === 'ping' || type === 'tailscale-ping') return <PingFields />;
   if (type === 'dns') return <DnsFields />;
-  if (type === 'docker') return <DockerFields />;
+  if (type === 'smtp') return <SmtpFields />;
   if (type === 'mqtt') return <MqttFields />;
   if (type === 'grpc-keyword') return <GrpcFields />;
-  if (databaseTypes.includes(type)) return <DatabaseFields type={type} />;
+  if (type === 'redis') return <DatabaseFields />;
   if (type === 'push') return <PushFields />;
   return null;
 }

@@ -2127,10 +2127,18 @@ components:
         keyword:
           type: string
           maxLength: 500
-          description: Text to search for in the response body (keyword/JSON-query monitor types).
+          description: Text to search for in the response body.
         invertKeyword:
           type: boolean
           description: If true, the monitor is UP when the keyword is NOT found in the response.
+        jsonPath:
+          type: string
+          maxLength: 255
+          description: JSONPath expression to evaluate against the response body.
+        expectedValue:
+          type: string
+          maxLength: 255
+          description: Expected value to compare against the JSONPath result.
         ignoreTls:
           type: boolean
           description: If true, TLS certificate errors are ignored when connecting to the target.
@@ -2322,6 +2330,12 @@ components:
           maxLength: 500
         invertKeyword:
           type: boolean
+        jsonPath:
+          type: string
+          maxLength: 255
+        expectedValue:
+          type: string
+          maxLength: 255
         ignoreTls:
           type: boolean
         maxRedirects:

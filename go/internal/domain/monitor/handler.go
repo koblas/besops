@@ -178,6 +178,8 @@ func monitorToOAS(m *Monitor) oas.Monitor {
 		RetryInterval:       oas.NewOptInt(m.RetryInterval),
 		Keyword:             oasutil.PtrToOptString(m.Keyword),
 		InvertKeyword:       oas.NewOptBool(m.InvertKeyword),
+		JsonPath:            oasutil.PtrToOptString(m.JsonPath),
+		ExpectedValue:       oasutil.PtrToOptString(m.ExpectedValue),
 		IgnoreTls:           oas.NewOptBool(m.IgnoreTLS),
 		MaxRedirects:        oas.NewOptInt(m.MaxRedirects),
 		AcceptedStatusCodes: codes,
@@ -239,6 +241,8 @@ func monitorFromInput(req *oas.MonitorInput, userID string) *Monitor {
 		RetryInterval:       oasutil.OptIntValue(req.RetryInterval, 60),
 		Keyword:             oasutil.OptStringValue(req.Keyword),
 		InvertKeyword:       oasutil.OptBoolValue(req.InvertKeyword, false),
+		JsonPath:            oasutil.OptStringValue(req.JsonPath),
+		ExpectedValue:       oasutil.OptStringValue(req.ExpectedValue),
 		IgnoreTLS:           oasutil.OptBoolValue(req.IgnoreTls, false),
 		MaxRedirects:        oasutil.OptIntValue(req.MaxRedirects, 10),
 		AcceptedStatusCodes: codes,
@@ -312,6 +316,12 @@ func applyMonitorInput(m *Monitor, req *oas.MonitorInput) {
 	}
 	if req.InvertKeyword.IsSet() {
 		m.InvertKeyword = req.InvertKeyword.Value
+	}
+	if req.JsonPath.IsSet() {
+		m.JsonPath = req.JsonPath.Value
+	}
+	if req.ExpectedValue.IsSet() {
+		m.ExpectedValue = req.ExpectedValue.Value
 	}
 	if req.IgnoreTls.IsSet() {
 		m.IgnoreTLS = req.IgnoreTls.Value

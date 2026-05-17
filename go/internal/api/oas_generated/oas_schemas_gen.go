@@ -2316,10 +2316,14 @@ type Monitor struct {
 	Timeout OptInt `json:"timeout"`
 	// Time (in seconds) between retry attempts when the monitor is in PENDING state.
 	RetryInterval OptInt `json:"retryInterval"`
-	// Text to search for in the response body (keyword/JSON-query monitor types).
+	// Text to search for in the response body.
 	Keyword OptString `json:"keyword"`
 	// If true, the monitor is UP when the keyword is NOT found in the response.
 	InvertKeyword OptBool `json:"invertKeyword"`
+	// JSONPath expression to evaluate against the response body.
+	JsonPath OptString `json:"jsonPath"`
+	// Expected value to compare against the JSONPath result.
+	ExpectedValue OptString `json:"expectedValue"`
 	// If true, TLS certificate errors are ignored when connecting to the target.
 	IgnoreTls OptBool `json:"ignoreTls"`
 	// Maximum number of HTTP redirects to follow.
@@ -2447,6 +2451,16 @@ func (s *Monitor) GetKeyword() OptString {
 // GetInvertKeyword returns the value of InvertKeyword.
 func (s *Monitor) GetInvertKeyword() OptBool {
 	return s.InvertKeyword
+}
+
+// GetJsonPath returns the value of JsonPath.
+func (s *Monitor) GetJsonPath() OptString {
+	return s.JsonPath
+}
+
+// GetExpectedValue returns the value of ExpectedValue.
+func (s *Monitor) GetExpectedValue() OptString {
+	return s.ExpectedValue
 }
 
 // GetIgnoreTls returns the value of IgnoreTls.
@@ -2667,6 +2681,16 @@ func (s *Monitor) SetKeyword(val OptString) {
 // SetInvertKeyword sets the value of InvertKeyword.
 func (s *Monitor) SetInvertKeyword(val OptBool) {
 	s.InvertKeyword = val
+}
+
+// SetJsonPath sets the value of JsonPath.
+func (s *Monitor) SetJsonPath(val OptString) {
+	s.JsonPath = val
+}
+
+// SetExpectedValue sets the value of ExpectedValue.
+func (s *Monitor) SetExpectedValue(val OptString) {
+	s.ExpectedValue = val
 }
 
 // SetIgnoreTls sets the value of IgnoreTls.
@@ -2945,6 +2969,8 @@ type MonitorInput struct {
 	RetryInterval       OptInt      `json:"retryInterval"`
 	Keyword             OptString   `json:"keyword"`
 	InvertKeyword       OptBool     `json:"invertKeyword"`
+	JsonPath            OptString   `json:"jsonPath"`
+	ExpectedValue       OptString   `json:"expectedValue"`
 	IgnoreTls           OptBool     `json:"ignoreTls"`
 	MaxRedirects        OptInt      `json:"maxRedirects"`
 	AcceptedStatusCodes []string    `json:"acceptedStatusCodes"`
@@ -3034,6 +3060,16 @@ func (s *MonitorInput) GetKeyword() OptString {
 // GetInvertKeyword returns the value of InvertKeyword.
 func (s *MonitorInput) GetInvertKeyword() OptBool {
 	return s.InvertKeyword
+}
+
+// GetJsonPath returns the value of JsonPath.
+func (s *MonitorInput) GetJsonPath() OptString {
+	return s.JsonPath
+}
+
+// GetExpectedValue returns the value of ExpectedValue.
+func (s *MonitorInput) GetExpectedValue() OptString {
+	return s.ExpectedValue
 }
 
 // GetIgnoreTls returns the value of IgnoreTls.
@@ -3239,6 +3275,16 @@ func (s *MonitorInput) SetKeyword(val OptString) {
 // SetInvertKeyword sets the value of InvertKeyword.
 func (s *MonitorInput) SetInvertKeyword(val OptBool) {
 	s.InvertKeyword = val
+}
+
+// SetJsonPath sets the value of JsonPath.
+func (s *MonitorInput) SetJsonPath(val OptString) {
+	s.JsonPath = val
+}
+
+// SetExpectedValue sets the value of ExpectedValue.
+func (s *MonitorInput) SetExpectedValue(val OptString) {
+	s.ExpectedValue = val
 }
 
 // SetIgnoreTls sets the value of IgnoreTls.

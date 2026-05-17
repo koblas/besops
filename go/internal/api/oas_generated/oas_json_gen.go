@@ -5187,6 +5187,18 @@ func (s *Monitor) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.JsonPath.Set {
+			e.FieldStart("jsonPath")
+			s.JsonPath.Encode(e)
+		}
+	}
+	{
+		if s.ExpectedValue.Set {
+			e.FieldStart("expectedValue")
+			s.ExpectedValue.Encode(e)
+		}
+	}
+	{
 		if s.IgnoreTls.Set {
 			e.FieldStart("ignoreTls")
 			s.IgnoreTls.Encode(e)
@@ -5386,7 +5398,7 @@ func (s *Monitor) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfMonitor = [44]string{
+var jsonFieldsNameOfMonitor = [46]string{
 	0:  "id",
 	1:  "name",
 	2:  "type",
@@ -5400,37 +5412,39 @@ var jsonFieldsNameOfMonitor = [44]string{
 	10: "retryInterval",
 	11: "keyword",
 	12: "invertKeyword",
-	13: "ignoreTls",
-	14: "maxRedirects",
-	15: "acceptedStatusCodes",
-	16: "method",
-	17: "headers",
-	18: "body",
-	19: "basicAuthUser",
-	20: "basicAuthPass",
-	21: "pushToken",
-	22: "description",
-	23: "upsideDown",
-	24: "dnsResolveType",
-	25: "dnsResolveServer",
-	26: "mqttTopic",
-	27: "mqttSuccessMessage",
-	28: "mqttUsername",
-	29: "mqttPassword",
-	30: "databaseQuery",
-	31: "dockerHost",
-	32: "dockerContainer",
-	33: "proxyId",
-	34: "grpcUrl",
-	35: "grpcServiceName",
-	36: "grpcMethod",
-	37: "grpcEnableTls",
-	38: "parentId",
-	39: "tags",
-	40: "notificationIds",
-	41: "resendInterval",
-	42: "packetSize",
-	43: "expiryNotification",
+	13: "jsonPath",
+	14: "expectedValue",
+	15: "ignoreTls",
+	16: "maxRedirects",
+	17: "acceptedStatusCodes",
+	18: "method",
+	19: "headers",
+	20: "body",
+	21: "basicAuthUser",
+	22: "basicAuthPass",
+	23: "pushToken",
+	24: "description",
+	25: "upsideDown",
+	26: "dnsResolveType",
+	27: "dnsResolveServer",
+	28: "mqttTopic",
+	29: "mqttSuccessMessage",
+	30: "mqttUsername",
+	31: "mqttPassword",
+	32: "databaseQuery",
+	33: "dockerHost",
+	34: "dockerContainer",
+	35: "proxyId",
+	36: "grpcUrl",
+	37: "grpcServiceName",
+	38: "grpcMethod",
+	39: "grpcEnableTls",
+	40: "parentId",
+	41: "tags",
+	42: "notificationIds",
+	43: "resendInterval",
+	44: "packetSize",
+	45: "expiryNotification",
 }
 
 // Decode decodes Monitor from json.
@@ -5578,6 +5592,26 @@ func (s *Monitor) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"invertKeyword\"")
+			}
+		case "jsonPath":
+			if err := func() error {
+				s.JsonPath.Reset()
+				if err := s.JsonPath.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"jsonPath\"")
+			}
+		case "expectedValue":
+			if err := func() error {
+				s.ExpectedValue.Reset()
+				if err := s.ExpectedValue.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"expectedValue\"")
 			}
 		case "ignoreTls":
 			if err := func() error {
@@ -6109,6 +6143,18 @@ func (s *MonitorInput) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.JsonPath.Set {
+			e.FieldStart("jsonPath")
+			s.JsonPath.Encode(e)
+		}
+	}
+	{
+		if s.ExpectedValue.Set {
+			e.FieldStart("expectedValue")
+			s.ExpectedValue.Encode(e)
+		}
+	}
+	{
 		if s.IgnoreTls.Set {
 			e.FieldStart("ignoreTls")
 			s.IgnoreTls.Encode(e)
@@ -6292,7 +6338,7 @@ func (s *MonitorInput) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfMonitorInput = [41]string{
+var jsonFieldsNameOfMonitorInput = [43]string{
 	0:  "name",
 	1:  "type",
 	2:  "active",
@@ -6305,35 +6351,37 @@ var jsonFieldsNameOfMonitorInput = [41]string{
 	9:  "retryInterval",
 	10: "keyword",
 	11: "invertKeyword",
-	12: "ignoreTls",
-	13: "maxRedirects",
-	14: "acceptedStatusCodes",
-	15: "method",
-	16: "headers",
-	17: "body",
-	18: "basicAuthUser",
-	19: "basicAuthPass",
-	20: "description",
-	21: "upsideDown",
-	22: "dnsResolveType",
-	23: "dnsResolveServer",
-	24: "mqttTopic",
-	25: "mqttSuccessMessage",
-	26: "mqttUsername",
-	27: "mqttPassword",
-	28: "databaseQuery",
-	29: "dockerHost",
-	30: "dockerContainer",
-	31: "proxyId",
-	32: "grpcUrl",
-	33: "grpcServiceName",
-	34: "grpcMethod",
-	35: "grpcEnableTls",
-	36: "parentId",
-	37: "notificationIds",
-	38: "resendInterval",
-	39: "packetSize",
-	40: "expiryNotification",
+	12: "jsonPath",
+	13: "expectedValue",
+	14: "ignoreTls",
+	15: "maxRedirects",
+	16: "acceptedStatusCodes",
+	17: "method",
+	18: "headers",
+	19: "body",
+	20: "basicAuthUser",
+	21: "basicAuthPass",
+	22: "description",
+	23: "upsideDown",
+	24: "dnsResolveType",
+	25: "dnsResolveServer",
+	26: "mqttTopic",
+	27: "mqttSuccessMessage",
+	28: "mqttUsername",
+	29: "mqttPassword",
+	30: "databaseQuery",
+	31: "dockerHost",
+	32: "dockerContainer",
+	33: "proxyId",
+	34: "grpcUrl",
+	35: "grpcServiceName",
+	36: "grpcMethod",
+	37: "grpcEnableTls",
+	38: "parentId",
+	39: "notificationIds",
+	40: "resendInterval",
+	41: "packetSize",
+	42: "expiryNotification",
 }
 
 // Decode decodes MonitorInput from json.
@@ -6469,6 +6517,26 @@ func (s *MonitorInput) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"invertKeyword\"")
+			}
+		case "jsonPath":
+			if err := func() error {
+				s.JsonPath.Reset()
+				if err := s.JsonPath.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"jsonPath\"")
+			}
+		case "expectedValue":
+			if err := func() error {
+				s.ExpectedValue.Reset()
+				if err := s.ExpectedValue.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"expectedValue\"")
 			}
 		case "ignoreTls":
 			if err := func() error {

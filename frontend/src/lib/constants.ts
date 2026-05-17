@@ -22,11 +22,11 @@ export const STATUS_LABELS: Record<StatusValue, string> = {
 };
 
 export const MONITOR_TYPE_CATEGORIES = {
-  General: ['http', 'keyword', 'json-query', 'port', 'ping', 'dns', 'push', 'group'],
-  Specific: ['steam', 'gamedig', 'mqtt', 'snmp', 'tailscale-ping', 'manual'],
-  Database: ['postgres', 'mysql', 'mongodb', 'sqlserver', 'redis', 'radius', 'rabbitmq'],
-  Docker: ['docker'],
-  Browser: ['real-browser'],
+  General: ['http', 'port', 'ping', 'dns', 'push', 'group'],
+  Network: ['smtp', 'tailscale-ping'],
+  Messaging: ['mqtt'],
+  Infrastructure: ['grpc-keyword'],
+  Database: ['redis'],
 } as const;
 
 export const MONITOR_TYPES = Object.values(MONITOR_TYPE_CATEGORIES).flat();

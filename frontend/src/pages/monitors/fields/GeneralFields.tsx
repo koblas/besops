@@ -10,9 +10,6 @@ const monitorTypeGroups = [
     label: 'HTTP',
     options: [
       { value: 'http', label: 'HTTP(s)' },
-      { value: 'keyword', label: 'HTTP(s) — Keyword' },
-      { value: 'json-query', label: 'HTTP(s) — JSON Query' },
-      { value: 'real-browser', label: 'HTTP(s) — Browser' },
     ],
   },
   {
@@ -21,40 +18,26 @@ const monitorTypeGroups = [
       { value: 'port', label: 'TCP Port' },
       { value: 'ping', label: 'Ping' },
       { value: 'dns', label: 'DNS' },
+      { value: 'smtp', label: 'SMTP' },
       { value: 'tailscale-ping', label: 'Tailscale Ping' },
     ],
   },
   {
     label: 'Database',
     options: [
-      { value: 'postgres', label: 'PostgreSQL' },
-      { value: 'mysql', label: 'MySQL / MariaDB' },
-      { value: 'mongodb', label: 'MongoDB' },
       { value: 'redis', label: 'Redis' },
-      { value: 'sqlserver', label: 'SQL Server' },
     ],
   },
   {
     label: 'Messaging',
     options: [
       { value: 'mqtt', label: 'MQTT' },
-      { value: 'rabbitmq', label: 'RabbitMQ' },
     ],
   },
   {
     label: 'Infrastructure',
     options: [
-      { value: 'docker', label: 'Docker Container' },
       { value: 'grpc-keyword', label: 'gRPC' },
-      { value: 'snmp', label: 'SNMP' },
-      { value: 'radius', label: 'Radius' },
-    ],
-  },
-  {
-    label: 'Game',
-    options: [
-      { value: 'steam', label: 'Steam Game Server' },
-      { value: 'gamedig', label: 'GameDig' },
     ],
   },
   {
@@ -62,7 +45,6 @@ const monitorTypeGroups = [
     options: [
       { value: 'push', label: 'Push (passive)' },
       { value: 'group', label: 'Group' },
-      { value: 'manual', label: 'Manual' },
     ],
   },
 ];

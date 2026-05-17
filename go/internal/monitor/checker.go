@@ -39,6 +39,8 @@ type Config struct {
 	IgnoreTLS     bool
 	Keyword       string
 	KeywordType   string
+	JsonPath      string
+	ExpectedValue string
 	ProxyID       *string
 	PushToken     string
 

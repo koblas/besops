@@ -62,6 +62,8 @@ type Monitor struct {
 	Timeout              int       `db:"timeout"`
 	ParentID             *string   `db:"parent_id"`
 	InvertKeyword        bool      `db:"invert_keyword"`
+	JsonPath             string    `db:"json_path"`
+	ExpectedValue        string    `db:"expected_value"`
 	ExpiryNotification   bool      `db:"expiry_notification"`
 	PacketSize           int       `db:"packet_size"`
 	ResendInterval       int       `db:"resend_interval"`

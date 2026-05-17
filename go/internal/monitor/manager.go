@@ -118,6 +118,8 @@ func modelToConfig(mon *domainmonitor.Monitor) *Config {
 		RetryInterval: time.Duration(mon.RetryInterval) * time.Second,
 		IgnoreTLS:     mon.IgnoreTLS,
 		Keyword:       mon.Keyword,
+		JsonPath:      mon.JsonPath,
+		ExpectedValue: mon.ExpectedValue,
 		ProxyID:       mon.ProxyID,
 		PushToken:     mon.PushToken,
 		HTTP: HTTPConfig{

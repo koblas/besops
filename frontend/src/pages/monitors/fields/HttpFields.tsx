@@ -146,6 +146,61 @@ export function HttpFields() {
       <Collapse
         ghost
         items={[{
+          key: 'keyword',
+          label: 'Keyword Check',
+          children: (
+            <>
+              <Form.Item
+                name="keyword"
+                label="Keyword"
+                extra="Case-sensitive text to look for in the response body. Leave empty to skip."
+              >
+                <Input placeholder="alive" />
+              </Form.Item>
+
+              <Form.Item
+                name="invertKeyword"
+                label="Alert When Found"
+                valuePropName="checked"
+                extra="By default, alerts when the keyword is MISSING. Enable to alert when it IS found."
+              >
+                <Switch />
+              </Form.Item>
+            </>
+          ),
+        }]}
+      />
+
+      <Collapse
+        ghost
+        items={[{
+          key: 'jsonQuery',
+          label: 'JSON Query',
+          children: (
+            <>
+              <Form.Item
+                name="jsonPath"
+                label="JSON Path"
+                extra="Dot-notation path into the JSON response (e.g. data.status or items.0.id). Leave empty to skip."
+              >
+                <Input placeholder="data.status" style={{ fontFamily: 'monospace' }} />
+              </Form.Item>
+
+              <Form.Item
+                name="expectedValue"
+                label="Expected Value"
+                extra="The value the path must return. If empty, the check passes when the path exists."
+              >
+                <Input placeholder="ok" style={{ fontFamily: 'monospace' }} />
+              </Form.Item>
+            </>
+          ),
+        }]}
+      />
+
+      <Collapse
+        ghost
+        items={[{
           key: 'tls',
           label: 'TLS & Proxy',
           children: (
