@@ -113,7 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const setup = useCallback(async (username: string, password: string) => {
-    const { data, error } = await api.POST('/auth/setup', {
+    const { error } = await api.POST('/auth/setup', {
       body: { username, password },
     });
     if (error) {

@@ -15,41 +15,45 @@ type DiscordNotifier struct{}
 func (n *DiscordNotifier) Name() string { return "discord" }
 
 func (n *DiscordNotifier) Send(ctx context.Context, config map[string]any, msg string, monitor *notification.MonitorInfo, heartbeat *notification.HeartbeatInfo) error {
-	webhookURL, _ := config["discordWebhookUrl"].(string)
+	webhookURL, _ := config["discordWebhookURL"].(string)
 	if webhookURL == "" {
-		return fmt.Errorf("discordWebhookUrl is required")
+		return fmt.Errorf("discordWebhookURL is required")
 	}
 
-	color := 0xe74c3c
-	statusText := "Down"
+	color := 0xe74c3c // red
 	if heartbeat != nil && heartbeat.Status == 1 {
-		color = 0x2ecc71
-		statusText = "Up"
+		color = 0x2ecc71 // green
+	}
+
+	username, _ := config["discordUsername"].(string)
+	if username == "" {
+		username = "Bes Ops"
 	}
 
 	monitorName := ""
+	monitorURL := ""
 	if monitor != nil {
 		monitorName = monitor.Name
+		monitorURL = monitor.URL
 	}
 
 	embed := map[string]any{
-		"title":       fmt.Sprintf("%s: %s", statusText, monitorName),
+		"title":       monitorName,
 		"description": msg,
 		"color":       color,
 	}
-
-	if heartbeat != nil && heartbeat.Time != "" {
-		embed["timestamp"] = heartbeat.Time
+	if monitorURL != "" {
+		embed["url"] = monitorURL
 	}
 
 	payload := map[string]any{
-		"username": "Bes Ops",
+		"username": username,
 		"embeds":   []any{embed},
 	}
 
-	prefix, _ := config["discordPrefixMessage"].(string)
-	if prefix != "" {
-		payload["content"] = prefix
+	prefixContent, _ := config["discordPrefixMessage"].(string)
+	if prefixContent != "" {
+		payload["content"] = prefixContent
 	}
 
 	body, err := json.Marshal(payload)

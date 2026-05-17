@@ -1,11 +1,11 @@
 package providers
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/koblas/besops/internal/notification"
 )
@@ -25,17 +25,19 @@ func (n *TelegramNotifier) Send(ctx context.Context, config map[string]any, msg 
 		return fmt.Errorf("telegramChatID is required")
 	}
 
-	threadID, _ := config["telegramMessageThreadID"].(string)
+	emoji := "🔴"
+	if heartbeat != nil && heartbeat.Status == 1 {
+		emoji = "✅"
+	}
+
+	text := fmt.Sprintf("%s %s", emoji, msg)
 
 	url := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", botToken)
 
 	payload := map[string]any{
 		"chat_id":    chatID,
-		"text":       msg,
+		"text":       text,
 		"parse_mode": "HTML",
-	}
-	if threadID != "" {
-		payload["message_thread_id"] = threadID
 	}
 
 	body, err := json.Marshal(payload)
@@ -43,7 +45,7 @@ func (n *TelegramNotifier) Send(ctx context.Context, config map[string]any, msg 
 		return fmt.Errorf("marshaling telegram payload: %w", err)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(body))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, strings.NewReader(string(body)))
 	if err != nil {
 		return fmt.Errorf("creating telegram request: %w", err)
 	}
@@ -56,7 +58,7 @@ func (n *TelegramNotifier) Send(ctx context.Context, config map[string]any, msg 
 	defer resp.Body.Close()
 
 	if resp.StatusCode >= 400 {
-		return fmt.Errorf("telegram API returned status %d", resp.StatusCode)
+		return fmt.Errorf("telegram returned status %d", resp.StatusCode)
 	}
 
 	return nil

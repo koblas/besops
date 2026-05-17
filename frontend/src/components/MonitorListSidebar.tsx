@@ -36,7 +36,7 @@ export function MonitorListSidebar() {
     if (q) {
       for (const m of monitors) {
         if (matched.has(m.id) && m.parentId) {
-          let parentId: string | undefined = m.parentId;
+          let parentId: string | null | undefined = m.parentId;
           while (parentId) {
             matched.add(parentId);
             const parent = monitors.find(p => p.id === parentId);

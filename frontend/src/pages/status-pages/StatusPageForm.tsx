@@ -218,7 +218,7 @@ export function StatusPageForm() {
                   </Tooltip>
                   <Popconfirm
                     title="Remove this group?"
-                    description={group.monitorIds.length > 0 ? `${group.monitorIds.length} monitor(s) will be removed from the page` : undefined}
+                    description={(group.monitorIds?.length ?? 0) > 0 ? `${group.monitorIds!.length} monitor(s) will be removed from the page` : undefined}
                     onConfirm={() => removeGroup(idx)}
                     okText="Remove"
                     okButtonProps={{ danger: true }}

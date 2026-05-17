@@ -162,6 +162,7 @@ func (a *App) Start(ctx context.Context) error {
 	notifRegistry.Register(&providers.DiscordNotifier{})
 	notifRegistry.Register(&providers.TelegramNotifier{})
 	notifRegistry.Register(&providers.SMTPNotifier{})
+	notifRegistry.Register(&providers.PagerDutyNotifier{})
 	notifDispatcher := corenotification.NewDispatcher(notifRegistry, &notificationRuleAdapter{repo: notifRepo})
 	monitorNotifier := &monitorNotificationAdapter{dispatcher: notifDispatcher, monitorRepo: monitorRepo}
 
