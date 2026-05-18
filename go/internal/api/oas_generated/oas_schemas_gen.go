@@ -382,20 +382,6 @@ func (s *CreateAPIKeyCreated) SetKey(val string) {
 	s.Key = val
 }
 
-type CreateDockerHostCreated struct {
-	ID uuid.UUID `json:"id"`
-}
-
-// GetID returns the value of ID.
-func (s *CreateDockerHostCreated) GetID() uuid.UUID {
-	return s.ID
-}
-
-// SetID sets the value of ID.
-func (s *CreateDockerHostCreated) SetID(val uuid.UUID) {
-	s.ID = val
-}
-
 type CreateMaintenanceCreated struct {
 	ID uuid.UUID `json:"id"`
 }
@@ -469,9 +455,6 @@ func (s *CreateStatusPageCreated) SetSlug(val string) {
 // DeleteAPIKeyNoContent is response for DeleteAPIKey operation.
 type DeleteAPIKeyNoContent struct{}
 
-// DeleteDockerHostNoContent is response for DeleteDockerHost operation.
-type DeleteDockerHostNoContent struct{}
-
 // DeleteIncidentNoContent is response for DeleteIncident operation.
 type DeleteIncidentNoContent struct{}
 
@@ -510,184 +493,6 @@ func (s *Disable2FAReq) GetCurrentPassword() string {
 // SetCurrentPassword sets the value of CurrentPassword.
 func (s *Disable2FAReq) SetCurrentPassword(val string) {
 	s.CurrentPassword = val
-}
-
-// A Docker daemon connection used by Docker-type monitors to check container health.
-// Ref: #/components/schemas/DockerHost
-type DockerHost struct {
-	// Unique identifier for this Docker host.
-	ID uuid.UUID `json:"id"`
-	// Human-readable name for this Docker host connection.
-	Name string `json:"name"`
-	// Connection method: 'socket' for local Unix socket, 'tcp' for remote TCP connection.
-	DockerType DockerHostDockerType `json:"dockerType"`
-	// Connection URI (e.g., '/var/run/docker.sock' for socket, 'tcp://host:2376' for TCP).
-	DockerDaemon OptString `json:"dockerDaemon"`
-}
-
-// GetID returns the value of ID.
-func (s *DockerHost) GetID() uuid.UUID {
-	return s.ID
-}
-
-// GetName returns the value of Name.
-func (s *DockerHost) GetName() string {
-	return s.Name
-}
-
-// GetDockerType returns the value of DockerType.
-func (s *DockerHost) GetDockerType() DockerHostDockerType {
-	return s.DockerType
-}
-
-// GetDockerDaemon returns the value of DockerDaemon.
-func (s *DockerHost) GetDockerDaemon() OptString {
-	return s.DockerDaemon
-}
-
-// SetID sets the value of ID.
-func (s *DockerHost) SetID(val uuid.UUID) {
-	s.ID = val
-}
-
-// SetName sets the value of Name.
-func (s *DockerHost) SetName(val string) {
-	s.Name = val
-}
-
-// SetDockerType sets the value of DockerType.
-func (s *DockerHost) SetDockerType(val DockerHostDockerType) {
-	s.DockerType = val
-}
-
-// SetDockerDaemon sets the value of DockerDaemon.
-func (s *DockerHost) SetDockerDaemon(val OptString) {
-	s.DockerDaemon = val
-}
-
-// Connection method: 'socket' for local Unix socket, 'tcp' for remote TCP connection.
-type DockerHostDockerType string
-
-const (
-	DockerHostDockerTypeSocket DockerHostDockerType = "socket"
-	DockerHostDockerTypeTCP    DockerHostDockerType = "tcp"
-)
-
-// AllValues returns all DockerHostDockerType values.
-func (DockerHostDockerType) AllValues() []DockerHostDockerType {
-	return []DockerHostDockerType{
-		DockerHostDockerTypeSocket,
-		DockerHostDockerTypeTCP,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s DockerHostDockerType) MarshalText() ([]byte, error) {
-	switch s {
-	case DockerHostDockerTypeSocket:
-		return []byte(s), nil
-	case DockerHostDockerTypeTCP:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *DockerHostDockerType) UnmarshalText(data []byte) error {
-	switch DockerHostDockerType(data) {
-	case DockerHostDockerTypeSocket:
-		*s = DockerHostDockerTypeSocket
-		return nil
-	case DockerHostDockerTypeTCP:
-		*s = DockerHostDockerTypeTCP
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
-
-// Input for adding or updating a Docker host connection.
-// Ref: #/components/schemas/DockerHostInput
-type DockerHostInput struct {
-	// Human-readable name for this Docker host connection.
-	Name string `json:"name"`
-	// Connection method: 'socket' for local Unix socket, 'tcp' for remote TCP connection.
-	DockerType DockerHostInputDockerType `json:"dockerType"`
-	// Connection URI (e.g., '/var/run/docker.sock' for socket, 'tcp://host:2376' for TCP).
-	DockerDaemon OptString `json:"dockerDaemon"`
-}
-
-// GetName returns the value of Name.
-func (s *DockerHostInput) GetName() string {
-	return s.Name
-}
-
-// GetDockerType returns the value of DockerType.
-func (s *DockerHostInput) GetDockerType() DockerHostInputDockerType {
-	return s.DockerType
-}
-
-// GetDockerDaemon returns the value of DockerDaemon.
-func (s *DockerHostInput) GetDockerDaemon() OptString {
-	return s.DockerDaemon
-}
-
-// SetName sets the value of Name.
-func (s *DockerHostInput) SetName(val string) {
-	s.Name = val
-}
-
-// SetDockerType sets the value of DockerType.
-func (s *DockerHostInput) SetDockerType(val DockerHostInputDockerType) {
-	s.DockerType = val
-}
-
-// SetDockerDaemon sets the value of DockerDaemon.
-func (s *DockerHostInput) SetDockerDaemon(val OptString) {
-	s.DockerDaemon = val
-}
-
-// Connection method: 'socket' for local Unix socket, 'tcp' for remote TCP connection.
-type DockerHostInputDockerType string
-
-const (
-	DockerHostInputDockerTypeSocket DockerHostInputDockerType = "socket"
-	DockerHostInputDockerTypeTCP    DockerHostInputDockerType = "tcp"
-)
-
-// AllValues returns all DockerHostInputDockerType values.
-func (DockerHostInputDockerType) AllValues() []DockerHostInputDockerType {
-	return []DockerHostInputDockerType{
-		DockerHostInputDockerTypeSocket,
-		DockerHostInputDockerTypeTCP,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s DockerHostInputDockerType) MarshalText() ([]byte, error) {
-	switch s {
-	case DockerHostInputDockerTypeSocket:
-		return []byte(s), nil
-	case DockerHostInputDockerTypeTCP:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *DockerHostInputDockerType) UnmarshalText(data []byte) error {
-	switch DockerHostInputDockerType(data) {
-	case DockerHostInputDockerTypeSocket:
-		*s = DockerHostInputDockerTypeSocket
-		return nil
-	case DockerHostInputDockerTypeTCP:
-		*s = DockerHostInputDockerTypeTCP
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
 }
 
 type Enable2FAReq struct {
@@ -2360,10 +2165,6 @@ type Monitor struct {
 	MqttPassword OptString `json:"mqttPassword"`
 	// SQL query to execute for database monitors. A successful query execution indicates UP.
 	DatabaseQuery OptString `json:"databaseQuery"`
-	// ID of the Docker host to use for Docker container monitors.
-	DockerHost OptUUID `json:"dockerHost"`
-	// Docker container name or ID to monitor.
-	DockerContainer OptString `json:"dockerContainer"`
 	// ID of the proxy to use for outbound connections.
 	ProxyId OptUUID `json:"proxyId"`
 	// Target URL for gRPC health check monitors.
@@ -2551,16 +2352,6 @@ func (s *Monitor) GetMqttPassword() OptString {
 // GetDatabaseQuery returns the value of DatabaseQuery.
 func (s *Monitor) GetDatabaseQuery() OptString {
 	return s.DatabaseQuery
-}
-
-// GetDockerHost returns the value of DockerHost.
-func (s *Monitor) GetDockerHost() OptUUID {
-	return s.DockerHost
-}
-
-// GetDockerContainer returns the value of DockerContainer.
-func (s *Monitor) GetDockerContainer() OptString {
-	return s.DockerContainer
 }
 
 // GetProxyId returns the value of ProxyId.
@@ -2783,16 +2574,6 @@ func (s *Monitor) SetDatabaseQuery(val OptString) {
 	s.DatabaseQuery = val
 }
 
-// SetDockerHost sets the value of DockerHost.
-func (s *Monitor) SetDockerHost(val OptUUID) {
-	s.DockerHost = val
-}
-
-// SetDockerContainer sets the value of DockerContainer.
-func (s *Monitor) SetDockerContainer(val OptString) {
-	s.DockerContainer = val
-}
-
 // SetProxyId sets the value of ProxyId.
 func (s *Monitor) SetProxyId(val OptUUID) {
 	s.ProxyId = val
@@ -2988,8 +2769,6 @@ type MonitorInput struct {
 	MqttUsername        OptString   `json:"mqttUsername"`
 	MqttPassword        OptString   `json:"mqttPassword"`
 	DatabaseQuery       OptString   `json:"databaseQuery"`
-	DockerHost          OptUUID     `json:"dockerHost"`
-	DockerContainer     OptString   `json:"dockerContainer"`
 	ProxyId             OptUUID     `json:"proxyId"`
 	GrpcUrl             OptString   `json:"grpcUrl"`
 	GrpcServiceName     OptString   `json:"grpcServiceName"`
@@ -3155,16 +2934,6 @@ func (s *MonitorInput) GetMqttPassword() OptString {
 // GetDatabaseQuery returns the value of DatabaseQuery.
 func (s *MonitorInput) GetDatabaseQuery() OptString {
 	return s.DatabaseQuery
-}
-
-// GetDockerHost returns the value of DockerHost.
-func (s *MonitorInput) GetDockerHost() OptUUID {
-	return s.DockerHost
-}
-
-// GetDockerContainer returns the value of DockerContainer.
-func (s *MonitorInput) GetDockerContainer() OptString {
-	return s.DockerContainer
 }
 
 // GetProxyId returns the value of ProxyId.
@@ -3372,16 +3141,6 @@ func (s *MonitorInput) SetDatabaseQuery(val OptString) {
 	s.DatabaseQuery = val
 }
 
-// SetDockerHost sets the value of DockerHost.
-func (s *MonitorInput) SetDockerHost(val OptUUID) {
-	s.DockerHost = val
-}
-
-// SetDockerContainer sets the value of DockerContainer.
-func (s *MonitorInput) SetDockerContainer(val OptString) {
-	s.DockerContainer = val
-}
-
 // SetProxyId sets the value of ProxyId.
 func (s *MonitorInput) SetProxyId(val OptUUID) {
 	s.ProxyId = val
@@ -3573,7 +3332,6 @@ const (
 	MonitorTypeJSONQuery     MonitorType = "json-query"
 	MonitorTypeGrpcKeyword   MonitorType = "grpc-keyword"
 	MonitorTypeDNS           MonitorType = "dns"
-	MonitorTypeDocker        MonitorType = "docker"
 	MonitorTypePush          MonitorType = "push"
 	MonitorTypeSteam         MonitorType = "steam"
 	MonitorTypeGamedig       MonitorType = "gamedig"
@@ -3602,7 +3360,6 @@ func (MonitorType) AllValues() []MonitorType {
 		MonitorTypeJSONQuery,
 		MonitorTypeGrpcKeyword,
 		MonitorTypeDNS,
-		MonitorTypeDocker,
 		MonitorTypePush,
 		MonitorTypeSteam,
 		MonitorTypeGamedig,
@@ -3638,8 +3395,6 @@ func (s MonitorType) MarshalText() ([]byte, error) {
 	case MonitorTypeGrpcKeyword:
 		return []byte(s), nil
 	case MonitorTypeDNS:
-		return []byte(s), nil
-	case MonitorTypeDocker:
 		return []byte(s), nil
 	case MonitorTypePush:
 		return []byte(s), nil
@@ -3701,9 +3456,6 @@ func (s *MonitorType) UnmarshalText(data []byte) error {
 		return nil
 	case MonitorTypeDNS:
 		*s = MonitorTypeDNS
-		return nil
-	case MonitorTypeDocker:
-		*s = MonitorTypeDocker
 		return nil
 	case MonitorTypePush:
 		*s = MonitorTypePush
@@ -6115,9 +5867,6 @@ func (s *TokenResponse) SetToken(val string) {
 
 func (*TokenResponse) changePasswordRes() {}
 func (*TokenResponse) refreshTokenRes()   {}
-
-// UpdateDockerHostOK is response for UpdateDockerHost operation.
-type UpdateDockerHostOK struct{}
 
 // UpdateMonitorTagOK is response for UpdateMonitorTag operation.
 type UpdateMonitorTagOK struct{}

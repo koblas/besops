@@ -8,7 +8,6 @@ DROP TABLE IF EXISTS notification_sent_history;
 DROP TABLE IF EXISTS api_key;
 DROP TABLE IF EXISTS setting;
 DROP TABLE IF EXISTS proxy;
-DROP TABLE IF EXISTS docker_host;
 DROP TABLE IF EXISTS monitor_tls_info;
 DROP TABLE IF EXISTS monitor_maintenance;
 DROP TABLE IF EXISTS maintenance_timeslot;

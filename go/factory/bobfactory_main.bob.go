@@ -13,7 +13,6 @@ import (
 
 type Factory struct {
 	baseAPIKeyMods                  APIKeyModSlice
-	baseDockerHostMods              DockerHostModSlice
 	baseDomainExpiryMods            DomainExpiryModSlice
 	baseGroupMods                   GroupModSlice
 	baseHeartbeatMods               HeartbeatModSlice
@@ -32,6 +31,7 @@ type Factory struct {
 	baseProxyMods                   ProxyModSlice
 	baseRemoteBrowserMods           RemoteBrowserModSlice
 	baseSchemaMigrationMods         SchemaMigrationModSlice
+	baseSessionMods                 SessionModSlice
 	baseSettingMods                 SettingModSlice
 	baseStatDailyMods               StatDailyModSlice
 	baseStatHourlyMods              StatHourlyModSlice
@@ -76,39 +76,6 @@ func (f *Factory) FromExistingAPIKey(m *models.APIKey) *APIKeyTemplate {
 	ctx := context.Background()
 	if m.R.User != nil {
 		APIKeyMods.WithExistingUser(m.R.User).Apply(ctx, o)
-	}
-
-	return o
-}
-
-func (f *Factory) NewDockerHost(mods ...DockerHostMod) *DockerHostTemplate {
-	return f.NewDockerHostWithContext(context.Background(), mods...)
-}
-
-func (f *Factory) NewDockerHostWithContext(ctx context.Context, mods ...DockerHostMod) *DockerHostTemplate {
-	o := &DockerHostTemplate{f: f}
-
-	if f != nil {
-		f.baseDockerHostMods.Apply(ctx, o)
-	}
-
-	DockerHostModSlice(mods).Apply(ctx, o)
-
-	return o
-}
-
-func (f *Factory) FromExistingDockerHost(m *models.DockerHost) *DockerHostTemplate {
-	o := &DockerHostTemplate{f: f, alreadyPersisted: true}
-
-	o.ID = func() string { return m.ID }
-	o.UserID = func() string { return m.UserID }
-	o.DockerDaemon = func() null.Val[string] { return m.DockerDaemon }
-	o.DockerType = func() string { return m.DockerType }
-	o.Name = func() string { return m.Name }
-
-	ctx := context.Background()
-	if m.R.User != nil {
-		DockerHostMods.WithExistingUser(m.R.User).Apply(ctx, o)
 	}
 
 	return o
@@ -423,8 +390,6 @@ func (f *Factory) FromExistingMonitor(m *models.Monitor) *MonitorTemplate {
 	o.Headers = func() null.Val[string] { return m.Headers }
 	o.BasicAuthUser = func() null.Val[string] { return m.BasicAuthUser }
 	o.BasicAuthPass = func() null.Val[string] { return m.BasicAuthPass }
-	o.DockerHost = func() null.Val[string] { return m.DockerHost }
-	o.DockerContainer = func() null.Val[string] { return m.DockerContainer }
 	o.ProxyID = func() null.Val[string] { return m.ProxyID }
 	o.ExpiryNotification = func() null.Val[bool] { return m.ExpiryNotification }
 	o.MQTTTopic = func() null.Val[string] { return m.MQTTTopic }
@@ -862,6 +827,34 @@ func (f *Factory) FromExistingSchemaMigration(m *models.SchemaMigration) *Schema
 	return o
 }
 
+func (f *Factory) NewSession(mods ...SessionMod) *SessionTemplate {
+	return f.NewSessionWithContext(context.Background(), mods...)
+}
+
+func (f *Factory) NewSessionWithContext(ctx context.Context, mods ...SessionMod) *SessionTemplate {
+	o := &SessionTemplate{f: f}
+
+	if f != nil {
+		f.baseSessionMods.Apply(ctx, o)
+	}
+
+	SessionModSlice(mods).Apply(ctx, o)
+
+	return o
+}
+
+func (f *Factory) FromExistingSession(m *models.Session) *SessionTemplate {
+	o := &SessionTemplate{f: f, alreadyPersisted: true}
+
+	o.ID = func() string { return m.ID }
+	o.UserID = func() string { return m.UserID }
+	o.Token = func() string { return m.Token }
+	o.ExpiresAt = func() time.Time { return m.ExpiresAt }
+	o.CreatedAt = func() time.Time { return m.CreatedAt }
+
+	return o
+}
+
 func (f *Factory) NewSetting(mods ...SettingMod) *SettingTemplate {
 	return f.NewSettingWithContext(context.Background(), mods...)
 }
@@ -1147,9 +1140,6 @@ func (f *Factory) FromExistingUser(m *models.User) *UserTemplate {
 	if len(m.R.APIKeys) > 0 {
 		UserMods.AddExistingAPIKeys(m.R.APIKeys...).Apply(ctx, o)
 	}
-	if len(m.R.DockerHosts) > 0 {
-		UserMods.AddExistingDockerHosts(m.R.DockerHosts...).Apply(ctx, o)
-	}
 	if len(m.R.Maintenances) > 0 {
 		UserMods.AddExistingMaintenances(m.R.Maintenances...).Apply(ctx, o)
 	}
@@ -1175,14 +1165,6 @@ func (f *Factory) ClearBaseAPIKeyMods() {
 
 func (f *Factory) AddBaseAPIKeyMod(mods ...APIKeyMod) {
 	f.baseAPIKeyMods = append(f.baseAPIKeyMods, mods...)
-}
-
-func (f *Factory) ClearBaseDockerHostMods() {
-	f.baseDockerHostMods = nil
-}
-
-func (f *Factory) AddBaseDockerHostMod(mods ...DockerHostMod) {
-	f.baseDockerHostMods = append(f.baseDockerHostMods, mods...)
 }
 
 func (f *Factory) ClearBaseDomainExpiryMods() {
@@ -1327,6 +1309,14 @@ func (f *Factory) ClearBaseSchemaMigrationMods() {
 
 func (f *Factory) AddBaseSchemaMigrationMod(mods ...SchemaMigrationMod) {
 	f.baseSchemaMigrationMods = append(f.baseSchemaMigrationMods, mods...)
+}
+
+func (f *Factory) ClearBaseSessionMods() {
+	f.baseSessionMods = nil
+}
+
+func (f *Factory) AddBaseSessionMod(mods ...SessionMod) {
+	f.baseSessionMods = append(f.baseSessionMods, mods...)
 }
 
 func (f *Factory) ClearBaseSettingMods() {

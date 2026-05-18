@@ -32,30 +32,6 @@ func TestCreateAPIKey(t *testing.T) {
 	}
 }
 
-func TestCreateDockerHost(t *testing.T) {
-	if testDB == nil {
-		t.Skip("skipping test, no DSN provided")
-	}
-
-	ctx, cancel := context.WithCancel(t.Context())
-	t.Cleanup(cancel)
-
-	tx, err := testDB.Begin(ctx)
-	if err != nil {
-		t.Fatalf("Error starting transaction: %v", err)
-	}
-
-	defer func() {
-		if err := tx.Rollback(ctx); err != nil {
-			t.Fatalf("Error rolling back transaction: %v", err)
-		}
-	}()
-
-	if _, err := New().NewDockerHostWithContext(ctx).Create(ctx, tx); err != nil {
-		t.Fatalf("Error creating DockerHost: %v", err)
-	}
-}
-
 func TestCreateDomainExpiry(t *testing.T) {
 	if testDB == nil {
 		t.Skip("skipping test, no DSN provided")
@@ -461,6 +437,30 @@ func TestCreateRemoteBrowser(t *testing.T) {
 
 	if _, err := New().NewRemoteBrowserWithContext(ctx).Create(ctx, tx); err != nil {
 		t.Fatalf("Error creating RemoteBrowser: %v", err)
+	}
+}
+
+func TestCreateSession(t *testing.T) {
+	if testDB == nil {
+		t.Skip("skipping test, no DSN provided")
+	}
+
+	ctx, cancel := context.WithCancel(t.Context())
+	t.Cleanup(cancel)
+
+	tx, err := testDB.Begin(ctx)
+	if err != nil {
+		t.Fatalf("Error starting transaction: %v", err)
+	}
+
+	defer func() {
+		if err := tx.Rollback(ctx); err != nil {
+			t.Fatalf("Error rolling back transaction: %v", err)
+		}
+	}()
+
+	if _, err := New().NewSessionWithContext(ctx).Create(ctx, tx); err != nil {
+		t.Fatalf("Error creating Session: %v", err)
 	}
 }
 

@@ -18,7 +18,6 @@ sqlite:
         - json-query
         - grpc-keyword
         - dns
-        - docker
         - push
         - steam
         - gamedig

@@ -524,9 +524,6 @@ func TestUserCountStruct(t *testing.T) {
 	// Verify APIKeys count field exists and is *int64
 	var _ *int64 = m.C.APIKeys
 
-	// Verify DockerHosts count field exists and is *int64
-	var _ *int64 = m.C.DockerHosts
-
 	// Verify Maintenances count field exists and is *int64
 	var _ *int64 = m.C.Maintenances
 
@@ -554,12 +551,6 @@ func TestUserLoadCountMethods(t *testing.T) {
 
 	// Verify LoadCountAPIKeys method exists on slice
 	_ = ms.LoadCountAPIKeys(ctx, nil)
-
-	// Verify LoadCountDockerHosts method exists on single model
-	_ = m.LoadCountDockerHosts(ctx, nil)
-
-	// Verify LoadCountDockerHosts method exists on slice
-	_ = ms.LoadCountDockerHosts(ctx, nil)
 
 	// Verify LoadCountMaintenances method exists on single model
 	_ = m.LoadCountMaintenances(ctx, nil)
@@ -599,9 +590,6 @@ func TestThenLoadCountUser(t *testing.T) {
 	// Verify APIKeys loader exists
 	_ = ThenLoadCount.User.APIKeys
 
-	// Verify DockerHosts loader exists
-	_ = ThenLoadCount.User.DockerHosts
-
 	// Verify Maintenances loader exists
 	_ = ThenLoadCount.User.Maintenances
 
@@ -625,9 +613,6 @@ func TestPreloadCountUser(t *testing.T) {
 	// Verify APIKeys preloader exists and returns a Preloader
 	_ = PreloadCount.User.APIKeys()
 
-	// Verify DockerHosts preloader exists and returns a Preloader
-	_ = PreloadCount.User.DockerHosts()
-
 	// Verify Maintenances preloader exists and returns a Preloader
 	_ = PreloadCount.User.Maintenances()
 
@@ -649,8 +634,6 @@ func TestUserPreloadCountMethod(t *testing.T) {
 	var m *User
 
 	_ = m.PreloadCount("APIKeys", 0)
-
-	_ = m.PreloadCount("DockerHosts", 0)
 
 	_ = m.PreloadCount("Maintenances", 0)
 

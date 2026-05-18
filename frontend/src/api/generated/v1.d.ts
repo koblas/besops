@@ -846,63 +846,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/docker-hosts": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List Docker hosts */
-        get: operations["listDockerHosts"];
-        put?: never;
-        /** Add a Docker host */
-        post: operations["createDockerHost"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/docker-hosts/{dockerHostId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                dockerHostId: string;
-            };
-            cookie?: never;
-        };
-        get?: never;
-        /** Update a Docker host */
-        put: operations["updateDockerHost"];
-        post?: never;
-        /** Delete a Docker host */
-        delete: operations["deleteDockerHost"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/docker-hosts/{dockerHostId}/test": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                dockerHostId: string;
-            };
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Test Docker host connection */
-        post: operations["testDockerHost"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/proxies": {
         parameters: {
             query?: never;
@@ -1227,7 +1170,7 @@ export interface components {
              * @description The monitoring protocol or check type to use.
              * @enum {string}
              */
-            type: "http" | "port" | "ping" | "keyword" | "json-query" | "grpc-keyword" | "dns" | "docker" | "push" | "steam" | "gamedig" | "mqtt" | "sqlserver" | "postgres" | "mysql" | "mongodb" | "radius" | "redis" | "group" | "snmp" | "rabbitmq" | "tailscale-ping" | "real-browser" | "manual";
+            type: "http" | "port" | "ping" | "keyword" | "json-query" | "grpc-keyword" | "dns" | "push" | "steam" | "gamedig" | "mqtt" | "sqlserver" | "postgres" | "mysql" | "mongodb" | "radius" | "redis" | "group" | "snmp" | "rabbitmq" | "tailscale-ping" | "real-browser" | "manual";
             /** @description Whether this monitor is currently active and performing checks. */
             active: boolean;
             /**
@@ -1312,13 +1255,6 @@ export interface components {
             databaseQuery?: string;
             /**
              * Format: uuid
-             * @description ID of the Docker host to use for Docker container monitors.
-             */
-            dockerHost?: string;
-            /** @description Docker container name or ID to monitor. */
-            dockerContainer?: string;
-            /**
-             * Format: uuid
              * @description ID of the proxy to use for outbound connections.
              */
             proxyId?: string;
@@ -1400,9 +1336,6 @@ export interface components {
             mqttUsername?: string;
             mqttPassword?: string;
             databaseQuery?: string;
-            /** Format: uuid */
-            dockerHost?: string;
-            dockerContainer?: string;
             /** Format: uuid */
             proxyId?: string;
             grpcUrl?: string;
@@ -1824,35 +1757,6 @@ export interface components {
              * @description Optional expiration date/time. If omitted, the key never expires.
              */
             expires?: string;
-        };
-        /** @description A Docker daemon connection used by Docker-type monitors to check container health. */
-        DockerHost: {
-            /**
-             * Format: uuid
-             * @description Unique identifier for this Docker host.
-             */
-            id: string;
-            /** @description Human-readable name for this Docker host connection. */
-            name: string;
-            /**
-             * @description Connection method: 'socket' for local Unix socket, 'tcp' for remote TCP connection.
-             * @enum {string}
-             */
-            dockerType: "socket" | "tcp";
-            /** @description Connection URI (e.g., '/var/run/docker.sock' for socket, 'tcp://host:2376' for TCP). */
-            dockerDaemon?: string;
-        };
-        /** @description Input for adding or updating a Docker host connection. */
-        DockerHostInput: {
-            /** @description Human-readable name for this Docker host connection. */
-            name: string;
-            /**
-             * @description Connection method: 'socket' for local Unix socket, 'tcp' for remote TCP connection.
-             * @enum {string}
-             */
-            dockerType: "socket" | "tcp";
-            /** @description Connection URI (e.g., '/var/run/docker.sock' for socket, 'tcp://host:2376' for TCP). */
-            dockerDaemon?: string;
         };
         /** @description An HTTP or SOCKS proxy used by monitors for outbound connections to their targets. */
         Proxy: {
@@ -3578,119 +3482,6 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description API key disabled */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MessageResponse"];
-                };
-            };
-        };
-    };
-    listDockerHosts: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Docker host list */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DockerHost"][];
-                };
-            };
-        };
-    };
-    createDockerHost: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DockerHostInput"];
-            };
-        };
-        responses: {
-            /** @description Docker host added */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** Format: uuid */
-                        id: string;
-                    };
-                };
-            };
-        };
-    };
-    updateDockerHost: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                dockerHostId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DockerHostInput"];
-            };
-        };
-        responses: {
-            /** @description Docker host updated */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    deleteDockerHost: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                dockerHostId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Docker host deleted */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    testDockerHost: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                dockerHostId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Connection test result */
             200: {
                 headers: {
                     [name: string]: unknown;

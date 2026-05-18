@@ -258,24 +258,6 @@ var Monitors = Table[
 			Generated: false,
 			AutoIncr:  false,
 		},
-		DockerHost: column{
-			Name:      "docker_host",
-			DBType:    "TEXT",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		DockerContainer: column{
-			Name:      "docker_container",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
 		ProxyID: column{
 			Name:      "proxy_id",
 			DBType:    "TEXT",
@@ -891,8 +873,6 @@ type monitorColumns struct {
 	Headers                             column
 	BasicAuthUser                       column
 	BasicAuthPass                       column
-	DockerHost                          column
-	DockerContainer                     column
 	ProxyID                             column
 	ExpiryNotification                  column
 	MQTTTopic                           column
@@ -954,7 +934,7 @@ type monitorColumns struct {
 
 func (c monitorColumns) AsSlice() []column {
 	return []column{
-		c.ID, c.Name, c.Active, c.UserID, c.Interval, c.URL, c.Type, c.Weight, c.Hostname, c.Port, c.CreatedDate, c.Keyword, c.Maxretries, c.IgnoreTLS, c.UpsideDown, c.Maxredirects, c.AcceptedStatuscodesJSON, c.DNSResolveType, c.DNSResolveServer, c.DNSLastResult, c.RetryInterval, c.PushToken, c.Method, c.Body, c.Headers, c.BasicAuthUser, c.BasicAuthPass, c.DockerHost, c.DockerContainer, c.ProxyID, c.ExpiryNotification, c.MQTTTopic, c.MQTTSuccessMessage, c.MQTTUsername, c.MQTTPassword, c.DatabaseConnectionString, c.DatabaseQuery, c.AuthMethod, c.AuthDomain, c.AuthWorkstation, c.GRPCURL, c.GRPCProtobuf, c.GRPCBody, c.GRPCMetadata, c.GRPCMethod, c.GRPCServiceName, c.GRPCEnableTLS, c.RadiusUsername, c.RadiusPassword, c.RadiusCallingStationID, c.RadiusCalledStationID, c.RadiusSecret, c.ResendInterval, c.PacketSize, c.Game, c.HTTPBodyEncoding, c.Description, c.TLSCa, c.TLSCert, c.TLSKey, c.ParentID, c.InvertKeyword, c.JSONPath, c.ExpectedValue, c.KafkaProducerTopic, c.KafkaProducerBrokers, c.KafkaProducerSSL, c.KafkaProducerAllowAutoTopicCreation, c.KafkaProducerSaslOptions, c.KafkaProducerMessage, c.OauthClientID, c.OauthClientSecret, c.OauthTokenURL, c.OauthScopes, c.OauthAuthMethod, c.Timeout, c.GamedigGivenPortOnly, c.SaveResponse, c.SaveErrorResponse, c.ResponseMaxLength, c.SystemServiceName, c.RabbitmqNodes, c.RabbitmqUsername, c.RabbitmqPassword, c.RemoteBrowser, c.DomainExpiryNotification,
+		c.ID, c.Name, c.Active, c.UserID, c.Interval, c.URL, c.Type, c.Weight, c.Hostname, c.Port, c.CreatedDate, c.Keyword, c.Maxretries, c.IgnoreTLS, c.UpsideDown, c.Maxredirects, c.AcceptedStatuscodesJSON, c.DNSResolveType, c.DNSResolveServer, c.DNSLastResult, c.RetryInterval, c.PushToken, c.Method, c.Body, c.Headers, c.BasicAuthUser, c.BasicAuthPass, c.ProxyID, c.ExpiryNotification, c.MQTTTopic, c.MQTTSuccessMessage, c.MQTTUsername, c.MQTTPassword, c.DatabaseConnectionString, c.DatabaseQuery, c.AuthMethod, c.AuthDomain, c.AuthWorkstation, c.GRPCURL, c.GRPCProtobuf, c.GRPCBody, c.GRPCMetadata, c.GRPCMethod, c.GRPCServiceName, c.GRPCEnableTLS, c.RadiusUsername, c.RadiusPassword, c.RadiusCallingStationID, c.RadiusCalledStationID, c.RadiusSecret, c.ResendInterval, c.PacketSize, c.Game, c.HTTPBodyEncoding, c.Description, c.TLSCa, c.TLSCert, c.TLSKey, c.ParentID, c.InvertKeyword, c.JSONPath, c.ExpectedValue, c.KafkaProducerTopic, c.KafkaProducerBrokers, c.KafkaProducerSSL, c.KafkaProducerAllowAutoTopicCreation, c.KafkaProducerSaslOptions, c.KafkaProducerMessage, c.OauthClientID, c.OauthClientSecret, c.OauthTokenURL, c.OauthScopes, c.OauthAuthMethod, c.Timeout, c.GamedigGivenPortOnly, c.SaveResponse, c.SaveErrorResponse, c.ResponseMaxLength, c.SystemServiceName, c.RabbitmqNodes, c.RabbitmqUsername, c.RabbitmqPassword, c.RemoteBrowser, c.DomainExpiryNotification,
 	}
 }
 

@@ -18,7 +18,6 @@ var Preload = getPreloaders()
 
 type preloaders struct {
 	APIKey                  apiKeyPreloader
-	DockerHost              dockerHostPreloader
 	Group                   groupPreloader
 	Heartbeat               heartbeatPreloader
 	Incident                incidentPreloader
@@ -47,7 +46,6 @@ type preloaders struct {
 func getPreloaders() preloaders {
 	return preloaders{
 		APIKey:                  buildAPIKeyPreloader(),
-		DockerHost:              buildDockerHostPreloader(),
 		Group:                   buildGroupPreloader(),
 		Heartbeat:               buildHeartbeatPreloader(),
 		Incident:                buildIncidentPreloader(),
@@ -82,7 +80,6 @@ var (
 
 type thenLoaders[Q orm.Loadable] struct {
 	APIKey                  apiKeyThenLoader[Q]
-	DockerHost              dockerHostThenLoader[Q]
 	Group                   groupThenLoader[Q]
 	Heartbeat               heartbeatThenLoader[Q]
 	Incident                incidentThenLoader[Q]
@@ -111,7 +108,6 @@ type thenLoaders[Q orm.Loadable] struct {
 func getThenLoaders[Q orm.Loadable]() thenLoaders[Q] {
 	return thenLoaders[Q]{
 		APIKey:                  buildAPIKeyThenLoader[Q](),
-		DockerHost:              buildDockerHostThenLoader[Q](),
 		Group:                   buildGroupThenLoader[Q](),
 		Heartbeat:               buildHeartbeatThenLoader[Q](),
 		Incident:                buildIncidentThenLoader[Q](),

@@ -55,7 +55,6 @@ type UserTemplate struct {
 
 type userR struct {
 	APIKeys        []*userRAPIKeysR
-	DockerHosts    []*userRDockerHostsR
 	Maintenances   []*userRMaintenancesR
 	Monitors       []*userRMonitorsR
 	Notifications  []*userRNotificationsR
@@ -66,10 +65,6 @@ type userR struct {
 type userRAPIKeysR struct {
 	number int
 	o      *APIKeyTemplate
-}
-type userRDockerHostsR struct {
-	number int
-	o      *DockerHostTemplate
 }
 type userRMaintenancesR struct {
 	number int
@@ -113,19 +108,6 @@ func (t UserTemplate) setModelRels(o *models.User) {
 			rel = append(rel, related...)
 		}
 		o.R.APIKeys = rel
-	}
-
-	if t.r.DockerHosts != nil {
-		rel := models.DockerHostSlice{}
-		for _, r := range t.r.DockerHosts {
-			related := r.o.BuildMany(r.number)
-			for _, rel := range related {
-				rel.UserID = o.ID // h2
-				rel.R.User = o
-			}
-			rel = append(rel, related...)
-		}
-		o.R.DockerHosts = rel
 	}
 
 	if t.r.Maintenances != nil {
@@ -344,26 +326,6 @@ func (o *UserTemplate) insertOptRels(ctx context.Context, exec bob.Executor, m *
 		}
 	}
 
-	isDockerHostsDone, _ := userRelDockerHostsCtx.Value(ctx)
-	if !isDockerHostsDone && o.r.DockerHosts != nil {
-		ctx = userRelDockerHostsCtx.WithValue(ctx, true)
-		for _, r := range o.r.DockerHosts {
-			if r.o.alreadyPersisted {
-				m.R.DockerHosts = append(m.R.DockerHosts, r.o.Build())
-			} else {
-				rel1, err := r.o.CreateMany(ctx, exec, r.number)
-				if err != nil {
-					return err
-				}
-
-				err = m.AttachDockerHosts(ctx, exec, rel1...)
-				if err != nil {
-					return err
-				}
-			}
-		}
-	}
-
 	isMaintenancesDone, _ := userRelMaintenancesCtx.Value(ctx)
 	if !isMaintenancesDone && o.r.Maintenances != nil {
 		ctx = userRelMaintenancesCtx.WithValue(ctx, true)
@@ -371,12 +333,12 @@ func (o *UserTemplate) insertOptRels(ctx context.Context, exec bob.Executor, m *
 			if r.o.alreadyPersisted {
 				m.R.Maintenances = append(m.R.Maintenances, r.o.Build())
 			} else {
-				rel2, err := r.o.CreateMany(ctx, exec, r.number)
+				rel1, err := r.o.CreateMany(ctx, exec, r.number)
 				if err != nil {
 					return err
 				}
 
-				err = m.AttachMaintenances(ctx, exec, rel2...)
+				err = m.AttachMaintenances(ctx, exec, rel1...)
 				if err != nil {
 					return err
 				}
@@ -391,12 +353,12 @@ func (o *UserTemplate) insertOptRels(ctx context.Context, exec bob.Executor, m *
 			if r.o.alreadyPersisted {
 				m.R.Monitors = append(m.R.Monitors, r.o.Build())
 			} else {
-				rel3, err := r.o.CreateMany(ctx, exec, r.number)
+				rel2, err := r.o.CreateMany(ctx, exec, r.number)
 				if err != nil {
 					return err
 				}
 
-				err = m.AttachMonitors(ctx, exec, rel3...)
+				err = m.AttachMonitors(ctx, exec, rel2...)
 				if err != nil {
 					return err
 				}
@@ -411,12 +373,12 @@ func (o *UserTemplate) insertOptRels(ctx context.Context, exec bob.Executor, m *
 			if r.o.alreadyPersisted {
 				m.R.Notifications = append(m.R.Notifications, r.o.Build())
 			} else {
-				rel4, err := r.o.CreateMany(ctx, exec, r.number)
+				rel3, err := r.o.CreateMany(ctx, exec, r.number)
 				if err != nil {
 					return err
 				}
 
-				err = m.AttachNotifications(ctx, exec, rel4...)
+				err = m.AttachNotifications(ctx, exec, rel3...)
 				if err != nil {
 					return err
 				}
@@ -431,12 +393,12 @@ func (o *UserTemplate) insertOptRels(ctx context.Context, exec bob.Executor, m *
 			if r.o.alreadyPersisted {
 				m.R.Proxies = append(m.R.Proxies, r.o.Build())
 			} else {
-				rel5, err := r.o.CreateMany(ctx, exec, r.number)
+				rel4, err := r.o.CreateMany(ctx, exec, r.number)
 				if err != nil {
 					return err
 				}
 
-				err = m.AttachProxies(ctx, exec, rel5...)
+				err = m.AttachProxies(ctx, exec, rel4...)
 				if err != nil {
 					return err
 				}
@@ -451,12 +413,12 @@ func (o *UserTemplate) insertOptRels(ctx context.Context, exec bob.Executor, m *
 			if r.o.alreadyPersisted {
 				m.R.RemoteBrowsers = append(m.R.RemoteBrowsers, r.o.Build())
 			} else {
-				rel6, err := r.o.CreateMany(ctx, exec, r.number)
+				rel5, err := r.o.CreateMany(ctx, exec, r.number)
 				if err != nil {
 					return err
 				}
 
-				err = m.AttachRemoteBrowsers(ctx, exec, rel6...)
+				err = m.AttachRemoteBrowsers(ctx, exec, rel5...)
 				if err != nil {
 					return err
 				}
@@ -967,54 +929,6 @@ func (m userMods) AddExistingAPIKeys(existingModels ...*models.APIKey) UserMod {
 func (m userMods) WithoutAPIKeys() UserMod {
 	return UserModFunc(func(ctx context.Context, o *UserTemplate) {
 		o.r.APIKeys = nil
-	})
-}
-
-func (m userMods) WithDockerHosts(number int, related *DockerHostTemplate) UserMod {
-	return UserModFunc(func(ctx context.Context, o *UserTemplate) {
-		o.r.DockerHosts = []*userRDockerHostsR{{
-			number: number,
-			o:      related,
-		}}
-	})
-}
-
-func (m userMods) WithNewDockerHosts(number int, mods ...DockerHostMod) UserMod {
-	return UserModFunc(func(ctx context.Context, o *UserTemplate) {
-		related := o.f.NewDockerHostWithContext(ctx, mods...)
-		m.WithDockerHosts(number, related).Apply(ctx, o)
-	})
-}
-
-func (m userMods) AddDockerHosts(number int, related *DockerHostTemplate) UserMod {
-	return UserModFunc(func(ctx context.Context, o *UserTemplate) {
-		o.r.DockerHosts = append(o.r.DockerHosts, &userRDockerHostsR{
-			number: number,
-			o:      related,
-		})
-	})
-}
-
-func (m userMods) AddNewDockerHosts(number int, mods ...DockerHostMod) UserMod {
-	return UserModFunc(func(ctx context.Context, o *UserTemplate) {
-		related := o.f.NewDockerHostWithContext(ctx, mods...)
-		m.AddDockerHosts(number, related).Apply(ctx, o)
-	})
-}
-
-func (m userMods) AddExistingDockerHosts(existingModels ...*models.DockerHost) UserMod {
-	return UserModFunc(func(ctx context.Context, o *UserTemplate) {
-		for _, em := range existingModels {
-			o.r.DockerHosts = append(o.r.DockerHosts, &userRDockerHostsR{
-				o: o.f.FromExistingDockerHost(em),
-			})
-		}
-	})
-}
-
-func (m userMods) WithoutDockerHosts() UserMod {
-	return UserModFunc(func(ctx context.Context, o *UserTemplate) {
-		o.r.DockerHosts = nil
 	})
 }
 

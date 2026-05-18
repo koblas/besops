@@ -140,7 +140,6 @@ func monitorToSetter(m *Monitor) *models.MonitorSetter {
 		Headers:                 omitnull.From(m.Headers),
 		BasicAuthUser:           omitnull.From(m.BasicAuthUser),
 		BasicAuthPass:           omitnull.From(m.BasicAuthPass),
-		DockerContainer:         omitnull.From(m.DockerContainer),
 		Description:             omitnull.From(m.Description),
 		TLSCert:                 omitnull.From(m.TLSCert),
 		TLSKey:                  omitnull.From(m.TLSKey),
@@ -186,7 +185,6 @@ func monitorToSetter(m *Monitor) *models.MonitorSetter {
 	} else {
 		s.Port = omitnull.FromPtr[int64](nil)
 	}
-	s.DockerHost = omitnull.FromPtr(m.DockerHost)
 	s.ProxyID = omitnull.FromPtr(m.ProxyID)
 	s.ParentID = omitnull.FromPtr(m.ParentID)
 	s.ExpiryNotification = omitnull.From(m.ExpiryNotification)
@@ -222,7 +220,6 @@ func monitorFromModel(m *models.Monitor) *Monitor {
 		Headers:              m.Headers.GetOrZero(),
 		BasicAuthUser:        m.BasicAuthUser.GetOrZero(),
 		BasicAuthPass:        m.BasicAuthPass.GetOrZero(),
-		DockerContainer:      m.DockerContainer.GetOrZero(),
 		Description:          m.Description.GetOrZero(),
 		TLSCert:              m.TLSCert.GetOrZero(),
 		TLSKey:               m.TLSKey.GetOrZero(),
@@ -264,9 +261,6 @@ func monitorFromModel(m *models.Monitor) *Monitor {
 	if v, ok := m.Port.Get(); ok {
 		port := int(v)
 		mon.Port = &port
-	}
-	if v, ok := m.DockerHost.Get(); ok {
-		mon.DockerHost = &v
 	}
 	if v, ok := m.ProxyID.Get(); ok {
 		mon.ProxyID = &v

@@ -859,102 +859,6 @@ func (s *CreateAPIKeyCreated) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
-func (s *CreateDockerHostCreated) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *CreateDockerHostCreated) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("id")
-		json.EncodeUUID(e, s.ID)
-	}
-}
-
-var jsonFieldsNameOfCreateDockerHostCreated = [1]string{
-	0: "id",
-}
-
-// Decode decodes CreateDockerHostCreated from json.
-func (s *CreateDockerHostCreated) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode CreateDockerHostCreated to nil")
-	}
-	var requiredBitSet [1]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "id":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				v, err := json.DecodeUUID(d)
-				s.ID = v
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"id\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode CreateDockerHostCreated")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000001,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfCreateDockerHostCreated) {
-					name = jsonFieldsNameOfCreateDockerHostCreated[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *CreateDockerHostCreated) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *CreateDockerHostCreated) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
 func (s *CreateMaintenanceCreated) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -1526,359 +1430,6 @@ func (s *Disable2FAReq) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *Disable2FAReq) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *DockerHost) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *DockerHost) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("id")
-		json.EncodeUUID(e, s.ID)
-	}
-	{
-		e.FieldStart("name")
-		e.Str(s.Name)
-	}
-	{
-		e.FieldStart("dockerType")
-		s.DockerType.Encode(e)
-	}
-	{
-		if s.DockerDaemon.Set {
-			e.FieldStart("dockerDaemon")
-			s.DockerDaemon.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfDockerHost = [4]string{
-	0: "id",
-	1: "name",
-	2: "dockerType",
-	3: "dockerDaemon",
-}
-
-// Decode decodes DockerHost from json.
-func (s *DockerHost) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode DockerHost to nil")
-	}
-	var requiredBitSet [1]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "id":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				v, err := json.DecodeUUID(d)
-				s.ID = v
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"id\"")
-			}
-		case "name":
-			requiredBitSet[0] |= 1 << 1
-			if err := func() error {
-				v, err := d.Str()
-				s.Name = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"name\"")
-			}
-		case "dockerType":
-			requiredBitSet[0] |= 1 << 2
-			if err := func() error {
-				if err := s.DockerType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"dockerType\"")
-			}
-		case "dockerDaemon":
-			if err := func() error {
-				s.DockerDaemon.Reset()
-				if err := s.DockerDaemon.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"dockerDaemon\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode DockerHost")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000111,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfDockerHost) {
-					name = jsonFieldsNameOfDockerHost[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *DockerHost) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *DockerHost) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes DockerHostDockerType as json.
-func (s DockerHostDockerType) Encode(e *jx.Encoder) {
-	e.Str(string(s))
-}
-
-// Decode decodes DockerHostDockerType from json.
-func (s *DockerHostDockerType) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode DockerHostDockerType to nil")
-	}
-	v, err := d.StrBytes()
-	if err != nil {
-		return err
-	}
-	// Try to use constant string.
-	switch DockerHostDockerType(v) {
-	case DockerHostDockerTypeSocket:
-		*s = DockerHostDockerTypeSocket
-	case DockerHostDockerTypeTCP:
-		*s = DockerHostDockerTypeTCP
-	default:
-		*s = DockerHostDockerType(v)
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s DockerHostDockerType) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *DockerHostDockerType) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *DockerHostInput) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *DockerHostInput) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("name")
-		e.Str(s.Name)
-	}
-	{
-		e.FieldStart("dockerType")
-		s.DockerType.Encode(e)
-	}
-	{
-		if s.DockerDaemon.Set {
-			e.FieldStart("dockerDaemon")
-			s.DockerDaemon.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfDockerHostInput = [3]string{
-	0: "name",
-	1: "dockerType",
-	2: "dockerDaemon",
-}
-
-// Decode decodes DockerHostInput from json.
-func (s *DockerHostInput) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode DockerHostInput to nil")
-	}
-	var requiredBitSet [1]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "name":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				v, err := d.Str()
-				s.Name = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"name\"")
-			}
-		case "dockerType":
-			requiredBitSet[0] |= 1 << 1
-			if err := func() error {
-				if err := s.DockerType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"dockerType\"")
-			}
-		case "dockerDaemon":
-			if err := func() error {
-				s.DockerDaemon.Reset()
-				if err := s.DockerDaemon.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"dockerDaemon\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode DockerHostInput")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000011,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfDockerHostInput) {
-					name = jsonFieldsNameOfDockerHostInput[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *DockerHostInput) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *DockerHostInput) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes DockerHostInputDockerType as json.
-func (s DockerHostInputDockerType) Encode(e *jx.Encoder) {
-	e.Str(string(s))
-}
-
-// Decode decodes DockerHostInputDockerType from json.
-func (s *DockerHostInputDockerType) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode DockerHostInputDockerType to nil")
-	}
-	v, err := d.StrBytes()
-	if err != nil {
-		return err
-	}
-	// Try to use constant string.
-	switch DockerHostInputDockerType(v) {
-	case DockerHostInputDockerTypeSocket:
-		*s = DockerHostInputDockerTypeSocket
-	case DockerHostInputDockerTypeTCP:
-		*s = DockerHostInputDockerTypeTCP
-	default:
-		*s = DockerHostInputDockerType(v)
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s DockerHostInputDockerType) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *DockerHostInputDockerType) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -5311,18 +4862,6 @@ func (s *Monitor) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.DockerHost.Set {
-			e.FieldStart("dockerHost")
-			s.DockerHost.Encode(e)
-		}
-	}
-	{
-		if s.DockerContainer.Set {
-			e.FieldStart("dockerContainer")
-			s.DockerContainer.Encode(e)
-		}
-	}
-	{
 		if s.ProxyId.Set {
 			e.FieldStart("proxyId")
 			s.ProxyId.Encode(e)
@@ -5398,7 +4937,7 @@ func (s *Monitor) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfMonitor = [46]string{
+var jsonFieldsNameOfMonitor = [44]string{
 	0:  "id",
 	1:  "name",
 	2:  "type",
@@ -5432,19 +4971,17 @@ var jsonFieldsNameOfMonitor = [46]string{
 	30: "mqttUsername",
 	31: "mqttPassword",
 	32: "databaseQuery",
-	33: "dockerHost",
-	34: "dockerContainer",
-	35: "proxyId",
-	36: "grpcUrl",
-	37: "grpcServiceName",
-	38: "grpcMethod",
-	39: "grpcEnableTls",
-	40: "parentId",
-	41: "tags",
-	42: "notificationIds",
-	43: "resendInterval",
-	44: "packetSize",
-	45: "expiryNotification",
+	33: "proxyId",
+	34: "grpcUrl",
+	35: "grpcServiceName",
+	36: "grpcMethod",
+	37: "grpcEnableTls",
+	38: "parentId",
+	39: "tags",
+	40: "notificationIds",
+	41: "resendInterval",
+	42: "packetSize",
+	43: "expiryNotification",
 }
 
 // Decode decodes Monitor from json.
@@ -5801,26 +5338,6 @@ func (s *Monitor) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"databaseQuery\"")
-			}
-		case "dockerHost":
-			if err := func() error {
-				s.DockerHost.Reset()
-				if err := s.DockerHost.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"dockerHost\"")
-			}
-		case "dockerContainer":
-			if err := func() error {
-				s.DockerContainer.Reset()
-				if err := s.DockerContainer.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"dockerContainer\"")
 			}
 		case "proxyId":
 			if err := func() error {
@@ -6261,18 +5778,6 @@ func (s *MonitorInput) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.DockerHost.Set {
-			e.FieldStart("dockerHost")
-			s.DockerHost.Encode(e)
-		}
-	}
-	{
-		if s.DockerContainer.Set {
-			e.FieldStart("dockerContainer")
-			s.DockerContainer.Encode(e)
-		}
-	}
-	{
 		if s.ProxyId.Set {
 			e.FieldStart("proxyId")
 			s.ProxyId.Encode(e)
@@ -6338,7 +5843,7 @@ func (s *MonitorInput) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfMonitorInput = [43]string{
+var jsonFieldsNameOfMonitorInput = [41]string{
 	0:  "name",
 	1:  "type",
 	2:  "active",
@@ -6370,18 +5875,16 @@ var jsonFieldsNameOfMonitorInput = [43]string{
 	28: "mqttUsername",
 	29: "mqttPassword",
 	30: "databaseQuery",
-	31: "dockerHost",
-	32: "dockerContainer",
-	33: "proxyId",
-	34: "grpcUrl",
-	35: "grpcServiceName",
-	36: "grpcMethod",
-	37: "grpcEnableTls",
-	38: "parentId",
-	39: "notificationIds",
-	40: "resendInterval",
-	41: "packetSize",
-	42: "expiryNotification",
+	31: "proxyId",
+	32: "grpcUrl",
+	33: "grpcServiceName",
+	34: "grpcMethod",
+	35: "grpcEnableTls",
+	36: "parentId",
+	37: "notificationIds",
+	38: "resendInterval",
+	39: "packetSize",
+	40: "expiryNotification",
 }
 
 // Decode decodes MonitorInput from json.
@@ -6716,26 +6219,6 @@ func (s *MonitorInput) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"databaseQuery\"")
-			}
-		case "dockerHost":
-			if err := func() error {
-				s.DockerHost.Reset()
-				if err := s.DockerHost.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"dockerHost\"")
-			}
-		case "dockerContainer":
-			if err := func() error {
-				s.DockerContainer.Reset()
-				if err := s.DockerContainer.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"dockerContainer\"")
 			}
 		case "proxyId":
 			if err := func() error {
@@ -7101,8 +6584,6 @@ func (s *MonitorType) Decode(d *jx.Decoder) error {
 		*s = MonitorTypeGrpcKeyword
 	case MonitorTypeDNS:
 		*s = MonitorTypeDNS
-	case MonitorTypeDocker:
-		*s = MonitorTypeDocker
 	case MonitorTypePush:
 		*s = MonitorTypePush
 	case MonitorTypeSteam:

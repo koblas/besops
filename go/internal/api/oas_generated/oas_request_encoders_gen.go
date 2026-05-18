@@ -52,20 +52,6 @@ func encodeCreateAPIKeyRequest(
 	return nil
 }
 
-func encodeCreateDockerHostRequest(
-	req *DockerHostInput,
-	r *http.Request,
-) error {
-	const contentType = "application/json"
-	e := new(jx.Encoder)
-	{
-		req.Encode(e)
-	}
-	encoded := e.Bytes()
-	ht.SetBody(r, bytes.NewReader(encoded), contentType)
-	return nil
-}
-
 func encodeCreateIncidentRequest(
 	req *IncidentInput,
 	r *http.Request,
@@ -264,20 +250,6 @@ func encodeSetMaintenanceStatusPagesRequest(
 
 func encodeSetupRequest(
 	req *SetupReq,
-	r *http.Request,
-) error {
-	const contentType = "application/json"
-	e := new(jx.Encoder)
-	{
-		req.Encode(e)
-	}
-	encoded := e.Bytes()
-	ht.SetBody(r, bytes.NewReader(encoded), contentType)
-	return nil
-}
-
-func encodeUpdateDockerHostRequest(
-	req *DockerHostInput,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"

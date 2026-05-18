@@ -9,7 +9,6 @@ import {
   KeyOutlined,
   HistoryOutlined,
   TagsOutlined,
-  CloudServerOutlined,
   GlobalOutlined,
   InfoCircleOutlined,
 } from '@ant-design/icons';
@@ -25,7 +24,6 @@ const menuItems = [
   { key: 'api-keys', icon: <KeyOutlined />, label: 'API Keys' },
   { key: 'monitor-history', icon: <HistoryOutlined />, label: 'Monitor History' },
   { key: 'tags', icon: <TagsOutlined />, label: 'Tags' },
-  { key: 'docker-hosts', icon: <CloudServerOutlined />, label: 'Docker Hosts' },
   { key: 'proxies', icon: <GlobalOutlined />, label: 'Proxies' },
   { key: 'about', icon: <InfoCircleOutlined />, label: 'About' },
 ];

@@ -53,8 +53,6 @@ type Monitor struct {
 	Headers                             null.Val[string] `db:"headers" `
 	BasicAuthUser                       null.Val[string] `db:"basic_auth_user" `
 	BasicAuthPass                       null.Val[string] `db:"basic_auth_pass" `
-	DockerHost                          null.Val[string] `db:"docker_host" `
-	DockerContainer                     null.Val[string] `db:"docker_container" `
 	ProxyID                             null.Val[string] `db:"proxy_id" `
 	ExpiryNotification                  null.Val[bool]   `db:"expiry_notification" `
 	MQTTTopic                           null.Val[string] `db:"mqtt_topic" `
@@ -147,7 +145,7 @@ type monitorR struct {
 
 func buildMonitorColumns(tableName string) monitorColumns {
 	columnsExpr := expr.NewColumnsExpr(
-		"id", "name", "active", "user_id", "interval", "url", "type", "weight", "hostname", "port", "created_date", "keyword", "maxretries", "ignore_tls", "upside_down", "maxredirects", "accepted_statuscodes_json", "dns_resolve_type", "dns_resolve_server", "dns_last_result", "retry_interval", "push_token", "method", "body", "headers", "basic_auth_user", "basic_auth_pass", "docker_host", "docker_container", "proxy_id", "expiry_notification", "mqtt_topic", "mqtt_success_message", "mqtt_username", "mqtt_password", "database_connection_string", "database_query", "auth_method", "auth_domain", "auth_workstation", "grpc_url", "grpc_protobuf", "grpc_body", "grpc_metadata", "grpc_method", "grpc_service_name", "grpc_enable_tls", "radius_username", "radius_password", "radius_calling_station_id", "radius_called_station_id", "radius_secret", "resend_interval", "packet_size", "game", "http_body_encoding", "description", "tls_ca", "tls_cert", "tls_key", "parent_id", "invert_keyword", "json_path", "expected_value", "kafka_producer_topic", "kafka_producer_brokers", "kafka_producer_ssl", "kafka_producer_allow_auto_topic_creation", "kafka_producer_sasl_options", "kafka_producer_message", "oauth_client_id", "oauth_client_secret", "oauth_token_url", "oauth_scopes", "oauth_auth_method", "timeout", "gamedig_given_port_only", "save_response", "save_error_response", "response_max_length", "system_service_name", "rabbitmq_nodes", "rabbitmq_username", "rabbitmq_password", "remote_browser", "domain_expiry_notification",
+		"id", "name", "active", "user_id", "interval", "url", "type", "weight", "hostname", "port", "created_date", "keyword", "maxretries", "ignore_tls", "upside_down", "maxredirects", "accepted_statuscodes_json", "dns_resolve_type", "dns_resolve_server", "dns_last_result", "retry_interval", "push_token", "method", "body", "headers", "basic_auth_user", "basic_auth_pass", "proxy_id", "expiry_notification", "mqtt_topic", "mqtt_success_message", "mqtt_username", "mqtt_password", "database_connection_string", "database_query", "auth_method", "auth_domain", "auth_workstation", "grpc_url", "grpc_protobuf", "grpc_body", "grpc_metadata", "grpc_method", "grpc_service_name", "grpc_enable_tls", "radius_username", "radius_password", "radius_calling_station_id", "radius_called_station_id", "radius_secret", "resend_interval", "packet_size", "game", "http_body_encoding", "description", "tls_ca", "tls_cert", "tls_key", "parent_id", "invert_keyword", "json_path", "expected_value", "kafka_producer_topic", "kafka_producer_brokers", "kafka_producer_ssl", "kafka_producer_allow_auto_topic_creation", "kafka_producer_sasl_options", "kafka_producer_message", "oauth_client_id", "oauth_client_secret", "oauth_token_url", "oauth_scopes", "oauth_auth_method", "timeout", "gamedig_given_port_only", "save_response", "save_error_response", "response_max_length", "system_service_name", "rabbitmq_nodes", "rabbitmq_username", "rabbitmq_password", "remote_browser", "domain_expiry_notification",
 	)
 	if tableName != "" {
 		columnsExpr = columnsExpr.WithParent(tableName)
@@ -182,8 +180,6 @@ func buildMonitorColumns(tableName string) monitorColumns {
 		Headers:                             sqlite.Quote(tableName, "headers"),
 		BasicAuthUser:                       sqlite.Quote(tableName, "basic_auth_user"),
 		BasicAuthPass:                       sqlite.Quote(tableName, "basic_auth_pass"),
-		DockerHost:                          sqlite.Quote(tableName, "docker_host"),
-		DockerContainer:                     sqlite.Quote(tableName, "docker_container"),
 		ProxyID:                             sqlite.Quote(tableName, "proxy_id"),
 		ExpiryNotification:                  sqlite.Quote(tableName, "expiry_notification"),
 		MQTTTopic:                           sqlite.Quote(tableName, "mqtt_topic"),
@@ -274,8 +270,6 @@ type monitorColumns struct {
 	Headers                             sqlite.Expression
 	BasicAuthUser                       sqlite.Expression
 	BasicAuthPass                       sqlite.Expression
-	DockerHost                          sqlite.Expression
-	DockerContainer                     sqlite.Expression
 	ProxyID                             sqlite.Expression
 	ExpiryNotification                  sqlite.Expression
 	MQTTTopic                           sqlite.Expression
@@ -378,8 +372,6 @@ type MonitorSetter struct {
 	Headers                             omitnull.Val[string] `db:"headers" `
 	BasicAuthUser                       omitnull.Val[string] `db:"basic_auth_user" `
 	BasicAuthPass                       omitnull.Val[string] `db:"basic_auth_pass" `
-	DockerHost                          omitnull.Val[string] `db:"docker_host" `
-	DockerContainer                     omitnull.Val[string] `db:"docker_container" `
 	ProxyID                             omitnull.Val[string] `db:"proxy_id" `
 	ExpiryNotification                  omitnull.Val[bool]   `db:"expiry_notification" `
 	MQTTTopic                           omitnull.Val[string] `db:"mqtt_topic" `
@@ -440,7 +432,7 @@ type MonitorSetter struct {
 }
 
 func (s MonitorSetter) SetColumns() []string {
-	vals := make([]string, 0, 86)
+	vals := make([]string, 0, 84)
 	if s.ID.IsValue() {
 		vals = append(vals, "id")
 	}
@@ -521,12 +513,6 @@ func (s MonitorSetter) SetColumns() []string {
 	}
 	if !s.BasicAuthPass.IsUnset() {
 		vals = append(vals, "basic_auth_pass")
-	}
-	if !s.DockerHost.IsUnset() {
-		vals = append(vals, "docker_host")
-	}
-	if !s.DockerContainer.IsUnset() {
-		vals = append(vals, "docker_container")
 	}
 	if !s.ProxyID.IsUnset() {
 		vals = append(vals, "proxy_id")
@@ -784,12 +770,6 @@ func (s MonitorSetter) Overwrite(t *Monitor) {
 	if !s.BasicAuthPass.IsUnset() {
 		t.BasicAuthPass = s.BasicAuthPass.MustGetNull()
 	}
-	if !s.DockerHost.IsUnset() {
-		t.DockerHost = s.DockerHost.MustGetNull()
-	}
-	if !s.DockerContainer.IsUnset() {
-		t.DockerContainer = s.DockerContainer.MustGetNull()
-	}
 	if !s.ProxyID.IsUnset() {
 		t.ProxyID = s.ProxyID.MustGetNull()
 	}
@@ -977,7 +957,7 @@ func (s *MonitorSetter) Apply(q *dialect.InsertQuery) {
 	}
 
 	q.AppendValues(bob.ExpressionFunc(func(ctx context.Context, w io.StringWriter, d bob.Dialect, start int) ([]any, error) {
-		vals := make([]bob.Expression, 0, 86)
+		vals := make([]bob.Expression, 0, 84)
 		if s.ID.IsValue() {
 			vals = append(vals, sqlite.Arg(s.ID.MustGet()))
 		}
@@ -1084,14 +1064,6 @@ func (s *MonitorSetter) Apply(q *dialect.InsertQuery) {
 
 		if !s.BasicAuthPass.IsUnset() {
 			vals = append(vals, sqlite.Arg(s.BasicAuthPass.MustGetNull()))
-		}
-
-		if !s.DockerHost.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.DockerHost.MustGetNull()))
-		}
-
-		if !s.DockerContainer.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.DockerContainer.MustGetNull()))
 		}
 
 		if !s.ProxyID.IsUnset() {
@@ -1335,7 +1307,7 @@ func (s MonitorSetter) UpdateMod() bob.Mod[*dialect.UpdateQuery] {
 }
 
 func (s MonitorSetter) Expressions(prefix ...string) []bob.Expression {
-	exprs := make([]bob.Expression, 0, 86)
+	exprs := make([]bob.Expression, 0, 84)
 
 	if s.ID.IsValue() {
 		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
@@ -1523,20 +1495,6 @@ func (s MonitorSetter) Expressions(prefix ...string) []bob.Expression {
 		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
 			sqlite.Quote(append(prefix, "basic_auth_pass")...),
 			sqlite.Arg(s.BasicAuthPass),
-		}})
-	}
-
-	if !s.DockerHost.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "docker_host")...),
-			sqlite.Arg(s.DockerHost),
-		}})
-	}
-
-	if !s.DockerContainer.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "docker_container")...),
-			sqlite.Arg(s.DockerContainer),
 		}})
 	}
 
@@ -3272,8 +3230,6 @@ type monitorWhere[Q sqlite.Filterable] struct {
 	Headers                             sqlite.WhereNullMod[Q, string]
 	BasicAuthUser                       sqlite.WhereNullMod[Q, string]
 	BasicAuthPass                       sqlite.WhereNullMod[Q, string]
-	DockerHost                          sqlite.WhereNullMod[Q, string]
-	DockerContainer                     sqlite.WhereNullMod[Q, string]
 	ProxyID                             sqlite.WhereNullMod[Q, string]
 	ExpiryNotification                  sqlite.WhereNullMod[Q, bool]
 	MQTTTopic                           sqlite.WhereNullMod[Q, string]
@@ -3366,8 +3322,6 @@ func buildMonitorWhere[Q sqlite.Filterable](cols monitorColumns) monitorWhere[Q]
 		Headers:                             sqlite.WhereNull[Q, string](cols.Headers),
 		BasicAuthUser:                       sqlite.WhereNull[Q, string](cols.BasicAuthUser),
 		BasicAuthPass:                       sqlite.WhereNull[Q, string](cols.BasicAuthPass),
-		DockerHost:                          sqlite.WhereNull[Q, string](cols.DockerHost),
-		DockerContainer:                     sqlite.WhereNull[Q, string](cols.DockerContainer),
 		ProxyID:                             sqlite.WhereNull[Q, string](cols.ProxyID),
 		ExpiryNotification:                  sqlite.WhereNull[Q, bool](cols.ExpiryNotification),
 		MQTTTopic:                           sqlite.WhereNull[Q, string](cols.MQTTTopic),

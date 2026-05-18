@@ -32,7 +32,6 @@ func (j joinSet[Q]) AliasedAs(alias string) joinSet[Q] {
 
 type joins[Q dialect.Joinable] struct {
 	APIKeys                   joinSet[apiKeyJoins[Q]]
-	DockerHosts               joinSet[dockerHostJoins[Q]]
 	Groups                    joinSet[groupJoins[Q]]
 	Heartbeats                joinSet[heartbeatJoins[Q]]
 	Incidents                 joinSet[incidentJoins[Q]]
@@ -69,7 +68,6 @@ func buildJoinSet[Q interface{ aliasedAs(string) Q }, C any, F func(C, string) Q
 func getJoins[Q dialect.Joinable]() joins[Q] {
 	return joins[Q]{
 		APIKeys:                   buildJoinSet[apiKeyJoins[Q]](APIKeys.Columns, buildAPIKeyJoins),
-		DockerHosts:               buildJoinSet[dockerHostJoins[Q]](DockerHosts.Columns, buildDockerHostJoins),
 		Groups:                    buildJoinSet[groupJoins[Q]](Groups.Columns, buildGroupJoins),
 		Heartbeats:                buildJoinSet[heartbeatJoins[Q]](Heartbeats.Columns, buildHeartbeatJoins),
 		Incidents:                 buildJoinSet[incidentJoins[Q]](Incidents.Columns, buildIncidentJoins),

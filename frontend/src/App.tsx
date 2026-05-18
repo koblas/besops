@@ -23,7 +23,6 @@ import { SecuritySettings } from './pages/settings/SecuritySettings';
 import { APIKeysSettings } from './pages/settings/APIKeysSettings';
 import { MonitorHistorySettings } from './pages/settings/MonitorHistorySettings';
 import { TagsSettings } from './pages/settings/TagsSettings';
-import { DockerHostsSettings } from './pages/settings/DockerHostsSettings';
 import { ProxiesSettings } from './pages/settings/ProxiesSettings';
 import { AboutSettings } from './pages/settings/AboutSettings';
 import { NotFound } from './pages/NotFound';
@@ -78,7 +77,6 @@ export function App() {
           <Route path="api-keys" element={<APIKeysSettings />} />
           <Route path="monitor-history" element={<MonitorHistorySettings />} />
           <Route path="tags" element={<TagsSettings />} />
-          <Route path="docker-hosts" element={<DockerHostsSettings />} />
           <Route path="proxies" element={<ProxiesSettings />} />
           <Route path="about" element={<AboutSettings />} />
         </Route>

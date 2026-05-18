@@ -19,7 +19,6 @@ import (
 	"github.com/koblas/besops/internal/database"
 	"github.com/koblas/besops/internal/domain/apikey"
 	"github.com/koblas/besops/internal/domain/badge"
-	"github.com/koblas/besops/internal/domain/dockerhost"
 	"github.com/koblas/besops/internal/domain/heartbeat"
 	"github.com/koblas/besops/internal/domain/maintenance"
 	domainmonitor "github.com/koblas/besops/internal/domain/monitor"
@@ -208,7 +207,6 @@ func (a *App) Start(ctx context.Context) error {
 		api.WithMonitors(domainmonitor.NewHandler(monitorRepo, a.monitors, heartbeatRepo, &tagReaderAdapter{tagRepo: tagRepo})),
 		api.WithSystem(system.NewHandler(db, statsHandler)),
 		api.WithProxies(proxy.NewHandler(proxy.NewRepository(db))),
-		api.WithDockerHosts(dockerhost.NewHandler(dockerhost.NewRepository(db))),
 		api.WithStatusPages(statuspage.NewHandler(statuspage.NewRepository(db), heartbeatRepo, &monitorNameAdapter{monitorRepo: monitorRepo})),
 		api.WithBadges(badge.NewHandler(heartbeatRepo)),
 	)

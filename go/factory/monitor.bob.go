@@ -64,8 +64,6 @@ type MonitorTemplate struct {
 	Headers                             func() null.Val[string]
 	BasicAuthUser                       func() null.Val[string]
 	BasicAuthPass                       func() null.Val[string]
-	DockerHost                          func() null.Val[string]
-	DockerContainer                     func() null.Val[string]
 	ProxyID                             func() null.Val[string]
 	ExpiryNotification                  func() null.Val[bool]
 	MQTTTopic                           func() null.Val[string]
@@ -471,14 +469,6 @@ func (o MonitorTemplate) BuildSetter() *models.MonitorSetter {
 		val := o.BasicAuthPass()
 		m.BasicAuthPass = omitnull.FromNull(val)
 	}
-	if o.DockerHost != nil {
-		val := o.DockerHost()
-		m.DockerHost = omitnull.FromNull(val)
-	}
-	if o.DockerContainer != nil {
-		val := o.DockerContainer()
-		m.DockerContainer = omitnull.FromNull(val)
-	}
 	if o.ProxyID != nil {
 		val := o.ProxyID()
 		m.ProxyID = omitnull.FromNull(val)
@@ -809,12 +799,6 @@ func (o MonitorTemplate) Build() *models.Monitor {
 	}
 	if o.BasicAuthPass != nil {
 		m.BasicAuthPass = o.BasicAuthPass()
-	}
-	if o.DockerHost != nil {
-		m.DockerHost = o.DockerHost()
-	}
-	if o.DockerContainer != nil {
-		m.DockerContainer = o.DockerContainer()
 	}
 	if o.ProxyID != nil {
 		m.ProxyID = o.ProxyID()
@@ -1407,8 +1391,6 @@ func (m monitorMods) RandomizeAllColumns(f *faker.Faker) MonitorMod {
 		MonitorMods.RandomHeaders(f),
 		MonitorMods.RandomBasicAuthUser(f),
 		MonitorMods.RandomBasicAuthPass(f),
-		MonitorMods.RandomDockerHost(f),
-		MonitorMods.RandomDockerContainer(f),
 		MonitorMods.RandomProxyID(f),
 		MonitorMods.RandomExpiryNotification(f),
 		MonitorMods.RandomMQTTTopic(f),
@@ -2604,112 +2586,6 @@ func (m monitorMods) RandomBasicAuthPass(f *faker.Faker) MonitorMod {
 func (m monitorMods) RandomBasicAuthPassNotNull(f *faker.Faker) MonitorMod {
 	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
 		o.BasicAuthPass = func() null.Val[string] {
-			if f == nil {
-				f = &defaultFaker
-			}
-
-			val := random_string(f)
-			return null.From(val)
-		}
-	})
-}
-
-// Set the model columns to this value
-func (m monitorMods) DockerHost(val null.Val[string]) MonitorMod {
-	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
-		o.DockerHost = func() null.Val[string] { return val }
-	})
-}
-
-// Set the Column from the function
-func (m monitorMods) DockerHostFunc(f func() null.Val[string]) MonitorMod {
-	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
-		o.DockerHost = f
-	})
-}
-
-// Clear any values for the column
-func (m monitorMods) UnsetDockerHost() MonitorMod {
-	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
-		o.DockerHost = nil
-	})
-}
-
-// Generates a random value for the column using the given faker
-// if faker is nil, a default faker is used
-// The generated value is sometimes null
-func (m monitorMods) RandomDockerHost(f *faker.Faker) MonitorMod {
-	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
-		o.DockerHost = func() null.Val[string] {
-			if f == nil {
-				f = &defaultFaker
-			}
-
-			val := random_string(f)
-			return null.From(val)
-		}
-	})
-}
-
-// Generates a random value for the column using the given faker
-// if faker is nil, a default faker is used
-// The generated value is never null
-func (m monitorMods) RandomDockerHostNotNull(f *faker.Faker) MonitorMod {
-	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
-		o.DockerHost = func() null.Val[string] {
-			if f == nil {
-				f = &defaultFaker
-			}
-
-			val := random_string(f)
-			return null.From(val)
-		}
-	})
-}
-
-// Set the model columns to this value
-func (m monitorMods) DockerContainer(val null.Val[string]) MonitorMod {
-	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
-		o.DockerContainer = func() null.Val[string] { return val }
-	})
-}
-
-// Set the Column from the function
-func (m monitorMods) DockerContainerFunc(f func() null.Val[string]) MonitorMod {
-	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
-		o.DockerContainer = f
-	})
-}
-
-// Clear any values for the column
-func (m monitorMods) UnsetDockerContainer() MonitorMod {
-	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
-		o.DockerContainer = nil
-	})
-}
-
-// Generates a random value for the column using the given faker
-// if faker is nil, a default faker is used
-// The generated value is sometimes null
-func (m monitorMods) RandomDockerContainer(f *faker.Faker) MonitorMod {
-	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
-		o.DockerContainer = func() null.Val[string] {
-			if f == nil {
-				f = &defaultFaker
-			}
-
-			val := random_string(f)
-			return null.From(val)
-		}
-	})
-}
-
-// Generates a random value for the column using the given faker
-// if faker is nil, a default faker is used
-// The generated value is never null
-func (m monitorMods) RandomDockerContainerNotNull(f *faker.Faker) MonitorMod {
-	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
-		o.DockerContainer = func() null.Val[string] {
 			if f == nil {
 				f = &defaultFaker
 			}

@@ -41,8 +41,6 @@ CREATE TABLE IF NOT EXISTS monitor (
     headers TEXT DEFAULT NULL,
     basic_auth_user VARCHAR(255) DEFAULT NULL,
     basic_auth_pass VARCHAR(255) DEFAULT NULL,
-    docker_host TEXT DEFAULT NULL,
-    docker_container VARCHAR(255) DEFAULT NULL,
     proxy_id TEXT DEFAULT NULL,
     expiry_notification BOOLEAN DEFAULT 0,
     mqtt_topic VARCHAR(255) DEFAULT NULL,
@@ -278,15 +276,6 @@ CREATE TABLE IF NOT EXISTS monitor_tls_info (
     monitor_id TEXT NOT NULL UNIQUE,
     info_json TEXT DEFAULT NULL,
     CONSTRAINT fk_tls_monitor FOREIGN KEY (monitor_id) REFERENCES monitor(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS docker_host (
-    id TEXT PRIMARY KEY,
-    user_id TEXT NOT NULL,
-    docker_daemon VARCHAR(500) DEFAULT NULL,
-    docker_type VARCHAR(10) NOT NULL DEFAULT 'socket',
-    name VARCHAR(150) NOT NULL,
-    CONSTRAINT fk_docker_user FOREIGN KEY (user_id) REFERENCES "user"(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS proxy (

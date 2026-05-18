@@ -103,20 +103,6 @@ func encodeCreateAPIKeyResponse(response *CreateAPIKeyCreated, w http.ResponseWr
 	return nil
 }
 
-func encodeCreateDockerHostResponse(response *CreateDockerHostCreated, w http.ResponseWriter, span trace.Span) error {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(201)
-	span.SetStatus(codes.Ok, http.StatusText(201))
-
-	e := new(jx.Encoder)
-	response.Encode(e)
-	if _, err := e.WriteTo(w); err != nil {
-		return errors.Wrap(err, "write")
-	}
-
-	return nil
-}
-
 func encodeCreateIncidentResponse(response *Incident, w http.ResponseWriter, span trace.Span) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(201)
@@ -216,13 +202,6 @@ func encodeCreateTagResponse(response *Tag, w http.ResponseWriter, span trace.Sp
 }
 
 func encodeDeleteAPIKeyResponse(response *DeleteAPIKeyNoContent, w http.ResponseWriter, span trace.Span) error {
-	w.WriteHeader(204)
-	span.SetStatus(codes.Ok, http.StatusText(204))
-
-	return nil
-}
-
-func encodeDeleteDockerHostResponse(response *DeleteDockerHostNoContent, w http.ResponseWriter, span trace.Span) error {
 	w.WriteHeader(204)
 	span.SetStatus(codes.Ok, http.StatusText(204))
 
@@ -754,24 +733,6 @@ func encodeListAPIKeysResponse(response []APIKey, w http.ResponseWriter, span tr
 	return nil
 }
 
-func encodeListDockerHostsResponse(response []DockerHost, w http.ResponseWriter, span trace.Span) error {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(200)
-	span.SetStatus(codes.Ok, http.StatusText(200))
-
-	e := new(jx.Encoder)
-	e.ArrStart()
-	for _, elem := range response {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-	if _, err := e.WriteTo(w); err != nil {
-		return errors.Wrap(err, "write")
-	}
-
-	return nil
-}
-
 func encodeListIncidentsResponse(response *ListIncidentsOK, w http.ResponseWriter, span trace.Span) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(200)
@@ -1165,20 +1126,6 @@ func encodeShrinkDatabaseResponse(response *MessageResponse, w http.ResponseWrit
 	return nil
 }
 
-func encodeTestDockerHostResponse(response *MessageResponse, w http.ResponseWriter, span trace.Span) error {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(200)
-	span.SetStatus(codes.Ok, http.StatusText(200))
-
-	e := new(jx.Encoder)
-	response.Encode(e)
-	if _, err := e.WriteTo(w); err != nil {
-		return errors.Wrap(err, "write")
-	}
-
-	return nil
-}
-
 func encodeTestNotificationResponse(response *MessageResponse, w http.ResponseWriter, span trace.Span) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(200)
@@ -1203,13 +1150,6 @@ func encodeUnpinIncidentResponse(response *MessageResponse, w http.ResponseWrite
 	if _, err := e.WriteTo(w); err != nil {
 		return errors.Wrap(err, "write")
 	}
-
-	return nil
-}
-
-func encodeUpdateDockerHostResponse(response *UpdateDockerHostOK, w http.ResponseWriter, span trace.Span) error {
-	w.WriteHeader(200)
-	span.SetStatus(codes.Ok, http.StatusText(200))
 
 	return nil
 }

@@ -30,8 +30,6 @@ type Monitor struct {
 	Headers              string    `db:"headers"`
 	BasicAuthUser        string    `db:"basic_auth_user"`
 	BasicAuthPass        string    `db:"basic_auth_pass"`
-	DockerHost           *string   `db:"docker_host"`
-	DockerContainer      string    `db:"docker_container"`
 	ProxyID              *string   `db:"proxy_id"`
 	Description          string    `db:"description"`
 	TLSCert              string    `db:"tls_cert"`

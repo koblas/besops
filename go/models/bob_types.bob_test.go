@@ -11,9 +11,6 @@ var testDB bob.Transactor[bob.Tx]
 // Make sure the type APIKey runs hooks after queries
 var _ bob.HookableType = &APIKey{}
 
-// Make sure the type DockerHost runs hooks after queries
-var _ bob.HookableType = &DockerHost{}
-
 // Make sure the type DomainExpiry runs hooks after queries
 var _ bob.HookableType = &DomainExpiry{}
 
@@ -67,6 +64,9 @@ var _ bob.HookableType = &RemoteBrowser{}
 
 // Make sure the type SchemaMigration runs hooks after queries
 var _ bob.HookableType = &SchemaMigration{}
+
+// Make sure the type Session runs hooks after queries
+var _ bob.HookableType = &Session{}
 
 // Make sure the type Setting runs hooks after queries
 var _ bob.HookableType = &Setting{}

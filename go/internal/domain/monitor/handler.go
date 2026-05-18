@@ -236,7 +236,6 @@ func monitorToOAS(m *Monitor) oas.Monitor {
 		MqttUsername:        oasutil.PtrToOptString(m.MQTTUsername),
 		MqttPassword:        oasutil.PtrToOptString(m.MQTTPassword),
 		DatabaseQuery:       oasutil.PtrToOptString(m.DatabaseQuery),
-		DockerContainer:     oasutil.PtrToOptString(m.DockerContainer),
 		GrpcUrl:             oasutil.PtrToOptString(m.GRPCUrl),
 		GrpcServiceName:     oasutil.PtrToOptString(m.GRPCServiceName),
 		GrpcMethod:          oasutil.PtrToOptString(m.GRPCMethod),
@@ -246,9 +245,6 @@ func monitorToOAS(m *Monitor) oas.Monitor {
 		ExpiryNotification:  oas.NewOptBool(m.ExpiryNotification),
 	}
 
-	if m.DockerHost != nil {
-		result.DockerHost = oas.NewOptUUID(oasutil.MustParseUUID(*m.DockerHost))
-	}
 	if m.ProxyID != nil {
 		result.ProxyId = oas.NewOptUUID(oasutil.MustParseUUID(*m.ProxyID))
 	}
@@ -298,8 +294,6 @@ func monitorFromInput(req *oas.MonitorInput, userID string) *Monitor {
 		MQTTUsername:        oasutil.OptStringValue(req.MqttUsername),
 		MQTTPassword:        oasutil.OptStringValue(req.MqttPassword),
 		DatabaseQuery:       oasutil.OptStringValue(req.DatabaseQuery),
-		DockerContainer:     oasutil.OptStringValue(req.DockerContainer),
-		DockerHost:          oasutil.OptUUIDPtr(req.DockerHost),
 		ProxyID:             oasutil.OptUUIDPtr(req.ProxyId),
 		GRPCUrl:             oasutil.OptStringValue(req.GrpcUrl),
 		GRPCServiceName:     oasutil.OptStringValue(req.GrpcServiceName),
@@ -412,12 +406,6 @@ func applyMonitorInput(m *Monitor, req *oas.MonitorInput) {
 	}
 	if req.DatabaseQuery.IsSet() {
 		m.DatabaseQuery = req.DatabaseQuery.Value
-	}
-	if req.DockerContainer.IsSet() {
-		m.DockerContainer = req.DockerContainer.Value
-	}
-	if req.DockerHost.IsSet() {
-		m.DockerHost = oasutil.OptUUIDPtr(req.DockerHost)
 	}
 	if req.ProxyId.IsSet() {
 		m.ProxyID = oasutil.OptUUIDPtr(req.ProxyId)

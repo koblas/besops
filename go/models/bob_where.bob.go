@@ -18,7 +18,6 @@ var (
 
 func Where[Q sqlite.Filterable]() struct {
 	APIKeys                   apiKeyWhere[Q]
-	DockerHosts               dockerHostWhere[Q]
 	DomainExpiries            domainExpiryWhere[Q]
 	Groups                    groupWhere[Q]
 	Heartbeats                heartbeatWhere[Q]
@@ -37,6 +36,7 @@ func Where[Q sqlite.Filterable]() struct {
 	Proxies                   proxyWhere[Q]
 	RemoteBrowsers            remoteBrowserWhere[Q]
 	SchemaMigrations          schemaMigrationWhere[Q]
+	Sessions                  sessionWhere[Q]
 	Settings                  settingWhere[Q]
 	StatDailies               statDailyWhere[Q]
 	StatHourlies              statHourlyWhere[Q]
@@ -48,7 +48,6 @@ func Where[Q sqlite.Filterable]() struct {
 } {
 	return struct {
 		APIKeys                   apiKeyWhere[Q]
-		DockerHosts               dockerHostWhere[Q]
 		DomainExpiries            domainExpiryWhere[Q]
 		Groups                    groupWhere[Q]
 		Heartbeats                heartbeatWhere[Q]
@@ -67,6 +66,7 @@ func Where[Q sqlite.Filterable]() struct {
 		Proxies                   proxyWhere[Q]
 		RemoteBrowsers            remoteBrowserWhere[Q]
 		SchemaMigrations          schemaMigrationWhere[Q]
+		Sessions                  sessionWhere[Q]
 		Settings                  settingWhere[Q]
 		StatDailies               statDailyWhere[Q]
 		StatHourlies              statHourlyWhere[Q]
@@ -77,7 +77,6 @@ func Where[Q sqlite.Filterable]() struct {
 		Users                     userWhere[Q]
 	}{
 		APIKeys:                   buildAPIKeyWhere[Q](APIKeys.Columns),
-		DockerHosts:               buildDockerHostWhere[Q](DockerHosts.Columns),
 		DomainExpiries:            buildDomainExpiryWhere[Q](DomainExpiries.Columns),
 		Groups:                    buildGroupWhere[Q](Groups.Columns),
 		Heartbeats:                buildHeartbeatWhere[Q](Heartbeats.Columns),
@@ -96,6 +95,7 @@ func Where[Q sqlite.Filterable]() struct {
 		Proxies:                   buildProxyWhere[Q](Proxies.Columns),
 		RemoteBrowsers:            buildRemoteBrowserWhere[Q](RemoteBrowsers.Columns),
 		SchemaMigrations:          buildSchemaMigrationWhere[Q](SchemaMigrations.Columns),
+		Sessions:                  buildSessionWhere[Q](Sessions.Columns),
 		Settings:                  buildSettingWhere[Q](Settings.Columns),
 		StatDailies:               buildStatDailyWhere[Q](StatDailies.Columns),
 		StatHourlies:              buildStatHourlyWhere[Q](StatHourlies.Columns),

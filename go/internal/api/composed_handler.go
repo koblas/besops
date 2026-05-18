@@ -8,7 +8,6 @@ import (
 	oas "github.com/koblas/besops/internal/api/oas_generated"
 	"github.com/koblas/besops/internal/domain/apikey"
 	"github.com/koblas/besops/internal/domain/badge"
-	"github.com/koblas/besops/internal/domain/dockerhost"
 	"github.com/koblas/besops/internal/domain/heartbeat"
 	"github.com/koblas/besops/internal/domain/maintenance"
 	"github.com/koblas/besops/internal/domain/monitor"
@@ -33,9 +32,8 @@ type ComposedHandler struct {
 	users         *user.Handler
 	monitors      *monitor.Handler
 	system        *system.Handler
-	proxies       *proxy.Handler
-	dockerHosts   *dockerhost.Handler
-	statusPages   *statuspage.Handler
+	proxies     *proxy.Handler
+	statusPages *statuspage.Handler
 	badges        *badge.Handler
 }
 
@@ -61,10 +59,6 @@ func WithUsers(h *user.Handler) Option       { return func(c *ComposedHandler) {
 func WithMonitors(h *monitor.Handler) Option { return func(c *ComposedHandler) { c.monitors = h } }
 func WithSystem(h *system.Handler) Option    { return func(c *ComposedHandler) { c.system = h } }
 func WithProxies(h *proxy.Handler) Option    { return func(c *ComposedHandler) { c.proxies = h } }
-func WithDockerHosts(h *dockerhost.Handler) Option {
-	return func(c *ComposedHandler) { c.dockerHosts = h }
-}
-
 func WithStatusPages(h *statuspage.Handler) Option {
 	return func(c *ComposedHandler) { c.statusPages = h }
 }
@@ -354,28 +348,6 @@ func (c *ComposedHandler) UpdateProxy(ctx context.Context, req *oas.ProxyInput, 
 
 func (c *ComposedHandler) DeleteProxy(ctx context.Context, params oas.DeleteProxyParams) error {
 	return c.proxies.DeleteProxy(ctx, params)
-}
-
-// --- Docker Host methods ---
-
-func (c *ComposedHandler) ListDockerHosts(ctx context.Context) ([]oas.DockerHost, error) {
-	return c.dockerHosts.ListDockerHosts(ctx)
-}
-
-func (c *ComposedHandler) CreateDockerHost(ctx context.Context, req *oas.DockerHostInput) (*oas.CreateDockerHostCreated, error) {
-	return c.dockerHosts.CreateDockerHost(ctx, req)
-}
-
-func (c *ComposedHandler) UpdateDockerHost(ctx context.Context, req *oas.DockerHostInput, params oas.UpdateDockerHostParams) error {
-	return c.dockerHosts.UpdateDockerHost(ctx, req, params)
-}
-
-func (c *ComposedHandler) DeleteDockerHost(ctx context.Context, params oas.DeleteDockerHostParams) error {
-	return c.dockerHosts.DeleteDockerHost(ctx, params)
-}
-
-func (c *ComposedHandler) TestDockerHost(ctx context.Context, params oas.TestDockerHostParams) (*oas.MessageResponse, error) {
-	return c.dockerHosts.TestDockerHost(ctx, params)
 }
 
 // --- Status Page methods ---

@@ -54,7 +54,6 @@ type UsersQuery = *sqlite.ViewQuery[*User, UserSlice]
 // userR is where relationships are stored.
 type userR struct {
 	APIKeys        APIKeySlice        // fk_api_key_0
-	DockerHosts    DockerHostSlice    // fk_docker_host_0
 	Maintenances   MaintenanceSlice   // fk_maintenance_0
 	Monitors       MonitorSlice       // fk_monitor_1
 	Notifications  NotificationSlice  // fk_notification_0
@@ -563,25 +562,6 @@ func (os UserSlice) APIKeys(mods ...bob.Mod[*dialect.SelectQuery]) APIKeysQuery 
 	)...)
 }
 
-// DockerHosts starts a query for related objects on docker_host
-func (o *User) DockerHosts(mods ...bob.Mod[*dialect.SelectQuery]) DockerHostsQuery {
-	return DockerHosts.Query(append(mods,
-		sm.Where(DockerHosts.Columns.UserID.EQ(sqlite.Arg(o.ID))),
-	)...)
-}
-
-func (os UserSlice) DockerHosts(mods ...bob.Mod[*dialect.SelectQuery]) DockerHostsQuery {
-	PKArgSlice := make([]bob.Expression, len(os))
-	for i, o := range os {
-		PKArgSlice[i] = sqlite.ArgGroup(o.ID)
-	}
-	PKArgExpr := sqlite.Group(PKArgSlice...)
-
-	return DockerHosts.Query(append(mods,
-		sm.Where(sqlite.Group(DockerHosts.Columns.UserID).OP("IN", PKArgExpr)),
-	)...)
-}
-
 // Maintenances starts a query for related objects on maintenance
 func (o *User) Maintenances(mods ...bob.Mod[*dialect.SelectQuery]) MaintenancesQuery {
 	return Maintenances.Query(append(mods,
@@ -737,74 +717,6 @@ func (user0 *User) AttachAPIKeys(ctx context.Context, exec bob.Executor, related
 	}
 
 	user0.R.APIKeys = append(user0.R.APIKeys, apiKeys1...)
-
-	for _, rel := range related {
-		rel.R.User = user0
-	}
-
-	return nil
-}
-
-func insertUserDockerHosts0(ctx context.Context, exec bob.Executor, dockerHosts1 []*DockerHostSetter, user0 *User) (DockerHostSlice, error) {
-	for i := range dockerHosts1 {
-		dockerHosts1[i].UserID = omit.From(user0.ID)
-	}
-
-	ret, err := DockerHosts.Insert(bob.ToMods(dockerHosts1...)).All(ctx, exec)
-	if err != nil {
-		return ret, fmt.Errorf("insertUserDockerHosts0: %w", err)
-	}
-
-	return ret, nil
-}
-
-func attachUserDockerHosts0(ctx context.Context, exec bob.Executor, count int, dockerHosts1 DockerHostSlice, user0 *User) (DockerHostSlice, error) {
-	setter := &DockerHostSetter{
-		UserID: omit.From(user0.ID),
-	}
-
-	err := dockerHosts1.UpdateAll(ctx, exec, *setter)
-	if err != nil {
-		return nil, fmt.Errorf("attachUserDockerHosts0: %w", err)
-	}
-
-	return dockerHosts1, nil
-}
-
-func (user0 *User) InsertDockerHosts(ctx context.Context, exec bob.Executor, related ...*DockerHostSetter) error {
-	if len(related) == 0 {
-		return nil
-	}
-
-	var err error
-
-	dockerHosts1, err := insertUserDockerHosts0(ctx, exec, related, user0)
-	if err != nil {
-		return err
-	}
-
-	user0.R.DockerHosts = append(user0.R.DockerHosts, dockerHosts1...)
-
-	for _, rel := range dockerHosts1 {
-		rel.R.User = user0
-	}
-	return nil
-}
-
-func (user0 *User) AttachDockerHosts(ctx context.Context, exec bob.Executor, related ...*DockerHost) error {
-	if len(related) == 0 {
-		return nil
-	}
-
-	var err error
-	dockerHosts1 := DockerHostSlice(related)
-
-	_, err = attachUserDockerHosts0(ctx, exec, len(related), dockerHosts1, user0)
-	if err != nil {
-		return err
-	}
-
-	user0.R.DockerHosts = append(user0.R.DockerHosts, dockerHosts1...)
 
 	for _, rel := range related {
 		rel.R.User = user0
@@ -1203,20 +1115,6 @@ func (o *User) Preload(name string, retrieved any) error {
 			}
 		}
 		return nil
-	case "DockerHosts":
-		rels, ok := retrieved.(DockerHostSlice)
-		if !ok {
-			return fmt.Errorf("user cannot load %T as %q", retrieved, name)
-		}
-
-		o.R.DockerHosts = rels
-
-		for _, rel := range rels {
-			if rel != nil {
-				rel.R.User = o
-			}
-		}
-		return nil
 	case "Maintenances":
 		rels, ok := retrieved.(MaintenanceSlice)
 		if !ok {
@@ -1300,7 +1198,6 @@ func buildUserPreloader() userPreloader {
 
 type userThenLoader[Q orm.Loadable] struct {
 	APIKeys        func(...bob.Mod[*dialect.SelectQuery]) orm.Loader[Q]
-	DockerHosts    func(...bob.Mod[*dialect.SelectQuery]) orm.Loader[Q]
 	Maintenances   func(...bob.Mod[*dialect.SelectQuery]) orm.Loader[Q]
 	Monitors       func(...bob.Mod[*dialect.SelectQuery]) orm.Loader[Q]
 	Notifications  func(...bob.Mod[*dialect.SelectQuery]) orm.Loader[Q]
@@ -1311,9 +1208,6 @@ type userThenLoader[Q orm.Loadable] struct {
 func buildUserThenLoader[Q orm.Loadable]() userThenLoader[Q] {
 	type APIKeysLoadInterface interface {
 		LoadAPIKeys(context.Context, bob.Executor, ...bob.Mod[*dialect.SelectQuery]) error
-	}
-	type DockerHostsLoadInterface interface {
-		LoadDockerHosts(context.Context, bob.Executor, ...bob.Mod[*dialect.SelectQuery]) error
 	}
 	type MaintenancesLoadInterface interface {
 		LoadMaintenances(context.Context, bob.Executor, ...bob.Mod[*dialect.SelectQuery]) error
@@ -1336,12 +1230,6 @@ func buildUserThenLoader[Q orm.Loadable]() userThenLoader[Q] {
 			"APIKeys",
 			func(ctx context.Context, exec bob.Executor, retrieved APIKeysLoadInterface, mods ...bob.Mod[*dialect.SelectQuery]) error {
 				return retrieved.LoadAPIKeys(ctx, exec, mods...)
-			},
-		),
-		DockerHosts: thenLoadBuilder[Q](
-			"DockerHosts",
-			func(ctx context.Context, exec bob.Executor, retrieved DockerHostsLoadInterface, mods ...bob.Mod[*dialect.SelectQuery]) error {
-				return retrieved.LoadDockerHosts(ctx, exec, mods...)
 			},
 		),
 		Maintenances: thenLoadBuilder[Q](
@@ -1432,67 +1320,6 @@ func (os UserSlice) LoadAPIKeys(ctx context.Context, exec bob.Executor, mods ...
 			rel.R.User = o
 
 			o.R.APIKeys = append(o.R.APIKeys, rel)
-		}
-	}
-
-	return nil
-}
-
-// LoadDockerHosts loads the user's DockerHosts into the .R struct
-func (o *User) LoadDockerHosts(ctx context.Context, exec bob.Executor, mods ...bob.Mod[*dialect.SelectQuery]) error {
-	if o == nil {
-		return nil
-	}
-
-	// Reset the relationship
-	o.R.DockerHosts = nil
-
-	related, err := o.DockerHosts(mods...).All(ctx, exec)
-	if err != nil {
-		return err
-	}
-
-	for _, rel := range related {
-		rel.R.User = o
-	}
-
-	o.R.DockerHosts = related
-	return nil
-}
-
-// LoadDockerHosts loads the user's DockerHosts into the .R struct
-func (os UserSlice) LoadDockerHosts(ctx context.Context, exec bob.Executor, mods ...bob.Mod[*dialect.SelectQuery]) error {
-	if len(os) == 0 {
-		return nil
-	}
-
-	dockerHosts, err := os.DockerHosts(mods...).All(ctx, exec)
-	if err != nil {
-		return err
-	}
-
-	for _, o := range os {
-		if o == nil {
-			continue
-		}
-
-		o.R.DockerHosts = nil
-	}
-
-	for _, o := range os {
-		if o == nil {
-			continue
-		}
-
-		for _, rel := range dockerHosts {
-
-			if !(o.ID == rel.UserID) {
-				continue
-			}
-
-			rel.R.User = o
-
-			o.R.DockerHosts = append(o.R.DockerHosts, rel)
 		}
 	}
 
@@ -1807,7 +1634,6 @@ func (os UserSlice) LoadRemoteBrowsers(ctx context.Context, exec bob.Executor, m
 // userC is where relationship counts are stored.
 type userC struct {
 	APIKeys        *int64
-	DockerHosts    *int64
 	Maintenances   *int64
 	Monitors       *int64
 	Notifications  *int64
@@ -1824,8 +1650,6 @@ func (o *User) PreloadCount(name string, count int64) error {
 	switch name {
 	case "APIKeys":
 		o.C.APIKeys = &count
-	case "DockerHosts":
-		o.C.DockerHosts = &count
 	case "Maintenances":
 		o.C.Maintenances = &count
 	case "Monitors":
@@ -1842,7 +1666,6 @@ func (o *User) PreloadCount(name string, count int64) error {
 
 type userCountPreloader struct {
 	APIKeys        func(...bob.Mod[*dialect.SelectQuery]) sqlite.Preloader
-	DockerHosts    func(...bob.Mod[*dialect.SelectQuery]) sqlite.Preloader
 	Maintenances   func(...bob.Mod[*dialect.SelectQuery]) sqlite.Preloader
 	Monitors       func(...bob.Mod[*dialect.SelectQuery]) sqlite.Preloader
 	Notifications  func(...bob.Mod[*dialect.SelectQuery]) sqlite.Preloader
@@ -1864,23 +1687,6 @@ func buildUserCountPreloader() userCountPreloader {
 
 					sm.From(APIKeys.Name()),
 					sm.Where(sqlite.Quote(APIKeys.Alias(), "user_id").EQ(sqlite.Quote(parent, "id"))),
-				}
-				subqueryMods = append(subqueryMods, mods...)
-				return sqlite.Group(sqlite.Select(subqueryMods...).Expression)
-			})
-		},
-		DockerHosts: func(mods ...bob.Mod[*dialect.SelectQuery]) sqlite.Preloader {
-			return countPreloader[*User]("DockerHosts", func(parent string) bob.Expression {
-				// Build a correlated subquery: (SELECT COUNT(*) FROM related WHERE fk = parent.pk)
-				if parent == "" {
-					parent = Users.Alias()
-				}
-
-				subqueryMods := []bob.Mod[*dialect.SelectQuery]{
-					sm.Columns(sqlite.Raw("count(*)")),
-
-					sm.From(DockerHosts.Name()),
-					sm.Where(sqlite.Quote(DockerHosts.Alias(), "user_id").EQ(sqlite.Quote(parent, "id"))),
 				}
 				subqueryMods = append(subqueryMods, mods...)
 				return sqlite.Group(sqlite.Select(subqueryMods...).Expression)
@@ -1976,7 +1782,6 @@ func buildUserCountPreloader() userCountPreloader {
 
 type userCountThenLoader[Q orm.Loadable] struct {
 	APIKeys        func(...bob.Mod[*dialect.SelectQuery]) orm.Loader[Q]
-	DockerHosts    func(...bob.Mod[*dialect.SelectQuery]) orm.Loader[Q]
 	Maintenances   func(...bob.Mod[*dialect.SelectQuery]) orm.Loader[Q]
 	Monitors       func(...bob.Mod[*dialect.SelectQuery]) orm.Loader[Q]
 	Notifications  func(...bob.Mod[*dialect.SelectQuery]) orm.Loader[Q]
@@ -1987,9 +1792,6 @@ type userCountThenLoader[Q orm.Loadable] struct {
 func buildUserCountThenLoader[Q orm.Loadable]() userCountThenLoader[Q] {
 	type APIKeysCountInterface interface {
 		LoadCountAPIKeys(context.Context, bob.Executor, ...bob.Mod[*dialect.SelectQuery]) error
-	}
-	type DockerHostsCountInterface interface {
-		LoadCountDockerHosts(context.Context, bob.Executor, ...bob.Mod[*dialect.SelectQuery]) error
 	}
 	type MaintenancesCountInterface interface {
 		LoadCountMaintenances(context.Context, bob.Executor, ...bob.Mod[*dialect.SelectQuery]) error
@@ -2012,12 +1814,6 @@ func buildUserCountThenLoader[Q orm.Loadable]() userCountThenLoader[Q] {
 			"APIKeys",
 			func(ctx context.Context, exec bob.Executor, retrieved APIKeysCountInterface, mods ...bob.Mod[*dialect.SelectQuery]) error {
 				return retrieved.LoadCountAPIKeys(ctx, exec, mods...)
-			},
-		),
-		DockerHosts: countThenLoadBuilder[Q](
-			"DockerHosts",
-			func(ctx context.Context, exec bob.Executor, retrieved DockerHostsCountInterface, mods ...bob.Mod[*dialect.SelectQuery]) error {
-				return retrieved.LoadCountDockerHosts(ctx, exec, mods...)
 			},
 		),
 		Maintenances: countThenLoadBuilder[Q](
@@ -2126,84 +1922,6 @@ func (os UserSlice) LoadCountAPIKeys(ctx context.Context, exec bob.Executor, mod
 		}
 		count := countMap[o.ID]
 		o.C.APIKeys = &count
-	}
-
-	return nil
-}
-
-// LoadCountDockerHosts loads the count of DockerHosts into the C struct
-func (o *User) LoadCountDockerHosts(ctx context.Context, exec bob.Executor, mods ...bob.Mod[*dialect.SelectQuery]) error {
-	if o == nil {
-		return nil
-	}
-
-	count, err := o.DockerHosts(mods...).Count(ctx, exec)
-	if err != nil {
-		return err
-	}
-
-	o.C.DockerHosts = &count
-	return nil
-}
-
-// LoadCountDockerHosts loads the count of DockerHosts for a slice in a single batch query
-func (os UserSlice) LoadCountDockerHosts(ctx context.Context, exec bob.Executor, mods ...bob.Mod[*dialect.SelectQuery]) error {
-	if len(os) == 0 {
-		return nil
-	}
-
-	// Build the IN arg expression from parent PKs
-	PKArgSlice := make([]bob.Expression, 0, len(os))
-	for _, o := range os {
-		if o == nil {
-			continue
-		}
-		PKArgSlice = append(PKArgSlice, sqlite.Arg(o.ID))
-	}
-	PKArgExpr := sqlite.Group(PKArgSlice...)
-
-	// countResult holds one scanned row from the batch count query.
-	// FK columns are aliased to the parent PK column names for direct map lookup.
-	type countResult struct {
-		ID    string
-		Count int64
-	}
-
-	batchMods := []bob.Mod[*dialect.SelectQuery]{
-		// SELECT fk AS parent_pk, count(*)
-		sm.Columns(
-			DockerHosts.Columns.UserID.As("id"),
-			sqlite.Raw("count(*) as count"),
-		),
-		// Single-hop: FROM related table directly
-		sm.From(DockerHosts.NameAs()),
-
-		// WHERE fk IN (parent PKs)
-		sm.Where(DockerHosts.Columns.UserID.OP("IN", PKArgExpr)),
-		// GROUP BY fk columns
-		sm.GroupBy(DockerHosts.Columns.UserID),
-	}
-	batchMods = append(batchMods, mods...)
-
-	results, err := bob.All(ctx, exec,
-		sqlite.Select(batchMods...),
-		scan.StructMapper[countResult](),
-	)
-	if err != nil {
-		return err
-	}
-
-	// Single-column FK: direct map lookup
-	countMap := make(map[string]int64, len(results))
-	for _, r := range results {
-		countMap[r.ID] = r.Count
-	}
-	for _, o := range os {
-		if o == nil {
-			continue
-		}
-		count := countMap[o.ID]
-		o.C.DockerHosts = &count
 	}
 
 	return nil
@@ -2602,7 +2320,6 @@ func (os UserSlice) LoadCountRemoteBrowsers(ctx context.Context, exec bob.Execut
 type userJoins[Q dialect.Joinable] struct {
 	typ            string
 	APIKeys        modAs[Q, apiKeyColumns]
-	DockerHosts    modAs[Q, dockerHostColumns]
 	Maintenances   modAs[Q, maintenanceColumns]
 	Monitors       modAs[Q, monitorColumns]
 	Notifications  modAs[Q, notificationColumns]
@@ -2624,20 +2341,6 @@ func buildUserJoins[Q dialect.Joinable](cols userColumns, typ string) userJoins[
 
 				{
 					mods = append(mods, dialect.Join[Q](typ, APIKeys.Name().As(to.Alias())).On(
-						to.UserID.EQ(cols.ID),
-					))
-				}
-
-				return mods
-			},
-		},
-		DockerHosts: modAs[Q, dockerHostColumns]{
-			c: DockerHosts.Columns,
-			f: func(to dockerHostColumns) bob.Mod[Q] {
-				mods := make(mods.QueryMods[Q], 0, 1)
-
-				{
-					mods = append(mods, dialect.Join[Q](typ, DockerHosts.Name().As(to.Alias())).On(
 						to.UserID.EQ(cols.ID),
 					))
 				}

@@ -27,7 +27,7 @@ func TestMigrateUpDown(t *testing.T) {
 	expected := []string{
 		"user", "monitor", "heartbeat", "notification",
 		"tag", "status_page", "maintenance", "setting",
-		"api_key", "proxy", "docker_host",
+		"api_key", "proxy",
 	}
 	for _, table := range expected {
 		if !slices.Contains(tables, table) {

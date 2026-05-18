@@ -31,8 +31,6 @@ tags:
     description: Application settings
   - name: api-keys
     description: API key management
-  - name: docker
-    description: Docker host management
   - name: proxy
     description: Proxy configuration
   - name: badges
@@ -1474,98 +1472,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
 
-  # ─── Docker ─────────────────────────────────────────────────────────────
-  /docker-hosts:
-    get:
-      operationId: listDockerHosts
-      tags: [docker]
-      x-ogen-operation-group: DockerHost
-      summary: List Docker hosts
-      responses:
-        "200":
-          description: Docker host list
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/DockerHost"
-    post:
-      operationId: createDockerHost
-      tags: [docker]
-      x-ogen-operation-group: DockerHost
-      summary: Add a Docker host
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/DockerHostInput"
-      responses:
-        "201":
-          description: Docker host added
-          content:
-            application/json:
-              schema:
-                type: object
-                required: [id]
-                properties:
-                  id:
-                    type: string
-                    format: uuid
-
-  /docker-hosts/{dockerHostId}:
-    parameters:
-      - name: dockerHostId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-    put:
-      operationId: updateDockerHost
-      tags: [docker]
-      x-ogen-operation-group: DockerHost
-      summary: Update a Docker host
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/DockerHostInput"
-      responses:
-        "200":
-          description: Docker host updated
-    delete:
-      operationId: deleteDockerHost
-      tags: [docker]
-      x-ogen-operation-group: DockerHost
-      summary: Delete a Docker host
-      responses:
-        "204":
-          description: Docker host deleted
-
-  /docker-hosts/{dockerHostId}/test:
-    parameters:
-      - name: dockerHostId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-    post:
-      operationId: testDockerHost
-      tags: [docker]
-      x-ogen-operation-group: DockerHost
-      summary: Test Docker host connection
-      responses:
-        "200":
-          description: Connection test result
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponse"
-
   # ─── Proxies ────────────────────────────────────────────────────────────
   /proxies:
     get:
@@ -2067,7 +1973,6 @@ components:
             - json-query
             - grpc-keyword
             - dns
-            - docker
             - push
             - steam
             - gamedig
@@ -2215,14 +2120,6 @@ components:
           type: string
           maxLength: 2000
           description: SQL query to execute for database monitors. A successful query execution indicates UP.
-        dockerHost:
-          type: string
-          format: uuid
-          description: ID of the Docker host to use for Docker container monitors.
-        dockerContainer:
-          type: string
-          maxLength: 255
-          description: Docker container name or ID to monitor.
         proxyId:
           type: string
           format: uuid
@@ -2390,12 +2287,6 @@ components:
         databaseQuery:
           type: string
           maxLength: 2000
-        dockerHost:
-          type: string
-          format: uuid
-        dockerContainer:
-          type: string
-          maxLength: 255
         proxyId:
           type: string
           format: uuid
@@ -3058,48 +2949,6 @@ components:
           type: string
           format: date-time
           description: Optional expiration date/time. If omitted, the key never expires.
-
-    DockerHost:
-      description: A Docker daemon connection used by Docker-type monitors to check container health.
-      type: object
-      required: [id, name, dockerType]
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: Unique identifier for this Docker host.
-        name:
-          type: string
-          minLength: 1
-          maxLength: 150
-          description: Human-readable name for this Docker host connection.
-        dockerType:
-          type: string
-          enum: [socket, tcp]
-          description: "Connection method: 'socket' for local Unix socket, 'tcp' for remote TCP connection."
-        dockerDaemon:
-          type: string
-          maxLength: 500
-          description: "Connection URI (e.g., '/var/run/docker.sock' for socket, 'tcp://host:2376' for TCP)."
-
-    DockerHostInput:
-      description: Input for adding or updating a Docker host connection.
-      type: object
-      required: [name, dockerType]
-      properties:
-        name:
-          type: string
-          minLength: 1
-          maxLength: 150
-          description: Human-readable name for this Docker host connection.
-        dockerType:
-          type: string
-          enum: [socket, tcp]
-          description: "Connection method: 'socket' for local Unix socket, 'tcp' for remote TCP connection."
-        dockerDaemon:
-          type: string
-          maxLength: 500
-          description: "Connection URI (e.g., '/var/run/docker.sock' for socket, 'tcp://host:2376' for TCP)."
 
     Proxy:
       description: An HTTP or SOCKS proxy used by monitors for outbound connections to their targets.

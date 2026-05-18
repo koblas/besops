@@ -77,15 +77,6 @@ func (UnimplementedHandler) CreateAPIKey(ctx context.Context, req *APIKeyInput) 
 	return r, ht.ErrNotImplemented
 }
 
-// CreateDockerHost implements createDockerHost operation.
-//
-// Add a Docker host.
-//
-// POST /docker-hosts
-func (UnimplementedHandler) CreateDockerHost(ctx context.Context, req *DockerHostInput) (r *CreateDockerHostCreated, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // CreateIncident implements createIncident operation.
 //
 // Create an incident on a status page.
@@ -155,15 +146,6 @@ func (UnimplementedHandler) CreateTag(ctx context.Context, req *TagInput) (r *Ta
 //
 // DELETE /api-keys/{keyId}
 func (UnimplementedHandler) DeleteAPIKey(ctx context.Context, params DeleteAPIKeyParams) error {
-	return ht.ErrNotImplemented
-}
-
-// DeleteDockerHost implements deleteDockerHost operation.
-//
-// Delete a Docker host.
-//
-// DELETE /docker-hosts/{dockerHostId}
-func (UnimplementedHandler) DeleteDockerHost(ctx context.Context, params DeleteDockerHostParams) error {
 	return ht.ErrNotImplemented
 }
 
@@ -483,15 +465,6 @@ func (UnimplementedHandler) ListAPIKeys(ctx context.Context) (r []APIKey, _ erro
 	return r, ht.ErrNotImplemented
 }
 
-// ListDockerHosts implements listDockerHosts operation.
-//
-// List Docker hosts.
-//
-// GET /docker-hosts
-func (UnimplementedHandler) ListDockerHosts(ctx context.Context) (r []DockerHost, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // ListIncidents implements listIncidents operation.
 //
 // Get incident history for a status page.
@@ -690,15 +663,6 @@ func (UnimplementedHandler) ShrinkDatabase(ctx context.Context) (r *MessageRespo
 	return r, ht.ErrNotImplemented
 }
 
-// TestDockerHost implements testDockerHost operation.
-//
-// Test Docker host connection.
-//
-// POST /docker-hosts/{dockerHostId}/test
-func (UnimplementedHandler) TestDockerHost(ctx context.Context, params TestDockerHostParams) (r *MessageResponse, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // TestNotification implements testNotification operation.
 //
 // Send a test notification.
@@ -715,15 +679,6 @@ func (UnimplementedHandler) TestNotification(ctx context.Context, params TestNot
 // POST /status-pages/{slug}/incidents/{incidentId}/unpin
 func (UnimplementedHandler) UnpinIncident(ctx context.Context, params UnpinIncidentParams) (r *MessageResponse, _ error) {
 	return r, ht.ErrNotImplemented
-}
-
-// UpdateDockerHost implements updateDockerHost operation.
-//
-// Update a Docker host.
-//
-// PUT /docker-hosts/{dockerHostId}
-func (UnimplementedHandler) UpdateDockerHost(ctx context.Context, req *DockerHostInput, params UpdateDockerHostParams) error {
-	return ht.ErrNotImplemented
 }
 
 // UpdateIncident implements updateIncident operation.

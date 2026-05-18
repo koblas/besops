@@ -13,7 +13,6 @@ type Handler interface {
 	APIKeyHandler
 	AuthHandler
 	BadgeHandler
-	DockerHostHandler
 	EventHandler
 	HeartbeatHandler
 	IncidentHandler
@@ -164,42 +163,6 @@ type BadgeHandler interface {
 	//
 	// GET /badges/{monitorId}/uptime
 	GetUptimeBadge(ctx context.Context, params GetUptimeBadgeParams) (SVGBadge, error)
-}
-
-// DockerHostHandler handles operations described by OpenAPI v3 specification.
-//
-// x-ogen-operation-group: DockerHost
-type DockerHostHandler interface {
-	// CreateDockerHost implements createDockerHost operation.
-	//
-	// Add a Docker host.
-	//
-	// POST /docker-hosts
-	CreateDockerHost(ctx context.Context, req *DockerHostInput) (*CreateDockerHostCreated, error)
-	// DeleteDockerHost implements deleteDockerHost operation.
-	//
-	// Delete a Docker host.
-	//
-	// DELETE /docker-hosts/{dockerHostId}
-	DeleteDockerHost(ctx context.Context, params DeleteDockerHostParams) error
-	// ListDockerHosts implements listDockerHosts operation.
-	//
-	// List Docker hosts.
-	//
-	// GET /docker-hosts
-	ListDockerHosts(ctx context.Context) ([]DockerHost, error)
-	// TestDockerHost implements testDockerHost operation.
-	//
-	// Test Docker host connection.
-	//
-	// POST /docker-hosts/{dockerHostId}/test
-	TestDockerHost(ctx context.Context, params TestDockerHostParams) (*MessageResponse, error)
-	// UpdateDockerHost implements updateDockerHost operation.
-	//
-	// Update a Docker host.
-	//
-	// PUT /docker-hosts/{dockerHostId}
-	UpdateDockerHost(ctx context.Context, req *DockerHostInput, params UpdateDockerHostParams) error
 }
 
 // EventHandler handles operations described by OpenAPI v3 specification.

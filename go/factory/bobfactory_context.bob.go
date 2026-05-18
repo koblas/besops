@@ -12,10 +12,6 @@ var (
 	apiKeyWithParentsCascadingCtx = newContextual[bool]("apiKeyWithParentsCascading")
 	apiKeyRelUserCtx              = newContextual[bool]("api_key.user.fk_api_key_0")
 
-	// Relationship Contexts for docker_host
-	dockerHostWithParentsCascadingCtx = newContextual[bool]("dockerHostWithParentsCascading")
-	dockerHostRelUserCtx              = newContextual[bool]("docker_host.user.fk_docker_host_0")
-
 	// Relationship Contexts for domain_expiry
 	domainExpiryWithParentsCascadingCtx = newContextual[bool]("domainExpiryWithParentsCascading")
 
@@ -108,6 +104,9 @@ var (
 	// Relationship Contexts for schema_migrations
 	schemaMigrationWithParentsCascadingCtx = newContextual[bool]("schemaMigrationWithParentsCascading")
 
+	// Relationship Contexts for session
+	sessionWithParentsCascadingCtx = newContextual[bool]("sessionWithParentsCascading")
+
 	// Relationship Contexts for setting
 	settingWithParentsCascadingCtx = newContextual[bool]("settingWithParentsCascading")
 
@@ -141,7 +140,6 @@ var (
 	// Relationship Contexts for user
 	userWithParentsCascadingCtx = newContextual[bool]("userWithParentsCascading")
 	userRelAPIKeysCtx           = newContextual[bool]("api_key.user.fk_api_key_0")
-	userRelDockerHostsCtx       = newContextual[bool]("docker_host.user.fk_docker_host_0")
 	userRelMaintenancesCtx      = newContextual[bool]("maintenance.user.fk_maintenance_0")
 	userRelMonitorsCtx          = newContextual[bool]("monitor.user.fk_monitor_1")
 	userRelNotificationsCtx     = newContextual[bool]("notification.user.fk_notification_0")
