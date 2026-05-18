@@ -6,8 +6,6 @@ export type Tag = components['schemas']['Tag'];
 export type TagInput = components['schemas']['TagInput'];
 export type MonitorTag = components['schemas']['MonitorTag'];
 
-type Monitor = components['schemas']['Monitor'];
-
 export function useTags() {
   return useQuery({
     queryKey: ['tags'],
@@ -75,32 +73,7 @@ export function useAddMonitorTag() {
       });
       if (error || !response.ok) throw error ?? new Error(`Failed: ${response.status}`);
     },
-    onMutate: async ({ monitorId, tagId }) => {
-      await queryClient.cancelQueries({ queryKey: ['monitors', monitorId] });
-      const previous = queryClient.getQueryData<Monitor>(['monitors', monitorId]);
-
-      if (previous) {
-        const allTags = queryClient.getQueryData<Tag[]>(['tags']) ?? [];
-        const tag = allTags.find(t => t.id === tagId);
-        const newMonitorTag: MonitorTag = {
-          tagId,
-          name: tag?.name,
-          color: tag?.color,
-        };
-        queryClient.setQueryData<Monitor>(['monitors', monitorId], {
-          ...previous,
-          tags: [...(previous.tags ?? []), newMonitorTag],
-        });
-      }
-
-      return { previous, monitorId };
-    },
-    onError: (_err, _vars, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(['monitors', context.monitorId], context.previous);
-      }
-    },
-    onSettled: (_data, _err, { monitorId }) => {
+    onSuccess: (_data, { monitorId }) => {
       queryClient.invalidateQueries({ queryKey: ['monitors', monitorId] });
       queryClient.invalidateQueries({ queryKey: ['monitors'], exact: true });
     },
@@ -116,25 +89,7 @@ export function useRemoveMonitorTag() {
       });
       if (error || !response.ok) throw error ?? new Error(`Failed: ${response.status}`);
     },
-    onMutate: async ({ monitorId, tagId }) => {
-      await queryClient.cancelQueries({ queryKey: ['monitors', monitorId] });
-      const previous = queryClient.getQueryData<Monitor>(['monitors', monitorId]);
-
-      if (previous) {
-        queryClient.setQueryData<Monitor>(['monitors', monitorId], {
-          ...previous,
-          tags: (previous.tags ?? []).filter(t => t.tagId !== tagId),
-        });
-      }
-
-      return { previous, monitorId };
-    },
-    onError: (_err, _vars, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(['monitors', context.monitorId], context.previous);
-      }
-    },
-    onSettled: (_data, _err, { monitorId }) => {
+    onSuccess: (_data, { monitorId }) => {
       queryClient.invalidateQueries({ queryKey: ['monitors', monitorId] });
       queryClient.invalidateQueries({ queryKey: ['monitors'], exact: true });
     },

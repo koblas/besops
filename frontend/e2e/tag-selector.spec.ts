@@ -1,19 +1,26 @@
 import { test, expect } from '@playwright/test';
 import { setupAuthenticatedSession, mockAPIs, mockMonitor, mockTags } from './helpers';
 
-test.describe('TagSelector on Monitor Edit', () => {
+test.describe('TagSelector on Monitor Form', () => {
   test.beforeEach(async ({ page }) => {
     await setupAuthenticatedSession(page);
     await mockAPIs(page);
   });
 
-  test('displays assigned tags with remove buttons', async ({ page }) => {
+  test('displays assigned tags on edit form', async ({ page }) => {
     await page.goto('/edit/mon-1');
 
     const tagsCard = page.locator('.ant-card', { hasText: 'Tags' });
     await expect(tagsCard).toBeVisible();
     await expect(tagsCard.getByText('production')).toBeVisible();
     await expect(tagsCard.getByText('critical')).toBeVisible();
+  });
+
+  test('shows tags card on new monitor form', async ({ page }) => {
+    await page.goto('/add');
+    const tagsCard = page.locator('.ant-card', { hasText: 'Tags' });
+    await expect(tagsCard).toBeVisible();
+    await expect(tagsCard.getByText('No tags assigned')).toBeVisible();
   });
 
   test('shows available tags in the dropdown excluding already-assigned', async ({ page }) => {
@@ -23,18 +30,16 @@ test.describe('TagSelector on Monitor Edit', () => {
     const select = tagsCard.locator('.ant-select');
     await select.click();
 
-    // 'staging' is available (not assigned), 'production' and 'critical' should not be
     await expect(page.getByTitle('staging')).toBeVisible();
     await expect(page.locator('.ant-select-item[title="production"]')).not.toBeVisible();
     await expect(page.locator('.ant-select-item[title="critical"]')).not.toBeVisible();
   });
 
-  test('adds a tag by selecting from dropdown', async ({ page }) => {
-    const addRequests: string[] = [];
+  test('selecting a tag shows it immediately in the UI without API call', async ({ page }) => {
+    let addTagCalled = false;
     await page.route('**/api/v1/monitors/mon-1/tags', async (route) => {
       if (route.request().method() === 'POST') {
-        const body = route.request().postDataJSON();
-        addRequests.push(body.tagId);
+        addTagCalled = true;
         return route.fulfill({ status: 201 });
       }
       return route.fulfill({ status: 201 });
@@ -47,15 +52,17 @@ test.describe('TagSelector on Monitor Edit', () => {
     await select.click();
     await page.getByTitle('staging').click();
 
-    expect(addRequests).toContain('tag-3');
+    // Tag appears in the UI immediately
+    await expect(tagsCard.getByText('staging')).toBeVisible();
+    // But no API call yet — that happens on save
+    expect(addTagCalled).toBe(false);
   });
 
-  test('removes a tag when close icon is clicked', async ({ page }) => {
-    let deleteTagId = '';
+  test('removing a tag hides it in the UI without API call', async ({ page }) => {
+    let deleteTagCalled = false;
     await page.route('**/api/v1/monitors/mon-1/tags/**', async (route) => {
       if (route.request().method() === 'DELETE') {
-        const url = route.request().url();
-        deleteTagId = url.split('/tags/')[1];
+        deleteTagCalled = true;
         return route.fulfill({ status: 204 });
       }
       return route.fulfill({ status: 204 });
@@ -67,10 +74,56 @@ test.describe('TagSelector on Monitor Edit', () => {
     const productionTag = tagsCard.locator('.ant-tag', { hasText: 'production' });
     await productionTag.locator('.anticon-close').click();
 
-    expect(deleteTagId).toBe('tag-1');
+    await expect(tagsCard.getByText('production')).not.toBeVisible();
+    expect(deleteTagCalled).toBe(false);
   });
 
-  test('creates a new tag and assigns it', async ({ page }) => {
+  test('tag changes are sent on form save', async ({ page }) => {
+    const addRequests: string[] = [];
+    const deleteRequests: string[] = [];
+
+    await page.route('**/api/v1/monitors/mon-1/tags', async (route) => {
+      if (route.request().method() === 'POST') {
+        const body = route.request().postDataJSON();
+        addRequests.push(body.tagId);
+        return route.fulfill({ status: 201 });
+      }
+      return route.fulfill({ status: 201 });
+    });
+
+    await page.route('**/api/v1/monitors/mon-1/tags/**', async (route) => {
+      if (route.request().method() === 'DELETE') {
+        const url = route.request().url();
+        deleteRequests.push(url.split('/tags/')[1]);
+        return route.fulfill({ status: 204 });
+      }
+      return route.fulfill({ status: 204 });
+    });
+
+    await page.goto('/edit/mon-1');
+
+    const tagsCard = page.locator('.ant-card', { hasText: 'Tags' });
+
+    // Add staging tag
+    const select = tagsCard.locator('.ant-select');
+    await select.click();
+    await page.getByTitle('staging').click();
+
+    // Remove production tag
+    const productionTag = tagsCard.locator('.ant-tag', { hasText: 'production' });
+    await productionTag.locator('.anticon-close').click();
+
+    // Submit the form
+    await page.getByRole('button', { name: 'Save Changes' }).click();
+
+    // Wait for the API calls
+    await page.waitForResponse((resp) => resp.url().includes('/monitors/mon-1/tags'));
+
+    expect(addRequests).toContain('tag-3');
+    expect(deleteRequests).toContain('tag-1');
+  });
+
+  test('creates a new tag immediately and reflects it in the form', async ({ page }) => {
     let createdTag = '';
 
     await page.route('**/api/v1/tags', async (route) => {
@@ -79,18 +132,7 @@ test.describe('TagSelector on Monitor Edit', () => {
         createdTag = body.name;
         return route.fulfill({ status: 201, json: { id: 'tag-new', name: body.name, color: body.color } });
       }
-      return route.fulfill({ json: mockTags });
-    });
-
-    const addTagPromise = page.waitForRequest((req) =>
-      req.url().includes('/monitors/mon-1/tags') && req.method() === 'POST'
-    );
-
-    await page.route('**/api/v1/monitors/mon-1/tags', async (route) => {
-      if (route.request().method() === 'POST') {
-        return route.fulfill({ status: 201 });
-      }
-      return route.fulfill({ status: 201 });
+      return route.fulfill({ json: [...mockTags, { id: 'tag-new', name: 'deployment', color: '#597ef7' }] });
     });
 
     await page.goto('/edit/mon-1');
@@ -102,16 +144,8 @@ test.describe('TagSelector on Monitor Edit', () => {
     await nameInput.fill('deployment');
     await tagsCard.getByRole('button', { name: 'Add' }).click();
 
-    const addReq = await addTagPromise;
-    const assignedBody = addReq.postDataJSON();
-
+    // Tag creation hits the API immediately
     expect(createdTag).toBe('deployment');
-    expect(assignedBody.tagId).toBe('tag-new');
-  });
-
-  test('tag section not shown on new monitor form', async ({ page }) => {
-    await page.goto('/add');
-    await expect(page.locator('.ant-card', { hasText: 'Tags' })).not.toBeVisible();
   });
 
   test('empty state shows helpful message when no tags assigned', async ({ page }) => {

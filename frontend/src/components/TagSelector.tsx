@@ -1,43 +1,34 @@
 import { useState } from 'react';
 import { Select, Space, Input, Button, ColorPicker, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { useTags, useCreateTag, useAddMonitorTag, useRemoveMonitorTag } from '../hooks/useTags';
-import type { MonitorTag } from '../hooks/useTags';
+import { useTags, useCreateTag } from '../hooks/useTags';
+import type { Tag } from '../hooks/useTags';
 import { TagBadge } from './TagBadge';
 
-interface TagSelectorProps {
-  monitorId: string;
-  assignedTags: MonitorTag[];
+export interface TagSelectorProps {
+  value: string[];
+  onChange: (tagIds: string[]) => void;
 }
 
-export function TagSelector({ monitorId, assignedTags }: TagSelectorProps) {
+export function TagSelector({ value, onChange }: TagSelectorProps) {
   const { data: allTags = [] } = useTags();
   const createTag = useCreateTag();
-  const addTag = useAddMonitorTag();
-  const removeTag = useRemoveMonitorTag();
-  const [selectedTagId, setSelectedTagId] = useState<string | undefined>();
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState('');
   const [newColor, setNewColor] = useState('#597ef7');
 
-  const assignedIds = new Set(assignedTags.map(t => t.tagId));
-  const available = allTags.filter(t => !assignedIds.has(t.id));
+  const assignedSet = new Set(value);
+  const available = allTags.filter(t => !assignedSet.has(t.id));
+  const assigned: Tag[] = value
+    .map(id => allTags.find(t => t.id === id))
+    .filter((t): t is Tag => t != null);
 
-  function handleAdd(tagId: string) {
-    addTag.mutate(
-      { monitorId, tagId },
-      {
-        onSuccess: () => setSelectedTagId(undefined),
-        onError: () => message.error('Failed to add tag'),
-      },
-    );
+  function handleSelect(tagId: string) {
+    onChange([...value, tagId]);
   }
 
   function handleRemove(tagId: string) {
-    removeTag.mutate(
-      { monitorId, tagId },
-      { onError: () => message.error('Failed to remove tag') },
-    );
+    onChange(value.filter(id => id !== tagId));
   }
 
   function handleCreate() {
@@ -47,7 +38,7 @@ export function TagSelector({ monitorId, assignedTags }: TagSelectorProps) {
       { name, color: newColor },
       {
         onSuccess: (tag) => {
-          addTag.mutate({ monitorId, tagId: tag.id });
+          onChange([...value, tag.id]);
           setNewName('');
           setCreating(false);
         },
@@ -59,15 +50,15 @@ export function TagSelector({ monitorId, assignedTags }: TagSelectorProps) {
   return (
     <div>
       <div style={{ marginBottom: 8, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-        {assignedTags.map(t => (
+        {assigned.map(t => (
           <TagBadge
-            key={t.tagId}
-            name={t.name ?? ''}
-            color={t.color ?? ''}
-            onClose={() => handleRemove(t.tagId!)}
+            key={t.id}
+            name={t.name}
+            color={t.color}
+            onClose={() => handleRemove(t.id)}
           />
         ))}
-        {assignedTags.length === 0 && (
+        {assigned.length === 0 && (
           <span style={{ color: 'var(--ant-color-text-tertiary)', fontSize: 12 }}>No tags assigned</span>
         )}
       </div>
@@ -75,8 +66,8 @@ export function TagSelector({ monitorId, assignedTags }: TagSelectorProps) {
       {!creating ? (
         <Space.Compact style={{ width: '100%' }}>
           <Select
-            value={selectedTagId}
-            onChange={(val) => { setSelectedTagId(val); if (val) handleAdd(val); }}
+            value={undefined}
+            onChange={(val) => { if (val) handleSelect(val); }}
             placeholder="Select a tag to add"
             options={available.map(t => ({ value: t.id, label: t.name }))}
             style={{ flex: 1, minWidth: 160 }}

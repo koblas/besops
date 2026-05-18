@@ -71,11 +71,11 @@ export async function mockAPIs(page: Page) {
     return route.fulfill({ status: 201, json: { id: 'tag-new', name: 'new-tag', color: '#597ef7' } });
   });
 
-  await page.route('**/api/v1/monitors/mon-1/tags', (route) => {
+  await page.route('**/api/v1/monitors/*/tags', (route) => {
     return route.fulfill({ status: 201 });
   });
 
-  await page.route('**/api/v1/monitors/mon-1/tags/**', (route) => {
+  await page.route('**/api/v1/monitors/*/tags/**', (route) => {
     return route.fulfill({ status: 204 });
   });
 

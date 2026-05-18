@@ -4,8 +4,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TagSelector } from './TagSelector';
 import { createTestWrapper } from '../test/wrapper';
 
-const mockAddMutate = vi.fn();
-const mockRemoveMutate = vi.fn();
 const mockCreateMutate = vi.fn();
 
 vi.mock('../hooks/useTags', () => ({
@@ -16,23 +14,16 @@ vi.mock('../hooks/useTags', () => ({
       { id: 'tag-3', name: 'staging', color: '#87d068' },
     ],
   }),
-  useAddMonitorTag: () => ({ mutate: mockAddMutate, isPending: false }),
-  useRemoveMonitorTag: () => ({ mutate: mockRemoveMutate, isPending: false }),
   useCreateTag: () => ({ mutate: mockCreateMutate, isPending: false }),
 }));
-
-const assignedTags = [
-  { tagId: 'tag-1', name: 'production', color: '#f50' },
-  { tagId: 'tag-2', name: 'critical', color: '#2db7f5' },
-];
 
 describe('TagSelector', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('renders assigned tags', () => {
-    render(<TagSelector monitorId="mon-1" assignedTags={assignedTags} />, {
+  it('renders assigned tags by ID lookup', () => {
+    render(<TagSelector value={['tag-1', 'tag-2']} onChange={() => {}} />, {
       wrapper: createTestWrapper(),
     });
 
@@ -41,52 +32,46 @@ describe('TagSelector', () => {
   });
 
   it('shows empty state when no tags assigned', () => {
-    render(<TagSelector monitorId="mon-1" assignedTags={[]} />, {
+    render(<TagSelector value={[]} onChange={() => {}} />, {
       wrapper: createTestWrapper(),
     });
 
     expect(screen.getByText('No tags assigned')).toBeInTheDocument();
   });
 
-  it('calls removeMonitorTag when tag close is clicked', async () => {
+  it('calls onChange without the removed tag when close is clicked', async () => {
     const user = userEvent.setup();
-    render(<TagSelector monitorId="mon-1" assignedTags={assignedTags} />, {
+    const onChange = vi.fn();
+    render(<TagSelector value={['tag-1', 'tag-2']} onChange={onChange} />, {
       wrapper: createTestWrapper(),
     });
 
     const closeIcons = document.querySelectorAll('.ant-tag .anticon-close');
     await user.click(closeIcons[0] as Element);
 
-    expect(mockRemoveMutate).toHaveBeenCalledWith(
-      { monitorId: 'mon-1', tagId: 'tag-1' },
-      expect.any(Object),
-    );
+    expect(onChange).toHaveBeenCalledWith(['tag-2']);
   });
 
-  it('calls addMonitorTag when a tag is selected from dropdown', async () => {
+  it('calls onChange with added tag when a tag is selected from dropdown', async () => {
     const user = userEvent.setup();
-    render(<TagSelector monitorId="mon-1" assignedTags={assignedTags} />, {
+    const onChange = vi.fn();
+    render(<TagSelector value={['tag-1', 'tag-2']} onChange={onChange} />, {
       wrapper: createTestWrapper(),
     });
 
-    // Open the select dropdown and type to search
     const combobox = screen.getByRole('combobox');
     await user.click(combobox);
     await user.type(combobox, 'staging');
 
-    // Ant Select renders options in a virtual list; find and click the option
     const option = await screen.findByText('staging');
     await user.click(option);
 
-    expect(mockAddMutate).toHaveBeenCalledWith(
-      { monitorId: 'mon-1', tagId: 'tag-3' },
-      expect.any(Object),
-    );
+    expect(onChange).toHaveBeenCalledWith(['tag-1', 'tag-2', 'tag-3']);
   });
 
   it('shows create form when "New Tag" is clicked', async () => {
     const user = userEvent.setup();
-    render(<TagSelector monitorId="mon-1" assignedTags={assignedTags} />, {
+    render(<TagSelector value={[]} onChange={() => {}} />, {
       wrapper: createTestWrapper(),
     });
 
@@ -99,7 +84,7 @@ describe('TagSelector', () => {
 
   it('calls createTag when new tag form is submitted', async () => {
     const user = userEvent.setup();
-    render(<TagSelector monitorId="mon-1" assignedTags={assignedTags} />, {
+    render(<TagSelector value={[]} onChange={() => {}} />, {
       wrapper: createTestWrapper(),
     });
 
@@ -115,7 +100,7 @@ describe('TagSelector', () => {
 
   it('hides create form when cancel is clicked', async () => {
     const user = userEvent.setup();
-    render(<TagSelector monitorId="mon-1" assignedTags={assignedTags} />, {
+    render(<TagSelector value={[]} onChange={() => {}} />, {
       wrapper: createTestWrapper(),
     });
 
@@ -128,7 +113,7 @@ describe('TagSelector', () => {
 
   it('disables Add button when tag name is empty', async () => {
     const user = userEvent.setup();
-    render(<TagSelector monitorId="mon-1" assignedTags={assignedTags} />, {
+    render(<TagSelector value={[]} onChange={() => {}} />, {
       wrapper: createTestWrapper(),
     });
 

@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Form, Button, Card, Space, Spin, Typography, Result, message } from 'antd';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useMonitor, useCreateMonitor, useUpdateMonitor } from '../../hooks/useMonitors';
+import { useAddMonitorTag, useRemoveMonitorTag } from '../../hooks/useTags';
 import type { MonitorInput } from '../../hooks/useMonitors';
 import { GeneralFields } from './fields/GeneralFields';
 import { HttpFields } from './fields/HttpFields';
@@ -33,6 +34,12 @@ export function MonitorForm({ mode }: { mode?: 'clone' }) {
   const { data: existing, isLoading, isError } = useMonitor(id);
   const createMutation = useCreateMonitor();
   const updateMutation = useUpdateMonitor();
+  const addTag = useAddMonitorTag();
+  const removeTag = useRemoveMonitorTag();
+
+  const [tagIds, setTagIds] = useState<string[]>([]);
+  const [originalTagIds, setOriginalTagIds] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (existing) {
@@ -45,8 +52,14 @@ export function MonitorForm({ mode }: { mode?: 'clone' }) {
         delete values.parentId;
       }
       form.setFieldsValue(values);
+
+      const ids = (existing.tags ?? []).map(t => t.tagId).filter((id): id is string => !!id);
+      setTagIds(ids);
+      if (isEdit) {
+        setOriginalTagIds(ids);
+      }
     }
-  }, [existing, form, mode]);
+  }, [existing, form, mode, isEdit]);
 
   if (id && isLoading) {
     return (
@@ -65,31 +78,62 @@ export function MonitorForm({ mode }: { mode?: 'clone' }) {
     ? 'Update the configuration for this monitor.'
     : 'Configure a new monitor to track the availability of your service.';
 
-  async function handleSubmit(values: MonitorInput) {
-    const input = { ...values, parentId: values.parentId ?? null } as MonitorInput;
-    if (isEdit) {
-      updateMutation.mutate(
-        { id: id!, input },
-        {
-          onSuccess: () => {
-            message.success('Monitor updated');
-            navigate(`/dashboard/${id}`);
-          },
-          onError: () => message.error('Failed to save monitor. Check your inputs and try again.'),
-        },
+  async function syncTags(monitorId: string) {
+    const toAdd = tagIds.filter(id => !originalTagIds.includes(id));
+    const toRemove = originalTagIds.filter(id => !tagIds.includes(id));
+
+    const promises: Promise<void>[] = [];
+    for (const tagId of toAdd) {
+      promises.push(
+        new Promise<void>((resolve, reject) => {
+          addTag.mutate({ monitorId, tagId }, { onSuccess: () => resolve(), onError: reject });
+        }),
       );
-    } else {
-      createMutation.mutate(input, {
-        onSuccess: (data) => {
-          message.success('Monitor created');
-          navigate(`/dashboard/${data.id}`);
-        },
-        onError: () => message.error('Failed to create monitor. Check your inputs and try again.'),
-      });
+    }
+    for (const tagId of toRemove) {
+      promises.push(
+        new Promise<void>((resolve, reject) => {
+          removeTag.mutate({ monitorId, tagId }, { onSuccess: () => resolve(), onError: reject });
+        }),
+      );
+    }
+    await Promise.all(promises);
+  }
+
+  async function handleSubmit(values: MonitorInput) {
+    setSaving(true);
+    const input = { ...values, parentId: values.parentId ?? null } as MonitorInput;
+
+    try {
+      if (isEdit) {
+        await new Promise<void>((resolve, reject) => {
+          updateMutation.mutate(
+            { id: id!, input },
+            { onSuccess: () => resolve(), onError: reject },
+          );
+        });
+        await syncTags(id!);
+        message.success('Monitor updated');
+        navigate(`/dashboard/${id}`);
+      } else {
+        const created = await new Promise<{ id: string }>((resolve, reject) => {
+          createMutation.mutate(input, {
+            onSuccess: (data) => resolve(data as { id: string }),
+            onError: reject,
+          });
+        });
+        await syncTags(created.id);
+        message.success('Monitor created');
+        navigate(`/dashboard/${created.id}`);
+      }
+    } catch {
+      message.error('Failed to save monitor. Check your inputs and try again.');
+    } finally {
+      setSaving(false);
     }
   }
 
-  const isPending = createMutation.isPending || updateMutation.isPending;
+  const isPending = saving;
 
   return (
     <div style={{ maxWidth: 680 }}>
@@ -108,11 +152,9 @@ export function MonitorForm({ mode }: { mode?: 'clone' }) {
           <GeneralFields excludeId={isEdit ? id : undefined} />
         </Card>
 
-        {isEdit && id && existing && (
-          <Card title="Tags" size="small" style={{ marginBottom: 16 }}>
-            <TagSelector monitorId={id} assignedTags={existing.tags ?? []} />
-          </Card>
-        )}
+        <Card title="Tags" size="small" style={{ marginBottom: 16 }}>
+          <TagSelector value={tagIds} onChange={setTagIds} />
+        </Card>
 
         {type && type !== 'group' && (
           <Card title="Connection" size="small" style={{ marginBottom: 16 }}>
