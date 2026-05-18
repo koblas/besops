@@ -44,6 +44,7 @@ type GroupTemplate struct {
 	Active       func() bool
 	Weight       func() int64
 	StatusPageID func() null.Val[string]
+	TagIdsJSON   func() null.Val[string]
 
 	r groupR
 	f *Factory
@@ -128,6 +129,10 @@ func (o GroupTemplate) BuildSetter() *models.GroupSetter {
 		val := o.StatusPageID()
 		m.StatusPageID = omitnull.FromNull(val)
 	}
+	if o.TagIdsJSON != nil {
+		val := o.TagIdsJSON()
+		m.TagIdsJSON = omitnull.FromNull(val)
+	}
 
 	return m
 }
@@ -170,6 +175,9 @@ func (o GroupTemplate) Build() *models.Group {
 	}
 	if o.StatusPageID != nil {
 		m.StatusPageID = o.StatusPageID()
+	}
+	if o.TagIdsJSON != nil {
+		m.TagIdsJSON = o.TagIdsJSON()
 	}
 
 	o.setModelRels(m)
@@ -345,6 +353,7 @@ func (m groupMods) RandomizeAllColumns(f *faker.Faker) GroupMod {
 		GroupMods.RandomActive(f),
 		GroupMods.RandomWeight(f),
 		GroupMods.RandomStatusPageID(f),
+		GroupMods.RandomTagIdsJSON(f),
 	}
 }
 
@@ -577,6 +586,59 @@ func (m groupMods) RandomStatusPageID(f *faker.Faker) GroupMod {
 func (m groupMods) RandomStatusPageIDNotNull(f *faker.Faker) GroupMod {
 	return GroupModFunc(func(_ context.Context, o *GroupTemplate) {
 		o.StatusPageID = func() null.Val[string] {
+			if f == nil {
+				f = &defaultFaker
+			}
+
+			val := random_string(f)
+			return null.From(val)
+		}
+	})
+}
+
+// Set the model columns to this value
+func (m groupMods) TagIdsJSON(val null.Val[string]) GroupMod {
+	return GroupModFunc(func(_ context.Context, o *GroupTemplate) {
+		o.TagIdsJSON = func() null.Val[string] { return val }
+	})
+}
+
+// Set the Column from the function
+func (m groupMods) TagIdsJSONFunc(f func() null.Val[string]) GroupMod {
+	return GroupModFunc(func(_ context.Context, o *GroupTemplate) {
+		o.TagIdsJSON = f
+	})
+}
+
+// Clear any values for the column
+func (m groupMods) UnsetTagIdsJSON() GroupMod {
+	return GroupModFunc(func(_ context.Context, o *GroupTemplate) {
+		o.TagIdsJSON = nil
+	})
+}
+
+// Generates a random value for the column using the given faker
+// if faker is nil, a default faker is used
+// The generated value is sometimes null
+func (m groupMods) RandomTagIdsJSON(f *faker.Faker) GroupMod {
+	return GroupModFunc(func(_ context.Context, o *GroupTemplate) {
+		o.TagIdsJSON = func() null.Val[string] {
+			if f == nil {
+				f = &defaultFaker
+			}
+
+			val := random_string(f)
+			return null.From(val)
+		}
+	})
+}
+
+// Generates a random value for the column using the given faker
+// if faker is nil, a default faker is used
+// The generated value is never null
+func (m groupMods) RandomTagIdsJSONNotNull(f *faker.Faker) GroupMod {
+	return GroupModFunc(func(_ context.Context, o *GroupTemplate) {
+		o.TagIdsJSON = func() null.Val[string] {
 			if f == nil {
 				f = &defaultFaker
 			}

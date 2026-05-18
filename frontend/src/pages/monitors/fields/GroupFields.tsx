@@ -1,20 +1,31 @@
-import { Form, InputNumber, Alert } from 'antd';
+import { Form, InputNumber, Select } from 'antd';
+import { useTags } from '../../../hooks/useTags';
 
 export function GroupFields() {
+  const { data: tags = [] } = useTags();
+
+  const tagOptions = tags.map(t => ({ value: t.id, label: t.name }));
+
   return (
     <>
-      <Alert
-        type="info"
-        showIcon
-        message="Group monitors aggregate the status of their children"
-        description="Add child monitors by setting their Parent Group to this monitor. The group's status will reflect the worst status among its active children."
-        style={{ marginBottom: 16 }}
-      />
+      <Form.Item
+        name="groupTagIds"
+        label="Member Tags"
+        extra="Any monitor with at least one of these tags is a member of this group."
+      >
+        <Select
+          mode="multiple"
+          allowClear
+          placeholder="Select tags..."
+          options={tagOptions}
+          optionFilterProp="label"
+        />
+      </Form.Item>
 
       <Form.Item
         name="interval"
         label="Status Check Interval (seconds)"
-        extra="How often to re-evaluate children's status. A shorter interval means faster propagation of child status changes to the group."
+        extra="How often to re-evaluate member status."
       >
         <InputNumber min={20} style={{ width: '100%' }} />
       </Form.Item>

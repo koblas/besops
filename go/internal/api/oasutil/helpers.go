@@ -67,16 +67,3 @@ func OptUUIDPtr(o oas.OptUUID) *string {
 	return nil
 }
 
-func OptNilUUIDPtr(o oas.OptNilUUID) *string {
-	if o.IsSet() && !o.IsNull() {
-		s := o.Value.String()
-		return &s
-	}
-	return nil
-}
-
-func NewOptNilUUID(id uuid.UUID) oas.OptNilUUID {
-	var o oas.OptNilUUID
-	o.SetTo(id)
-	return o
-}

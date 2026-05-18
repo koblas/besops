@@ -55,7 +55,7 @@ type UsersQuery = *sqlite.ViewQuery[*User, UserSlice]
 type userR struct {
 	APIKeys        APIKeySlice        // fk_api_key_0
 	Maintenances   MaintenanceSlice   // fk_maintenance_0
-	Monitors       MonitorSlice       // fk_monitor_1
+	Monitors       MonitorSlice       // fk_monitor_0
 	Notifications  NotificationSlice  // fk_notification_0
 	Proxies        ProxySlice         // fk_proxy_0
 	RemoteBrowsers RemoteBrowserSlice // fk_remote_browser_0

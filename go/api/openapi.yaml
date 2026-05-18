@@ -2013,10 +2013,6 @@ components:
           maxLength: 1000
         upsideDown:
           type: boolean
-        parentId:
-          type: string
-          format: uuid
-          nullable: true
         pushToken:
           type: string
           maxLength: 64
@@ -2082,10 +2078,6 @@ components:
           maxLength: 1000
         upsideDown:
           type: boolean
-        parentId:
-          type: string
-          format: uuid
-          nullable: true
         notificationIds:
           type: array
           maxItems: 50
@@ -2359,6 +2351,13 @@ components:
         kind:
           type: string
           enum: [group]
+        tagIds:
+          type: array
+          maxItems: 50
+          items:
+            type: string
+            format: uuid
+          description: Tag IDs used to select member monitors. Any monitor with any of these tags is a group member.
 
     Heartbeat:
       description: A single check result recording the status and response time of a monitor at a point in time.
@@ -2848,6 +2847,13 @@ components:
             type: string
             format: uuid
           description: IDs of monitors to include in this group.
+        tagIds:
+          type: array
+          maxItems: 50
+          items:
+            type: string
+            format: uuid
+          description: Tag IDs used to dynamically include monitors. Unioned with monitorIds.
 
     Incident:
       description: An incident posted to a status page to communicate service disruptions or planned changes to users.

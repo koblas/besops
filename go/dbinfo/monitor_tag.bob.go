@@ -53,6 +53,20 @@ var MonitorTags = Table[
 		},
 	},
 	Indexes: monitorTagIndexes{
+		IdxMonitorTagTagID: index{
+			Type: "c",
+			Name: "idx_monitor_tag_tag_id",
+			Columns: []indexColumn{
+				{
+					Name:         "tag_id",
+					Desc:         null.FromCond(false, true),
+					IsExpression: false,
+				},
+			},
+			Unique:  false,
+			Comment: "",
+			Partial: false,
+		},
 		IdxMonitorTagMonitorID: index{
 			Type: "c",
 			Name: "idx_monitor_tag_monitor_id",
@@ -125,13 +139,14 @@ func (c monitorTagColumns) AsSlice() []column {
 }
 
 type monitorTagIndexes struct {
+	IdxMonitorTagTagID         index
 	IdxMonitorTagMonitorID     index
 	SqliteAutoindexMonitorTag1 index
 }
 
 func (i monitorTagIndexes) AsSlice() []index {
 	return []index{
-		i.IdxMonitorTagMonitorID, i.SqliteAutoindexMonitorTag1,
+		i.IdxMonitorTagTagID, i.IdxMonitorTagMonitorID, i.SqliteAutoindexMonitorTag1,
 	}
 }
 

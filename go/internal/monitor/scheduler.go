@@ -225,12 +225,6 @@ func (s *Scheduler) loadAndSchedule(id string, immediate bool) error {
 
 	cfg := modelToConfig(mon)
 
-	if cfg.ParentID != "" {
-		if parent, parentErr := s.store.FindByID(s.ctx, cfg.ParentID); parentErr == nil {
-			cfg.ParentName = parent.Name
-		}
-	}
-
 	if s.tags != nil {
 		if tags, tagErr := s.tags.GetTagsForMonitor(s.ctx, id); tagErr == nil {
 			cfg.Tags = tags
@@ -407,8 +401,6 @@ func (s *Scheduler) executeCheck(cfg *Config, retry int) {
 			metrics:     s.metrics,
 			monitorName: cfg.Name,
 			monitorType: cfg.Type,
-			groupID:     cfg.ParentID,
-			groupName:   cfg.ParentName,
 			tags:        cfg.Tags,
 		}
 		handler.HandleResult(s.ctx, cfg.ID, result, retry)

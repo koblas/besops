@@ -78,6 +78,15 @@ var Groups = Table[
 			Generated: false,
 			AutoIncr:  false,
 		},
+		TagIdsJSON: column{
+			Name:      "tag_ids_json",
+			DBType:    "TEXT",
+			Default:   "NULL",
+			Comment:   "",
+			Nullable:  true,
+			Generated: false,
+			AutoIncr:  false,
+		},
 	},
 	Indexes: groupIndexes{
 		SqliteAutoindexGroup1: index{
@@ -123,11 +132,12 @@ type groupColumns struct {
 	Active       column
 	Weight       column
 	StatusPageID column
+	TagIdsJSON   column
 }
 
 func (c groupColumns) AsSlice() []column {
 	return []column{
-		c.ID, c.Name, c.CreatedDate, c.Public, c.Active, c.Weight, c.StatusPageID,
+		c.ID, c.Name, c.CreatedDate, c.Public, c.Active, c.Weight, c.StatusPageID, c.TagIdsJSON,
 	}
 }
 

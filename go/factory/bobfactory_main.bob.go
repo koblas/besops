@@ -135,6 +135,7 @@ func (f *Factory) FromExistingGroup(m *models.Group) *GroupTemplate {
 	o.Active = func() bool { return m.Active }
 	o.Weight = func() int64 { return m.Weight }
 	o.StatusPageID = func() null.Val[string] { return m.StatusPageID }
+	o.TagIdsJSON = func() null.Val[string] { return m.TagIdsJSON }
 
 	ctx := context.Background()
 	if m.R.StatusPage != nil {
@@ -421,7 +422,6 @@ func (f *Factory) FromExistingMonitor(m *models.Monitor) *MonitorTemplate {
 	o.TLSCa = func() null.Val[string] { return m.TLSCa }
 	o.TLSCert = func() null.Val[string] { return m.TLSCert }
 	o.TLSKey = func() null.Val[string] { return m.TLSKey }
-	o.ParentID = func() null.Val[string] { return m.ParentID }
 	o.InvertKeyword = func() bool { return m.InvertKeyword }
 	o.JSONPath = func() null.Val[string] { return m.JSONPath }
 	o.ExpectedValue = func() null.Val[string] { return m.ExpectedValue }
@@ -447,16 +447,11 @@ func (f *Factory) FromExistingMonitor(m *models.Monitor) *MonitorTemplate {
 	o.RabbitmqPassword = func() null.Val[string] { return m.RabbitmqPassword }
 	o.RemoteBrowser = func() null.Val[string] { return m.RemoteBrowser }
 	o.DomainExpiryNotification = func() null.Val[bool] { return m.DomainExpiryNotification }
+	o.GroupTagIdsJSON = func() null.Val[string] { return m.GroupTagIdsJSON }
 
 	ctx := context.Background()
 	if len(m.R.Heartbeats) > 0 {
 		MonitorMods.AddExistingHeartbeats(m.R.Heartbeats...).Apply(ctx, o)
-	}
-	if m.R.Parent != nil {
-		MonitorMods.WithExistingParent(m.R.Parent).Apply(ctx, o)
-	}
-	if len(m.R.ReverseParents) > 0 {
-		MonitorMods.AddExistingReverseParents(m.R.ReverseParents...).Apply(ctx, o)
 	}
 	if m.R.User != nil {
 		MonitorMods.WithExistingUser(m.R.User).Apply(ctx, o)

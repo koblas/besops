@@ -48,13 +48,7 @@ Fail loudly at the boundary. Never swallow exceptions — handle, wrap with cont
 ## Self-improvement
 After I correct you, propose an update to this file (or the relevant doc in `docs/agents/`) so the same mistake doesn't recur. Don't update without my okay.
 
-## Project context (WHAT / WHY / HOW)
-<!-- Fill in. Keep tight. Pointers > copies. -->
-- **What**: <one-line description of the system; key modules and their purpose>
-- **Why**: <product purpose; the constraint that drives architecture>
-- **How**: <stack; entrypoints; how to run, test, lint; where deeper docs live>
-
-## Tooling (defer to these — don't reimplement in prose)
+## Tooling
 - Formatter — run before commit; never argue with its output
 - Linter — fix lints, don't disable them
 - Tests — full suite must pass before "done"

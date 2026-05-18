@@ -50,10 +50,6 @@ export function MonitorForm({ mode }: { mode?: 'clone' }) {
         delete values.id;
         values.name = `${existing.name} (Copy)`;
       }
-      if (values.parentId === null) {
-        delete values.parentId;
-      }
-
       // Flatten config fields into top-level form values
       const configFields = flattenConfigToForm(values);
       delete values.config;
@@ -142,7 +138,6 @@ export function MonitorForm({ mode }: { mode?: 'clone' }) {
       retryInterval: values.retryInterval,
       description: (flat.description as string) || undefined,
       upsideDown: flat.upsideDown as boolean | undefined,
-      parentId: (flat.parentId as string | null) ?? null,
       notificationIds: (flat.notificationIds as string[]) || undefined,
       resendInterval: values.resendInterval,
       expiryNotification: flat.expiryNotification as boolean | undefined,
@@ -194,7 +189,7 @@ export function MonitorForm({ mode }: { mode?: 'clone' }) {
         initialValues={{ type: 'http', active: true, method: 'GET', interval: 60, maxRetries: 0, timeout: 48, retryInterval: 60, maxRedirects: 10, resendInterval: 0, packetSize: 56 }}
       >
         <Card size="small" style={{ marginBottom: 16 }}>
-          <GeneralFields excludeId={isEdit ? id : undefined} />
+          <GeneralFields />
         </Card>
 
         <Card title="Tags" size="small" style={{ marginBottom: 16 }}>

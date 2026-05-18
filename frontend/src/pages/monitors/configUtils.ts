@@ -53,8 +53,10 @@ export function buildConfigFromForm(values: FormValues): MonitorConfig {
       return { kind: 'smtp', ...pick(values, smtpFields) } as MonitorConfig;
     case 'tailscale-ping':
       return { kind: 'tailscale-ping', ...pick(values, tailscalePingFields) } as MonitorConfig;
-    case 'group':
-      return { kind: 'group' };
+    case 'group': {
+      const tagIds = values.groupTagIds as string[] | undefined;
+      return { kind: 'group', ...(tagIds?.length ? { tagIds } : {}) } as MonitorConfig;
+    }
     default:
       return { kind: 'group' };
   }
@@ -65,5 +67,11 @@ export function flattenConfigToForm(monitor: FormValues): Record<string, unknown
   if (!config) return {};
 
   const { kind: _, ...rest } = config as Record<string, unknown>;
+
+  if ('tagIds' in rest) {
+    rest.groupTagIds = rest.tagIds;
+    delete rest.tagIds;
+  }
+
   return rest;
 }

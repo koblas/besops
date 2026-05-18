@@ -213,10 +213,6 @@ func monitorToOAS(m *Monitor) oas.Monitor {
 		ExpiryNotification: oas.NewOptBool(m.ExpiryNotification),
 	}
 
-	if m.ParentID != nil {
-		result.ParentId = oasutil.NewOptNilUUID(oasutil.MustParseUUID(*m.ParentID))
-	}
-
 	cfg := buildConfigFromDomain(m)
 	result.Config = oas.OptMonitorConfig{Value: cfg, Set: true}
 
@@ -249,10 +245,7 @@ func buildConfigFromDomain(m *Monitor) oas.MonitorConfig {
 	case "tailscale-ping":
 		return buildTailscalePingConfig(m)
 	case "group":
-		return oas.MonitorConfig{
-			Type:               oas.GroupMonitorConfigMonitorConfig,
-			GroupMonitorConfig: oas.GroupMonitorConfig{Kind: "group"},
-		}
+		return buildGroupConfig(m)
 	default:
 		return oas.MonitorConfig{}
 	}
@@ -419,6 +412,39 @@ func buildTailscalePingConfig(m *Monitor) oas.MonitorConfig {
 	}
 }
 
+func buildGroupConfig(m *Monitor) oas.MonitorConfig {
+	cfg := oas.GroupMonitorConfig{Kind: "group"}
+	if m.GroupTagIDs != "" {
+		var ids []string
+		if err := json.Unmarshal([]byte(m.GroupTagIDs), &ids); err == nil {
+			uuids := make([]uuid.UUID, 0, len(ids))
+			for _, id := range ids {
+				if u, err := uuid.Parse(id); err == nil {
+					uuids = append(uuids, u)
+				}
+			}
+			cfg.TagIds = uuids
+		}
+	}
+	return oas.MonitorConfig{
+		Type:               oas.GroupMonitorConfigMonitorConfig,
+		GroupMonitorConfig: cfg,
+	}
+}
+
+func applyGroupConfig(m *Monitor, cfg *oas.GroupMonitorConfig) {
+	if len(cfg.TagIds) > 0 {
+		ids := make([]string, len(cfg.TagIds))
+		for i, u := range cfg.TagIds {
+			ids[i] = u.String()
+		}
+		b, _ := json.Marshal(ids)
+		m.GroupTagIDs = string(b)
+	} else {
+		m.GroupTagIDs = ""
+	}
+}
+
 func monitorFromInput(req *oas.MonitorInput, userID string) *Monitor {
 	m := &Monitor{
 		Name:               req.Name,
@@ -431,7 +457,6 @@ func monitorFromInput(req *oas.MonitorInput, userID string) *Monitor {
 		RetryInterval:      oasutil.OptIntValue(req.RetryInterval, 60),
 		Description:        oasutil.OptStringValue(req.Description),
 		UpsideDown:         oasutil.OptBoolValue(req.UpsideDown, false),
-		ParentID:           oasutil.OptNilUUIDPtr(req.ParentId),
 		ResendInterval:     oasutil.OptIntValue(req.ResendInterval, 0),
 		ExpiryNotification: oasutil.OptBoolValue(req.ExpiryNotification, false),
 		PushToken:          uuid.New().String(),
@@ -467,9 +492,6 @@ func applyMonitorInput(m *Monitor, req *oas.MonitorInput) {
 	if req.UpsideDown.IsSet() {
 		m.UpsideDown = req.UpsideDown.Value
 	}
-	if req.ParentId.IsSet() {
-		m.ParentID = oasutil.OptNilUUIDPtr(req.ParentId)
-	}
 	if req.ResendInterval.IsSet() {
 		m.ResendInterval = req.ResendInterval.Value
 	}
@@ -500,8 +522,10 @@ func applyConfig(m *Monitor, cfg *oas.MonitorConfig) {
 		applySmtpConfig(m, &cfg.SmtpMonitorConfig)
 	case oas.TailscalePingMonitorConfigMonitorConfig:
 		applyTailscalePingConfig(m, &cfg.TailscalePingMonitorConfig)
-	case oas.PushMonitorConfigMonitorConfig, oas.GroupMonitorConfigMonitorConfig:
+	case oas.PushMonitorConfigMonitorConfig:
 		// no type-specific fields
+	case oas.GroupMonitorConfigMonitorConfig:
+		applyGroupConfig(m, &cfg.GroupMonitorConfig)
 	}
 }
 

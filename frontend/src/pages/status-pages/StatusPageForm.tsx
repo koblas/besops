@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useStatusPage, useCreateStatusPage, useUpdateStatusPage } from '../../hooks/useStatusPages';
 import type { StatusPageInput, StatusPageGroup } from '../../hooks/useStatusPages';
 import { useMonitors } from '../../hooks/useMonitors';
+import { useTags } from '../../hooks/useTags';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -25,6 +26,7 @@ export function StatusPageForm() {
 
   const { data: existing, isLoading, isError } = useStatusPage(slug ?? undefined);
   const { data: monitors = [] } = useMonitors();
+  const { data: tags = [] } = useTags();
   const createMutation = useCreateStatusPage();
   const updateMutation = useUpdateStatusPage();
   const [form] = Form.useForm();
@@ -242,8 +244,17 @@ export function StatusPageForm() {
                 value={group.monitorIds}
                 onChange={monitorIds => updateGroup(idx, { monitorIds })}
                 options={monitors.map(m => ({ value: m.id, label: m.name }))}
-                style={{ width: '100%' }}
+                style={{ width: '100%', marginBottom: 8 }}
                 notFoundContent="No monitors created yet"
+              />
+              <Select
+                mode="multiple"
+                placeholder="Or include monitors by tag"
+                value={group.tagIds}
+                onChange={tagIds => updateGroup(idx, { tagIds })}
+                options={tags.map(t => ({ value: t.id, label: t.name }))}
+                style={{ width: '100%' }}
+                notFoundContent="No tags created yet"
               />
             </Card>
           ))}

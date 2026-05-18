@@ -58,7 +58,6 @@ func TestHandleResult_RecordsMetrics_WhenUp(t *testing.T) {
 		metrics:     observer,
 		monitorName: "Web App",
 		monitorType: "http",
-		groupName:   "Production",
 		tags:        []string{"critical", "env:prod"},
 	}
 
@@ -76,7 +75,7 @@ func TestHandleResult_RecordsMetrics_WhenUp(t *testing.T) {
 	assert.Equal(t, "mon-1", records[0].monitor.MonitorID())
 	assert.Equal(t, "Web App", records[0].monitor.MonitorName())
 	assert.Equal(t, "http", records[0].monitor.MonitorType())
-	assert.Equal(t, "Production", records[0].monitor.GroupName())
+	assert.Equal(t, "", records[0].monitor.GroupName())
 	assert.Equal(t, []string{"critical", "env:prod"}, records[0].monitor.Tags())
 }
 

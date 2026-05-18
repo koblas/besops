@@ -2,6 +2,7 @@ package statuspage
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -31,14 +32,30 @@ type MonitorNameResolver interface {
 	FindNameByID(ctx context.Context, id string) (string, error)
 }
 
-type Handler struct {
-	repo       Repository
-	hbReader   HeartbeatReader
-	monitorNam MonitorNameResolver
+// MonitorResolver resolves tag IDs to monitor IDs for status page groups.
+type MonitorResolver interface {
+	FindIDsByTagIDs(ctx context.Context, tagIDs []string) ([]string, error)
 }
 
-func NewHandler(repo Repository, hbReader HeartbeatReader, monitorNam MonitorNameResolver) *Handler {
-	return &Handler{repo: repo, hbReader: hbReader, monitorNam: monitorNam}
+type Handler struct {
+	repo            Repository
+	hbReader        HeartbeatReader
+	monitorNam      MonitorNameResolver
+	monitorResolver MonitorResolver
+}
+
+func NewHandler(repo Repository, hbReader HeartbeatReader, monitorNam MonitorNameResolver, opts ...HandlerOption) *Handler {
+	h := &Handler{repo: repo, hbReader: hbReader, monitorNam: monitorNam}
+	for _, opt := range opts {
+		opt(h)
+	}
+	return h
+}
+
+type HandlerOption func(*Handler)
+
+func WithMonitorResolver(r MonitorResolver) HandlerOption {
+	return func(h *Handler) { h.monitorResolver = r }
 }
 
 func (h *Handler) ListStatusPages(ctx context.Context) ([]oas.StatusPage, error) {
@@ -137,6 +154,7 @@ func (h *Handler) GetStatusPageHeartbeats(ctx context.Context, params oas.GetSta
 		return nil, fmt.Errorf("loading groups: %w", err)
 	}
 
+	seen := map[string]struct{}{}
 	var monitorIDs []string
 	for _, g := range groups {
 		mgs, mgErr := h.repo.GetMonitorGroups(ctx, g.ID)
@@ -144,7 +162,24 @@ func (h *Handler) GetStatusPageHeartbeats(ctx context.Context, params oas.GetSta
 			return nil, fmt.Errorf("loading monitor groups: %w", mgErr)
 		}
 		for _, mg := range mgs {
-			monitorIDs = append(monitorIDs, mg.MonitorID)
+			if _, ok := seen[mg.MonitorID]; !ok {
+				seen[mg.MonitorID] = struct{}{}
+				monitorIDs = append(monitorIDs, mg.MonitorID)
+			}
+		}
+
+		tagIDs := parseTagIDStrings(g.TagIDs)
+		if len(tagIDs) > 0 && h.monitorResolver != nil {
+			resolved, resolveErr := h.monitorResolver.FindIDsByTagIDs(ctx, tagIDs)
+			if resolveErr != nil {
+				return nil, fmt.Errorf("resolving tag monitors: %w", resolveErr)
+			}
+			for _, mid := range resolved {
+				if _, ok := seen[mid]; !ok {
+					seen[mid] = struct{}{}
+					monitorIDs = append(monitorIDs, mid)
+				}
+			}
 		}
 	}
 
@@ -344,6 +379,7 @@ func (h *Handler) loadGroups(ctx context.Context, statusPageID string) ([]oas.St
 			Name:       g.Name,
 			Weight:     oas.NewOptInt(int(g.Weight)),
 			MonitorIds: monitorIDs,
+			TagIds:     parseTagIDs(g.TagIDs),
 		}
 	}
 	return result, nil
@@ -361,6 +397,7 @@ func (h *Handler) saveGroups(ctx context.Context, statusPageID string, oasGroups
 			Name:         og.Name,
 			Weight:       int64(oasutil.OptIntValue(og.Weight, 1000)),
 			StatusPageID: statusPageID,
+			TagIDs:       serializeTagIDs(og.TagIds),
 		}
 	}
 
@@ -432,6 +469,48 @@ func optTheme(t string) oas.OptStatusPageTheme {
 		return oas.OptStatusPageTheme{}
 	}
 	return oas.NewOptStatusPageTheme(oas.StatusPageTheme(t))
+}
+
+func parseTagIDStrings(s string) []string {
+	if s == "" {
+		return nil
+	}
+	var ids []string
+	if err := json.Unmarshal([]byte(s), &ids); err != nil {
+		return nil
+	}
+	return ids
+}
+
+func parseTagIDs(s string) []uuid.UUID {
+	if s == "" {
+		return nil
+	}
+	var ids []string
+	if err := json.Unmarshal([]byte(s), &ids); err != nil {
+		return nil
+	}
+	result := make([]uuid.UUID, 0, len(ids))
+	for _, id := range ids {
+		u, err := uuid.Parse(id)
+		if err != nil {
+			continue
+		}
+		result = append(result, u)
+	}
+	return result
+}
+
+func serializeTagIDs(ids []uuid.UUID) string {
+	if len(ids) == 0 {
+		return ""
+	}
+	strs := make([]string, len(ids))
+	for i, id := range ids {
+		strs[i] = id.String()
+	}
+	data, _ := json.Marshal(strs)
+	return string(data)
 }
 
 func incidentToOAS(inc *Incident) oas.Incident {

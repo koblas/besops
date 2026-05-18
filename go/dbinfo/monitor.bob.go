@@ -537,15 +537,6 @@ var Monitors = Table[
 			Generated: false,
 			AutoIncr:  false,
 		},
-		ParentID: column{
-			Name:      "parent_id",
-			DBType:    "TEXT",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
 		InvertKeyword: column{
 			Name:      "invert_keyword",
 			DBType:    "BOOLEAN",
@@ -771,6 +762,15 @@ var Monitors = Table[
 			Generated: false,
 			AutoIncr:  false,
 		},
+		GroupTagIdsJSON: column{
+			Name:      "group_tag_ids_json",
+			DBType:    "TEXT",
+			Default:   "NULL",
+			Comment:   "",
+			Nullable:  true,
+			Generated: false,
+			AutoIncr:  false,
+		},
 	},
 	Indexes: monitorIndexes{
 		IdxMonitorActive: index{
@@ -825,15 +825,6 @@ var Monitors = Table[
 		FKMonitor0: foreignKey{
 			constraint: constraint{
 				Name:    "fk_monitor_0",
-				Columns: []string{"parent_id"},
-				Comment: "",
-			},
-			ForeignTable:   "monitor",
-			ForeignColumns: []string{"id"},
-		},
-		FKMonitor1: foreignKey{
-			constraint: constraint{
-				Name:    "fk_monitor_1",
 				Columns: []string{"user_id"},
 				Comment: "",
 			},
@@ -904,7 +895,6 @@ type monitorColumns struct {
 	TLSCa                               column
 	TLSCert                             column
 	TLSKey                              column
-	ParentID                            column
 	InvertKeyword                       column
 	JSONPath                            column
 	ExpectedValue                       column
@@ -930,11 +920,12 @@ type monitorColumns struct {
 	RabbitmqPassword                    column
 	RemoteBrowser                       column
 	DomainExpiryNotification            column
+	GroupTagIdsJSON                     column
 }
 
 func (c monitorColumns) AsSlice() []column {
 	return []column{
-		c.ID, c.Name, c.Active, c.UserID, c.Interval, c.URL, c.Type, c.Weight, c.Hostname, c.Port, c.CreatedDate, c.Keyword, c.Maxretries, c.IgnoreTLS, c.UpsideDown, c.Maxredirects, c.AcceptedStatuscodesJSON, c.DNSResolveType, c.DNSResolveServer, c.DNSLastResult, c.RetryInterval, c.PushToken, c.Method, c.Body, c.Headers, c.BasicAuthUser, c.BasicAuthPass, c.ProxyID, c.ExpiryNotification, c.MQTTTopic, c.MQTTSuccessMessage, c.MQTTUsername, c.MQTTPassword, c.DatabaseConnectionString, c.DatabaseQuery, c.AuthMethod, c.AuthDomain, c.AuthWorkstation, c.GRPCURL, c.GRPCProtobuf, c.GRPCBody, c.GRPCMetadata, c.GRPCMethod, c.GRPCServiceName, c.GRPCEnableTLS, c.RadiusUsername, c.RadiusPassword, c.RadiusCallingStationID, c.RadiusCalledStationID, c.RadiusSecret, c.ResendInterval, c.PacketSize, c.Game, c.HTTPBodyEncoding, c.Description, c.TLSCa, c.TLSCert, c.TLSKey, c.ParentID, c.InvertKeyword, c.JSONPath, c.ExpectedValue, c.KafkaProducerTopic, c.KafkaProducerBrokers, c.KafkaProducerSSL, c.KafkaProducerAllowAutoTopicCreation, c.KafkaProducerSaslOptions, c.KafkaProducerMessage, c.OauthClientID, c.OauthClientSecret, c.OauthTokenURL, c.OauthScopes, c.OauthAuthMethod, c.Timeout, c.GamedigGivenPortOnly, c.SaveResponse, c.SaveErrorResponse, c.ResponseMaxLength, c.SystemServiceName, c.RabbitmqNodes, c.RabbitmqUsername, c.RabbitmqPassword, c.RemoteBrowser, c.DomainExpiryNotification,
+		c.ID, c.Name, c.Active, c.UserID, c.Interval, c.URL, c.Type, c.Weight, c.Hostname, c.Port, c.CreatedDate, c.Keyword, c.Maxretries, c.IgnoreTLS, c.UpsideDown, c.Maxredirects, c.AcceptedStatuscodesJSON, c.DNSResolveType, c.DNSResolveServer, c.DNSLastResult, c.RetryInterval, c.PushToken, c.Method, c.Body, c.Headers, c.BasicAuthUser, c.BasicAuthPass, c.ProxyID, c.ExpiryNotification, c.MQTTTopic, c.MQTTSuccessMessage, c.MQTTUsername, c.MQTTPassword, c.DatabaseConnectionString, c.DatabaseQuery, c.AuthMethod, c.AuthDomain, c.AuthWorkstation, c.GRPCURL, c.GRPCProtobuf, c.GRPCBody, c.GRPCMetadata, c.GRPCMethod, c.GRPCServiceName, c.GRPCEnableTLS, c.RadiusUsername, c.RadiusPassword, c.RadiusCallingStationID, c.RadiusCalledStationID, c.RadiusSecret, c.ResendInterval, c.PacketSize, c.Game, c.HTTPBodyEncoding, c.Description, c.TLSCa, c.TLSCert, c.TLSKey, c.InvertKeyword, c.JSONPath, c.ExpectedValue, c.KafkaProducerTopic, c.KafkaProducerBrokers, c.KafkaProducerSSL, c.KafkaProducerAllowAutoTopicCreation, c.KafkaProducerSaslOptions, c.KafkaProducerMessage, c.OauthClientID, c.OauthClientSecret, c.OauthTokenURL, c.OauthScopes, c.OauthAuthMethod, c.Timeout, c.GamedigGivenPortOnly, c.SaveResponse, c.SaveErrorResponse, c.ResponseMaxLength, c.SystemServiceName, c.RabbitmqNodes, c.RabbitmqUsername, c.RabbitmqPassword, c.RemoteBrowser, c.DomainExpiryNotification, c.GroupTagIdsJSON,
 	}
 }
 
@@ -952,12 +943,11 @@ func (i monitorIndexes) AsSlice() []index {
 
 type monitorForeignKeys struct {
 	FKMonitor0 foreignKey
-	FKMonitor1 foreignKey
 }
 
 func (f monitorForeignKeys) AsSlice() []foreignKey {
 	return []foreignKey{
-		f.FKMonitor0, f.FKMonitor1,
+		f.FKMonitor0,
 	}
 }
 

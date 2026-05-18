@@ -84,7 +84,6 @@ type Monitor struct {
 	TLSCa                               null.Val[string] `db:"tls_ca" `
 	TLSCert                             null.Val[string] `db:"tls_cert" `
 	TLSKey                              null.Val[string] `db:"tls_key" `
-	ParentID                            null.Val[string] `db:"parent_id" `
 	InvertKeyword                       bool             `db:"invert_keyword" `
 	JSONPath                            null.Val[string] `db:"json_path" `
 	ExpectedValue                       null.Val[string] `db:"expected_value" `
@@ -110,6 +109,7 @@ type Monitor struct {
 	RabbitmqPassword                    null.Val[string] `db:"rabbitmq_password" `
 	RemoteBrowser                       null.Val[string] `db:"remote_browser" `
 	DomainExpiryNotification            null.Val[bool]   `db:"domain_expiry_notification" `
+	GroupTagIdsJSON                     null.Val[string] `db:"group_tag_ids_json" `
 
 	R monitorR `db:"-" `
 
@@ -129,9 +129,7 @@ type MonitorsQuery = *sqlite.ViewQuery[*Monitor, MonitorSlice]
 // monitorR is where relationships are stored.
 type monitorR struct {
 	Heartbeats                HeartbeatSlice               // fk_heartbeat_0
-	Parent                    *Monitor                     // fk_monitor_0
-	ReverseParents            MonitorSlice                 // fk_monitor_0__self_join_reverse
-	User                      *User                        // fk_monitor_1
+	User                      *User                        // fk_monitor_0
 	MonitorGroups             MonitorGroupSlice            // fk_monitor_group_1
 	MonitorMaintenances       MonitorMaintenanceSlice      // fk_monitor_maintenance_1
 	MonitorNotifications      MonitorNotificationSlice     // fk_monitor_notification_1
@@ -145,7 +143,7 @@ type monitorR struct {
 
 func buildMonitorColumns(tableName string) monitorColumns {
 	columnsExpr := expr.NewColumnsExpr(
-		"id", "name", "active", "user_id", "interval", "url", "type", "weight", "hostname", "port", "created_date", "keyword", "maxretries", "ignore_tls", "upside_down", "maxredirects", "accepted_statuscodes_json", "dns_resolve_type", "dns_resolve_server", "dns_last_result", "retry_interval", "push_token", "method", "body", "headers", "basic_auth_user", "basic_auth_pass", "proxy_id", "expiry_notification", "mqtt_topic", "mqtt_success_message", "mqtt_username", "mqtt_password", "database_connection_string", "database_query", "auth_method", "auth_domain", "auth_workstation", "grpc_url", "grpc_protobuf", "grpc_body", "grpc_metadata", "grpc_method", "grpc_service_name", "grpc_enable_tls", "radius_username", "radius_password", "radius_calling_station_id", "radius_called_station_id", "radius_secret", "resend_interval", "packet_size", "game", "http_body_encoding", "description", "tls_ca", "tls_cert", "tls_key", "parent_id", "invert_keyword", "json_path", "expected_value", "kafka_producer_topic", "kafka_producer_brokers", "kafka_producer_ssl", "kafka_producer_allow_auto_topic_creation", "kafka_producer_sasl_options", "kafka_producer_message", "oauth_client_id", "oauth_client_secret", "oauth_token_url", "oauth_scopes", "oauth_auth_method", "timeout", "gamedig_given_port_only", "save_response", "save_error_response", "response_max_length", "system_service_name", "rabbitmq_nodes", "rabbitmq_username", "rabbitmq_password", "remote_browser", "domain_expiry_notification",
+		"id", "name", "active", "user_id", "interval", "url", "type", "weight", "hostname", "port", "created_date", "keyword", "maxretries", "ignore_tls", "upside_down", "maxredirects", "accepted_statuscodes_json", "dns_resolve_type", "dns_resolve_server", "dns_last_result", "retry_interval", "push_token", "method", "body", "headers", "basic_auth_user", "basic_auth_pass", "proxy_id", "expiry_notification", "mqtt_topic", "mqtt_success_message", "mqtt_username", "mqtt_password", "database_connection_string", "database_query", "auth_method", "auth_domain", "auth_workstation", "grpc_url", "grpc_protobuf", "grpc_body", "grpc_metadata", "grpc_method", "grpc_service_name", "grpc_enable_tls", "radius_username", "radius_password", "radius_calling_station_id", "radius_called_station_id", "radius_secret", "resend_interval", "packet_size", "game", "http_body_encoding", "description", "tls_ca", "tls_cert", "tls_key", "invert_keyword", "json_path", "expected_value", "kafka_producer_topic", "kafka_producer_brokers", "kafka_producer_ssl", "kafka_producer_allow_auto_topic_creation", "kafka_producer_sasl_options", "kafka_producer_message", "oauth_client_id", "oauth_client_secret", "oauth_token_url", "oauth_scopes", "oauth_auth_method", "timeout", "gamedig_given_port_only", "save_response", "save_error_response", "response_max_length", "system_service_name", "rabbitmq_nodes", "rabbitmq_username", "rabbitmq_password", "remote_browser", "domain_expiry_notification", "group_tag_ids_json",
 	)
 	if tableName != "" {
 		columnsExpr = columnsExpr.WithParent(tableName)
@@ -211,7 +209,6 @@ func buildMonitorColumns(tableName string) monitorColumns {
 		TLSCa:                               sqlite.Quote(tableName, "tls_ca"),
 		TLSCert:                             sqlite.Quote(tableName, "tls_cert"),
 		TLSKey:                              sqlite.Quote(tableName, "tls_key"),
-		ParentID:                            sqlite.Quote(tableName, "parent_id"),
 		InvertKeyword:                       sqlite.Quote(tableName, "invert_keyword"),
 		JSONPath:                            sqlite.Quote(tableName, "json_path"),
 		ExpectedValue:                       sqlite.Quote(tableName, "expected_value"),
@@ -237,6 +234,7 @@ func buildMonitorColumns(tableName string) monitorColumns {
 		RabbitmqPassword:                    sqlite.Quote(tableName, "rabbitmq_password"),
 		RemoteBrowser:                       sqlite.Quote(tableName, "remote_browser"),
 		DomainExpiryNotification:            sqlite.Quote(tableName, "domain_expiry_notification"),
+		GroupTagIdsJSON:                     sqlite.Quote(tableName, "group_tag_ids_json"),
 	}
 }
 
@@ -301,7 +299,6 @@ type monitorColumns struct {
 	TLSCa                               sqlite.Expression
 	TLSCert                             sqlite.Expression
 	TLSKey                              sqlite.Expression
-	ParentID                            sqlite.Expression
 	InvertKeyword                       sqlite.Expression
 	JSONPath                            sqlite.Expression
 	ExpectedValue                       sqlite.Expression
@@ -327,6 +324,7 @@ type monitorColumns struct {
 	RabbitmqPassword                    sqlite.Expression
 	RemoteBrowser                       sqlite.Expression
 	DomainExpiryNotification            sqlite.Expression
+	GroupTagIdsJSON                     sqlite.Expression
 }
 
 func (c monitorColumns) Alias() string {
@@ -403,7 +401,6 @@ type MonitorSetter struct {
 	TLSCa                               omitnull.Val[string] `db:"tls_ca" `
 	TLSCert                             omitnull.Val[string] `db:"tls_cert" `
 	TLSKey                              omitnull.Val[string] `db:"tls_key" `
-	ParentID                            omitnull.Val[string] `db:"parent_id" `
 	InvertKeyword                       omit.Val[bool]       `db:"invert_keyword" `
 	JSONPath                            omitnull.Val[string] `db:"json_path" `
 	ExpectedValue                       omitnull.Val[string] `db:"expected_value" `
@@ -429,6 +426,7 @@ type MonitorSetter struct {
 	RabbitmqPassword                    omitnull.Val[string] `db:"rabbitmq_password" `
 	RemoteBrowser                       omitnull.Val[string] `db:"remote_browser" `
 	DomainExpiryNotification            omitnull.Val[bool]   `db:"domain_expiry_notification" `
+	GroupTagIdsJSON                     omitnull.Val[string] `db:"group_tag_ids_json" `
 }
 
 func (s MonitorSetter) SetColumns() []string {
@@ -607,9 +605,6 @@ func (s MonitorSetter) SetColumns() []string {
 	if !s.TLSKey.IsUnset() {
 		vals = append(vals, "tls_key")
 	}
-	if !s.ParentID.IsUnset() {
-		vals = append(vals, "parent_id")
-	}
 	if s.InvertKeyword.IsValue() {
 		vals = append(vals, "invert_keyword")
 	}
@@ -684,6 +679,9 @@ func (s MonitorSetter) SetColumns() []string {
 	}
 	if !s.DomainExpiryNotification.IsUnset() {
 		vals = append(vals, "domain_expiry_notification")
+	}
+	if !s.GroupTagIdsJSON.IsUnset() {
+		vals = append(vals, "group_tag_ids_json")
 	}
 	return vals
 }
@@ -863,9 +861,6 @@ func (s MonitorSetter) Overwrite(t *Monitor) {
 	if !s.TLSKey.IsUnset() {
 		t.TLSKey = s.TLSKey.MustGetNull()
 	}
-	if !s.ParentID.IsUnset() {
-		t.ParentID = s.ParentID.MustGetNull()
-	}
 	if s.InvertKeyword.IsValue() {
 		t.InvertKeyword = s.InvertKeyword.MustGet()
 	}
@@ -940,6 +935,9 @@ func (s MonitorSetter) Overwrite(t *Monitor) {
 	}
 	if !s.DomainExpiryNotification.IsUnset() {
 		t.DomainExpiryNotification = s.DomainExpiryNotification.MustGetNull()
+	}
+	if !s.GroupTagIdsJSON.IsUnset() {
+		t.GroupTagIdsJSON = s.GroupTagIdsJSON.MustGetNull()
 	}
 }
 
@@ -1190,10 +1188,6 @@ func (s *MonitorSetter) Apply(q *dialect.InsertQuery) {
 			vals = append(vals, sqlite.Arg(s.TLSKey.MustGetNull()))
 		}
 
-		if !s.ParentID.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.ParentID.MustGetNull()))
-		}
-
 		if s.InvertKeyword.IsValue() {
 			vals = append(vals, sqlite.Arg(s.InvertKeyword.MustGet()))
 		}
@@ -1292,6 +1286,10 @@ func (s *MonitorSetter) Apply(q *dialect.InsertQuery) {
 
 		if !s.DomainExpiryNotification.IsUnset() {
 			vals = append(vals, sqlite.Arg(s.DomainExpiryNotification.MustGetNull()))
+		}
+
+		if !s.GroupTagIdsJSON.IsUnset() {
+			vals = append(vals, sqlite.Arg(s.GroupTagIdsJSON.MustGetNull()))
 		}
 
 		if len(vals) == 0 {
@@ -1715,13 +1713,6 @@ func (s MonitorSetter) Expressions(prefix ...string) []bob.Expression {
 		}})
 	}
 
-	if !s.ParentID.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "parent_id")...),
-			sqlite.Arg(s.ParentID),
-		}})
-	}
-
 	if s.InvertKeyword.IsValue() {
 		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
 			sqlite.Quote(append(prefix, "invert_keyword")...),
@@ -1894,6 +1885,13 @@ func (s MonitorSetter) Expressions(prefix ...string) []bob.Expression {
 		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
 			sqlite.Quote(append(prefix, "domain_expiry_notification")...),
 			sqlite.Arg(s.DomainExpiryNotification),
+		}})
+	}
+
+	if !s.GroupTagIdsJSON.IsUnset() {
+		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
+			sqlite.Quote(append(prefix, "group_tag_ids_json")...),
+			sqlite.Arg(s.GroupTagIdsJSON),
 		}})
 	}
 
@@ -2141,44 +2139,6 @@ func (os MonitorSlice) Heartbeats(mods ...bob.Mod[*dialect.SelectQuery]) Heartbe
 
 	return Heartbeats.Query(append(mods,
 		sm.Where(sqlite.Group(Heartbeats.Columns.MonitorID).OP("IN", PKArgExpr)),
-	)...)
-}
-
-// Parent starts a query for related objects on monitor
-func (o *Monitor) Parent(mods ...bob.Mod[*dialect.SelectQuery]) MonitorsQuery {
-	return Monitors.Query(append(mods,
-		sm.Where(Monitors.Columns.ID.EQ(sqlite.Arg(o.ParentID))),
-	)...)
-}
-
-func (os MonitorSlice) Parent(mods ...bob.Mod[*dialect.SelectQuery]) MonitorsQuery {
-	PKArgSlice := make([]bob.Expression, len(os))
-	for i, o := range os {
-		PKArgSlice[i] = sqlite.ArgGroup(o.ParentID)
-	}
-	PKArgExpr := sqlite.Group(PKArgSlice...)
-
-	return Monitors.Query(append(mods,
-		sm.Where(sqlite.Group(Monitors.Columns.ID).OP("IN", PKArgExpr)),
-	)...)
-}
-
-// ReverseParents starts a query for related objects on monitor
-func (o *Monitor) ReverseParents(mods ...bob.Mod[*dialect.SelectQuery]) MonitorsQuery {
-	return Monitors.Query(append(mods,
-		sm.Where(Monitors.Columns.ParentID.EQ(sqlite.Arg(o.ID))),
-	)...)
-}
-
-func (os MonitorSlice) ReverseParents(mods ...bob.Mod[*dialect.SelectQuery]) MonitorsQuery {
-	PKArgSlice := make([]bob.Expression, len(os))
-	for i, o := range os {
-		PKArgSlice[i] = sqlite.ArgGroup(o.ID)
-	}
-	PKArgExpr := sqlite.Group(PKArgSlice...)
-
-	return Monitors.Query(append(mods,
-		sm.Where(sqlite.Group(Monitors.Columns.ParentID).OP("IN", PKArgExpr)),
 	)...)
 }
 
@@ -2435,122 +2395,6 @@ func (monitor0 *Monitor) AttachHeartbeats(ctx context.Context, exec bob.Executor
 
 	for _, rel := range related {
 		rel.R.Monitor = monitor0
-	}
-
-	return nil
-}
-
-func attachMonitorParent0(ctx context.Context, exec bob.Executor, count int, monitor0 *Monitor, monitor1 *Monitor) (*Monitor, error) {
-	setter := &MonitorSetter{
-		ParentID: omitnull.From(monitor1.ID),
-	}
-
-	err := monitor0.Update(ctx, exec, setter)
-	if err != nil {
-		return nil, fmt.Errorf("attachMonitorParent0: %w", err)
-	}
-
-	return monitor0, nil
-}
-
-func (monitor0 *Monitor) InsertParent(ctx context.Context, exec bob.Executor, related *MonitorSetter) error {
-	var err error
-
-	monitor1, err := Monitors.Insert(related).One(ctx, exec)
-	if err != nil {
-		return fmt.Errorf("inserting related objects: %w", err)
-	}
-
-	_, err = attachMonitorParent0(ctx, exec, 1, monitor0, monitor1)
-	if err != nil {
-		return err
-	}
-
-	monitor0.R.Parent = monitor1
-
-	monitor1.R.ReverseParents = append(monitor1.R.ReverseParents, monitor0)
-
-	return nil
-}
-
-func (monitor0 *Monitor) AttachParent(ctx context.Context, exec bob.Executor, monitor1 *Monitor) error {
-	var err error
-
-	_, err = attachMonitorParent0(ctx, exec, 1, monitor0, monitor1)
-	if err != nil {
-		return err
-	}
-
-	monitor0.R.Parent = monitor1
-
-	monitor1.R.ReverseParents = append(monitor1.R.ReverseParents, monitor0)
-
-	return nil
-}
-
-func insertMonitorReverseParents0(ctx context.Context, exec bob.Executor, monitors1 []*MonitorSetter, monitor0 *Monitor) (MonitorSlice, error) {
-	for i := range monitors1 {
-		monitors1[i].ParentID = omitnull.From(monitor0.ID)
-	}
-
-	ret, err := Monitors.Insert(bob.ToMods(monitors1...)).All(ctx, exec)
-	if err != nil {
-		return ret, fmt.Errorf("insertMonitorReverseParents0: %w", err)
-	}
-
-	return ret, nil
-}
-
-func attachMonitorReverseParents0(ctx context.Context, exec bob.Executor, count int, monitors1 MonitorSlice, monitor0 *Monitor) (MonitorSlice, error) {
-	setter := &MonitorSetter{
-		ParentID: omitnull.From(monitor0.ID),
-	}
-
-	err := monitors1.UpdateAll(ctx, exec, *setter)
-	if err != nil {
-		return nil, fmt.Errorf("attachMonitorReverseParents0: %w", err)
-	}
-
-	return monitors1, nil
-}
-
-func (monitor0 *Monitor) InsertReverseParents(ctx context.Context, exec bob.Executor, related ...*MonitorSetter) error {
-	if len(related) == 0 {
-		return nil
-	}
-
-	var err error
-
-	monitors1, err := insertMonitorReverseParents0(ctx, exec, related, monitor0)
-	if err != nil {
-		return err
-	}
-
-	monitor0.R.ReverseParents = append(monitor0.R.ReverseParents, monitors1...)
-
-	for _, rel := range monitors1 {
-		rel.R.Parent = monitor0
-	}
-	return nil
-}
-
-func (monitor0 *Monitor) AttachReverseParents(ctx context.Context, exec bob.Executor, related ...*Monitor) error {
-	if len(related) == 0 {
-		return nil
-	}
-
-	var err error
-	monitors1 := MonitorSlice(related)
-
-	_, err = attachMonitorReverseParents0(ctx, exec, len(related), monitors1, monitor0)
-	if err != nil {
-		return err
-	}
-
-	monitor0.R.ReverseParents = append(monitor0.R.ReverseParents, monitors1...)
-
-	for _, rel := range related {
-		rel.R.Parent = monitor0
 	}
 
 	return nil
@@ -3261,7 +3105,6 @@ type monitorWhere[Q sqlite.Filterable] struct {
 	TLSCa                               sqlite.WhereNullMod[Q, string]
 	TLSCert                             sqlite.WhereNullMod[Q, string]
 	TLSKey                              sqlite.WhereNullMod[Q, string]
-	ParentID                            sqlite.WhereNullMod[Q, string]
 	InvertKeyword                       sqlite.WhereMod[Q, bool]
 	JSONPath                            sqlite.WhereNullMod[Q, string]
 	ExpectedValue                       sqlite.WhereNullMod[Q, string]
@@ -3287,6 +3130,7 @@ type monitorWhere[Q sqlite.Filterable] struct {
 	RabbitmqPassword                    sqlite.WhereNullMod[Q, string]
 	RemoteBrowser                       sqlite.WhereNullMod[Q, string]
 	DomainExpiryNotification            sqlite.WhereNullMod[Q, bool]
+	GroupTagIdsJSON                     sqlite.WhereNullMod[Q, string]
 }
 
 func (monitorWhere[Q]) AliasedAs(alias string) monitorWhere[Q] {
@@ -3353,7 +3197,6 @@ func buildMonitorWhere[Q sqlite.Filterable](cols monitorColumns) monitorWhere[Q]
 		TLSCa:                               sqlite.WhereNull[Q, string](cols.TLSCa),
 		TLSCert:                             sqlite.WhereNull[Q, string](cols.TLSCert),
 		TLSKey:                              sqlite.WhereNull[Q, string](cols.TLSKey),
-		ParentID:                            sqlite.WhereNull[Q, string](cols.ParentID),
 		InvertKeyword:                       sqlite.Where[Q, bool](cols.InvertKeyword),
 		JSONPath:                            sqlite.WhereNull[Q, string](cols.JSONPath),
 		ExpectedValue:                       sqlite.WhereNull[Q, string](cols.ExpectedValue),
@@ -3379,6 +3222,7 @@ func buildMonitorWhere[Q sqlite.Filterable](cols monitorColumns) monitorWhere[Q]
 		RabbitmqPassword:                    sqlite.WhereNull[Q, string](cols.RabbitmqPassword),
 		RemoteBrowser:                       sqlite.WhereNull[Q, string](cols.RemoteBrowser),
 		DomainExpiryNotification:            sqlite.WhereNull[Q, bool](cols.DomainExpiryNotification),
+		GroupTagIdsJSON:                     sqlite.WhereNull[Q, string](cols.GroupTagIdsJSON),
 	}
 }
 
@@ -3399,32 +3243,6 @@ func (o *Monitor) Preload(name string, retrieved any) error {
 		for _, rel := range rels {
 			if rel != nil {
 				rel.R.Monitor = o
-			}
-		}
-		return nil
-	case "Parent":
-		rel, ok := retrieved.(*Monitor)
-		if !ok {
-			return fmt.Errorf("monitor cannot load %T as %q", retrieved, name)
-		}
-
-		o.R.Parent = rel
-
-		if rel != nil {
-			rel.R.ReverseParents = MonitorSlice{o}
-		}
-		return nil
-	case "ReverseParents":
-		rels, ok := retrieved.(MonitorSlice)
-		if !ok {
-			return fmt.Errorf("monitor cannot load %T as %q", retrieved, name)
-		}
-
-		o.R.ReverseParents = rels
-
-		for _, rel := range rels {
-			if rel != nil {
-				rel.R.Parent = o
 			}
 		}
 		return nil
@@ -3570,26 +3388,12 @@ func (o *Monitor) Preload(name string, retrieved any) error {
 }
 
 type monitorPreloader struct {
-	Parent         func(...sqlite.PreloadOption) sqlite.Preloader
 	User           func(...sqlite.PreloadOption) sqlite.Preloader
 	MonitorTLSInfo func(...sqlite.PreloadOption) sqlite.Preloader
 }
 
 func buildMonitorPreloader() monitorPreloader {
 	return monitorPreloader{
-		Parent: func(opts ...sqlite.PreloadOption) sqlite.Preloader {
-			return sqlite.Preload[*Monitor, MonitorSlice](sqlite.PreloadRel{
-				Name: "Parent",
-				Sides: []sqlite.PreloadSide{
-					{
-						From:        Monitors,
-						To:          Monitors,
-						FromColumns: []string{"parent_id"},
-						ToColumns:   []string{"id"},
-					},
-				},
-			}, Monitors.Columns.Names(), opts...)
-		},
 		User: func(opts ...sqlite.PreloadOption) sqlite.Preloader {
 			return sqlite.Preload[*User, UserSlice](sqlite.PreloadRel{
 				Name: "User",
@@ -3621,8 +3425,6 @@ func buildMonitorPreloader() monitorPreloader {
 
 type monitorThenLoader[Q orm.Loadable] struct {
 	Heartbeats                func(...bob.Mod[*dialect.SelectQuery]) orm.Loader[Q]
-	Parent                    func(...bob.Mod[*dialect.SelectQuery]) orm.Loader[Q]
-	ReverseParents            func(...bob.Mod[*dialect.SelectQuery]) orm.Loader[Q]
 	User                      func(...bob.Mod[*dialect.SelectQuery]) orm.Loader[Q]
 	MonitorGroups             func(...bob.Mod[*dialect.SelectQuery]) orm.Loader[Q]
 	MonitorMaintenances       func(...bob.Mod[*dialect.SelectQuery]) orm.Loader[Q]
@@ -3638,12 +3440,6 @@ type monitorThenLoader[Q orm.Loadable] struct {
 func buildMonitorThenLoader[Q orm.Loadable]() monitorThenLoader[Q] {
 	type HeartbeatsLoadInterface interface {
 		LoadHeartbeats(context.Context, bob.Executor, ...bob.Mod[*dialect.SelectQuery]) error
-	}
-	type ParentLoadInterface interface {
-		LoadParent(context.Context, bob.Executor, ...bob.Mod[*dialect.SelectQuery]) error
-	}
-	type ReverseParentsLoadInterface interface {
-		LoadReverseParents(context.Context, bob.Executor, ...bob.Mod[*dialect.SelectQuery]) error
 	}
 	type UserLoadInterface interface {
 		LoadUser(context.Context, bob.Executor, ...bob.Mod[*dialect.SelectQuery]) error
@@ -3681,18 +3477,6 @@ func buildMonitorThenLoader[Q orm.Loadable]() monitorThenLoader[Q] {
 			"Heartbeats",
 			func(ctx context.Context, exec bob.Executor, retrieved HeartbeatsLoadInterface, mods ...bob.Mod[*dialect.SelectQuery]) error {
 				return retrieved.LoadHeartbeats(ctx, exec, mods...)
-			},
-		),
-		Parent: thenLoadBuilder[Q](
-			"Parent",
-			func(ctx context.Context, exec bob.Executor, retrieved ParentLoadInterface, mods ...bob.Mod[*dialect.SelectQuery]) error {
-				return retrieved.LoadParent(ctx, exec, mods...)
-			},
-		),
-		ReverseParents: thenLoadBuilder[Q](
-			"ReverseParents",
-			func(ctx context.Context, exec bob.Executor, retrieved ReverseParentsLoadInterface, mods ...bob.Mod[*dialect.SelectQuery]) error {
-				return retrieved.LoadReverseParents(ctx, exec, mods...)
 			},
 		),
 		User: thenLoadBuilder[Q](
@@ -3813,125 +3597,6 @@ func (os MonitorSlice) LoadHeartbeats(ctx context.Context, exec bob.Executor, mo
 			rel.R.Monitor = o
 
 			o.R.Heartbeats = append(o.R.Heartbeats, rel)
-		}
-	}
-
-	return nil
-}
-
-// LoadParent loads the monitor's Parent into the .R struct
-func (o *Monitor) LoadParent(ctx context.Context, exec bob.Executor, mods ...bob.Mod[*dialect.SelectQuery]) error {
-	if o == nil {
-		return nil
-	}
-
-	// Reset the relationship
-	o.R.Parent = nil
-
-	related, err := o.Parent(mods...).One(ctx, exec)
-	if err != nil {
-		return err
-	}
-
-	related.R.ReverseParents = MonitorSlice{o}
-
-	o.R.Parent = related
-	return nil
-}
-
-// LoadParent loads the monitor's Parent into the .R struct
-func (os MonitorSlice) LoadParent(ctx context.Context, exec bob.Executor, mods ...bob.Mod[*dialect.SelectQuery]) error {
-	if len(os) == 0 {
-		return nil
-	}
-
-	monitors, err := os.Parent(mods...).All(ctx, exec)
-	if err != nil {
-		return err
-	}
-
-	for _, o := range os {
-		if o == nil {
-			continue
-		}
-
-		for _, rel := range monitors {
-			if !o.ParentID.IsValue() {
-				continue
-			}
-
-			if !(o.ParentID.IsValue() && o.ParentID.MustGet() == rel.ID) {
-				continue
-			}
-
-			rel.R.ReverseParents = append(rel.R.ReverseParents, o)
-
-			o.R.Parent = rel
-			break
-		}
-	}
-
-	return nil
-}
-
-// LoadReverseParents loads the monitor's ReverseParents into the .R struct
-func (o *Monitor) LoadReverseParents(ctx context.Context, exec bob.Executor, mods ...bob.Mod[*dialect.SelectQuery]) error {
-	if o == nil {
-		return nil
-	}
-
-	// Reset the relationship
-	o.R.ReverseParents = nil
-
-	related, err := o.ReverseParents(mods...).All(ctx, exec)
-	if err != nil {
-		return err
-	}
-
-	for _, rel := range related {
-		rel.R.Parent = o
-	}
-
-	o.R.ReverseParents = related
-	return nil
-}
-
-// LoadReverseParents loads the monitor's ReverseParents into the .R struct
-func (os MonitorSlice) LoadReverseParents(ctx context.Context, exec bob.Executor, mods ...bob.Mod[*dialect.SelectQuery]) error {
-	if len(os) == 0 {
-		return nil
-	}
-
-	monitors, err := os.ReverseParents(mods...).All(ctx, exec)
-	if err != nil {
-		return err
-	}
-
-	for _, o := range os {
-		if o == nil {
-			continue
-		}
-
-		o.R.ReverseParents = nil
-	}
-
-	for _, o := range os {
-		if o == nil {
-			continue
-		}
-
-		for _, rel := range monitors {
-
-			if !rel.ParentID.IsValue() {
-				continue
-			}
-			if !(rel.ParentID.IsValue() && o.ID == rel.ParentID.MustGet()) {
-				continue
-			}
-
-			rel.R.Parent = o
-
-			o.R.ReverseParents = append(o.R.ReverseParents, rel)
 		}
 	}
 
@@ -4533,7 +4198,6 @@ func (os MonitorSlice) LoadStatMinutelies(ctx context.Context, exec bob.Executor
 // monitorC is where relationship counts are stored.
 type monitorC struct {
 	Heartbeats                *int64
-	ReverseParents            *int64
 	MonitorGroups             *int64
 	MonitorMaintenances       *int64
 	MonitorNotifications      *int64
@@ -4553,8 +4217,6 @@ func (o *Monitor) PreloadCount(name string, count int64) error {
 	switch name {
 	case "Heartbeats":
 		o.C.Heartbeats = &count
-	case "ReverseParents":
-		o.C.ReverseParents = &count
 	case "MonitorGroups":
 		o.C.MonitorGroups = &count
 	case "MonitorMaintenances":
@@ -4577,7 +4239,6 @@ func (o *Monitor) PreloadCount(name string, count int64) error {
 
 type monitorCountPreloader struct {
 	Heartbeats                func(...bob.Mod[*dialect.SelectQuery]) sqlite.Preloader
-	ReverseParents            func(...bob.Mod[*dialect.SelectQuery]) sqlite.Preloader
 	MonitorGroups             func(...bob.Mod[*dialect.SelectQuery]) sqlite.Preloader
 	MonitorMaintenances       func(...bob.Mod[*dialect.SelectQuery]) sqlite.Preloader
 	MonitorNotifications      func(...bob.Mod[*dialect.SelectQuery]) sqlite.Preloader
@@ -4602,23 +4263,6 @@ func buildMonitorCountPreloader() monitorCountPreloader {
 
 					sm.From(Heartbeats.Name()),
 					sm.Where(sqlite.Quote(Heartbeats.Alias(), "monitor_id").EQ(sqlite.Quote(parent, "id"))),
-				}
-				subqueryMods = append(subqueryMods, mods...)
-				return sqlite.Group(sqlite.Select(subqueryMods...).Expression)
-			})
-		},
-		ReverseParents: func(mods ...bob.Mod[*dialect.SelectQuery]) sqlite.Preloader {
-			return countPreloader[*Monitor]("ReverseParents", func(parent string) bob.Expression {
-				// Build a correlated subquery: (SELECT COUNT(*) FROM related WHERE fk = parent.pk)
-				if parent == "" {
-					parent = Monitors.Alias()
-				}
-
-				subqueryMods := []bob.Mod[*dialect.SelectQuery]{
-					sm.Columns(sqlite.Raw("count(*)")),
-
-					sm.From(Monitors.Name()),
-					sm.Where(sqlite.Quote(Monitors.Alias(), "parent_id").EQ(sqlite.Quote(parent, "id"))),
 				}
 				subqueryMods = append(subqueryMods, mods...)
 				return sqlite.Group(sqlite.Select(subqueryMods...).Expression)
@@ -4765,7 +4409,6 @@ func buildMonitorCountPreloader() monitorCountPreloader {
 
 type monitorCountThenLoader[Q orm.Loadable] struct {
 	Heartbeats                func(...bob.Mod[*dialect.SelectQuery]) orm.Loader[Q]
-	ReverseParents            func(...bob.Mod[*dialect.SelectQuery]) orm.Loader[Q]
 	MonitorGroups             func(...bob.Mod[*dialect.SelectQuery]) orm.Loader[Q]
 	MonitorMaintenances       func(...bob.Mod[*dialect.SelectQuery]) orm.Loader[Q]
 	MonitorNotifications      func(...bob.Mod[*dialect.SelectQuery]) orm.Loader[Q]
@@ -4779,9 +4422,6 @@ type monitorCountThenLoader[Q orm.Loadable] struct {
 func buildMonitorCountThenLoader[Q orm.Loadable]() monitorCountThenLoader[Q] {
 	type HeartbeatsCountInterface interface {
 		LoadCountHeartbeats(context.Context, bob.Executor, ...bob.Mod[*dialect.SelectQuery]) error
-	}
-	type ReverseParentsCountInterface interface {
-		LoadCountReverseParents(context.Context, bob.Executor, ...bob.Mod[*dialect.SelectQuery]) error
 	}
 	type MonitorGroupsCountInterface interface {
 		LoadCountMonitorGroups(context.Context, bob.Executor, ...bob.Mod[*dialect.SelectQuery]) error
@@ -4813,12 +4453,6 @@ func buildMonitorCountThenLoader[Q orm.Loadable]() monitorCountThenLoader[Q] {
 			"Heartbeats",
 			func(ctx context.Context, exec bob.Executor, retrieved HeartbeatsCountInterface, mods ...bob.Mod[*dialect.SelectQuery]) error {
 				return retrieved.LoadCountHeartbeats(ctx, exec, mods...)
-			},
-		),
-		ReverseParents: countThenLoadBuilder[Q](
-			"ReverseParents",
-			func(ctx context.Context, exec bob.Executor, retrieved ReverseParentsCountInterface, mods ...bob.Mod[*dialect.SelectQuery]) error {
-				return retrieved.LoadCountReverseParents(ctx, exec, mods...)
 			},
 		),
 		MonitorGroups: countThenLoadBuilder[Q](
@@ -4945,84 +4579,6 @@ func (os MonitorSlice) LoadCountHeartbeats(ctx context.Context, exec bob.Executo
 		}
 		count := countMap[o.ID]
 		o.C.Heartbeats = &count
-	}
-
-	return nil
-}
-
-// LoadCountReverseParents loads the count of ReverseParents into the C struct
-func (o *Monitor) LoadCountReverseParents(ctx context.Context, exec bob.Executor, mods ...bob.Mod[*dialect.SelectQuery]) error {
-	if o == nil {
-		return nil
-	}
-
-	count, err := o.ReverseParents(mods...).Count(ctx, exec)
-	if err != nil {
-		return err
-	}
-
-	o.C.ReverseParents = &count
-	return nil
-}
-
-// LoadCountReverseParents loads the count of ReverseParents for a slice in a single batch query
-func (os MonitorSlice) LoadCountReverseParents(ctx context.Context, exec bob.Executor, mods ...bob.Mod[*dialect.SelectQuery]) error {
-	if len(os) == 0 {
-		return nil
-	}
-
-	// Build the IN arg expression from parent PKs
-	PKArgSlice := make([]bob.Expression, 0, len(os))
-	for _, o := range os {
-		if o == nil {
-			continue
-		}
-		PKArgSlice = append(PKArgSlice, sqlite.Arg(o.ID))
-	}
-	PKArgExpr := sqlite.Group(PKArgSlice...)
-
-	// countResult holds one scanned row from the batch count query.
-	// FK columns are aliased to the parent PK column names for direct map lookup.
-	type countResult struct {
-		ID    string
-		Count int64
-	}
-
-	batchMods := []bob.Mod[*dialect.SelectQuery]{
-		// SELECT fk AS parent_pk, count(*)
-		sm.Columns(
-			Monitors.Columns.ParentID.As("id"),
-			sqlite.Raw("count(*) as count"),
-		),
-		// Single-hop: FROM related table directly
-		sm.From(Monitors.NameAs()),
-
-		// WHERE fk IN (parent PKs)
-		sm.Where(Monitors.Columns.ParentID.OP("IN", PKArgExpr)),
-		// GROUP BY fk columns
-		sm.GroupBy(Monitors.Columns.ParentID),
-	}
-	batchMods = append(batchMods, mods...)
-
-	results, err := bob.All(ctx, exec,
-		sqlite.Select(batchMods...),
-		scan.StructMapper[countResult](),
-	)
-	if err != nil {
-		return err
-	}
-
-	// Single-column FK: direct map lookup
-	countMap := make(map[string]int64, len(results))
-	for _, r := range results {
-		countMap[r.ID] = r.Count
-	}
-	for _, o := range os {
-		if o == nil {
-			continue
-		}
-		count := countMap[o.ID]
-		o.C.ReverseParents = &count
 	}
 
 	return nil
@@ -5655,8 +5211,6 @@ func (os MonitorSlice) LoadCountStatMinutelies(ctx context.Context, exec bob.Exe
 type monitorJoins[Q dialect.Joinable] struct {
 	typ                       string
 	Heartbeats                modAs[Q, heartbeatColumns]
-	Parent                    modAs[Q, monitorColumns]
-	ReverseParents            modAs[Q, monitorColumns]
 	User                      modAs[Q, userColumns]
 	MonitorGroups             modAs[Q, monitorGroupColumns]
 	MonitorMaintenances       modAs[Q, monitorMaintenanceColumns]
@@ -5684,34 +5238,6 @@ func buildMonitorJoins[Q dialect.Joinable](cols monitorColumns, typ string) moni
 				{
 					mods = append(mods, dialect.Join[Q](typ, Heartbeats.Name().As(to.Alias())).On(
 						to.MonitorID.EQ(cols.ID),
-					))
-				}
-
-				return mods
-			},
-		},
-		Parent: modAs[Q, monitorColumns]{
-			c: Monitors.Columns,
-			f: func(to monitorColumns) bob.Mod[Q] {
-				mods := make(mods.QueryMods[Q], 0, 1)
-
-				{
-					mods = append(mods, dialect.Join[Q](typ, Monitors.Name().As(to.Alias())).On(
-						to.ID.EQ(cols.ParentID),
-					))
-				}
-
-				return mods
-			},
-		},
-		ReverseParents: modAs[Q, monitorColumns]{
-			c: Monitors.Columns,
-			f: func(to monitorColumns) bob.Mod[Q] {
-				mods := make(mods.QueryMods[Q], 0, 1)
-
-				{
-					mods = append(mods, dialect.Join[Q](typ, Monitors.Name().As(to.Alias())).On(
-						to.ParentID.EQ(cols.ID),
 					))
 				}
 

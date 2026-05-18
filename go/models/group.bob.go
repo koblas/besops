@@ -33,6 +33,7 @@ type Group struct {
 	Active       bool             `db:"active" `
 	Weight       int64            `db:"weight" `
 	StatusPageID null.Val[string] `db:"status_page_id" `
+	TagIdsJSON   null.Val[string] `db:"tag_ids_json" `
 
 	R groupR `db:"-" `
 
@@ -57,7 +58,7 @@ type groupR struct {
 
 func buildGroupColumns(tableName string) groupColumns {
 	columnsExpr := expr.NewColumnsExpr(
-		"id", "name", "created_date", "public", "active", "weight", "status_page_id",
+		"id", "name", "created_date", "public", "active", "weight", "status_page_id", "tag_ids_json",
 	)
 	if tableName != "" {
 		columnsExpr = columnsExpr.WithParent(tableName)
@@ -72,6 +73,7 @@ func buildGroupColumns(tableName string) groupColumns {
 		Active:       sqlite.Quote(tableName, "active"),
 		Weight:       sqlite.Quote(tableName, "weight"),
 		StatusPageID: sqlite.Quote(tableName, "status_page_id"),
+		TagIdsJSON:   sqlite.Quote(tableName, "tag_ids_json"),
 	}
 }
 
@@ -85,6 +87,7 @@ type groupColumns struct {
 	Active       sqlite.Expression
 	Weight       sqlite.Expression
 	StatusPageID sqlite.Expression
+	TagIdsJSON   sqlite.Expression
 }
 
 func (c groupColumns) Alias() string {
@@ -110,10 +113,11 @@ type GroupSetter struct {
 	Active       omit.Val[bool]       `db:"active" `
 	Weight       omit.Val[int64]      `db:"weight" `
 	StatusPageID omitnull.Val[string] `db:"status_page_id" `
+	TagIdsJSON   omitnull.Val[string] `db:"tag_ids_json" `
 }
 
 func (s GroupSetter) SetColumns() []string {
-	vals := make([]string, 0, 7)
+	vals := make([]string, 0, 8)
 	if s.ID.IsValue() {
 		vals = append(vals, "id")
 	}
@@ -134,6 +138,9 @@ func (s GroupSetter) SetColumns() []string {
 	}
 	if !s.StatusPageID.IsUnset() {
 		vals = append(vals, "status_page_id")
+	}
+	if !s.TagIdsJSON.IsUnset() {
+		vals = append(vals, "tag_ids_json")
 	}
 	return vals
 }
@@ -160,6 +167,9 @@ func (s GroupSetter) Overwrite(t *Group) {
 	if !s.StatusPageID.IsUnset() {
 		t.StatusPageID = s.StatusPageID.MustGetNull()
 	}
+	if !s.TagIdsJSON.IsUnset() {
+		t.TagIdsJSON = s.TagIdsJSON.MustGetNull()
+	}
 }
 
 func (s *GroupSetter) Apply(q *dialect.InsertQuery) {
@@ -176,7 +186,7 @@ func (s *GroupSetter) Apply(q *dialect.InsertQuery) {
 	}
 
 	q.AppendValues(bob.ExpressionFunc(func(ctx context.Context, w io.StringWriter, d bob.Dialect, start int) ([]any, error) {
-		vals := make([]bob.Expression, 0, 7)
+		vals := make([]bob.Expression, 0, 8)
 		if s.ID.IsValue() {
 			vals = append(vals, sqlite.Arg(s.ID.MustGet()))
 		}
@@ -205,6 +215,10 @@ func (s *GroupSetter) Apply(q *dialect.InsertQuery) {
 			vals = append(vals, sqlite.Arg(s.StatusPageID.MustGetNull()))
 		}
 
+		if !s.TagIdsJSON.IsUnset() {
+			vals = append(vals, sqlite.Arg(s.TagIdsJSON.MustGetNull()))
+		}
+
 		if len(vals) == 0 {
 			vals = append(vals, sqlite.Arg(nil))
 		}
@@ -218,7 +232,7 @@ func (s GroupSetter) UpdateMod() bob.Mod[*dialect.UpdateQuery] {
 }
 
 func (s GroupSetter) Expressions(prefix ...string) []bob.Expression {
-	exprs := make([]bob.Expression, 0, 7)
+	exprs := make([]bob.Expression, 0, 8)
 
 	if s.ID.IsValue() {
 		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
@@ -266,6 +280,13 @@ func (s GroupSetter) Expressions(prefix ...string) []bob.Expression {
 		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
 			sqlite.Quote(append(prefix, "status_page_id")...),
 			sqlite.Arg(s.StatusPageID),
+		}})
+	}
+
+	if !s.TagIdsJSON.IsUnset() {
+		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
+			sqlite.Quote(append(prefix, "tag_ids_json")...),
+			sqlite.Arg(s.TagIdsJSON),
 		}})
 	}
 
@@ -659,6 +680,7 @@ type groupWhere[Q sqlite.Filterable] struct {
 	Active       sqlite.WhereMod[Q, bool]
 	Weight       sqlite.WhereMod[Q, int64]
 	StatusPageID sqlite.WhereNullMod[Q, string]
+	TagIdsJSON   sqlite.WhereNullMod[Q, string]
 }
 
 func (groupWhere[Q]) AliasedAs(alias string) groupWhere[Q] {
@@ -674,6 +696,7 @@ func buildGroupWhere[Q sqlite.Filterable](cols groupColumns) groupWhere[Q] {
 		Active:       sqlite.Where[Q, bool](cols.Active),
 		Weight:       sqlite.Where[Q, int64](cols.Weight),
 		StatusPageID: sqlite.WhereNull[Q, string](cols.StatusPageID),
+		TagIdsJSON:   sqlite.WhereNull[Q, string](cols.TagIdsJSON),
 	}
 }
 

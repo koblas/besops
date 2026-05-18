@@ -153,7 +153,7 @@ func (a *App) Start(ctx context.Context) error {
 	registry.Register(&monitortypes.PushChecker{})
 	registry.Register(&monitortypes.SMTPMonitorChecker{})
 	registry.Register(&monitortypes.TailscalePingChecker{})
-	registry.Register(&monitortypes.GroupChecker{MonitorRepo: monitorRepo, HbStore: heartbeatRepo})
+	registry.Register(&monitortypes.GroupChecker{HbStore: heartbeatRepo, TagFinder: monitorRepo})
 
 	// Notification dispatcher
 	notifRepo := domainnotification.NewRepository(db)
@@ -207,7 +207,7 @@ func (a *App) Start(ctx context.Context) error {
 		api.WithMonitors(domainmonitor.NewHandler(monitorRepo, a.monitors, heartbeatRepo, &tagReaderAdapter{tagRepo: tagRepo})),
 		api.WithSystem(system.NewHandler(db, statsHandler)),
 		api.WithProxies(proxy.NewHandler(proxy.NewRepository(db))),
-		api.WithStatusPages(statuspage.NewHandler(statuspage.NewRepository(db), heartbeatRepo, &monitorNameAdapter{monitorRepo: monitorRepo})),
+		api.WithStatusPages(statuspage.NewHandler(statuspage.NewRepository(db), heartbeatRepo, &monitorNameAdapter{monitorRepo: monitorRepo}, statuspage.WithMonitorResolver(&monitorResolverAdapter{monitorRepo: monitorRepo}))),
 		api.WithBadges(badge.NewHandler(heartbeatRepo)),
 	)
 
@@ -493,6 +493,23 @@ func (a *tagProviderAdapter) GetTagsForMonitor(ctx context.Context, monitorID st
 		names = append(names, t.Name)
 	}
 	return names, nil
+}
+
+// monitorResolverAdapter bridges the monitor repository to the statuspage.MonitorResolver interface.
+type monitorResolverAdapter struct {
+	monitorRepo domainmonitor.Repository
+}
+
+func (a *monitorResolverAdapter) FindIDsByTagIDs(ctx context.Context, tagIDs []string) ([]string, error) {
+	monitors, err := a.monitorRepo.FindByTagIDs(ctx, tagIDs)
+	if err != nil {
+		return nil, err
+	}
+	ids := make([]string, len(monitors))
+	for i, m := range monitors {
+		ids[i] = m.ID
+	}
+	return ids, nil
 }
 
 // tagReaderAdapter bridges the tag repository to the domainmonitor.TagReader interface (API responses).

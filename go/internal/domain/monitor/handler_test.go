@@ -4,6 +4,7 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -451,4 +452,56 @@ func TestBuildConfigFromDomain_AllTypes(t *testing.T) {
 			assert.Equal(t, tt.expectedType, cfg.Type)
 		})
 	}
+}
+
+func TestGroupConfig_TagIdsRoundTrip(t *testing.T) {
+	tagID1 := "550e8400-e29b-41d4-a716-446655440001"
+	tagID2 := "550e8400-e29b-41d4-a716-446655440002"
+
+	req := &oas.MonitorInput{
+		Name: "Group With Tags",
+		Type: "group",
+		Config: oas.MonitorConfig{
+			Type: oas.GroupMonitorConfigMonitorConfig,
+			GroupMonitorConfig: oas.GroupMonitorConfig{
+				Kind: "group",
+				TagIds: []uuid.UUID{
+					uuid.MustParse(tagID1),
+					uuid.MustParse(tagID2),
+				},
+			},
+		},
+	}
+
+	m := monitorFromInput(req, "user-1")
+	assert.JSONEq(t, `["550e8400-e29b-41d4-a716-446655440001","550e8400-e29b-41d4-a716-446655440002"]`, m.GroupTagIDs)
+
+	oasResult := monitorToOAS(m)
+	require.True(t, oasResult.Config.Set)
+	require.Equal(t, oas.GroupMonitorConfigMonitorConfig, oasResult.Config.Value.Type)
+
+	groupCfg := oasResult.Config.Value.GroupMonitorConfig
+	require.Len(t, groupCfg.TagIds, 2)
+	assert.Equal(t, tagID1, groupCfg.TagIds[0].String())
+	assert.Equal(t, tagID2, groupCfg.TagIds[1].String())
+}
+
+func TestGroupConfig_EmptyTagIds(t *testing.T) {
+	req := &oas.MonitorInput{
+		Name: "Empty Group",
+		Type: "group",
+		Config: oas.MonitorConfig{
+			Type: oas.GroupMonitorConfigMonitorConfig,
+			GroupMonitorConfig: oas.GroupMonitorConfig{
+				Kind: "group",
+			},
+		},
+	}
+
+	m := monitorFromInput(req, "user-1")
+	assert.Equal(t, "", m.GroupTagIDs)
+
+	oasResult := monitorToOAS(m)
+	groupCfg := oasResult.Config.Value.GroupMonitorConfig
+	assert.Empty(t, groupCfg.TagIds)
 }

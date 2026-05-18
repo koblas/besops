@@ -204,7 +204,21 @@ describe('buildConfigFromForm', () => {
     expect(config).toEqual({ kind: 'push' });
   });
 
-  it('builds GroupMonitorConfig from flat form values', () => {
+  it('group with tagIds produces correct config', () => {
+    const values = {
+      type: 'group',
+      groupTagIds: ['a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'b2c3d4e5-f6a7-8901-bcde-f12345678901'],
+    };
+
+    const config = buildConfigFromForm(values);
+
+    expect(config).toEqual({
+      kind: 'group',
+      tagIds: ['a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'b2c3d4e5-f6a7-8901-bcde-f12345678901'],
+    });
+  });
+
+  it('group without tagIds produces minimal config', () => {
     const values = { type: 'group' };
 
     const config = buildConfigFromForm(values);
@@ -297,5 +311,37 @@ describe('flattenConfigToForm', () => {
     expect(flat.port).toBe(53);
     expect(flat.dnsResolveType).toBe('A');
     expect(flat.dnsResolveServer).toBe('1.1.1.1');
+  });
+
+  it('renames tagIds to groupTagIds for group config', () => {
+    const monitor = {
+      name: 'Group Mon',
+      type: 'group',
+      config: {
+        kind: 'group' as const,
+        tagIds: ['a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'b2c3d4e5-f6a7-8901-bcde-f12345678901'],
+      },
+    };
+
+    const flat = flattenConfigToForm(monitor);
+
+    expect(flat.groupTagIds).toEqual(['a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'b2c3d4e5-f6a7-8901-bcde-f12345678901']);
+    expect(flat).not.toHaveProperty('tagIds');
+  });
+
+  it('handles group config without tagIds', () => {
+    const monitor = {
+      name: 'Group Mon',
+      type: 'group',
+      config: {
+        kind: 'group' as const,
+      },
+    };
+
+    const flat = flattenConfigToForm(monitor);
+
+    expect(flat).toEqual({});
+    expect(flat).not.toHaveProperty('tagIds');
+    expect(flat).not.toHaveProperty('groupTagIds');
   });
 });

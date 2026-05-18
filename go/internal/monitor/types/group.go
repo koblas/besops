@@ -15,23 +15,28 @@ type GroupHeartbeatReader interface {
 	GetLatest(ctx context.Context, monitorID string) (*heartbeat.Heartbeat, error)
 }
 
-// GroupChecker aggregates the status of child monitors to produce a group heartbeat.
-// Unlike other checkers, it needs access to the monitor repo and heartbeat store.
+// TagMonitorFinder resolves tag IDs to the monitors that carry them.
+type TagMonitorFinder interface {
+	FindByTagIDs(ctx context.Context, tagIDs []string) ([]*domainmonitor.Monitor, error)
+}
+
+// GroupChecker aggregates the status of member monitors to produce a group heartbeat.
+// Members are resolved by tags via TagFinder.
 type GroupChecker struct {
-	MonitorRepo domainmonitor.Repository
-	HbStore     GroupHeartbeatReader
+	HbStore   GroupHeartbeatReader
+	TagFinder TagMonitorFinder
 }
 
 func (c *GroupChecker) Type() string { return "group" }
 func (c *GroupChecker) IsAggregate()  {}
 
 func (c *GroupChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.CheckResult, error) {
-	children, err := c.MonitorRepo.GetChildren(ctx, cfg.ID)
+	members, err := c.resolveMembers(ctx, cfg)
 	if err != nil {
-		return monitor.CheckResult{Status: status.Down, Message: "failed to load children"}, nil
+		return monitor.CheckResult{Status: status.Down, Message: "failed to load members"}, nil
 	}
 
-	if len(children) == 0 {
+	if len(members) == 0 {
 		return monitor.CheckResult{Status: status.Pending, Message: "Group empty"}, nil
 	}
 
@@ -39,7 +44,7 @@ func (c *GroupChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.
 	var downNames []string
 	var pendingNames []string
 
-	for _, child := range children {
+	for _, child := range members {
 		if !child.Active {
 			continue
 		}
@@ -77,4 +82,11 @@ func (c *GroupChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.
 		}
 		return monitor.CheckResult{Status: status.Down, Message: msg}, nil
 	}
+}
+
+func (c *GroupChecker) resolveMembers(ctx context.Context, cfg *monitor.Config) ([]*domainmonitor.Monitor, error) {
+	if len(cfg.GroupTagIDs) > 0 && c.TagFinder != nil {
+		return c.TagFinder.FindByTagIDs(ctx, cfg.GroupTagIDs)
+	}
+	return nil, nil
 }

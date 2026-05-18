@@ -126,6 +126,7 @@ func (r *sqliteRepo) GetGroups(ctx context.Context, statusPageID string) ([]*Gro
 			Name:         g.Name,
 			Weight:       g.Weight,
 			StatusPageID: g.StatusPageID.GetOrZero(),
+			TagIDs:       g.TagIdsJSON.GetOrZero(),
 		}
 	}
 	return result, nil
@@ -152,6 +153,7 @@ func (r *sqliteRepo) SaveGroups(ctx context.Context, statusPageID string, groups
 			Name:         omit.From(g.Name),
 			Weight:       omit.From(g.Weight),
 			StatusPageID: omitnull.From(statusPageID),
+			TagIdsJSON:   omitnull.From(g.TagIDs),
 		}).One(ctx, r.db)
 		if insertErr != nil {
 			return fmt.Errorf("inserting group %q: %w", g.Name, insertErr)

@@ -95,7 +95,6 @@ type MonitorTemplate struct {
 	TLSCa                               func() null.Val[string]
 	TLSCert                             func() null.Val[string]
 	TLSKey                              func() null.Val[string]
-	ParentID                            func() null.Val[string]
 	InvertKeyword                       func() bool
 	JSONPath                            func() null.Val[string]
 	ExpectedValue                       func() null.Val[string]
@@ -121,6 +120,7 @@ type MonitorTemplate struct {
 	RabbitmqPassword                    func() null.Val[string]
 	RemoteBrowser                       func() null.Val[string]
 	DomainExpiryNotification            func() null.Val[bool]
+	GroupTagIdsJSON                     func() null.Val[string]
 
 	r monitorR
 	f *Factory
@@ -130,8 +130,6 @@ type MonitorTemplate struct {
 
 type monitorR struct {
 	Heartbeats                []*monitorRHeartbeatsR
-	Parent                    *monitorRParentR
-	ReverseParents            []*monitorRReverseParentsR
 	User                      *monitorRUserR
 	MonitorGroups             []*monitorRMonitorGroupsR
 	MonitorMaintenances       []*monitorRMonitorMaintenancesR
@@ -147,13 +145,6 @@ type monitorR struct {
 type monitorRHeartbeatsR struct {
 	number int
 	o      *HeartbeatTemplate
-}
-type monitorRParentR struct {
-	o *MonitorTemplate
-}
-type monitorRReverseParentsR struct {
-	number int
-	o      *MonitorTemplate
 }
 type monitorRUserR struct {
 	o *UserTemplate
@@ -215,26 +206,6 @@ func (t MonitorTemplate) setModelRels(o *models.Monitor) {
 			rel = append(rel, related...)
 		}
 		o.R.Heartbeats = rel
-	}
-
-	if t.r.Parent != nil {
-		rel := t.r.Parent.o.Build()
-		rel.R.ReverseParents = append(rel.R.ReverseParents, o)
-		o.ParentID = null.From(rel.ID) // h2
-		o.R.Parent = rel
-	}
-
-	if t.r.ReverseParents != nil {
-		rel := models.MonitorSlice{}
-		for _, r := range t.r.ReverseParents {
-			related := r.o.BuildMany(r.number)
-			for _, rel := range related {
-				rel.ParentID = null.From(o.ID) // h2
-				rel.R.Parent = o
-			}
-			rel = append(rel, related...)
-		}
-		o.R.ReverseParents = rel
 	}
 
 	if t.r.User != nil {
@@ -593,10 +564,6 @@ func (o MonitorTemplate) BuildSetter() *models.MonitorSetter {
 		val := o.TLSKey()
 		m.TLSKey = omitnull.FromNull(val)
 	}
-	if o.ParentID != nil {
-		val := o.ParentID()
-		m.ParentID = omitnull.FromNull(val)
-	}
 	if o.InvertKeyword != nil {
 		val := o.InvertKeyword()
 		m.InvertKeyword = omit.From(val)
@@ -696,6 +663,10 @@ func (o MonitorTemplate) BuildSetter() *models.MonitorSetter {
 	if o.DomainExpiryNotification != nil {
 		val := o.DomainExpiryNotification()
 		m.DomainExpiryNotification = omitnull.FromNull(val)
+	}
+	if o.GroupTagIdsJSON != nil {
+		val := o.GroupTagIdsJSON()
+		m.GroupTagIdsJSON = omitnull.FromNull(val)
 	}
 
 	return m
@@ -893,9 +864,6 @@ func (o MonitorTemplate) Build() *models.Monitor {
 	if o.TLSKey != nil {
 		m.TLSKey = o.TLSKey()
 	}
-	if o.ParentID != nil {
-		m.ParentID = o.ParentID()
-	}
 	if o.InvertKeyword != nil {
 		m.InvertKeyword = o.InvertKeyword()
 	}
@@ -971,6 +939,9 @@ func (o MonitorTemplate) Build() *models.Monitor {
 	if o.DomainExpiryNotification != nil {
 		m.DomainExpiryNotification = o.DomainExpiryNotification()
 	}
+	if o.GroupTagIdsJSON != nil {
+		m.GroupTagIdsJSON = o.GroupTagIdsJSON()
+	}
 
 	o.setModelRels(m)
 
@@ -1035,45 +1006,6 @@ func (o *MonitorTemplate) insertOptRels(ctx context.Context, exec bob.Executor, 
 		}
 	}
 
-	isParentDone, _ := monitorRelParentCtx.Value(ctx)
-	if !isParentDone && o.r.Parent != nil {
-		ctx = monitorRelParentCtx.WithValue(ctx, true)
-		if o.r.Parent.o.alreadyPersisted {
-			m.R.Parent = o.r.Parent.o.Build()
-		} else {
-			var rel1 *models.Monitor
-			rel1, err = o.r.Parent.o.Create(ctx, exec)
-			if err != nil {
-				return err
-			}
-			err = m.AttachParent(ctx, exec, rel1)
-			if err != nil {
-				return err
-			}
-		}
-
-	}
-
-	isReverseParentsDone, _ := monitorRelReverseParentsCtx.Value(ctx)
-	if !isReverseParentsDone && o.r.ReverseParents != nil {
-		ctx = monitorRelReverseParentsCtx.WithValue(ctx, true)
-		for _, r := range o.r.ReverseParents {
-			if r.o.alreadyPersisted {
-				m.R.ReverseParents = append(m.R.ReverseParents, r.o.Build())
-			} else {
-				rel2, err := r.o.CreateMany(ctx, exec, r.number)
-				if err != nil {
-					return err
-				}
-
-				err = m.AttachReverseParents(ctx, exec, rel2...)
-				if err != nil {
-					return err
-				}
-			}
-		}
-	}
-
 	isMonitorGroupsDone, _ := monitorRelMonitorGroupsCtx.Value(ctx)
 	if !isMonitorGroupsDone && o.r.MonitorGroups != nil {
 		ctx = monitorRelMonitorGroupsCtx.WithValue(ctx, true)
@@ -1081,12 +1013,12 @@ func (o *MonitorTemplate) insertOptRels(ctx context.Context, exec bob.Executor, 
 			if r.o.alreadyPersisted {
 				m.R.MonitorGroups = append(m.R.MonitorGroups, r.o.Build())
 			} else {
-				rel4, err := r.o.CreateMany(ctx, exec, r.number)
+				rel2, err := r.o.CreateMany(ctx, exec, r.number)
 				if err != nil {
 					return err
 				}
 
-				err = m.AttachMonitorGroups(ctx, exec, rel4...)
+				err = m.AttachMonitorGroups(ctx, exec, rel2...)
 				if err != nil {
 					return err
 				}
@@ -1101,12 +1033,12 @@ func (o *MonitorTemplate) insertOptRels(ctx context.Context, exec bob.Executor, 
 			if r.o.alreadyPersisted {
 				m.R.MonitorMaintenances = append(m.R.MonitorMaintenances, r.o.Build())
 			} else {
-				rel5, err := r.o.CreateMany(ctx, exec, r.number)
+				rel3, err := r.o.CreateMany(ctx, exec, r.number)
 				if err != nil {
 					return err
 				}
 
-				err = m.AttachMonitorMaintenances(ctx, exec, rel5...)
+				err = m.AttachMonitorMaintenances(ctx, exec, rel3...)
 				if err != nil {
 					return err
 				}
@@ -1121,12 +1053,12 @@ func (o *MonitorTemplate) insertOptRels(ctx context.Context, exec bob.Executor, 
 			if r.o.alreadyPersisted {
 				m.R.MonitorNotifications = append(m.R.MonitorNotifications, r.o.Build())
 			} else {
-				rel6, err := r.o.CreateMany(ctx, exec, r.number)
+				rel4, err := r.o.CreateMany(ctx, exec, r.number)
 				if err != nil {
 					return err
 				}
 
-				err = m.AttachMonitorNotifications(ctx, exec, rel6...)
+				err = m.AttachMonitorNotifications(ctx, exec, rel4...)
 				if err != nil {
 					return err
 				}
@@ -1141,12 +1073,12 @@ func (o *MonitorTemplate) insertOptRels(ctx context.Context, exec bob.Executor, 
 			if r.o.alreadyPersisted {
 				m.R.MonitorTags = append(m.R.MonitorTags, r.o.Build())
 			} else {
-				rel7, err := r.o.CreateMany(ctx, exec, r.number)
+				rel5, err := r.o.CreateMany(ctx, exec, r.number)
 				if err != nil {
 					return err
 				}
 
-				err = m.AttachMonitorTags(ctx, exec, rel7...)
+				err = m.AttachMonitorTags(ctx, exec, rel5...)
 				if err != nil {
 					return err
 				}
@@ -1160,12 +1092,12 @@ func (o *MonitorTemplate) insertOptRels(ctx context.Context, exec bob.Executor, 
 		if o.r.MonitorTLSInfo.o.alreadyPersisted {
 			m.R.MonitorTLSInfo = o.r.MonitorTLSInfo.o.Build()
 		} else {
-			var rel8 *models.MonitorTLSInfo
-			rel8, err = o.r.MonitorTLSInfo.o.Create(ctx, exec)
+			var rel6 *models.MonitorTLSInfo
+			rel6, err = o.r.MonitorTLSInfo.o.Create(ctx, exec)
 			if err != nil {
 				return err
 			}
-			err = m.AttachMonitorTLSInfo(ctx, exec, rel8)
+			err = m.AttachMonitorTLSInfo(ctx, exec, rel6)
 			if err != nil {
 				return err
 			}
@@ -1180,12 +1112,12 @@ func (o *MonitorTemplate) insertOptRels(ctx context.Context, exec bob.Executor, 
 			if r.o.alreadyPersisted {
 				m.R.NotificationSentHistories = append(m.R.NotificationSentHistories, r.o.Build())
 			} else {
-				rel9, err := r.o.CreateMany(ctx, exec, r.number)
+				rel7, err := r.o.CreateMany(ctx, exec, r.number)
 				if err != nil {
 					return err
 				}
 
-				err = m.AttachNotificationSentHistories(ctx, exec, rel9...)
+				err = m.AttachNotificationSentHistories(ctx, exec, rel7...)
 				if err != nil {
 					return err
 				}
@@ -1200,12 +1132,12 @@ func (o *MonitorTemplate) insertOptRels(ctx context.Context, exec bob.Executor, 
 			if r.o.alreadyPersisted {
 				m.R.StatDailies = append(m.R.StatDailies, r.o.Build())
 			} else {
-				rel10, err := r.o.CreateMany(ctx, exec, r.number)
+				rel8, err := r.o.CreateMany(ctx, exec, r.number)
 				if err != nil {
 					return err
 				}
 
-				err = m.AttachStatDailies(ctx, exec, rel10...)
+				err = m.AttachStatDailies(ctx, exec, rel8...)
 				if err != nil {
 					return err
 				}
@@ -1220,12 +1152,12 @@ func (o *MonitorTemplate) insertOptRels(ctx context.Context, exec bob.Executor, 
 			if r.o.alreadyPersisted {
 				m.R.StatHourlies = append(m.R.StatHourlies, r.o.Build())
 			} else {
-				rel11, err := r.o.CreateMany(ctx, exec, r.number)
+				rel9, err := r.o.CreateMany(ctx, exec, r.number)
 				if err != nil {
 					return err
 				}
 
-				err = m.AttachStatHourlies(ctx, exec, rel11...)
+				err = m.AttachStatHourlies(ctx, exec, rel9...)
 				if err != nil {
 					return err
 				}
@@ -1240,12 +1172,12 @@ func (o *MonitorTemplate) insertOptRels(ctx context.Context, exec bob.Executor, 
 			if r.o.alreadyPersisted {
 				m.R.StatMinutelies = append(m.R.StatMinutelies, r.o.Build())
 			} else {
-				rel12, err := r.o.CreateMany(ctx, exec, r.number)
+				rel10, err := r.o.CreateMany(ctx, exec, r.number)
 				if err != nil {
 					return err
 				}
 
-				err = m.AttachStatMinutelies(ctx, exec, rel12...)
+				err = m.AttachStatMinutelies(ctx, exec, rel10...)
 				if err != nil {
 					return err
 				}
@@ -1267,25 +1199,25 @@ func (o *MonitorTemplate) Create(ctx context.Context, exec bob.Executor) (*model
 		MonitorMods.WithNewUser().Apply(ctx, o)
 	}
 
-	var rel3 *models.User
+	var rel1 *models.User
 
 	if o.r.User.o.alreadyPersisted {
-		rel3 = o.r.User.o.Build()
+		rel1 = o.r.User.o.Build()
 	} else {
-		rel3, err = o.r.User.o.Create(ctx, exec)
+		rel1, err = o.r.User.o.Create(ctx, exec)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	opt.UserID = omit.From(rel3.ID)
+	opt.UserID = omit.From(rel1.ID)
 
 	m, err := models.Monitors.Insert(opt).One(ctx, exec)
 	if err != nil {
 		return nil, err
 	}
 
-	m.R.User = rel3
+	m.R.User = rel1
 
 	if err := o.insertOptRels(ctx, exec, m); err != nil {
 		return nil, err
@@ -1422,7 +1354,6 @@ func (m monitorMods) RandomizeAllColumns(f *faker.Faker) MonitorMod {
 		MonitorMods.RandomTLSCa(f),
 		MonitorMods.RandomTLSCert(f),
 		MonitorMods.RandomTLSKey(f),
-		MonitorMods.RandomParentID(f),
 		MonitorMods.RandomInvertKeyword(f),
 		MonitorMods.RandomJSONPath(f),
 		MonitorMods.RandomExpectedValue(f),
@@ -1448,6 +1379,7 @@ func (m monitorMods) RandomizeAllColumns(f *faker.Faker) MonitorMod {
 		MonitorMods.RandomRabbitmqPassword(f),
 		MonitorMods.RandomRemoteBrowser(f),
 		MonitorMods.RandomDomainExpiryNotification(f),
+		MonitorMods.RandomGroupTagIdsJSON(f),
 	}
 }
 
@@ -4174,59 +4106,6 @@ func (m monitorMods) RandomTLSKeyNotNull(f *faker.Faker) MonitorMod {
 }
 
 // Set the model columns to this value
-func (m monitorMods) ParentID(val null.Val[string]) MonitorMod {
-	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
-		o.ParentID = func() null.Val[string] { return val }
-	})
-}
-
-// Set the Column from the function
-func (m monitorMods) ParentIDFunc(f func() null.Val[string]) MonitorMod {
-	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
-		o.ParentID = f
-	})
-}
-
-// Clear any values for the column
-func (m monitorMods) UnsetParentID() MonitorMod {
-	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
-		o.ParentID = nil
-	})
-}
-
-// Generates a random value for the column using the given faker
-// if faker is nil, a default faker is used
-// The generated value is sometimes null
-func (m monitorMods) RandomParentID(f *faker.Faker) MonitorMod {
-	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
-		o.ParentID = func() null.Val[string] {
-			if f == nil {
-				f = &defaultFaker
-			}
-
-			val := random_string(f)
-			return null.From(val)
-		}
-	})
-}
-
-// Generates a random value for the column using the given faker
-// if faker is nil, a default faker is used
-// The generated value is never null
-func (m monitorMods) RandomParentIDNotNull(f *faker.Faker) MonitorMod {
-	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
-		o.ParentID = func() null.Val[string] {
-			if f == nil {
-				f = &defaultFaker
-			}
-
-			val := random_string(f)
-			return null.From(val)
-		}
-	})
-}
-
-// Set the model columns to this value
 func (m monitorMods) InvertKeyword(val bool) MonitorMod {
 	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
 		o.InvertKeyword = func() bool { return val }
@@ -5375,17 +5254,65 @@ func (m monitorMods) RandomDomainExpiryNotificationNotNull(f *faker.Faker) Monit
 	})
 }
 
+// Set the model columns to this value
+func (m monitorMods) GroupTagIdsJSON(val null.Val[string]) MonitorMod {
+	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
+		o.GroupTagIdsJSON = func() null.Val[string] { return val }
+	})
+}
+
+// Set the Column from the function
+func (m monitorMods) GroupTagIdsJSONFunc(f func() null.Val[string]) MonitorMod {
+	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
+		o.GroupTagIdsJSON = f
+	})
+}
+
+// Clear any values for the column
+func (m monitorMods) UnsetGroupTagIdsJSON() MonitorMod {
+	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
+		o.GroupTagIdsJSON = nil
+	})
+}
+
+// Generates a random value for the column using the given faker
+// if faker is nil, a default faker is used
+// The generated value is sometimes null
+func (m monitorMods) RandomGroupTagIdsJSON(f *faker.Faker) MonitorMod {
+	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
+		o.GroupTagIdsJSON = func() null.Val[string] {
+			if f == nil {
+				f = &defaultFaker
+			}
+
+			val := random_string(f)
+			return null.From(val)
+		}
+	})
+}
+
+// Generates a random value for the column using the given faker
+// if faker is nil, a default faker is used
+// The generated value is never null
+func (m monitorMods) RandomGroupTagIdsJSONNotNull(f *faker.Faker) MonitorMod {
+	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
+		o.GroupTagIdsJSON = func() null.Val[string] {
+			if f == nil {
+				f = &defaultFaker
+			}
+
+			val := random_string(f)
+			return null.From(val)
+		}
+	})
+}
+
 func (m monitorMods) WithParentsCascading() MonitorMod {
 	return MonitorModFunc(func(ctx context.Context, o *MonitorTemplate) {
 		if isDone, _ := monitorWithParentsCascadingCtx.Value(ctx); isDone {
 			return
 		}
 		ctx = monitorWithParentsCascadingCtx.WithValue(ctx, true)
-		{
-
-			related := o.f.NewMonitorWithContext(ctx, MonitorMods.WithParentsCascading())
-			m.WithParent(related).Apply(ctx, o)
-		}
 		{
 
 			related := o.f.NewUserWithContext(ctx, UserMods.WithParentsCascading())
@@ -5396,36 +5323,6 @@ func (m monitorMods) WithParentsCascading() MonitorMod {
 			related := o.f.NewMonitorTLSInfoWithContext(ctx, MonitorTLSInfoMods.WithParentsCascading())
 			m.WithMonitorTLSInfo(related).Apply(ctx, o)
 		}
-	})
-}
-
-func (m monitorMods) WithParent(rel *MonitorTemplate) MonitorMod {
-	return MonitorModFunc(func(ctx context.Context, o *MonitorTemplate) {
-		o.r.Parent = &monitorRParentR{
-			o: rel,
-		}
-	})
-}
-
-func (m monitorMods) WithNewParent(mods ...MonitorMod) MonitorMod {
-	return MonitorModFunc(func(ctx context.Context, o *MonitorTemplate) {
-		related := o.f.NewMonitorWithContext(ctx, mods...)
-
-		m.WithParent(related).Apply(ctx, o)
-	})
-}
-
-func (m monitorMods) WithExistingParent(em *models.Monitor) MonitorMod {
-	return MonitorModFunc(func(ctx context.Context, o *MonitorTemplate) {
-		o.r.Parent = &monitorRParentR{
-			o: o.f.FromExistingMonitor(em),
-		}
-	})
-}
-
-func (m monitorMods) WithoutParent() MonitorMod {
-	return MonitorModFunc(func(ctx context.Context, o *MonitorTemplate) {
-		o.r.Parent = nil
 	})
 }
 
@@ -5534,54 +5431,6 @@ func (m monitorMods) AddExistingHeartbeats(existingModels ...*models.Heartbeat) 
 func (m monitorMods) WithoutHeartbeats() MonitorMod {
 	return MonitorModFunc(func(ctx context.Context, o *MonitorTemplate) {
 		o.r.Heartbeats = nil
-	})
-}
-
-func (m monitorMods) WithReverseParents(number int, related *MonitorTemplate) MonitorMod {
-	return MonitorModFunc(func(ctx context.Context, o *MonitorTemplate) {
-		o.r.ReverseParents = []*monitorRReverseParentsR{{
-			number: number,
-			o:      related,
-		}}
-	})
-}
-
-func (m monitorMods) WithNewReverseParents(number int, mods ...MonitorMod) MonitorMod {
-	return MonitorModFunc(func(ctx context.Context, o *MonitorTemplate) {
-		related := o.f.NewMonitorWithContext(ctx, mods...)
-		m.WithReverseParents(number, related).Apply(ctx, o)
-	})
-}
-
-func (m monitorMods) AddReverseParents(number int, related *MonitorTemplate) MonitorMod {
-	return MonitorModFunc(func(ctx context.Context, o *MonitorTemplate) {
-		o.r.ReverseParents = append(o.r.ReverseParents, &monitorRReverseParentsR{
-			number: number,
-			o:      related,
-		})
-	})
-}
-
-func (m monitorMods) AddNewReverseParents(number int, mods ...MonitorMod) MonitorMod {
-	return MonitorModFunc(func(ctx context.Context, o *MonitorTemplate) {
-		related := o.f.NewMonitorWithContext(ctx, mods...)
-		m.AddReverseParents(number, related).Apply(ctx, o)
-	})
-}
-
-func (m monitorMods) AddExistingReverseParents(existingModels ...*models.Monitor) MonitorMod {
-	return MonitorModFunc(func(ctx context.Context, o *MonitorTemplate) {
-		for _, em := range existingModels {
-			o.r.ReverseParents = append(o.r.ReverseParents, &monitorRReverseParentsR{
-				o: o.f.FromExistingMonitor(em),
-			})
-		}
-	})
-}
-
-func (m monitorMods) WithoutReverseParents() MonitorMod {
-	return MonitorModFunc(func(ctx context.Context, o *MonitorTemplate) {
-		o.r.ReverseParents = nil
 	})
 }
 

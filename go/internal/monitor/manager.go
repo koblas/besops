@@ -133,11 +133,6 @@ func (m *Manager) RunningCount() int {
 }
 
 func modelToConfig(mon *domainmonitor.Monitor) *Config {
-	var parentID string
-	if mon.ParentID != nil {
-		parentID = *mon.ParentID
-	}
-
 	cfg := &Config{
 		ID:            mon.ID,
 		Type:          mon.Type,
@@ -147,7 +142,6 @@ func modelToConfig(mon *domainmonitor.Monitor) *Config {
 		Interval:      time.Duration(mon.Interval) * time.Second,
 		Timeout:       time.Duration(mon.Timeout) * time.Second,
 		MaxRetries:    mon.MaxRetries,
-		ParentID:      parentID,
 		RetryInterval: time.Duration(mon.RetryInterval) * time.Second,
 		IgnoreTLS:     mon.IgnoreTLS,
 		Keyword:       mon.Keyword,
@@ -202,6 +196,10 @@ func modelToConfig(mon *domainmonitor.Monitor) *Config {
 		cfg.KeywordType = "contain"
 	}
 
+	if mon.GroupTagIDs != "" {
+		_ = json.Unmarshal([]byte(mon.GroupTagIDs), &cfg.GroupTagIDs)
+	}
+
 	return cfg
 }
 
@@ -214,8 +212,6 @@ type resultRecorder struct {
 	metrics     MetricsObserver
 	monitorName string
 	monitorType string
-	groupID     string
-	groupName   string
 	tags        []string
 }
 
@@ -268,11 +264,10 @@ func (r *resultRecorder) HandleResult(ctx context.Context, monitorID string, res
 			latency = *hb.Latency
 		}
 		r.metrics.Record(ctx, &monitorMetricInfo{
-			id:        monitorID,
-			name:      r.monitorName,
-			typ:       r.monitorType,
-			groupName: r.groupName,
-			tags:      r.tags,
+			id:   monitorID,
+			name: r.monitorName,
+			typ:  r.monitorType,
+			tags: r.tags,
 		}, result.Status == status.Up, latency)
 	}
 
@@ -302,15 +297,14 @@ func truncateMessage(s string, maxLen int) string {
 }
 
 type monitorMetricInfo struct {
-	id        string
-	name      string
-	typ       string
-	groupName string
-	tags      []string
+	id   string
+	name string
+	typ  string
+	tags []string
 }
 
 func (m *monitorMetricInfo) MonitorID() string   { return m.id }
 func (m *monitorMetricInfo) MonitorName() string { return m.name }
 func (m *monitorMetricInfo) MonitorType() string { return m.typ }
-func (m *monitorMetricInfo) GroupName() string   { return m.groupName }
+func (m *monitorMetricInfo) GroupName() string   { return "" }
 func (m *monitorMetricInfo) Tags() []string      { return m.tags }

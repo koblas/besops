@@ -23,6 +23,7 @@ type Group struct {
 	Name         string
 	Weight       int64
 	StatusPageID string
+	TagIDs       string
 }
 
 type MonitorGroup struct {

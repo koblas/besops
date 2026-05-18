@@ -140,9 +140,6 @@ func TestMonitorCountStruct(t *testing.T) {
 	// Verify Heartbeats count field exists and is *int64
 	var _ *int64 = m.C.Heartbeats
 
-	// Verify ReverseParents count field exists and is *int64
-	var _ *int64 = m.C.ReverseParents
-
 	// Verify MonitorGroups count field exists and is *int64
 	var _ *int64 = m.C.MonitorGroups
 
@@ -179,12 +176,6 @@ func TestMonitorLoadCountMethods(t *testing.T) {
 
 	// Verify LoadCountHeartbeats method exists on slice
 	_ = ms.LoadCountHeartbeats(ctx, nil)
-
-	// Verify LoadCountReverseParents method exists on single model
-	_ = m.LoadCountReverseParents(ctx, nil)
-
-	// Verify LoadCountReverseParents method exists on slice
-	_ = ms.LoadCountReverseParents(ctx, nil)
 
 	// Verify LoadCountMonitorGroups method exists on single model
 	_ = m.LoadCountMonitorGroups(ctx, nil)
@@ -242,9 +233,6 @@ func TestThenLoadCountMonitor(t *testing.T) {
 	// Verify Heartbeats loader exists
 	_ = ThenLoadCount.Monitor.Heartbeats
 
-	// Verify ReverseParents loader exists
-	_ = ThenLoadCount.Monitor.ReverseParents
-
 	// Verify MonitorGroups loader exists
 	_ = ThenLoadCount.Monitor.MonitorGroups
 
@@ -277,9 +265,6 @@ func TestPreloadCountMonitor(t *testing.T) {
 	// Verify Heartbeats preloader exists and returns a Preloader
 	_ = PreloadCount.Monitor.Heartbeats()
 
-	// Verify ReverseParents preloader exists and returns a Preloader
-	_ = PreloadCount.Monitor.ReverseParents()
-
 	// Verify MonitorGroups preloader exists and returns a Preloader
 	_ = PreloadCount.Monitor.MonitorGroups()
 
@@ -310,8 +295,6 @@ func TestMonitorPreloadCountMethod(t *testing.T) {
 	var m *Monitor
 
 	_ = m.PreloadCount("Heartbeats", 0)
-
-	_ = m.PreloadCount("ReverseParents", 0)
 
 	_ = m.PreloadCount("MonitorGroups", 0)
 

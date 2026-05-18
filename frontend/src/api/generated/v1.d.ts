@@ -1175,8 +1175,6 @@ export interface components {
             retryInterval: number;
             description?: string;
             upsideDown?: boolean;
-            /** Format: uuid */
-            parentId?: string | null;
             /** @description Server-generated token for push monitors. */
             pushToken?: string;
             tags?: components["schemas"]["MonitorTag"][];
@@ -1202,8 +1200,6 @@ export interface components {
             retryInterval: number;
             description?: string;
             upsideDown?: boolean;
-            /** Format: uuid */
-            parentId?: string | null;
             notificationIds?: string[];
             /** @default 0 */
             resendInterval: number;
@@ -1340,6 +1336,8 @@ export interface components {
              * @enum {string}
              */
             kind: "group";
+            /** @description Tag IDs used to select member monitors. Any monitor with any of these tags is a group member. */
+            tagIds?: string[];
         };
         /** @description A single check result recording the status and response time of a monitor at a point in time. */
         Heartbeat: {
@@ -1645,6 +1643,8 @@ export interface components {
             weight?: number;
             /** @description IDs of monitors to include in this group. */
             monitorIds?: string[];
+            /** @description Tag IDs used to dynamically include monitors. Unioned with monitorIds. */
+            tagIds?: string[];
         };
         /** @description An incident posted to a status page to communicate service disruptions or planned changes to users. */
         Incident: {

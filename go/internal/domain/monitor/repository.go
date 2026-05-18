@@ -10,5 +10,5 @@ type Repository interface {
 	Create(ctx context.Context, m *Monitor) (string, error)
 	Update(ctx context.Context, m *Monitor) error
 	Delete(ctx context.Context, id string) error
-	GetChildren(ctx context.Context, parentID string) ([]*Monitor, error)
+	FindByTagIDs(ctx context.Context, tagIDs []string) ([]*Monitor, error)
 }

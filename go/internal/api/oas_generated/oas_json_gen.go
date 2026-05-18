@@ -2774,10 +2774,21 @@ func (s *GroupMonitorConfig) encodeFields(e *jx.Encoder) {
 		e.FieldStart("kind")
 		s.Kind.Encode(e)
 	}
+	{
+		if s.TagIds != nil {
+			e.FieldStart("tagIds")
+			e.ArrStart()
+			for _, elem := range s.TagIds {
+				json.EncodeUUID(e, elem)
+			}
+			e.ArrEnd()
+		}
+	}
 }
 
-var jsonFieldsNameOfGroupMonitorConfig = [1]string{
+var jsonFieldsNameOfGroupMonitorConfig = [2]string{
 	0: "kind",
+	1: "tagIds",
 }
 
 // Decode decodes GroupMonitorConfig from json.
@@ -2798,6 +2809,25 @@ func (s *GroupMonitorConfig) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"kind\"")
+			}
+		case "tagIds":
+			if err := func() error {
+				s.TagIds = make([]uuid.UUID, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem uuid.UUID
+					v, err := json.DecodeUUID(d)
+					elem = v
+					if err != nil {
+						return err
+					}
+					s.TagIds = append(s.TagIds, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"tagIds\"")
 			}
 		default:
 			return d.Skip()
@@ -5884,12 +5914,6 @@ func (s *Monitor) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.ParentId.Set {
-			e.FieldStart("parentId")
-			s.ParentId.Encode(e)
-		}
-	}
-	{
 		if s.PushToken.Set {
 			e.FieldStart("pushToken")
 			s.PushToken.Encode(e)
@@ -5935,7 +5959,7 @@ func (s *Monitor) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfMonitor = [17]string{
+var jsonFieldsNameOfMonitor = [16]string{
 	0:  "id",
 	1:  "name",
 	2:  "type",
@@ -5946,13 +5970,12 @@ var jsonFieldsNameOfMonitor = [17]string{
 	7:  "retryInterval",
 	8:  "description",
 	9:  "upsideDown",
-	10: "parentId",
-	11: "pushToken",
-	12: "tags",
-	13: "notificationIds",
-	14: "resendInterval",
-	15: "expiryNotification",
-	16: "config",
+	10: "pushToken",
+	11: "tags",
+	12: "notificationIds",
+	13: "resendInterval",
+	14: "expiryNotification",
+	15: "config",
 }
 
 // Decode decodes Monitor from json.
@@ -5960,7 +5983,7 @@ func (s *Monitor) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode Monitor to nil")
 	}
-	var requiredBitSet [3]uint8
+	var requiredBitSet [2]uint8
 	s.setDefaults()
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
@@ -6071,16 +6094,6 @@ func (s *Monitor) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"upsideDown\"")
 			}
-		case "parentId":
-			if err := func() error {
-				s.ParentId.Reset()
-				if err := s.ParentId.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"parentId\"")
-			}
 		case "pushToken":
 			if err := func() error {
 				s.PushToken.Reset()
@@ -6166,9 +6179,8 @@ func (s *Monitor) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [3]uint8{
+	for i, mask := range [2]uint8{
 		0b00001111,
-		0b00000000,
 		0b00000000,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
@@ -6544,6 +6556,19 @@ func (s MonitorConfig) encodeFields(e *jx.Encoder) {
 	case GroupMonitorConfigMonitorConfig:
 		e.FieldStart("kind")
 		e.Str("group")
+		{
+			s := s.GroupMonitorConfig
+			{
+				if s.TagIds != nil {
+					e.FieldStart("tagIds")
+					e.ArrStart()
+					for _, elem := range s.TagIds {
+						json.EncodeUUID(e, elem)
+					}
+					e.ArrEnd()
+				}
+			}
+		}
 	}
 }
 
@@ -6740,12 +6765,6 @@ func (s *MonitorInput) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.ParentId.Set {
-			e.FieldStart("parentId")
-			s.ParentId.Encode(e)
-		}
-	}
-	{
 		if s.NotificationIds != nil {
 			e.FieldStart("notificationIds")
 			e.ArrStart()
@@ -6773,7 +6792,7 @@ func (s *MonitorInput) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfMonitorInput = [14]string{
+var jsonFieldsNameOfMonitorInput = [13]string{
 	0:  "name",
 	1:  "type",
 	2:  "active",
@@ -6783,11 +6802,10 @@ var jsonFieldsNameOfMonitorInput = [14]string{
 	6:  "retryInterval",
 	7:  "description",
 	8:  "upsideDown",
-	9:  "parentId",
-	10: "notificationIds",
-	11: "resendInterval",
-	12: "expiryNotification",
-	13: "config",
+	9:  "notificationIds",
+	10: "resendInterval",
+	11: "expiryNotification",
+	12: "config",
 }
 
 // Decode decodes MonitorInput from json.
@@ -6894,16 +6912,6 @@ func (s *MonitorInput) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"upsideDown\"")
 			}
-		case "parentId":
-			if err := func() error {
-				s.ParentId.Reset()
-				if err := s.ParentId.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"parentId\"")
-			}
 		case "notificationIds":
 			if err := func() error {
 				s.NotificationIds = make([]uuid.UUID, 0)
@@ -6944,7 +6952,7 @@ func (s *MonitorInput) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"expiryNotification\"")
 			}
 		case "config":
-			requiredBitSet[1] |= 1 << 5
+			requiredBitSet[1] |= 1 << 4
 			if err := func() error {
 				if err := s.Config.Decode(d); err != nil {
 					return err
@@ -6964,7 +6972,7 @@ func (s *MonitorInput) Decode(d *jx.Decoder) error {
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
 		0b00000011,
-		0b00100000,
+		0b00010000,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -8390,57 +8398,6 @@ func (s OptMonitorConfig) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptMonitorConfig) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes uuid.UUID as json.
-func (o OptNilUUID) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	json.EncodeUUID(e, o.Value)
-}
-
-// Decode decodes uuid.UUID from json.
-func (o *OptNilUUID) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilUUID to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v uuid.UUID
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	v, err := json.DecodeUUID(d)
-	if err != nil {
-		return err
-	}
-	o.Value = v
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilUUID) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilUUID) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -11258,13 +11215,24 @@ func (s *StatusPageGroup) encodeFields(e *jx.Encoder) {
 			e.ArrEnd()
 		}
 	}
+	{
+		if s.TagIds != nil {
+			e.FieldStart("tagIds")
+			e.ArrStart()
+			for _, elem := range s.TagIds {
+				json.EncodeUUID(e, elem)
+			}
+			e.ArrEnd()
+		}
+	}
 }
 
-var jsonFieldsNameOfStatusPageGroup = [4]string{
+var jsonFieldsNameOfStatusPageGroup = [5]string{
 	0: "id",
 	1: "name",
 	2: "weight",
 	3: "monitorIds",
+	4: "tagIds",
 }
 
 // Decode decodes StatusPageGroup from json.
@@ -11326,6 +11294,25 @@ func (s *StatusPageGroup) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"monitorIds\"")
+			}
+		case "tagIds":
+			if err := func() error {
+				s.TagIds = make([]uuid.UUID, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem uuid.UUID
+					v, err := json.DecodeUUID(d)
+					elem = v
+					if err != nil {
+						return err
+					}
+					s.TagIds = append(s.TagIds, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"tagIds\"")
 			}
 		default:
 			return d.Skip()

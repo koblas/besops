@@ -104,12 +104,26 @@ func (r *repo) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func (r *repo) GetChildren(ctx context.Context, parentID string) ([]*Monitor, error) {
+func (r *repo) FindByTagIDs(ctx context.Context, tagIDs []string) ([]*Monitor, error) {
+	if len(tagIDs) == 0 {
+		return nil, nil
+	}
+
+	args := make([]bob.Expression, len(tagIDs))
+	for i, id := range tagIDs {
+		args[i] = sqlite.Arg(id)
+	}
+
 	ms, err := models.Monitors.Query(
-		sm.Where(models.Monitors.Columns.ParentID.EQ(sqlite.Arg(parentID))),
+		sm.InnerJoin(sqlite.Quote("monitor_tag")).OnEQ(
+			sqlite.Quote("monitor_tag", "monitor_id"),
+			models.Monitors.Columns.ID,
+		),
+		sm.Where(sqlite.Quote("monitor_tag", "tag_id").In(args...)),
+		sm.GroupBy(models.Monitors.Columns.ID),
 	).All(ctx, r.db)
 	if err != nil {
-		return nil, fmt.Errorf("querying child monitors: %w", err)
+		return nil, fmt.Errorf("querying monitors by tag IDs: %w", err)
 	}
 	return monitorsFromModels(ms), nil
 }
@@ -177,6 +191,7 @@ func monitorToSetter(m *Monitor) *models.MonitorSetter {
 		KafkaProducerSSL:        omit.From(m.KafkaProducerSSL),
 		KafkaProducerMessage:    omitnull.From(m.KafkaProducerMessage),
 		RemoteBrowser:           omitnull.FromPtr(m.RemoteBrowser),
+		GroupTagIdsJSON:         omitnull.From(m.GroupTagIDs),
 	}
 
 	if m.Port != nil {
@@ -186,7 +201,6 @@ func monitorToSetter(m *Monitor) *models.MonitorSetter {
 		s.Port = omitnull.FromPtr[int64](nil)
 	}
 	s.ProxyID = omitnull.FromPtr(m.ProxyID)
-	s.ParentID = omitnull.FromPtr(m.ParentID)
 	s.ExpiryNotification = omitnull.From(m.ExpiryNotification)
 
 	return s
@@ -265,14 +279,14 @@ func monitorFromModel(m *models.Monitor) *Monitor {
 	if v, ok := m.ProxyID.Get(); ok {
 		mon.ProxyID = &v
 	}
-	if v, ok := m.ParentID.Get(); ok {
-		mon.ParentID = &v
-	}
 	if v, ok := m.ExpiryNotification.Get(); ok {
 		mon.ExpiryNotification = v
 	}
 	if v, ok := m.RemoteBrowser.Get(); ok {
 		mon.RemoteBrowser = &v
+	}
+	if v, ok := m.GroupTagIdsJSON.Get(); ok {
+		mon.GroupTagIDs = v
 	}
 
 	return mon

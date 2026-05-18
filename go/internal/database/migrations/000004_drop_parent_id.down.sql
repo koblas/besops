@@ -1,0 +1,1 @@
+ALTER TABLE monitor ADD COLUMN parent_id TEXT DEFAULT NULL;

@@ -1183,6 +1183,8 @@ func (s *GetStatusPageHeartbeatsOKUptimeList) init() GetStatusPageHeartbeatsOKUp
 // Ref: #/components/schemas/GroupMonitorConfig
 type GroupMonitorConfig struct {
 	Kind GroupMonitorConfigKind `json:"kind"`
+	// Tag IDs used to select member monitors. Any monitor with any of these tags is a group member.
+	TagIds []uuid.UUID `json:"tagIds"`
 }
 
 // GetKind returns the value of Kind.
@@ -1190,9 +1192,19 @@ func (s *GroupMonitorConfig) GetKind() GroupMonitorConfigKind {
 	return s.Kind
 }
 
+// GetTagIds returns the value of TagIds.
+func (s *GroupMonitorConfig) GetTagIds() []uuid.UUID {
+	return s.TagIds
+}
+
 // SetKind sets the value of Kind.
 func (s *GroupMonitorConfig) SetKind(val GroupMonitorConfigKind) {
 	s.Kind = val
+}
+
+// SetTagIds sets the value of TagIds.
+func (s *GroupMonitorConfig) SetTagIds(val []uuid.UUID) {
+	s.TagIds = val
 }
 
 type GroupMonitorConfigKind string
@@ -2754,7 +2766,6 @@ type Monitor struct {
 	RetryInterval OptInt      `json:"retryInterval"`
 	Description   OptString   `json:"description"`
 	UpsideDown    OptBool     `json:"upsideDown"`
-	ParentId      OptNilUUID  `json:"parentId"`
 	// Server-generated token for push monitors.
 	PushToken          OptString        `json:"pushToken"`
 	Tags               []MonitorTag     `json:"tags"`
@@ -2812,11 +2823,6 @@ func (s *Monitor) GetDescription() OptString {
 // GetUpsideDown returns the value of UpsideDown.
 func (s *Monitor) GetUpsideDown() OptBool {
 	return s.UpsideDown
-}
-
-// GetParentId returns the value of ParentId.
-func (s *Monitor) GetParentId() OptNilUUID {
-	return s.ParentId
 }
 
 // GetPushToken returns the value of PushToken.
@@ -2897,11 +2903,6 @@ func (s *Monitor) SetDescription(val OptString) {
 // SetUpsideDown sets the value of UpsideDown.
 func (s *Monitor) SetUpsideDown(val OptBool) {
 	s.UpsideDown = val
-}
-
-// SetParentId sets the value of ParentId.
-func (s *Monitor) SetParentId(val OptNilUUID) {
-	s.ParentId = val
 }
 
 // SetPushToken sets the value of PushToken.
@@ -3250,7 +3251,6 @@ type MonitorInput struct {
 	RetryInterval      OptInt        `json:"retryInterval"`
 	Description        OptString     `json:"description"`
 	UpsideDown         OptBool       `json:"upsideDown"`
-	ParentId           OptNilUUID    `json:"parentId"`
 	NotificationIds    []uuid.UUID   `json:"notificationIds"`
 	ResendInterval     OptInt        `json:"resendInterval"`
 	ExpiryNotification OptBool       `json:"expiryNotification"`
@@ -3300,11 +3300,6 @@ func (s *MonitorInput) GetDescription() OptString {
 // GetUpsideDown returns the value of UpsideDown.
 func (s *MonitorInput) GetUpsideDown() OptBool {
 	return s.UpsideDown
-}
-
-// GetParentId returns the value of ParentId.
-func (s *MonitorInput) GetParentId() OptNilUUID {
-	return s.ParentId
 }
 
 // GetNotificationIds returns the value of NotificationIds.
@@ -3370,11 +3365,6 @@ func (s *MonitorInput) SetDescription(val OptString) {
 // SetUpsideDown sets the value of UpsideDown.
 func (s *MonitorInput) SetUpsideDown(val OptBool) {
 	s.UpsideDown = val
-}
-
-// SetParentId sets the value of ParentId.
-func (s *MonitorInput) SetParentId(val OptNilUUID) {
-	s.ParentId = val
 }
 
 // SetNotificationIds sets the value of NotificationIds.
@@ -4526,69 +4516,6 @@ func (o OptMonitorConfig) Get() (v MonitorConfig, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptMonitorConfig) Or(d MonitorConfig) MonitorConfig {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilUUID returns new OptNilUUID with value set to v.
-func NewOptNilUUID(v uuid.UUID) OptNilUUID {
-	return OptNilUUID{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilUUID is optional nullable uuid.UUID.
-type OptNilUUID struct {
-	Value uuid.UUID
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilUUID was set.
-func (o OptNilUUID) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilUUID) Reset() {
-	var v uuid.UUID
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilUUID) SetTo(v uuid.UUID) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilUUID) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilUUID) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v uuid.UUID
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilUUID) Get() (v uuid.UUID, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilUUID) Or(d uuid.UUID) uuid.UUID {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -6143,6 +6070,8 @@ type StatusPageGroup struct {
 	Weight OptInt `json:"weight"`
 	// IDs of monitors to include in this group.
 	MonitorIds []uuid.UUID `json:"monitorIds"`
+	// Tag IDs used to dynamically include monitors. Unioned with monitorIds.
+	TagIds []uuid.UUID `json:"tagIds"`
 }
 
 // GetID returns the value of ID.
@@ -6165,6 +6094,11 @@ func (s *StatusPageGroup) GetMonitorIds() []uuid.UUID {
 	return s.MonitorIds
 }
 
+// GetTagIds returns the value of TagIds.
+func (s *StatusPageGroup) GetTagIds() []uuid.UUID {
+	return s.TagIds
+}
+
 // SetID sets the value of ID.
 func (s *StatusPageGroup) SetID(val OptUUID) {
 	s.ID = val
@@ -6183,6 +6117,11 @@ func (s *StatusPageGroup) SetWeight(val OptInt) {
 // SetMonitorIds sets the value of MonitorIds.
 func (s *StatusPageGroup) SetMonitorIds(val []uuid.UUID) {
 	s.MonitorIds = val
+}
+
+// SetTagIds sets the value of TagIds.
+func (s *StatusPageGroup) SetTagIds(val []uuid.UUID) {
+	s.TagIds = val
 }
 
 // Input for creating or updating a status page.

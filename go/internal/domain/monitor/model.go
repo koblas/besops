@@ -58,7 +58,6 @@ type Monitor struct {
 	GameName             string    `db:"game"`
 	HTTPBodyEncoding     string    `db:"http_body_encoding"`
 	Timeout              int       `db:"timeout"`
-	ParentID             *string   `db:"parent_id"`
 	InvertKeyword        bool      `db:"invert_keyword"`
 	JsonPath             string    `db:"json_path"`
 	ExpectedValue        string    `db:"expected_value"`
@@ -70,4 +69,5 @@ type Monitor struct {
 	KafkaProducerSSL     bool      `db:"kafka_producer_ssl"`
 	KafkaProducerMessage string    `db:"kafka_producer_message"`
 	RemoteBrowser        *string   `db:"remote_browser"`
+	GroupTagIDs          string    `db:"group_tag_ids_json"`
 }
