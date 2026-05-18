@@ -39,7 +39,6 @@ const monitorTypeGroups = [
     label: 'Other',
     options: [
       { value: 'push', label: 'Push (passive)' },
-      { value: 'group', label: 'Group' },
     ],
   },
 ];

@@ -44,6 +44,10 @@ export function MonitorForm({ mode }: { mode?: 'clone' }) {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    if (existing && existing.type === 'group' && isEdit) {
+      navigate(`/edit-group/${id}`, { replace: true });
+      return;
+    }
     if (existing) {
       const values = { ...existing } as Record<string, unknown>;
       if (mode === 'clone') {

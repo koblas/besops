@@ -9,6 +9,7 @@ import { DashboardPage } from './pages/dashboard/DashboardPage';
 import { DashboardHome } from './pages/dashboard/DashboardHome';
 import { MonitorDetail } from './pages/dashboard/MonitorDetail';
 import { MonitorForm } from './pages/monitors/MonitorForm';
+import { GroupForm } from './pages/monitors/GroupForm';
 import { MonitorList } from './pages/monitors/MonitorList';
 import { MaintenanceList } from './pages/maintenance/MaintenanceList';
 import { MaintenanceForm } from './pages/maintenance/MaintenanceForm';
@@ -60,8 +61,14 @@ export function App() {
         <Route path="/add" element={<DashboardPage />}>
           <Route index element={<MonitorForm />} />
         </Route>
+        <Route path="/add-group" element={<DashboardPage />}>
+          <Route index element={<GroupForm />} />
+        </Route>
         <Route path="/edit/:id" element={<DashboardPage />}>
           <Route index element={<MonitorForm />} />
+        </Route>
+        <Route path="/edit-group/:id" element={<DashboardPage />}>
+          <Route index element={<GroupForm />} />
         </Route>
         <Route path="/clone/:id" element={<DashboardPage />}>
           <Route index element={<MonitorForm mode="clone" />} />

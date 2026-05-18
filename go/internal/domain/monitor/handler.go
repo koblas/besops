@@ -463,6 +463,7 @@ func monitorFromInput(req *oas.MonitorInput, userID string) *Monitor {
 	}
 
 	applyConfig(m, &req.Config)
+	enforceGroupDefaults(m)
 
 	return m
 }
@@ -500,6 +501,15 @@ func applyMonitorInput(m *Monitor, req *oas.MonitorInput) {
 	}
 
 	applyConfig(m, &req.Config)
+	enforceGroupDefaults(m)
+}
+
+func enforceGroupDefaults(m *Monitor) {
+	if m.Type == "group" {
+		m.Interval = 60
+		m.MaxRetries = 0
+		m.RetryInterval = 60
+	}
 }
 
 func applyConfig(m *Monitor, cfg *oas.MonitorConfig) {

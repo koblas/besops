@@ -1,5 +1,7 @@
-import { Form, InputNumber, Select } from 'antd';
+import { Form, Select, Typography } from 'antd';
 import { useTags } from '../../../hooks/useTags';
+
+const { Text } = Typography;
 
 export function GroupFields() {
   const { data: tags = [] } = useTags();
@@ -22,13 +24,9 @@ export function GroupFields() {
         />
       </Form.Item>
 
-      <Form.Item
-        name="interval"
-        label="Status Check Interval (seconds)"
-        extra="How often to re-evaluate member status."
-      >
-        <InputNumber min={20} style={{ width: '100%' }} />
-      </Form.Item>
+      <Text type="secondary" style={{ fontSize: 12 }}>
+        Group status is re-evaluated every 60 seconds.
+      </Text>
     </>
   );
 }

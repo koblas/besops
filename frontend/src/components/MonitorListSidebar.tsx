@@ -1,5 +1,5 @@
-import { Input, Button, Empty, Spin } from 'antd';
-import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { Input, Button, Empty, Spin, Dropdown } from 'antd';
+import { PlusOutlined, SearchOutlined, DownOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMemo, useState } from 'react';
 import { useMonitors } from '../hooks/useMonitors';
@@ -44,15 +44,21 @@ export function MonitorListSidebar() {
         />
       </div>
       <div style={{ marginBottom: 16 }}>
-        <Button
+        <Dropdown.Button
           type="primary"
-          icon={<PlusOutlined />}
+          icon={<DownOutlined />}
           onClick={() => navigate('/add')}
           size="small"
-          block
+          menu={{
+            items: [
+              { key: 'monitor', label: 'Add Monitor', onClick: () => navigate('/add') },
+              { key: 'group', label: 'Add Group', onClick: () => navigate('/add-group') },
+            ],
+          }}
+          style={{ width: '100%' }}
         >
-          Add Monitor
-        </Button>
+          <PlusOutlined /> Add Monitor
+        </Dropdown.Button>
       </div>
       <div style={{ flex: 1, overflow: 'auto' }}>
         {isError ? (

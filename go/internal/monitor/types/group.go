@@ -49,7 +49,7 @@ func (c *GroupChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.
 		return monitor.CheckResult{Status: status.Pending, Message: "No monitors have the selected tags"}, nil
 	}
 
-	worstStatus := status.Up
+	var upCount, downCount int
 	var downNames []string
 	var pendingNames []string
 
@@ -60,37 +60,49 @@ func (c *GroupChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.
 
 		latest, hbErr := c.HbStore.GetLatest(ctx, child.ID)
 		if hbErr != nil || latest == nil {
-			if worstStatus == status.Up {
-				worstStatus = status.Pending
-			}
 			pendingNames = append(pendingNames, child.Name)
 			continue
 		}
 
 		childStatus := status.Status(latest.Status)
-		if childStatus == status.Down {
-			worstStatus = status.Down
+		switch childStatus {
+		case status.Down:
+			downCount++
 			downNames = append(downNames, child.Name)
-		} else if childStatus == status.Pending {
-			if worstStatus != status.Down {
-				worstStatus = status.Pending
-			}
+		case status.Up:
+			upCount++
+		default:
 			pendingNames = append(pendingNames, child.Name)
 		}
 	}
 
-	switch worstStatus {
-	case status.Up:
-		return monitor.CheckResult{Status: status.Up, Message: "All children up"}, nil
-	case status.Pending:
-		return monitor.CheckResult{Status: status.Pending, Message: "Pending: " + strings.Join(pendingNames, ", ")}, nil
-	default:
-		msg := "Down: " + strings.Join(downNames, ", ")
-		if len(pendingNames) > 0 {
-			msg += "; pending: " + strings.Join(pendingNames, ", ")
-		}
-		return monitor.CheckResult{Status: status.Down, Message: msg}, nil
+	activeCount := upCount + downCount + len(pendingNames)
+
+	if activeCount == 0 {
+		return monitor.CheckResult{Status: status.Pending, Message: "No active children"}, nil
 	}
+
+	if downCount == 0 && len(pendingNames) == 0 {
+		return monitor.CheckResult{Status: status.Up, Message: "All children up"}, nil
+	}
+
+	if downCount == 0 {
+		if upCount > 0 {
+			return monitor.CheckResult{Status: status.Up, Message: "All children up"}, nil
+		}
+		return monitor.CheckResult{Status: status.Pending, Message: "Pending: " + strings.Join(pendingNames, ", ")}, nil
+	}
+
+	if upCount == 0 && len(pendingNames) == 0 {
+		return monitor.CheckResult{Status: status.Down, Message: "Down: " + strings.Join(downNames, ", ")}, nil
+	}
+
+	// Some children are down but others are up or pending — degraded
+	msg := "Down: " + strings.Join(downNames, ", ")
+	if len(pendingNames) > 0 {
+		msg += "; pending: " + strings.Join(pendingNames, ", ")
+	}
+	return monitor.CheckResult{Status: status.Degraded, Message: msg}, nil
 }
 
 func (c *GroupChecker) resolveMembers(ctx context.Context, cfg *monitor.Config) ([]*domainmonitor.Monitor, error) {

@@ -63,6 +63,8 @@ function getHeartbeatBarColor(status: number): string {
       return 'rgba(23, 71, 245, 0.41)';
     case STATUS.PENDING:
       return 'rgba(245, 182, 23, 0.41)';
+    case STATUS.DEGRADED:
+      return 'rgba(251, 146, 60, 0.41)';
     default:
       return 'rgba(220, 53, 69, 0.41)';
   }
@@ -103,7 +105,7 @@ function buildRecentData(heartbeats: Heartbeat[], monitorInterval: number | unde
     });
     downData.push({
       x,
-      y: beat.status === STATUS.DOWN || beat.status === STATUS.MAINTENANCE || beat.status === STATUS.PENDING ? 1 : 0,
+      y: beat.status !== STATUS.UP ? 1 : 0,
     });
     colorData.push(getHeartbeatBarColor(beat.status));
     lastTime = beatTime;

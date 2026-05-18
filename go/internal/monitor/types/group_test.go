@@ -81,7 +81,7 @@ func TestGroupChecker_AllChildrenUp(t *testing.T) {
 	assert.Equal(t, "All children up", result.Message)
 }
 
-func TestGroupChecker_OneChildDown(t *testing.T) {
+func TestGroupChecker_OneChildDown_Degraded(t *testing.T) {
 	checker := &types.GroupChecker{
 		TagFinder: &mockTagFinder{
 			monitors: []*domainmonitor.Monitor{
@@ -97,7 +97,28 @@ func TestGroupChecker_OneChildDown(t *testing.T) {
 
 	result, err := checker.Check(t.Context(), &monitor.Config{ID: "group-1", Type: "group", GroupTagIDs: []string{"tag-prod"}})
 	require.NoError(t, err)
+	assert.Equal(t, status.Degraded, result.Status)
+	assert.Contains(t, result.Message, "API")
+}
+
+func TestGroupChecker_AllChildrenDown(t *testing.T) {
+	checker := &types.GroupChecker{
+		TagFinder: &mockTagFinder{
+			monitors: []*domainmonitor.Monitor{
+				{ID: "child-1", Name: "Web", Active: true},
+				{ID: "child-2", Name: "API", Active: true},
+			},
+		},
+		HbStore: &mockHbStore{beats: map[string]*heartbeat.Heartbeat{
+			"child-1": {MonitorID: "child-1", Status: int(status.Down)},
+			"child-2": {MonitorID: "child-2", Status: int(status.Down)},
+		}},
+	}
+
+	result, err := checker.Check(t.Context(), &monitor.Config{ID: "group-1", Type: "group", GroupTagIDs: []string{"tag-prod"}})
+	require.NoError(t, err)
 	assert.Equal(t, status.Down, result.Status)
+	assert.Contains(t, result.Message, "Web")
 	assert.Contains(t, result.Message, "API")
 }
 
@@ -120,7 +141,10 @@ func TestGroupChecker_InactiveChildIgnored(t *testing.T) {
 	assert.Equal(t, status.Up, result.Status)
 }
 
-func TestGroupChecker_PendingChild(t *testing.T) {
+// Given one child is up and another hasn't reported yet,
+// When the group status is evaluated,
+// Then the group is Up (optimistic — no known failures).
+func TestGroupChecker_PendingChildWithUpSibling_IsUp(t *testing.T) {
 	checker := &types.GroupChecker{
 		TagFinder: &mockTagFinder{
 			monitors: []*domainmonitor.Monitor{
@@ -135,8 +159,26 @@ func TestGroupChecker_PendingChild(t *testing.T) {
 
 	result, err := checker.Check(t.Context(), &monitor.Config{ID: "group-1", Type: "group", GroupTagIDs: []string{"tag-a"}})
 	require.NoError(t, err)
+	assert.Equal(t, status.Up, result.Status)
+}
+
+// Given all children have no heartbeats yet,
+// When the group status is evaluated,
+// Then the group is Pending.
+func TestGroupChecker_AllPending(t *testing.T) {
+	checker := &types.GroupChecker{
+		TagFinder: &mockTagFinder{
+			monitors: []*domainmonitor.Monitor{
+				{ID: "child-1", Name: "Web", Active: true},
+				{ID: "child-2", Name: "API", Active: true},
+			},
+		},
+		HbStore: &mockHbStore{beats: map[string]*heartbeat.Heartbeat{}},
+	}
+
+	result, err := checker.Check(t.Context(), &monitor.Config{ID: "group-1", Type: "group", GroupTagIDs: []string{"tag-a"}})
+	require.NoError(t, err)
 	assert.Equal(t, status.Pending, result.Status)
-	assert.Contains(t, result.Message, "New")
 }
 
 func TestGroupChecker_MultipleTagIDs(t *testing.T) {
@@ -160,7 +202,7 @@ func TestGroupChecker_MultipleTagIDs(t *testing.T) {
 	assert.Equal(t, "All children up", result.Message)
 }
 
-func TestGroupChecker_TagBasedMixed(t *testing.T) {
+func TestGroupChecker_TagBasedMixed_Degraded(t *testing.T) {
 	checker := &types.GroupChecker{
 		TagFinder: &mockTagFinder{
 			monitors: []*domainmonitor.Monitor{
@@ -177,6 +219,6 @@ func TestGroupChecker_TagBasedMixed(t *testing.T) {
 	cfg := &monitor.Config{ID: "group-1", Type: "group", GroupTagIDs: []string{"tag-prod"}}
 	result, err := checker.Check(t.Context(), cfg)
 	require.NoError(t, err)
-	assert.Equal(t, status.Down, result.Status)
+	assert.Equal(t, status.Degraded, result.Status)
 	assert.Contains(t, result.Message, "Broken")
 }

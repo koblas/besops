@@ -7,6 +7,7 @@ const (
 	Up          Status = 1
 	Pending     Status = 2
 	Maintenance Status = 3
+	Degraded    Status = 4
 )
 
 func (s Status) String() string {
@@ -19,6 +20,8 @@ func (s Status) String() string {
 		return "PENDING"
 	case Maintenance:
 		return "MAINTENANCE"
+	case Degraded:
+		return "DEGRADED"
 	default:
 		return "UNKNOWN"
 	}

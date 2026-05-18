@@ -178,7 +178,7 @@ func (r *sqliteRepo) GetAverageResponse(ctx context.Context, monitorID string, h
 func (r *sqliteRepo) GetUptime(ctx context.Context, monitorID string, hours int) (float64, error) {
 	var total, up int64
 	err := r.db.QueryRowContext(ctx,
-		`SELECT COUNT(*), COALESCE(SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END), 0) FROM heartbeat WHERE monitor_id = ? AND time >= datetime('now', ?)`,
+		`SELECT COUNT(*), COALESCE(SUM(CASE WHEN status IN (1, 4) THEN 1 ELSE 0 END), 0) FROM heartbeat WHERE monitor_id = ? AND time >= datetime('now', ?)`,
 		monitorID, fmt.Sprintf("-%d hours", hours),
 	).Scan(&total, &up)
 	if err != nil {

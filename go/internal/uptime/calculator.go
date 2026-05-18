@@ -152,7 +152,7 @@ func computeBucket(beats []*heartbeat.Heartbeat) *statBucket {
 
 	for _, hb := range beats {
 		switch hb.Status {
-		case 1: // up
+		case 1, 4: // up or degraded
 			b.up++
 		case 0: // down
 			b.down++
