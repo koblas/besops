@@ -98,8 +98,6 @@ func (c *HTTPChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.C
 		Message:      fmt.Sprintf("%d - %s", resp.StatusCode, http.StatusText(resp.StatusCode)),
 	}
 
-	slog.DebugContext(ctx, "got body", slog.String("body", string(body)[:min(1000, len(body))]))
-
 	// TLS certificate info
 	if resp.TLS != nil && len(resp.TLS.PeerCertificates) > 0 {
 		cert := resp.TLS.PeerCertificates[0]

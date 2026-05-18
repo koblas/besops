@@ -14,7 +14,8 @@ export function useHeartbeats(monitorId: string | undefined, opts?: { hours?: nu
         params: { path: { monitorId: monitorId! }, query },
       });
       if (error) throw error;
-      return data;
+      // API returns newest-first; consumers expect chronological (oldest-first)
+      return [...(data ?? [])].reverse();
     },
     enabled: !!monitorId,
   });

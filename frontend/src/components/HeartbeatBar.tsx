@@ -115,23 +115,27 @@ export function HeartbeatBar({ heartbeats, size = 'normal' }: HeartbeatBarProps)
 
   const hoveredBeat = hoverIndex !== null ? visibleBeats[hoverIndex] : null;
 
-  const timeSinceFirst = (() => {
-    if (size === 'small' || visibleBeats.length < 5) return null;
+  const legend = (() => {
+    if (visibleBeats.length < 2) return null;
     const first = visibleBeats[0];
     if (!first) return null;
-    const minutes = dayjs().diff(dayjs(first.time), 'minute');
-    if (minutes > 60) return `${Math.floor(minutes / 60)}h`;
-    return `${minutes}m`;
-  })();
 
-  const timeSinceLast = (() => {
-    if (size === 'small' || visibleBeats.length < 5) return null;
-    const last = visibleBeats[visibleBeats.length - 1];
-    if (!last) return null;
-    const seconds = dayjs().diff(dayjs(last.time), 'second');
-    if (seconds < 120) return 'Now';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-    return `${Math.floor(seconds / 3600)}h ago`;
+    const minutes = dayjs().diff(dayjs(first.time), 'minute');
+    let timeAgo: string;
+    if (minutes >= 1440) {
+      const days = Math.floor(minutes / 1440);
+      timeAgo = `${days} day${days !== 1 ? 's' : ''} ago`;
+    } else if (minutes >= 60) {
+      const hours = Math.floor(minutes / 60);
+      timeAgo = `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+    } else {
+      timeAgo = `${minutes} min ago`;
+    }
+
+    const upCount = visibleBeats.filter(b => b.status === 1 || b.status === 4).length;
+    const pct = ((upCount / visibleBeats.length) * 100).toFixed(visibleBeats.length > 20 ? 2 : 1);
+
+    return { timeAgo, pct };
   })();
 
   const wrapPadding = (beatHeight * HOVER_SCALE - beatHeight) / 2;
@@ -172,20 +176,20 @@ export function HeartbeatBar({ heartbeats, size = 'normal' }: HeartbeatBarProps)
           </div>
         </div>
       )}
-      {timeSinceFirst && timeSinceLast && (
+      {legend && (
         <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            fontSize: 12,
+            fontSize: size === 'small' ? 10 : 11,
             color: '#888',
-            marginTop: 2,
-            marginLeft: emptySlots * beatFullWidth,
+            marginTop: size === 'small' ? 1 : 2,
           }}
         >
-          <span>{timeSinceFirst}</span>
-          <span>{timeSinceLast}</span>
+          <span>{legend.timeAgo}</span>
+          <span>{legend.pct}% uptime</span>
+          <span>Now</span>
         </div>
       )}
     </div>
