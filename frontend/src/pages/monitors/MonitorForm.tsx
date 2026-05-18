@@ -19,6 +19,7 @@ import { TimingFields } from './fields/TimingFields';
 import { AlertFields } from './fields/AlertFields';
 import { NotificationSelector } from './fields/NotificationSelector';
 import { TagSelector } from '../../components/TagSelector';
+import { mergeContentType, extractContentType } from './headerUtils';
 
 const { Title, Text } = Typography;
 
@@ -54,9 +55,9 @@ export function MonitorForm({ mode }: { mode?: 'clone' }) {
 
       // Extract Content-Type from headers into bodyContentType for the form
       const hdrs = (values.headers ?? []) as { name: string; value: string }[];
-      const ctEntry = hdrs.find(h => h.name.toLowerCase() === 'content-type');
-      if (ctEntry) {
-        values.bodyContentType = ctEntry.value;
+      const ct = extractContentType(hdrs);
+      if (ct) {
+        values.bodyContentType = ct;
       }
 
       form.setFieldsValue(values);
@@ -114,14 +115,10 @@ export function MonitorForm({ mode }: { mode?: 'clone' }) {
 
     // Merge bodyContentType into the headers array and remove the virtual field
     if (input.bodyContentType && input.body) {
-      const hdrs = (input.headers ?? []) as { name: string; value: string }[];
-      const existing = hdrs.find(h => h.name.toLowerCase() === 'content-type');
-      if (existing) {
-        existing.value = input.bodyContentType;
-      } else {
-        hdrs.push({ name: 'Content-Type', value: input.bodyContentType });
-      }
-      (input as Record<string, unknown>).headers = hdrs;
+      (input as Record<string, unknown>).headers = mergeContentType(
+        ((input.headers ?? []) as { name: string; value: string }[]),
+        input.bodyContentType,
+      );
     }
     delete input.bodyContentType;
 
