@@ -2066,9 +2066,19 @@ components:
           default: GET
           description: HTTP method to use for HTTP-based monitors.
         headers:
-          type: string
-          maxLength: 5000
-          description: JSON-encoded object of HTTP headers to send with the request.
+          type: array
+          maxItems: 50
+          description: HTTP headers to send with the request.
+          items:
+            type: object
+            required: [name, value]
+            properties:
+              name:
+                type: string
+                maxLength: 255
+              value:
+                type: string
+                maxLength: 2000
         body:
           type: string
           maxLength: 10000
@@ -2250,8 +2260,18 @@ components:
           type: string
           default: GET
         headers:
-          type: string
-          maxLength: 5000
+          type: array
+          maxItems: 50
+          items:
+            type: object
+            required: [name, value]
+            properties:
+              name:
+                type: string
+                maxLength: 255
+              value:
+                type: string
+                maxLength: 2000
         body:
           type: string
           maxLength: 10000

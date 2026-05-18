@@ -53,14 +53,10 @@ export function MonitorForm({ mode }: { mode?: 'clone' }) {
       }
 
       // Extract Content-Type from headers into bodyContentType for the form
-      if (typeof values.headers === 'string' && values.headers) {
-        try {
-          const hdrs = JSON.parse(values.headers as string) as Record<string, string>;
-          const ctKey = Object.keys(hdrs).find(k => k.toLowerCase() === 'content-type');
-          if (ctKey) {
-            values.bodyContentType = hdrs[ctKey];
-          }
-        } catch { /* ignore malformed headers */ }
+      const hdrs = (values.headers ?? []) as { name: string; value: string }[];
+      const ctEntry = hdrs.find(h => h.name.toLowerCase() === 'content-type');
+      if (ctEntry) {
+        values.bodyContentType = ctEntry.value;
       }
 
       form.setFieldsValue(values);
@@ -116,16 +112,16 @@ export function MonitorForm({ mode }: { mode?: 'clone' }) {
     setSaving(true);
     const input = { ...values, parentId: values.parentId ?? null } as MonitorInput & { bodyContentType?: string };
 
-    // Merge bodyContentType into headers and remove the virtual field
+    // Merge bodyContentType into the headers array and remove the virtual field
     if (input.bodyContentType && input.body) {
-      const hdrs: Record<string, string> = input.headers ? JSON.parse(input.headers) : {};
-      const existingCtKey = Object.keys(hdrs).find(k => k.toLowerCase() === 'content-type');
-      if (existingCtKey) {
-        hdrs[existingCtKey] = input.bodyContentType;
+      const hdrs = (input.headers ?? []) as { name: string; value: string }[];
+      const existing = hdrs.find(h => h.name.toLowerCase() === 'content-type');
+      if (existing) {
+        existing.value = input.bodyContentType;
       } else {
-        hdrs['Content-Type'] = input.bodyContentType;
+        hdrs.push({ name: 'Content-Type', value: input.bodyContentType });
       }
-      input.headers = JSON.stringify(hdrs);
+      (input as Record<string, unknown>).headers = hdrs;
     }
     delete input.bodyContentType;
 

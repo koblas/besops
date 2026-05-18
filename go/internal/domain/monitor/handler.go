@@ -222,7 +222,7 @@ func monitorToOAS(m *Monitor) oas.Monitor {
 		MaxRedirects:        oas.NewOptInt(m.MaxRedirects),
 		AcceptedStatusCodes: codes,
 		Method:              newOptMonitorMethod(m.Method),
-		Headers:             oasutil.PtrToOptString(m.Headers),
+		Headers:             headersToOAS(m.Headers),
 		Body:                oasutil.PtrToOptString(m.Body),
 		BasicAuthUser:       oasutil.PtrToOptString(m.BasicAuthUser),
 		BasicAuthPass:       oasutil.PtrToOptString(m.BasicAuthPass),
@@ -281,7 +281,7 @@ func monitorFromInput(req *oas.MonitorInput, userID string) *Monitor {
 		MaxRedirects:        oasutil.OptIntValue(req.MaxRedirects, 10),
 		AcceptedStatusCodes: codes,
 		Method:              oasutil.OptStringValue(req.Method),
-		Headers:             oasutil.OptStringValue(req.Headers),
+		Headers:             headersFromOAS(req.Headers),
 		Body:                oasutil.OptStringValue(req.Body),
 		BasicAuthUser:       oasutil.OptStringValue(req.BasicAuthUser),
 		BasicAuthPass:       oasutil.OptStringValue(req.BasicAuthPass),
@@ -368,8 +368,8 @@ func applyMonitorInput(m *Monitor, req *oas.MonitorInput) {
 	if req.Method.IsSet() {
 		m.Method = req.Method.Value
 	}
-	if req.Headers.IsSet() {
-		m.Headers = req.Headers.Value
+	if len(req.Headers) > 0 {
+		m.Headers = headersFromOAS(req.Headers)
 	}
 	if req.Body.IsSet() {
 		m.Body = req.Body.Value
@@ -448,6 +448,33 @@ func newOptDNSResolveType(s string) oas.OptMonitorDnsResolveType {
 		return oas.OptMonitorDnsResolveType{}
 	}
 	return oas.OptMonitorDnsResolveType{Value: oas.MonitorDnsResolveType(s), Set: true}
+}
+
+func headersToOAS(raw string) []oas.MonitorHeadersItem {
+	if raw == "" {
+		return nil
+	}
+	var m map[string]string
+	if err := json.Unmarshal([]byte(raw), &m); err != nil {
+		return nil
+	}
+	items := make([]oas.MonitorHeadersItem, 0, len(m))
+	for k, v := range m {
+		items = append(items, oas.MonitorHeadersItem{Name: k, Value: v})
+	}
+	return items
+}
+
+func headersFromOAS(items []oas.MonitorInputHeadersItem) string {
+	if len(items) == 0 {
+		return ""
+	}
+	m := make(map[string]string, len(items))
+	for _, item := range items {
+		m[item.Name] = item.Value
+	}
+	b, _ := json.Marshal(m)
+	return string(b)
 }
 
 func (h *Handler) GetMonitorUptimes(ctx context.Context) (oas.GetMonitorUptimesOK, error) {

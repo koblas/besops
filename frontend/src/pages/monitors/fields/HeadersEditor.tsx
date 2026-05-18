@@ -6,6 +6,7 @@ const commonHeaders = [
   'Accept',
   'Authorization',
   'Cache-Control',
+  'Content-Type',
   'Cookie',
   'If-Modified-Since',
   'If-None-Match',
@@ -17,52 +18,35 @@ const commonHeaders = [
   'X-Request-ID',
 ];
 
-interface HeaderEntry {
-  key: string;
+export interface HeaderEntry {
+  name: string;
   value: string;
 }
 
 interface HeadersEditorProps {
-  value?: string;
-  onChange?: (value: string) => void;
+  value?: HeaderEntry[];
+  onChange?: (value: HeaderEntry[]) => void;
 }
 
-function parseInitial(value: string | undefined): HeaderEntry[] {
-  if (!value) return [];
-  try {
-    const parsed = JSON.parse(value);
-    return Object.entries(parsed).map(([key, val]) => ({ key, value: String(val) }));
-  } catch {
-    return [];
-  }
-}
-
-export function HeadersEditor({ value, onChange }: HeadersEditorProps) {
-  const [entries, setEntries] = useState<HeaderEntry[]>(() => parseInitial(value));
+export function HeadersEditor({ value = [], onChange }: HeadersEditorProps) {
+  const [entries, setEntries] = useState<HeaderEntry[]>(value);
 
   function emit(updated: HeaderEntry[]) {
     setEntries(updated);
-    const obj: Record<string, string> = {};
-    for (const entry of updated) {
-      if (entry.key.trim()) {
-        obj[entry.key.trim()] = entry.value;
-      }
-    }
-    const hasEntries = Object.keys(obj).length > 0;
-    onChange?.(hasEntries ? JSON.stringify(obj) : '');
+    onChange?.(updated.filter(e => e.name.trim()));
   }
 
   function addEntry() {
-    emit([...entries, { key: '', value: '' }]);
+    emit([...entries, { name: '', value: '' }]);
   }
 
   function removeEntry(index: number) {
     emit(entries.filter((_, i) => i !== index));
   }
 
-  function updateKey(index: number, key: string) {
+  function updateName(index: number, name: string) {
     const updated = [...entries];
-    updated[index] = { ...updated[index], key };
+    updated[index] = { ...updated[index], name };
     emit(updated);
   }
 
@@ -72,9 +56,9 @@ export function HeadersEditor({ value, onChange }: HeadersEditorProps) {
     emit(updated);
   }
 
-  const usedKeys = new Set(entries.map(e => e.key.toLowerCase()));
+  const usedNames = new Set(entries.map(e => e.name.toLowerCase()));
   const suggestions = commonHeaders
-    .filter(h => !usedKeys.has(h.toLowerCase()))
+    .filter(h => !usedNames.has(h.toLowerCase()))
     .map(h => ({ value: h }));
 
   return (
@@ -82,8 +66,8 @@ export function HeadersEditor({ value, onChange }: HeadersEditorProps) {
       {entries.map((entry, i) => (
         <Space key={i} style={{ display: 'flex', marginBottom: 8 }} align="start">
           <AutoComplete
-            value={entry.key}
-            onChange={(val) => updateKey(i, val)}
+            value={entry.name}
+            onChange={(val) => updateName(i, val)}
             options={suggestions}
             placeholder="Header name"
             style={{ width: 200 }}

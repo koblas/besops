@@ -2137,8 +2137,8 @@ type Monitor struct {
 	AcceptedStatusCodes []string `json:"acceptedStatusCodes"`
 	// HTTP method to use for HTTP-based monitors.
 	Method OptMonitorMethod `json:"method"`
-	// JSON-encoded object of HTTP headers to send with the request.
-	Headers OptString `json:"headers"`
+	// HTTP headers to send with the request.
+	Headers []MonitorHeadersItem `json:"headers"`
 	// HTTP request body for POST/PUT/PATCH monitors.
 	Body OptString `json:"body"`
 	// Username for HTTP Basic Authentication.
@@ -2285,7 +2285,7 @@ func (s *Monitor) GetMethod() OptMonitorMethod {
 }
 
 // GetHeaders returns the value of Headers.
-func (s *Monitor) GetHeaders() OptString {
+func (s *Monitor) GetHeaders() []MonitorHeadersItem {
 	return s.Headers
 }
 
@@ -2505,7 +2505,7 @@ func (s *Monitor) SetMethod(val OptMonitorMethod) {
 }
 
 // SetHeaders sets the value of Headers.
-func (s *Monitor) SetHeaders(val OptString) {
+func (s *Monitor) SetHeaders(val []MonitorHeadersItem) {
 	s.Headers = val
 }
 
@@ -2730,6 +2730,31 @@ func (s *MonitorDnsResolveType) UnmarshalText(data []byte) error {
 	}
 }
 
+type MonitorHeadersItem struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+// GetName returns the value of Name.
+func (s *MonitorHeadersItem) GetName() string {
+	return s.Name
+}
+
+// GetValue returns the value of Value.
+func (s *MonitorHeadersItem) GetValue() string {
+	return s.Value
+}
+
+// SetName sets the value of Name.
+func (s *MonitorHeadersItem) SetName(val string) {
+	s.Name = val
+}
+
+// SetValue sets the value of Value.
+func (s *MonitorHeadersItem) SetValue(val string) {
+	s.Value = val
+}
+
 // Input for creating or updating a monitor. Only name and type are required; all other fields are
 // optional and type-dependent.
 // Ref: #/components/schemas/MonitorInput
@@ -2741,44 +2766,44 @@ type MonitorInput struct {
 	// Whether the monitor should start checking immediately after creation.
 	Active OptBool `json:"active"`
 	// Check interval in seconds.
-	Interval            OptInt      `json:"interval"`
-	URL                 OptString   `json:"url"`
-	Hostname            OptString   `json:"hostname"`
-	Port                OptInt      `json:"port"`
-	MaxRetries          OptInt      `json:"maxRetries"`
-	Timeout             OptInt      `json:"timeout"`
-	RetryInterval       OptInt      `json:"retryInterval"`
-	Keyword             OptString   `json:"keyword"`
-	InvertKeyword       OptBool     `json:"invertKeyword"`
-	JsonPath            OptString   `json:"jsonPath"`
-	ExpectedValue       OptString   `json:"expectedValue"`
-	IgnoreTls           OptBool     `json:"ignoreTls"`
-	MaxRedirects        OptInt      `json:"maxRedirects"`
-	AcceptedStatusCodes []string    `json:"acceptedStatusCodes"`
-	Method              OptString   `json:"method"`
-	Headers             OptString   `json:"headers"`
-	Body                OptString   `json:"body"`
-	BasicAuthUser       OptString   `json:"basicAuthUser"`
-	BasicAuthPass       OptString   `json:"basicAuthPass"`
-	Description         OptString   `json:"description"`
-	UpsideDown          OptBool     `json:"upsideDown"`
-	DnsResolveType      OptString   `json:"dnsResolveType"`
-	DnsResolveServer    OptString   `json:"dnsResolveServer"`
-	MqttTopic           OptString   `json:"mqttTopic"`
-	MqttSuccessMessage  OptString   `json:"mqttSuccessMessage"`
-	MqttUsername        OptString   `json:"mqttUsername"`
-	MqttPassword        OptString   `json:"mqttPassword"`
-	DatabaseQuery       OptString   `json:"databaseQuery"`
-	ProxyId             OptUUID     `json:"proxyId"`
-	GrpcUrl             OptString   `json:"grpcUrl"`
-	GrpcServiceName     OptString   `json:"grpcServiceName"`
-	GrpcMethod          OptString   `json:"grpcMethod"`
-	GrpcEnableTls       OptBool     `json:"grpcEnableTls"`
-	ParentId            OptNilUUID  `json:"parentId"`
-	NotificationIds     []uuid.UUID `json:"notificationIds"`
-	ResendInterval      OptInt      `json:"resendInterval"`
-	PacketSize          OptInt      `json:"packetSize"`
-	ExpiryNotification  OptBool     `json:"expiryNotification"`
+	Interval            OptInt                    `json:"interval"`
+	URL                 OptString                 `json:"url"`
+	Hostname            OptString                 `json:"hostname"`
+	Port                OptInt                    `json:"port"`
+	MaxRetries          OptInt                    `json:"maxRetries"`
+	Timeout             OptInt                    `json:"timeout"`
+	RetryInterval       OptInt                    `json:"retryInterval"`
+	Keyword             OptString                 `json:"keyword"`
+	InvertKeyword       OptBool                   `json:"invertKeyword"`
+	JsonPath            OptString                 `json:"jsonPath"`
+	ExpectedValue       OptString                 `json:"expectedValue"`
+	IgnoreTls           OptBool                   `json:"ignoreTls"`
+	MaxRedirects        OptInt                    `json:"maxRedirects"`
+	AcceptedStatusCodes []string                  `json:"acceptedStatusCodes"`
+	Method              OptString                 `json:"method"`
+	Headers             []MonitorInputHeadersItem `json:"headers"`
+	Body                OptString                 `json:"body"`
+	BasicAuthUser       OptString                 `json:"basicAuthUser"`
+	BasicAuthPass       OptString                 `json:"basicAuthPass"`
+	Description         OptString                 `json:"description"`
+	UpsideDown          OptBool                   `json:"upsideDown"`
+	DnsResolveType      OptString                 `json:"dnsResolveType"`
+	DnsResolveServer    OptString                 `json:"dnsResolveServer"`
+	MqttTopic           OptString                 `json:"mqttTopic"`
+	MqttSuccessMessage  OptString                 `json:"mqttSuccessMessage"`
+	MqttUsername        OptString                 `json:"mqttUsername"`
+	MqttPassword        OptString                 `json:"mqttPassword"`
+	DatabaseQuery       OptString                 `json:"databaseQuery"`
+	ProxyId             OptUUID                   `json:"proxyId"`
+	GrpcUrl             OptString                 `json:"grpcUrl"`
+	GrpcServiceName     OptString                 `json:"grpcServiceName"`
+	GrpcMethod          OptString                 `json:"grpcMethod"`
+	GrpcEnableTls       OptBool                   `json:"grpcEnableTls"`
+	ParentId            OptNilUUID                `json:"parentId"`
+	NotificationIds     []uuid.UUID               `json:"notificationIds"`
+	ResendInterval      OptInt                    `json:"resendInterval"`
+	PacketSize          OptInt                    `json:"packetSize"`
+	ExpiryNotification  OptBool                   `json:"expiryNotification"`
 }
 
 // GetName returns the value of Name.
@@ -2872,7 +2897,7 @@ func (s *MonitorInput) GetMethod() OptString {
 }
 
 // GetHeaders returns the value of Headers.
-func (s *MonitorInput) GetHeaders() OptString {
+func (s *MonitorInput) GetHeaders() []MonitorInputHeadersItem {
 	return s.Headers
 }
 
@@ -3077,7 +3102,7 @@ func (s *MonitorInput) SetMethod(val OptString) {
 }
 
 // SetHeaders sets the value of Headers.
-func (s *MonitorInput) SetHeaders(val OptString) {
+func (s *MonitorInput) SetHeaders(val []MonitorInputHeadersItem) {
 	s.Headers = val
 }
 
@@ -3189,6 +3214,31 @@ func (s *MonitorInput) SetPacketSize(val OptInt) {
 // SetExpiryNotification sets the value of ExpiryNotification.
 func (s *MonitorInput) SetExpiryNotification(val OptBool) {
 	s.ExpiryNotification = val
+}
+
+type MonitorInputHeadersItem struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+// GetName returns the value of Name.
+func (s *MonitorInputHeadersItem) GetName() string {
+	return s.Name
+}
+
+// GetValue returns the value of Value.
+func (s *MonitorInputHeadersItem) GetValue() string {
+	return s.Value
+}
+
+// SetName sets the value of Name.
+func (s *MonitorInputHeadersItem) SetName(val string) {
+	s.Name = val
+}
+
+// SetValue sets the value of Value.
+func (s *MonitorInputHeadersItem) SetValue(val string) {
+	s.Value = val
 }
 
 // HTTP method to use for HTTP-based monitors.

@@ -1222,8 +1222,11 @@ export interface components {
              * @enum {string}
              */
             method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS";
-            /** @description JSON-encoded object of HTTP headers to send with the request. */
-            headers?: string;
+            /** @description HTTP headers to send with the request. */
+            headers?: {
+                name: string;
+                value: string;
+            }[];
             /** @description HTTP request body for POST/PUT/PATCH monitors. */
             body?: string;
             /** @description Username for HTTP Basic Authentication. */
@@ -1323,7 +1326,10 @@ export interface components {
             acceptedStatusCodes?: string[];
             /** @default GET */
             method: string;
-            headers?: string;
+            headers?: {
+                name: string;
+                value: string;
+            }[];
             body?: string;
             basicAuthUser?: string;
             basicAuthPass?: string;
