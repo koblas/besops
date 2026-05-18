@@ -495,6 +495,196 @@ func (s *Disable2FAReq) SetCurrentPassword(val string) {
 	s.CurrentPassword = val
 }
 
+// Ref: #/components/schemas/DnsMonitorConfig
+type DnsMonitorConfig struct {
+	Kind             DnsMonitorConfigKind              `json:"kind"`
+	Hostname         OptString                         `json:"hostname"`
+	Port             OptInt                            `json:"port"`
+	DnsResolveType   OptDnsMonitorConfigDnsResolveType `json:"dnsResolveType"`
+	DnsResolveServer OptString                         `json:"dnsResolveServer"`
+}
+
+// GetKind returns the value of Kind.
+func (s *DnsMonitorConfig) GetKind() DnsMonitorConfigKind {
+	return s.Kind
+}
+
+// GetHostname returns the value of Hostname.
+func (s *DnsMonitorConfig) GetHostname() OptString {
+	return s.Hostname
+}
+
+// GetPort returns the value of Port.
+func (s *DnsMonitorConfig) GetPort() OptInt {
+	return s.Port
+}
+
+// GetDnsResolveType returns the value of DnsResolveType.
+func (s *DnsMonitorConfig) GetDnsResolveType() OptDnsMonitorConfigDnsResolveType {
+	return s.DnsResolveType
+}
+
+// GetDnsResolveServer returns the value of DnsResolveServer.
+func (s *DnsMonitorConfig) GetDnsResolveServer() OptString {
+	return s.DnsResolveServer
+}
+
+// SetKind sets the value of Kind.
+func (s *DnsMonitorConfig) SetKind(val DnsMonitorConfigKind) {
+	s.Kind = val
+}
+
+// SetHostname sets the value of Hostname.
+func (s *DnsMonitorConfig) SetHostname(val OptString) {
+	s.Hostname = val
+}
+
+// SetPort sets the value of Port.
+func (s *DnsMonitorConfig) SetPort(val OptInt) {
+	s.Port = val
+}
+
+// SetDnsResolveType sets the value of DnsResolveType.
+func (s *DnsMonitorConfig) SetDnsResolveType(val OptDnsMonitorConfigDnsResolveType) {
+	s.DnsResolveType = val
+}
+
+// SetDnsResolveServer sets the value of DnsResolveServer.
+func (s *DnsMonitorConfig) SetDnsResolveServer(val OptString) {
+	s.DnsResolveServer = val
+}
+
+type DnsMonitorConfigDnsResolveType string
+
+const (
+	DnsMonitorConfigDnsResolveTypeA     DnsMonitorConfigDnsResolveType = "A"
+	DnsMonitorConfigDnsResolveTypeAAAA  DnsMonitorConfigDnsResolveType = "AAAA"
+	DnsMonitorConfigDnsResolveTypeCAA   DnsMonitorConfigDnsResolveType = "CAA"
+	DnsMonitorConfigDnsResolveTypeCNAME DnsMonitorConfigDnsResolveType = "CNAME"
+	DnsMonitorConfigDnsResolveTypeMX    DnsMonitorConfigDnsResolveType = "MX"
+	DnsMonitorConfigDnsResolveTypeNS    DnsMonitorConfigDnsResolveType = "NS"
+	DnsMonitorConfigDnsResolveTypePTR   DnsMonitorConfigDnsResolveType = "PTR"
+	DnsMonitorConfigDnsResolveTypeSOA   DnsMonitorConfigDnsResolveType = "SOA"
+	DnsMonitorConfigDnsResolveTypeSRV   DnsMonitorConfigDnsResolveType = "SRV"
+	DnsMonitorConfigDnsResolveTypeTXT   DnsMonitorConfigDnsResolveType = "TXT"
+)
+
+// AllValues returns all DnsMonitorConfigDnsResolveType values.
+func (DnsMonitorConfigDnsResolveType) AllValues() []DnsMonitorConfigDnsResolveType {
+	return []DnsMonitorConfigDnsResolveType{
+		DnsMonitorConfigDnsResolveTypeA,
+		DnsMonitorConfigDnsResolveTypeAAAA,
+		DnsMonitorConfigDnsResolveTypeCAA,
+		DnsMonitorConfigDnsResolveTypeCNAME,
+		DnsMonitorConfigDnsResolveTypeMX,
+		DnsMonitorConfigDnsResolveTypeNS,
+		DnsMonitorConfigDnsResolveTypePTR,
+		DnsMonitorConfigDnsResolveTypeSOA,
+		DnsMonitorConfigDnsResolveTypeSRV,
+		DnsMonitorConfigDnsResolveTypeTXT,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s DnsMonitorConfigDnsResolveType) MarshalText() ([]byte, error) {
+	switch s {
+	case DnsMonitorConfigDnsResolveTypeA:
+		return []byte(s), nil
+	case DnsMonitorConfigDnsResolveTypeAAAA:
+		return []byte(s), nil
+	case DnsMonitorConfigDnsResolveTypeCAA:
+		return []byte(s), nil
+	case DnsMonitorConfigDnsResolveTypeCNAME:
+		return []byte(s), nil
+	case DnsMonitorConfigDnsResolveTypeMX:
+		return []byte(s), nil
+	case DnsMonitorConfigDnsResolveTypeNS:
+		return []byte(s), nil
+	case DnsMonitorConfigDnsResolveTypePTR:
+		return []byte(s), nil
+	case DnsMonitorConfigDnsResolveTypeSOA:
+		return []byte(s), nil
+	case DnsMonitorConfigDnsResolveTypeSRV:
+		return []byte(s), nil
+	case DnsMonitorConfigDnsResolveTypeTXT:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *DnsMonitorConfigDnsResolveType) UnmarshalText(data []byte) error {
+	switch DnsMonitorConfigDnsResolveType(data) {
+	case DnsMonitorConfigDnsResolveTypeA:
+		*s = DnsMonitorConfigDnsResolveTypeA
+		return nil
+	case DnsMonitorConfigDnsResolveTypeAAAA:
+		*s = DnsMonitorConfigDnsResolveTypeAAAA
+		return nil
+	case DnsMonitorConfigDnsResolveTypeCAA:
+		*s = DnsMonitorConfigDnsResolveTypeCAA
+		return nil
+	case DnsMonitorConfigDnsResolveTypeCNAME:
+		*s = DnsMonitorConfigDnsResolveTypeCNAME
+		return nil
+	case DnsMonitorConfigDnsResolveTypeMX:
+		*s = DnsMonitorConfigDnsResolveTypeMX
+		return nil
+	case DnsMonitorConfigDnsResolveTypeNS:
+		*s = DnsMonitorConfigDnsResolveTypeNS
+		return nil
+	case DnsMonitorConfigDnsResolveTypePTR:
+		*s = DnsMonitorConfigDnsResolveTypePTR
+		return nil
+	case DnsMonitorConfigDnsResolveTypeSOA:
+		*s = DnsMonitorConfigDnsResolveTypeSOA
+		return nil
+	case DnsMonitorConfigDnsResolveTypeSRV:
+		*s = DnsMonitorConfigDnsResolveTypeSRV
+		return nil
+	case DnsMonitorConfigDnsResolveTypeTXT:
+		*s = DnsMonitorConfigDnsResolveTypeTXT
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type DnsMonitorConfigKind string
+
+const (
+	DnsMonitorConfigKindDNS DnsMonitorConfigKind = "dns"
+)
+
+// AllValues returns all DnsMonitorConfigKind values.
+func (DnsMonitorConfigKind) AllValues() []DnsMonitorConfigKind {
+	return []DnsMonitorConfigKind{
+		DnsMonitorConfigKindDNS,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s DnsMonitorConfigKind) MarshalText() ([]byte, error) {
+	switch s {
+	case DnsMonitorConfigKindDNS:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *DnsMonitorConfigKind) UnmarshalText(data []byte) error {
+	switch DnsMonitorConfigKind(data) {
+	case DnsMonitorConfigKindDNS:
+		*s = DnsMonitorConfigKindDNS
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
 type Enable2FAReq struct {
 	CurrentPassword string `json:"currentPassword"`
 	Token           string `json:"token"`
@@ -990,6 +1180,159 @@ func (s *GetStatusPageHeartbeatsOKUptimeList) init() GetStatusPageHeartbeatsOKUp
 	return m
 }
 
+// Ref: #/components/schemas/GroupMonitorConfig
+type GroupMonitorConfig struct {
+	Kind GroupMonitorConfigKind `json:"kind"`
+}
+
+// GetKind returns the value of Kind.
+func (s *GroupMonitorConfig) GetKind() GroupMonitorConfigKind {
+	return s.Kind
+}
+
+// SetKind sets the value of Kind.
+func (s *GroupMonitorConfig) SetKind(val GroupMonitorConfigKind) {
+	s.Kind = val
+}
+
+type GroupMonitorConfigKind string
+
+const (
+	GroupMonitorConfigKindGroup GroupMonitorConfigKind = "group"
+)
+
+// AllValues returns all GroupMonitorConfigKind values.
+func (GroupMonitorConfigKind) AllValues() []GroupMonitorConfigKind {
+	return []GroupMonitorConfigKind{
+		GroupMonitorConfigKindGroup,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s GroupMonitorConfigKind) MarshalText() ([]byte, error) {
+	switch s {
+	case GroupMonitorConfigKindGroup:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *GroupMonitorConfigKind) UnmarshalText(data []byte) error {
+	switch GroupMonitorConfigKind(data) {
+	case GroupMonitorConfigKindGroup:
+		*s = GroupMonitorConfigKindGroup
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// Ref: #/components/schemas/GrpcMonitorConfig
+type GrpcMonitorConfig struct {
+	Kind            GrpcMonitorConfigKind `json:"kind"`
+	GrpcUrl         OptString             `json:"grpcUrl"`
+	GrpcServiceName OptString             `json:"grpcServiceName"`
+	GrpcMethod      OptString             `json:"grpcMethod"`
+	GrpcEnableTls   OptBool               `json:"grpcEnableTls"`
+	IgnoreTls       OptBool               `json:"ignoreTls"`
+}
+
+// GetKind returns the value of Kind.
+func (s *GrpcMonitorConfig) GetKind() GrpcMonitorConfigKind {
+	return s.Kind
+}
+
+// GetGrpcUrl returns the value of GrpcUrl.
+func (s *GrpcMonitorConfig) GetGrpcUrl() OptString {
+	return s.GrpcUrl
+}
+
+// GetGrpcServiceName returns the value of GrpcServiceName.
+func (s *GrpcMonitorConfig) GetGrpcServiceName() OptString {
+	return s.GrpcServiceName
+}
+
+// GetGrpcMethod returns the value of GrpcMethod.
+func (s *GrpcMonitorConfig) GetGrpcMethod() OptString {
+	return s.GrpcMethod
+}
+
+// GetGrpcEnableTls returns the value of GrpcEnableTls.
+func (s *GrpcMonitorConfig) GetGrpcEnableTls() OptBool {
+	return s.GrpcEnableTls
+}
+
+// GetIgnoreTls returns the value of IgnoreTls.
+func (s *GrpcMonitorConfig) GetIgnoreTls() OptBool {
+	return s.IgnoreTls
+}
+
+// SetKind sets the value of Kind.
+func (s *GrpcMonitorConfig) SetKind(val GrpcMonitorConfigKind) {
+	s.Kind = val
+}
+
+// SetGrpcUrl sets the value of GrpcUrl.
+func (s *GrpcMonitorConfig) SetGrpcUrl(val OptString) {
+	s.GrpcUrl = val
+}
+
+// SetGrpcServiceName sets the value of GrpcServiceName.
+func (s *GrpcMonitorConfig) SetGrpcServiceName(val OptString) {
+	s.GrpcServiceName = val
+}
+
+// SetGrpcMethod sets the value of GrpcMethod.
+func (s *GrpcMonitorConfig) SetGrpcMethod(val OptString) {
+	s.GrpcMethod = val
+}
+
+// SetGrpcEnableTls sets the value of GrpcEnableTls.
+func (s *GrpcMonitorConfig) SetGrpcEnableTls(val OptBool) {
+	s.GrpcEnableTls = val
+}
+
+// SetIgnoreTls sets the value of IgnoreTls.
+func (s *GrpcMonitorConfig) SetIgnoreTls(val OptBool) {
+	s.IgnoreTls = val
+}
+
+type GrpcMonitorConfigKind string
+
+const (
+	GrpcMonitorConfigKindGrpcKeyword GrpcMonitorConfigKind = "grpc-keyword"
+)
+
+// AllValues returns all GrpcMonitorConfigKind values.
+func (GrpcMonitorConfigKind) AllValues() []GrpcMonitorConfigKind {
+	return []GrpcMonitorConfigKind{
+		GrpcMonitorConfigKindGrpcKeyword,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s GrpcMonitorConfigKind) MarshalText() ([]byte, error) {
+	switch s {
+	case GrpcMonitorConfigKindGrpcKeyword:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *GrpcMonitorConfigKind) UnmarshalText(data []byte) error {
+	switch GrpcMonitorConfigKind(data) {
+	case GrpcMonitorConfigKindGrpcKeyword:
+		*s = GrpcMonitorConfigKindGrpcKeyword
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
 type HealthCheckOK struct {
 	Status HealthCheckOKStatus `json:"status"`
 }
@@ -1156,6 +1499,310 @@ func (HeartbeatStatus) AllValues() []HeartbeatStatus {
 		HeartbeatStatus1,
 		HeartbeatStatus2,
 		HeartbeatStatus3,
+	}
+}
+
+// Ref: #/components/schemas/HttpMonitorConfig
+type HttpMonitorConfig struct {
+	Kind                HttpMonitorConfigKind          `json:"kind"`
+	URL                 OptString                      `json:"url"`
+	Method              OptHttpMonitorConfigMethod     `json:"method"`
+	Headers             []HttpMonitorConfigHeadersItem `json:"headers"`
+	Body                OptString                      `json:"body"`
+	BasicAuthUser       OptString                      `json:"basicAuthUser"`
+	BasicAuthPass       OptString                      `json:"basicAuthPass"`
+	MaxRedirects        OptInt                         `json:"maxRedirects"`
+	AcceptedStatusCodes []string                       `json:"acceptedStatusCodes"`
+	IgnoreTls           OptBool                        `json:"ignoreTls"`
+	Keyword             OptString                      `json:"keyword"`
+	InvertKeyword       OptBool                        `json:"invertKeyword"`
+	JsonPath            OptString                      `json:"jsonPath"`
+	ExpectedValue       OptString                      `json:"expectedValue"`
+	ProxyId             OptUUID                        `json:"proxyId"`
+}
+
+// GetKind returns the value of Kind.
+func (s *HttpMonitorConfig) GetKind() HttpMonitorConfigKind {
+	return s.Kind
+}
+
+// GetURL returns the value of URL.
+func (s *HttpMonitorConfig) GetURL() OptString {
+	return s.URL
+}
+
+// GetMethod returns the value of Method.
+func (s *HttpMonitorConfig) GetMethod() OptHttpMonitorConfigMethod {
+	return s.Method
+}
+
+// GetHeaders returns the value of Headers.
+func (s *HttpMonitorConfig) GetHeaders() []HttpMonitorConfigHeadersItem {
+	return s.Headers
+}
+
+// GetBody returns the value of Body.
+func (s *HttpMonitorConfig) GetBody() OptString {
+	return s.Body
+}
+
+// GetBasicAuthUser returns the value of BasicAuthUser.
+func (s *HttpMonitorConfig) GetBasicAuthUser() OptString {
+	return s.BasicAuthUser
+}
+
+// GetBasicAuthPass returns the value of BasicAuthPass.
+func (s *HttpMonitorConfig) GetBasicAuthPass() OptString {
+	return s.BasicAuthPass
+}
+
+// GetMaxRedirects returns the value of MaxRedirects.
+func (s *HttpMonitorConfig) GetMaxRedirects() OptInt {
+	return s.MaxRedirects
+}
+
+// GetAcceptedStatusCodes returns the value of AcceptedStatusCodes.
+func (s *HttpMonitorConfig) GetAcceptedStatusCodes() []string {
+	return s.AcceptedStatusCodes
+}
+
+// GetIgnoreTls returns the value of IgnoreTls.
+func (s *HttpMonitorConfig) GetIgnoreTls() OptBool {
+	return s.IgnoreTls
+}
+
+// GetKeyword returns the value of Keyword.
+func (s *HttpMonitorConfig) GetKeyword() OptString {
+	return s.Keyword
+}
+
+// GetInvertKeyword returns the value of InvertKeyword.
+func (s *HttpMonitorConfig) GetInvertKeyword() OptBool {
+	return s.InvertKeyword
+}
+
+// GetJsonPath returns the value of JsonPath.
+func (s *HttpMonitorConfig) GetJsonPath() OptString {
+	return s.JsonPath
+}
+
+// GetExpectedValue returns the value of ExpectedValue.
+func (s *HttpMonitorConfig) GetExpectedValue() OptString {
+	return s.ExpectedValue
+}
+
+// GetProxyId returns the value of ProxyId.
+func (s *HttpMonitorConfig) GetProxyId() OptUUID {
+	return s.ProxyId
+}
+
+// SetKind sets the value of Kind.
+func (s *HttpMonitorConfig) SetKind(val HttpMonitorConfigKind) {
+	s.Kind = val
+}
+
+// SetURL sets the value of URL.
+func (s *HttpMonitorConfig) SetURL(val OptString) {
+	s.URL = val
+}
+
+// SetMethod sets the value of Method.
+func (s *HttpMonitorConfig) SetMethod(val OptHttpMonitorConfigMethod) {
+	s.Method = val
+}
+
+// SetHeaders sets the value of Headers.
+func (s *HttpMonitorConfig) SetHeaders(val []HttpMonitorConfigHeadersItem) {
+	s.Headers = val
+}
+
+// SetBody sets the value of Body.
+func (s *HttpMonitorConfig) SetBody(val OptString) {
+	s.Body = val
+}
+
+// SetBasicAuthUser sets the value of BasicAuthUser.
+func (s *HttpMonitorConfig) SetBasicAuthUser(val OptString) {
+	s.BasicAuthUser = val
+}
+
+// SetBasicAuthPass sets the value of BasicAuthPass.
+func (s *HttpMonitorConfig) SetBasicAuthPass(val OptString) {
+	s.BasicAuthPass = val
+}
+
+// SetMaxRedirects sets the value of MaxRedirects.
+func (s *HttpMonitorConfig) SetMaxRedirects(val OptInt) {
+	s.MaxRedirects = val
+}
+
+// SetAcceptedStatusCodes sets the value of AcceptedStatusCodes.
+func (s *HttpMonitorConfig) SetAcceptedStatusCodes(val []string) {
+	s.AcceptedStatusCodes = val
+}
+
+// SetIgnoreTls sets the value of IgnoreTls.
+func (s *HttpMonitorConfig) SetIgnoreTls(val OptBool) {
+	s.IgnoreTls = val
+}
+
+// SetKeyword sets the value of Keyword.
+func (s *HttpMonitorConfig) SetKeyword(val OptString) {
+	s.Keyword = val
+}
+
+// SetInvertKeyword sets the value of InvertKeyword.
+func (s *HttpMonitorConfig) SetInvertKeyword(val OptBool) {
+	s.InvertKeyword = val
+}
+
+// SetJsonPath sets the value of JsonPath.
+func (s *HttpMonitorConfig) SetJsonPath(val OptString) {
+	s.JsonPath = val
+}
+
+// SetExpectedValue sets the value of ExpectedValue.
+func (s *HttpMonitorConfig) SetExpectedValue(val OptString) {
+	s.ExpectedValue = val
+}
+
+// SetProxyId sets the value of ProxyId.
+func (s *HttpMonitorConfig) SetProxyId(val OptUUID) {
+	s.ProxyId = val
+}
+
+type HttpMonitorConfigHeadersItem struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+// GetName returns the value of Name.
+func (s *HttpMonitorConfigHeadersItem) GetName() string {
+	return s.Name
+}
+
+// GetValue returns the value of Value.
+func (s *HttpMonitorConfigHeadersItem) GetValue() string {
+	return s.Value
+}
+
+// SetName sets the value of Name.
+func (s *HttpMonitorConfigHeadersItem) SetName(val string) {
+	s.Name = val
+}
+
+// SetValue sets the value of Value.
+func (s *HttpMonitorConfigHeadersItem) SetValue(val string) {
+	s.Value = val
+}
+
+type HttpMonitorConfigKind string
+
+const (
+	HttpMonitorConfigKindHTTP HttpMonitorConfigKind = "http"
+)
+
+// AllValues returns all HttpMonitorConfigKind values.
+func (HttpMonitorConfigKind) AllValues() []HttpMonitorConfigKind {
+	return []HttpMonitorConfigKind{
+		HttpMonitorConfigKindHTTP,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s HttpMonitorConfigKind) MarshalText() ([]byte, error) {
+	switch s {
+	case HttpMonitorConfigKindHTTP:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *HttpMonitorConfigKind) UnmarshalText(data []byte) error {
+	switch HttpMonitorConfigKind(data) {
+	case HttpMonitorConfigKindHTTP:
+		*s = HttpMonitorConfigKindHTTP
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type HttpMonitorConfigMethod string
+
+const (
+	HttpMonitorConfigMethodGET     HttpMonitorConfigMethod = "GET"
+	HttpMonitorConfigMethodPOST    HttpMonitorConfigMethod = "POST"
+	HttpMonitorConfigMethodPUT     HttpMonitorConfigMethod = "PUT"
+	HttpMonitorConfigMethodPATCH   HttpMonitorConfigMethod = "PATCH"
+	HttpMonitorConfigMethodDELETE  HttpMonitorConfigMethod = "DELETE"
+	HttpMonitorConfigMethodHEAD    HttpMonitorConfigMethod = "HEAD"
+	HttpMonitorConfigMethodOPTIONS HttpMonitorConfigMethod = "OPTIONS"
+)
+
+// AllValues returns all HttpMonitorConfigMethod values.
+func (HttpMonitorConfigMethod) AllValues() []HttpMonitorConfigMethod {
+	return []HttpMonitorConfigMethod{
+		HttpMonitorConfigMethodGET,
+		HttpMonitorConfigMethodPOST,
+		HttpMonitorConfigMethodPUT,
+		HttpMonitorConfigMethodPATCH,
+		HttpMonitorConfigMethodDELETE,
+		HttpMonitorConfigMethodHEAD,
+		HttpMonitorConfigMethodOPTIONS,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s HttpMonitorConfigMethod) MarshalText() ([]byte, error) {
+	switch s {
+	case HttpMonitorConfigMethodGET:
+		return []byte(s), nil
+	case HttpMonitorConfigMethodPOST:
+		return []byte(s), nil
+	case HttpMonitorConfigMethodPUT:
+		return []byte(s), nil
+	case HttpMonitorConfigMethodPATCH:
+		return []byte(s), nil
+	case HttpMonitorConfigMethodDELETE:
+		return []byte(s), nil
+	case HttpMonitorConfigMethodHEAD:
+		return []byte(s), nil
+	case HttpMonitorConfigMethodOPTIONS:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *HttpMonitorConfigMethod) UnmarshalText(data []byte) error {
+	switch HttpMonitorConfigMethod(data) {
+	case HttpMonitorConfigMethodGET:
+		*s = HttpMonitorConfigMethodGET
+		return nil
+	case HttpMonitorConfigMethodPOST:
+		*s = HttpMonitorConfigMethodPOST
+		return nil
+	case HttpMonitorConfigMethodPUT:
+		*s = HttpMonitorConfigMethodPUT
+		return nil
+	case HttpMonitorConfigMethodPATCH:
+		*s = HttpMonitorConfigMethodPATCH
+		return nil
+	case HttpMonitorConfigMethodDELETE:
+		*s = HttpMonitorConfigMethodDELETE
+		return nil
+	case HttpMonitorConfigMethodHEAD:
+		*s = HttpMonitorConfigMethodHEAD
+		return nil
+	case HttpMonitorConfigMethodOPTIONS:
+		*s = HttpMonitorConfigMethodOPTIONS
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
 	}
 }
 
@@ -2094,99 +2741,27 @@ func (s *MessageResponse) SetMessage(val string) {
 func (*MessageResponse) pushHeartbeatRes() {}
 func (*MessageResponse) setupRes()         {}
 
-// A monitor represents a single endpoint or service being monitored for uptime. Each monitor
-// periodically checks its target and records heartbeats with status and response time.
+// A monitor represents a single endpoint or service being monitored for uptime.
 // Ref: #/components/schemas/Monitor
 type Monitor struct {
-	// Unique identifier for this monitor.
-	ID uuid.UUID `json:"id"`
-	// Human-readable display name for this monitor.
-	Name string `json:"name"`
-	// The monitoring protocol or check type to use.
-	Type MonitorType `json:"type"`
-	// Whether this monitor is currently active and performing checks.
-	Active bool `json:"active"`
-	// How often (in seconds) the monitor performs a check.
-	Interval OptInt `json:"interval"`
-	// Target URL for HTTP/keyword/JSON-query monitors.
-	URL OptString `json:"url"`
-	// Target hostname for ping, DNS, TCP, and other hostname-based monitors.
-	Hostname OptString `json:"hostname"`
-	// Target port number for TCP, SMTP, and other port-based monitors.
-	Port OptInt `json:"port"`
-	// Number of consecutive failures before the monitor is marked DOWN. During retries, status is
-	// PENDING.
-	MaxRetries OptInt `json:"maxRetries"`
-	// Maximum time (in seconds) to wait for a response before considering the check failed.
-	Timeout OptInt `json:"timeout"`
-	// Time (in seconds) between retry attempts when the monitor is in PENDING state.
-	RetryInterval OptInt `json:"retryInterval"`
-	// Text to search for in the response body.
-	Keyword OptString `json:"keyword"`
-	// If true, the monitor is UP when the keyword is NOT found in the response.
-	InvertKeyword OptBool `json:"invertKeyword"`
-	// JSONPath expression to evaluate against the response body.
-	JsonPath OptString `json:"jsonPath"`
-	// Expected value to compare against the JSONPath result.
-	ExpectedValue OptString `json:"expectedValue"`
-	// If true, TLS certificate errors are ignored when connecting to the target.
-	IgnoreTls OptBool `json:"ignoreTls"`
-	// Maximum number of HTTP redirects to follow.
-	MaxRedirects OptInt `json:"maxRedirects"`
-	// List of accepted HTTP status codes or ranges (e.g., ['200-299', '301']).
-	AcceptedStatusCodes []string `json:"acceptedStatusCodes"`
-	// HTTP method to use for HTTP-based monitors.
-	Method OptMonitorMethod `json:"method"`
-	// HTTP headers to send with the request.
-	Headers []MonitorHeadersItem `json:"headers"`
-	// HTTP request body for POST/PUT/PATCH monitors.
-	Body OptString `json:"body"`
-	// Username for HTTP Basic Authentication.
-	BasicAuthUser OptString `json:"basicAuthUser"`
-	// Password for HTTP Basic Authentication.
-	BasicAuthPass OptString `json:"basicAuthPass"`
-	// Unique token for push-based monitors. External systems POST to /push/{pushToken} to report status.
-	PushToken OptString `json:"pushToken"`
-	// Optional notes or description for this monitor.
-	Description OptString `json:"description"`
-	// If true, inverts the status logic (DOWN becomes UP and vice versa).
-	UpsideDown OptBool `json:"upsideDown"`
-	// DNS record type to query for DNS monitors.
-	DnsResolveType OptMonitorDnsResolveType `json:"dnsResolveType"`
-	// Custom DNS server to query (e.g., '8.8.8.8'). Uses system resolver if empty.
-	DnsResolveServer OptString `json:"dnsResolveServer"`
-	// MQTT topic to subscribe to for MQTT monitors.
-	MqttTopic OptString `json:"mqttTopic"`
-	// Expected message content on the MQTT topic for a successful check.
-	MqttSuccessMessage OptString `json:"mqttSuccessMessage"`
-	// MQTT broker authentication username.
-	MqttUsername OptString `json:"mqttUsername"`
-	// MQTT broker authentication password.
-	MqttPassword OptString `json:"mqttPassword"`
-	// SQL query to execute for database monitors. A successful query execution indicates UP.
-	DatabaseQuery OptString `json:"databaseQuery"`
-	// ID of the proxy to use for outbound connections.
-	ProxyId OptUUID `json:"proxyId"`
-	// Target URL for gRPC health check monitors.
-	GrpcUrl OptString `json:"grpcUrl"`
-	// GRPC service name to check.
-	GrpcServiceName OptString `json:"grpcServiceName"`
-	// GRPC method to invoke.
-	GrpcMethod OptString `json:"grpcMethod"`
-	// Whether to use TLS for gRPC connections.
-	GrpcEnableTls OptBool `json:"grpcEnableTls"`
-	// ID of the parent monitor for grouped/nested monitors.
-	ParentId OptNilUUID `json:"parentId"`
-	// Tags assigned to this monitor with optional per-monitor values.
-	Tags []MonitorTag `json:"tags"`
-	// IDs of notification providers that receive alerts for this monitor.
-	NotificationIds []uuid.UUID `json:"notificationIds"`
-	// Interval (in number of checks) between repeated DOWN notifications. 0 means no resending.
-	ResendInterval OptInt `json:"resendInterval"`
-	// ICMP packet size in bytes for ping monitors.
-	PacketSize OptInt `json:"packetSize"`
-	// If true, sends a notification when the TLS certificate is approaching expiry.
-	ExpiryNotification OptBool `json:"expiryNotification"`
+	ID            uuid.UUID   `json:"id"`
+	Name          string      `json:"name"`
+	Type          MonitorType `json:"type"`
+	Active        bool        `json:"active"`
+	Interval      OptInt      `json:"interval"`
+	Timeout       OptInt      `json:"timeout"`
+	MaxRetries    OptInt      `json:"maxRetries"`
+	RetryInterval OptInt      `json:"retryInterval"`
+	Description   OptString   `json:"description"`
+	UpsideDown    OptBool     `json:"upsideDown"`
+	ParentId      OptNilUUID  `json:"parentId"`
+	// Server-generated token for push monitors.
+	PushToken          OptString        `json:"pushToken"`
+	Tags               []MonitorTag     `json:"tags"`
+	NotificationIds    []uuid.UUID      `json:"notificationIds"`
+	ResendInterval     OptInt           `json:"resendInterval"`
+	ExpiryNotification OptBool          `json:"expiryNotification"`
+	Config             OptMonitorConfig `json:"config"`
 }
 
 // GetID returns the value of ID.
@@ -2214,19 +2789,9 @@ func (s *Monitor) GetInterval() OptInt {
 	return s.Interval
 }
 
-// GetURL returns the value of URL.
-func (s *Monitor) GetURL() OptString {
-	return s.URL
-}
-
-// GetHostname returns the value of Hostname.
-func (s *Monitor) GetHostname() OptString {
-	return s.Hostname
-}
-
-// GetPort returns the value of Port.
-func (s *Monitor) GetPort() OptInt {
-	return s.Port
+// GetTimeout returns the value of Timeout.
+func (s *Monitor) GetTimeout() OptInt {
+	return s.Timeout
 }
 
 // GetMaxRetries returns the value of MaxRetries.
@@ -2234,79 +2799,9 @@ func (s *Monitor) GetMaxRetries() OptInt {
 	return s.MaxRetries
 }
 
-// GetTimeout returns the value of Timeout.
-func (s *Monitor) GetTimeout() OptInt {
-	return s.Timeout
-}
-
 // GetRetryInterval returns the value of RetryInterval.
 func (s *Monitor) GetRetryInterval() OptInt {
 	return s.RetryInterval
-}
-
-// GetKeyword returns the value of Keyword.
-func (s *Monitor) GetKeyword() OptString {
-	return s.Keyword
-}
-
-// GetInvertKeyword returns the value of InvertKeyword.
-func (s *Monitor) GetInvertKeyword() OptBool {
-	return s.InvertKeyword
-}
-
-// GetJsonPath returns the value of JsonPath.
-func (s *Monitor) GetJsonPath() OptString {
-	return s.JsonPath
-}
-
-// GetExpectedValue returns the value of ExpectedValue.
-func (s *Monitor) GetExpectedValue() OptString {
-	return s.ExpectedValue
-}
-
-// GetIgnoreTls returns the value of IgnoreTls.
-func (s *Monitor) GetIgnoreTls() OptBool {
-	return s.IgnoreTls
-}
-
-// GetMaxRedirects returns the value of MaxRedirects.
-func (s *Monitor) GetMaxRedirects() OptInt {
-	return s.MaxRedirects
-}
-
-// GetAcceptedStatusCodes returns the value of AcceptedStatusCodes.
-func (s *Monitor) GetAcceptedStatusCodes() []string {
-	return s.AcceptedStatusCodes
-}
-
-// GetMethod returns the value of Method.
-func (s *Monitor) GetMethod() OptMonitorMethod {
-	return s.Method
-}
-
-// GetHeaders returns the value of Headers.
-func (s *Monitor) GetHeaders() []MonitorHeadersItem {
-	return s.Headers
-}
-
-// GetBody returns the value of Body.
-func (s *Monitor) GetBody() OptString {
-	return s.Body
-}
-
-// GetBasicAuthUser returns the value of BasicAuthUser.
-func (s *Monitor) GetBasicAuthUser() OptString {
-	return s.BasicAuthUser
-}
-
-// GetBasicAuthPass returns the value of BasicAuthPass.
-func (s *Monitor) GetBasicAuthPass() OptString {
-	return s.BasicAuthPass
-}
-
-// GetPushToken returns the value of PushToken.
-func (s *Monitor) GetPushToken() OptString {
-	return s.PushToken
 }
 
 // GetDescription returns the value of Description.
@@ -2319,69 +2814,14 @@ func (s *Monitor) GetUpsideDown() OptBool {
 	return s.UpsideDown
 }
 
-// GetDnsResolveType returns the value of DnsResolveType.
-func (s *Monitor) GetDnsResolveType() OptMonitorDnsResolveType {
-	return s.DnsResolveType
-}
-
-// GetDnsResolveServer returns the value of DnsResolveServer.
-func (s *Monitor) GetDnsResolveServer() OptString {
-	return s.DnsResolveServer
-}
-
-// GetMqttTopic returns the value of MqttTopic.
-func (s *Monitor) GetMqttTopic() OptString {
-	return s.MqttTopic
-}
-
-// GetMqttSuccessMessage returns the value of MqttSuccessMessage.
-func (s *Monitor) GetMqttSuccessMessage() OptString {
-	return s.MqttSuccessMessage
-}
-
-// GetMqttUsername returns the value of MqttUsername.
-func (s *Monitor) GetMqttUsername() OptString {
-	return s.MqttUsername
-}
-
-// GetMqttPassword returns the value of MqttPassword.
-func (s *Monitor) GetMqttPassword() OptString {
-	return s.MqttPassword
-}
-
-// GetDatabaseQuery returns the value of DatabaseQuery.
-func (s *Monitor) GetDatabaseQuery() OptString {
-	return s.DatabaseQuery
-}
-
-// GetProxyId returns the value of ProxyId.
-func (s *Monitor) GetProxyId() OptUUID {
-	return s.ProxyId
-}
-
-// GetGrpcUrl returns the value of GrpcUrl.
-func (s *Monitor) GetGrpcUrl() OptString {
-	return s.GrpcUrl
-}
-
-// GetGrpcServiceName returns the value of GrpcServiceName.
-func (s *Monitor) GetGrpcServiceName() OptString {
-	return s.GrpcServiceName
-}
-
-// GetGrpcMethod returns the value of GrpcMethod.
-func (s *Monitor) GetGrpcMethod() OptString {
-	return s.GrpcMethod
-}
-
-// GetGrpcEnableTls returns the value of GrpcEnableTls.
-func (s *Monitor) GetGrpcEnableTls() OptBool {
-	return s.GrpcEnableTls
-}
-
 // GetParentId returns the value of ParentId.
 func (s *Monitor) GetParentId() OptNilUUID {
 	return s.ParentId
+}
+
+// GetPushToken returns the value of PushToken.
+func (s *Monitor) GetPushToken() OptString {
+	return s.PushToken
 }
 
 // GetTags returns the value of Tags.
@@ -2399,14 +2839,14 @@ func (s *Monitor) GetResendInterval() OptInt {
 	return s.ResendInterval
 }
 
-// GetPacketSize returns the value of PacketSize.
-func (s *Monitor) GetPacketSize() OptInt {
-	return s.PacketSize
-}
-
 // GetExpiryNotification returns the value of ExpiryNotification.
 func (s *Monitor) GetExpiryNotification() OptBool {
 	return s.ExpiryNotification
+}
+
+// GetConfig returns the value of Config.
+func (s *Monitor) GetConfig() OptMonitorConfig {
+	return s.Config
 }
 
 // SetID sets the value of ID.
@@ -2434,19 +2874,9 @@ func (s *Monitor) SetInterval(val OptInt) {
 	s.Interval = val
 }
 
-// SetURL sets the value of URL.
-func (s *Monitor) SetURL(val OptString) {
-	s.URL = val
-}
-
-// SetHostname sets the value of Hostname.
-func (s *Monitor) SetHostname(val OptString) {
-	s.Hostname = val
-}
-
-// SetPort sets the value of Port.
-func (s *Monitor) SetPort(val OptInt) {
-	s.Port = val
+// SetTimeout sets the value of Timeout.
+func (s *Monitor) SetTimeout(val OptInt) {
+	s.Timeout = val
 }
 
 // SetMaxRetries sets the value of MaxRetries.
@@ -2454,79 +2884,9 @@ func (s *Monitor) SetMaxRetries(val OptInt) {
 	s.MaxRetries = val
 }
 
-// SetTimeout sets the value of Timeout.
-func (s *Monitor) SetTimeout(val OptInt) {
-	s.Timeout = val
-}
-
 // SetRetryInterval sets the value of RetryInterval.
 func (s *Monitor) SetRetryInterval(val OptInt) {
 	s.RetryInterval = val
-}
-
-// SetKeyword sets the value of Keyword.
-func (s *Monitor) SetKeyword(val OptString) {
-	s.Keyword = val
-}
-
-// SetInvertKeyword sets the value of InvertKeyword.
-func (s *Monitor) SetInvertKeyword(val OptBool) {
-	s.InvertKeyword = val
-}
-
-// SetJsonPath sets the value of JsonPath.
-func (s *Monitor) SetJsonPath(val OptString) {
-	s.JsonPath = val
-}
-
-// SetExpectedValue sets the value of ExpectedValue.
-func (s *Monitor) SetExpectedValue(val OptString) {
-	s.ExpectedValue = val
-}
-
-// SetIgnoreTls sets the value of IgnoreTls.
-func (s *Monitor) SetIgnoreTls(val OptBool) {
-	s.IgnoreTls = val
-}
-
-// SetMaxRedirects sets the value of MaxRedirects.
-func (s *Monitor) SetMaxRedirects(val OptInt) {
-	s.MaxRedirects = val
-}
-
-// SetAcceptedStatusCodes sets the value of AcceptedStatusCodes.
-func (s *Monitor) SetAcceptedStatusCodes(val []string) {
-	s.AcceptedStatusCodes = val
-}
-
-// SetMethod sets the value of Method.
-func (s *Monitor) SetMethod(val OptMonitorMethod) {
-	s.Method = val
-}
-
-// SetHeaders sets the value of Headers.
-func (s *Monitor) SetHeaders(val []MonitorHeadersItem) {
-	s.Headers = val
-}
-
-// SetBody sets the value of Body.
-func (s *Monitor) SetBody(val OptString) {
-	s.Body = val
-}
-
-// SetBasicAuthUser sets the value of BasicAuthUser.
-func (s *Monitor) SetBasicAuthUser(val OptString) {
-	s.BasicAuthUser = val
-}
-
-// SetBasicAuthPass sets the value of BasicAuthPass.
-func (s *Monitor) SetBasicAuthPass(val OptString) {
-	s.BasicAuthPass = val
-}
-
-// SetPushToken sets the value of PushToken.
-func (s *Monitor) SetPushToken(val OptString) {
-	s.PushToken = val
 }
 
 // SetDescription sets the value of Description.
@@ -2539,69 +2899,14 @@ func (s *Monitor) SetUpsideDown(val OptBool) {
 	s.UpsideDown = val
 }
 
-// SetDnsResolveType sets the value of DnsResolveType.
-func (s *Monitor) SetDnsResolveType(val OptMonitorDnsResolveType) {
-	s.DnsResolveType = val
-}
-
-// SetDnsResolveServer sets the value of DnsResolveServer.
-func (s *Monitor) SetDnsResolveServer(val OptString) {
-	s.DnsResolveServer = val
-}
-
-// SetMqttTopic sets the value of MqttTopic.
-func (s *Monitor) SetMqttTopic(val OptString) {
-	s.MqttTopic = val
-}
-
-// SetMqttSuccessMessage sets the value of MqttSuccessMessage.
-func (s *Monitor) SetMqttSuccessMessage(val OptString) {
-	s.MqttSuccessMessage = val
-}
-
-// SetMqttUsername sets the value of MqttUsername.
-func (s *Monitor) SetMqttUsername(val OptString) {
-	s.MqttUsername = val
-}
-
-// SetMqttPassword sets the value of MqttPassword.
-func (s *Monitor) SetMqttPassword(val OptString) {
-	s.MqttPassword = val
-}
-
-// SetDatabaseQuery sets the value of DatabaseQuery.
-func (s *Monitor) SetDatabaseQuery(val OptString) {
-	s.DatabaseQuery = val
-}
-
-// SetProxyId sets the value of ProxyId.
-func (s *Monitor) SetProxyId(val OptUUID) {
-	s.ProxyId = val
-}
-
-// SetGrpcUrl sets the value of GrpcUrl.
-func (s *Monitor) SetGrpcUrl(val OptString) {
-	s.GrpcUrl = val
-}
-
-// SetGrpcServiceName sets the value of GrpcServiceName.
-func (s *Monitor) SetGrpcServiceName(val OptString) {
-	s.GrpcServiceName = val
-}
-
-// SetGrpcMethod sets the value of GrpcMethod.
-func (s *Monitor) SetGrpcMethod(val OptString) {
-	s.GrpcMethod = val
-}
-
-// SetGrpcEnableTls sets the value of GrpcEnableTls.
-func (s *Monitor) SetGrpcEnableTls(val OptBool) {
-	s.GrpcEnableTls = val
-}
-
 // SetParentId sets the value of ParentId.
 func (s *Monitor) SetParentId(val OptNilUUID) {
 	s.ParentId = val
+}
+
+// SetPushToken sets the value of PushToken.
+func (s *Monitor) SetPushToken(val OptString) {
+	s.PushToken = val
 }
 
 // SetTags sets the value of Tags.
@@ -2619,191 +2924,337 @@ func (s *Monitor) SetResendInterval(val OptInt) {
 	s.ResendInterval = val
 }
 
-// SetPacketSize sets the value of PacketSize.
-func (s *Monitor) SetPacketSize(val OptInt) {
-	s.PacketSize = val
-}
-
 // SetExpiryNotification sets the value of ExpiryNotification.
 func (s *Monitor) SetExpiryNotification(val OptBool) {
 	s.ExpiryNotification = val
 }
 
+// SetConfig sets the value of Config.
+func (s *Monitor) SetConfig(val OptMonitorConfig) {
+	s.Config = val
+}
+
 func (*Monitor) getMonitorRes()    {}
 func (*Monitor) updateMonitorRes() {}
 
-// DNS record type to query for DNS monitors.
-type MonitorDnsResolveType string
+// Ref: #/components/schemas/MonitorConfig
+// MonitorConfig represents sum type.
+type MonitorConfig struct {
+	Type                       MonitorConfigType // switch on this field
+	HttpMonitorConfig          HttpMonitorConfig
+	PortMonitorConfig          PortMonitorConfig
+	PingMonitorConfig          PingMonitorConfig
+	DnsMonitorConfig           DnsMonitorConfig
+	GrpcMonitorConfig          GrpcMonitorConfig
+	MqttMonitorConfig          MqttMonitorConfig
+	RedisMonitorConfig         RedisMonitorConfig
+	PushMonitorConfig          PushMonitorConfig
+	SmtpMonitorConfig          SmtpMonitorConfig
+	TailscalePingMonitorConfig TailscalePingMonitorConfig
+	GroupMonitorConfig         GroupMonitorConfig
+}
 
+// MonitorConfigType is oneOf type of MonitorConfig.
+type MonitorConfigType string
+
+// Possible values for MonitorConfigType.
 const (
-	MonitorDnsResolveTypeA     MonitorDnsResolveType = "A"
-	MonitorDnsResolveTypeAAAA  MonitorDnsResolveType = "AAAA"
-	MonitorDnsResolveTypeCAA   MonitorDnsResolveType = "CAA"
-	MonitorDnsResolveTypeCNAME MonitorDnsResolveType = "CNAME"
-	MonitorDnsResolveTypeMX    MonitorDnsResolveType = "MX"
-	MonitorDnsResolveTypeNS    MonitorDnsResolveType = "NS"
-	MonitorDnsResolveTypePTR   MonitorDnsResolveType = "PTR"
-	MonitorDnsResolveTypeSOA   MonitorDnsResolveType = "SOA"
-	MonitorDnsResolveTypeSRV   MonitorDnsResolveType = "SRV"
-	MonitorDnsResolveTypeTXT   MonitorDnsResolveType = "TXT"
+	HttpMonitorConfigMonitorConfig          MonitorConfigType = "http"
+	PortMonitorConfigMonitorConfig          MonitorConfigType = "port"
+	PingMonitorConfigMonitorConfig          MonitorConfigType = "ping"
+	DnsMonitorConfigMonitorConfig           MonitorConfigType = "dns"
+	GrpcMonitorConfigMonitorConfig          MonitorConfigType = "grpc-keyword"
+	MqttMonitorConfigMonitorConfig          MonitorConfigType = "mqtt"
+	RedisMonitorConfigMonitorConfig         MonitorConfigType = "redis"
+	PushMonitorConfigMonitorConfig          MonitorConfigType = "push"
+	SmtpMonitorConfigMonitorConfig          MonitorConfigType = "smtp"
+	TailscalePingMonitorConfigMonitorConfig MonitorConfigType = "tailscale-ping"
+	GroupMonitorConfigMonitorConfig         MonitorConfigType = "group"
 )
 
-// AllValues returns all MonitorDnsResolveType values.
-func (MonitorDnsResolveType) AllValues() []MonitorDnsResolveType {
-	return []MonitorDnsResolveType{
-		MonitorDnsResolveTypeA,
-		MonitorDnsResolveTypeAAAA,
-		MonitorDnsResolveTypeCAA,
-		MonitorDnsResolveTypeCNAME,
-		MonitorDnsResolveTypeMX,
-		MonitorDnsResolveTypeNS,
-		MonitorDnsResolveTypePTR,
-		MonitorDnsResolveTypeSOA,
-		MonitorDnsResolveTypeSRV,
-		MonitorDnsResolveTypeTXT,
+// IsHttpMonitorConfig reports whether MonitorConfig is HttpMonitorConfig.
+func (s MonitorConfig) IsHttpMonitorConfig() bool { return s.Type == HttpMonitorConfigMonitorConfig }
+
+// IsPortMonitorConfig reports whether MonitorConfig is PortMonitorConfig.
+func (s MonitorConfig) IsPortMonitorConfig() bool { return s.Type == PortMonitorConfigMonitorConfig }
+
+// IsPingMonitorConfig reports whether MonitorConfig is PingMonitorConfig.
+func (s MonitorConfig) IsPingMonitorConfig() bool { return s.Type == PingMonitorConfigMonitorConfig }
+
+// IsDnsMonitorConfig reports whether MonitorConfig is DnsMonitorConfig.
+func (s MonitorConfig) IsDnsMonitorConfig() bool { return s.Type == DnsMonitorConfigMonitorConfig }
+
+// IsGrpcMonitorConfig reports whether MonitorConfig is GrpcMonitorConfig.
+func (s MonitorConfig) IsGrpcMonitorConfig() bool { return s.Type == GrpcMonitorConfigMonitorConfig }
+
+// IsMqttMonitorConfig reports whether MonitorConfig is MqttMonitorConfig.
+func (s MonitorConfig) IsMqttMonitorConfig() bool { return s.Type == MqttMonitorConfigMonitorConfig }
+
+// IsRedisMonitorConfig reports whether MonitorConfig is RedisMonitorConfig.
+func (s MonitorConfig) IsRedisMonitorConfig() bool { return s.Type == RedisMonitorConfigMonitorConfig }
+
+// IsPushMonitorConfig reports whether MonitorConfig is PushMonitorConfig.
+func (s MonitorConfig) IsPushMonitorConfig() bool { return s.Type == PushMonitorConfigMonitorConfig }
+
+// IsSmtpMonitorConfig reports whether MonitorConfig is SmtpMonitorConfig.
+func (s MonitorConfig) IsSmtpMonitorConfig() bool { return s.Type == SmtpMonitorConfigMonitorConfig }
+
+// IsTailscalePingMonitorConfig reports whether MonitorConfig is TailscalePingMonitorConfig.
+func (s MonitorConfig) IsTailscalePingMonitorConfig() bool {
+	return s.Type == TailscalePingMonitorConfigMonitorConfig
+}
+
+// IsGroupMonitorConfig reports whether MonitorConfig is GroupMonitorConfig.
+func (s MonitorConfig) IsGroupMonitorConfig() bool { return s.Type == GroupMonitorConfigMonitorConfig }
+
+// SetHttpMonitorConfig sets MonitorConfig to HttpMonitorConfig.
+func (s *MonitorConfig) SetHttpMonitorConfig(v HttpMonitorConfig) {
+	s.Type = HttpMonitorConfigMonitorConfig
+	s.HttpMonitorConfig = v
+}
+
+// GetHttpMonitorConfig returns HttpMonitorConfig and true boolean if MonitorConfig is HttpMonitorConfig.
+func (s MonitorConfig) GetHttpMonitorConfig() (v HttpMonitorConfig, ok bool) {
+	if !s.IsHttpMonitorConfig() {
+		return v, false
 	}
+	return s.HttpMonitorConfig, true
 }
 
-// MarshalText implements encoding.TextMarshaler.
-func (s MonitorDnsResolveType) MarshalText() ([]byte, error) {
-	switch s {
-	case MonitorDnsResolveTypeA:
-		return []byte(s), nil
-	case MonitorDnsResolveTypeAAAA:
-		return []byte(s), nil
-	case MonitorDnsResolveTypeCAA:
-		return []byte(s), nil
-	case MonitorDnsResolveTypeCNAME:
-		return []byte(s), nil
-	case MonitorDnsResolveTypeMX:
-		return []byte(s), nil
-	case MonitorDnsResolveTypeNS:
-		return []byte(s), nil
-	case MonitorDnsResolveTypePTR:
-		return []byte(s), nil
-	case MonitorDnsResolveTypeSOA:
-		return []byte(s), nil
-	case MonitorDnsResolveTypeSRV:
-		return []byte(s), nil
-	case MonitorDnsResolveTypeTXT:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
+// NewHttpMonitorConfigMonitorConfig returns new MonitorConfig from HttpMonitorConfig.
+func NewHttpMonitorConfigMonitorConfig(v HttpMonitorConfig) MonitorConfig {
+	var s MonitorConfig
+	s.SetHttpMonitorConfig(v)
+	return s
+}
+
+// SetPortMonitorConfig sets MonitorConfig to PortMonitorConfig.
+func (s *MonitorConfig) SetPortMonitorConfig(v PortMonitorConfig) {
+	s.Type = PortMonitorConfigMonitorConfig
+	s.PortMonitorConfig = v
+}
+
+// GetPortMonitorConfig returns PortMonitorConfig and true boolean if MonitorConfig is PortMonitorConfig.
+func (s MonitorConfig) GetPortMonitorConfig() (v PortMonitorConfig, ok bool) {
+	if !s.IsPortMonitorConfig() {
+		return v, false
 	}
+	return s.PortMonitorConfig, true
 }
 
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *MonitorDnsResolveType) UnmarshalText(data []byte) error {
-	switch MonitorDnsResolveType(data) {
-	case MonitorDnsResolveTypeA:
-		*s = MonitorDnsResolveTypeA
-		return nil
-	case MonitorDnsResolveTypeAAAA:
-		*s = MonitorDnsResolveTypeAAAA
-		return nil
-	case MonitorDnsResolveTypeCAA:
-		*s = MonitorDnsResolveTypeCAA
-		return nil
-	case MonitorDnsResolveTypeCNAME:
-		*s = MonitorDnsResolveTypeCNAME
-		return nil
-	case MonitorDnsResolveTypeMX:
-		*s = MonitorDnsResolveTypeMX
-		return nil
-	case MonitorDnsResolveTypeNS:
-		*s = MonitorDnsResolveTypeNS
-		return nil
-	case MonitorDnsResolveTypePTR:
-		*s = MonitorDnsResolveTypePTR
-		return nil
-	case MonitorDnsResolveTypeSOA:
-		*s = MonitorDnsResolveTypeSOA
-		return nil
-	case MonitorDnsResolveTypeSRV:
-		*s = MonitorDnsResolveTypeSRV
-		return nil
-	case MonitorDnsResolveTypeTXT:
-		*s = MonitorDnsResolveTypeTXT
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
+// NewPortMonitorConfigMonitorConfig returns new MonitorConfig from PortMonitorConfig.
+func NewPortMonitorConfigMonitorConfig(v PortMonitorConfig) MonitorConfig {
+	var s MonitorConfig
+	s.SetPortMonitorConfig(v)
+	return s
+}
+
+// SetPingMonitorConfig sets MonitorConfig to PingMonitorConfig.
+func (s *MonitorConfig) SetPingMonitorConfig(v PingMonitorConfig) {
+	s.Type = PingMonitorConfigMonitorConfig
+	s.PingMonitorConfig = v
+}
+
+// GetPingMonitorConfig returns PingMonitorConfig and true boolean if MonitorConfig is PingMonitorConfig.
+func (s MonitorConfig) GetPingMonitorConfig() (v PingMonitorConfig, ok bool) {
+	if !s.IsPingMonitorConfig() {
+		return v, false
 	}
+	return s.PingMonitorConfig, true
 }
 
-type MonitorHeadersItem struct {
-	Name  string `json:"name"`
-	Value string `json:"value"`
+// NewPingMonitorConfigMonitorConfig returns new MonitorConfig from PingMonitorConfig.
+func NewPingMonitorConfigMonitorConfig(v PingMonitorConfig) MonitorConfig {
+	var s MonitorConfig
+	s.SetPingMonitorConfig(v)
+	return s
 }
 
-// GetName returns the value of Name.
-func (s *MonitorHeadersItem) GetName() string {
-	return s.Name
+// SetDnsMonitorConfig sets MonitorConfig to DnsMonitorConfig.
+func (s *MonitorConfig) SetDnsMonitorConfig(v DnsMonitorConfig) {
+	s.Type = DnsMonitorConfigMonitorConfig
+	s.DnsMonitorConfig = v
 }
 
-// GetValue returns the value of Value.
-func (s *MonitorHeadersItem) GetValue() string {
-	return s.Value
+// GetDnsMonitorConfig returns DnsMonitorConfig and true boolean if MonitorConfig is DnsMonitorConfig.
+func (s MonitorConfig) GetDnsMonitorConfig() (v DnsMonitorConfig, ok bool) {
+	if !s.IsDnsMonitorConfig() {
+		return v, false
+	}
+	return s.DnsMonitorConfig, true
 }
 
-// SetName sets the value of Name.
-func (s *MonitorHeadersItem) SetName(val string) {
-	s.Name = val
+// NewDnsMonitorConfigMonitorConfig returns new MonitorConfig from DnsMonitorConfig.
+func NewDnsMonitorConfigMonitorConfig(v DnsMonitorConfig) MonitorConfig {
+	var s MonitorConfig
+	s.SetDnsMonitorConfig(v)
+	return s
 }
 
-// SetValue sets the value of Value.
-func (s *MonitorHeadersItem) SetValue(val string) {
-	s.Value = val
+// SetGrpcMonitorConfig sets MonitorConfig to GrpcMonitorConfig.
+func (s *MonitorConfig) SetGrpcMonitorConfig(v GrpcMonitorConfig) {
+	s.Type = GrpcMonitorConfigMonitorConfig
+	s.GrpcMonitorConfig = v
 }
 
-// Input for creating or updating a monitor. Only name and type are required; all other fields are
-// optional and type-dependent.
+// GetGrpcMonitorConfig returns GrpcMonitorConfig and true boolean if MonitorConfig is GrpcMonitorConfig.
+func (s MonitorConfig) GetGrpcMonitorConfig() (v GrpcMonitorConfig, ok bool) {
+	if !s.IsGrpcMonitorConfig() {
+		return v, false
+	}
+	return s.GrpcMonitorConfig, true
+}
+
+// NewGrpcMonitorConfigMonitorConfig returns new MonitorConfig from GrpcMonitorConfig.
+func NewGrpcMonitorConfigMonitorConfig(v GrpcMonitorConfig) MonitorConfig {
+	var s MonitorConfig
+	s.SetGrpcMonitorConfig(v)
+	return s
+}
+
+// SetMqttMonitorConfig sets MonitorConfig to MqttMonitorConfig.
+func (s *MonitorConfig) SetMqttMonitorConfig(v MqttMonitorConfig) {
+	s.Type = MqttMonitorConfigMonitorConfig
+	s.MqttMonitorConfig = v
+}
+
+// GetMqttMonitorConfig returns MqttMonitorConfig and true boolean if MonitorConfig is MqttMonitorConfig.
+func (s MonitorConfig) GetMqttMonitorConfig() (v MqttMonitorConfig, ok bool) {
+	if !s.IsMqttMonitorConfig() {
+		return v, false
+	}
+	return s.MqttMonitorConfig, true
+}
+
+// NewMqttMonitorConfigMonitorConfig returns new MonitorConfig from MqttMonitorConfig.
+func NewMqttMonitorConfigMonitorConfig(v MqttMonitorConfig) MonitorConfig {
+	var s MonitorConfig
+	s.SetMqttMonitorConfig(v)
+	return s
+}
+
+// SetRedisMonitorConfig sets MonitorConfig to RedisMonitorConfig.
+func (s *MonitorConfig) SetRedisMonitorConfig(v RedisMonitorConfig) {
+	s.Type = RedisMonitorConfigMonitorConfig
+	s.RedisMonitorConfig = v
+}
+
+// GetRedisMonitorConfig returns RedisMonitorConfig and true boolean if MonitorConfig is RedisMonitorConfig.
+func (s MonitorConfig) GetRedisMonitorConfig() (v RedisMonitorConfig, ok bool) {
+	if !s.IsRedisMonitorConfig() {
+		return v, false
+	}
+	return s.RedisMonitorConfig, true
+}
+
+// NewRedisMonitorConfigMonitorConfig returns new MonitorConfig from RedisMonitorConfig.
+func NewRedisMonitorConfigMonitorConfig(v RedisMonitorConfig) MonitorConfig {
+	var s MonitorConfig
+	s.SetRedisMonitorConfig(v)
+	return s
+}
+
+// SetPushMonitorConfig sets MonitorConfig to PushMonitorConfig.
+func (s *MonitorConfig) SetPushMonitorConfig(v PushMonitorConfig) {
+	s.Type = PushMonitorConfigMonitorConfig
+	s.PushMonitorConfig = v
+}
+
+// GetPushMonitorConfig returns PushMonitorConfig and true boolean if MonitorConfig is PushMonitorConfig.
+func (s MonitorConfig) GetPushMonitorConfig() (v PushMonitorConfig, ok bool) {
+	if !s.IsPushMonitorConfig() {
+		return v, false
+	}
+	return s.PushMonitorConfig, true
+}
+
+// NewPushMonitorConfigMonitorConfig returns new MonitorConfig from PushMonitorConfig.
+func NewPushMonitorConfigMonitorConfig(v PushMonitorConfig) MonitorConfig {
+	var s MonitorConfig
+	s.SetPushMonitorConfig(v)
+	return s
+}
+
+// SetSmtpMonitorConfig sets MonitorConfig to SmtpMonitorConfig.
+func (s *MonitorConfig) SetSmtpMonitorConfig(v SmtpMonitorConfig) {
+	s.Type = SmtpMonitorConfigMonitorConfig
+	s.SmtpMonitorConfig = v
+}
+
+// GetSmtpMonitorConfig returns SmtpMonitorConfig and true boolean if MonitorConfig is SmtpMonitorConfig.
+func (s MonitorConfig) GetSmtpMonitorConfig() (v SmtpMonitorConfig, ok bool) {
+	if !s.IsSmtpMonitorConfig() {
+		return v, false
+	}
+	return s.SmtpMonitorConfig, true
+}
+
+// NewSmtpMonitorConfigMonitorConfig returns new MonitorConfig from SmtpMonitorConfig.
+func NewSmtpMonitorConfigMonitorConfig(v SmtpMonitorConfig) MonitorConfig {
+	var s MonitorConfig
+	s.SetSmtpMonitorConfig(v)
+	return s
+}
+
+// SetTailscalePingMonitorConfig sets MonitorConfig to TailscalePingMonitorConfig.
+func (s *MonitorConfig) SetTailscalePingMonitorConfig(v TailscalePingMonitorConfig) {
+	s.Type = TailscalePingMonitorConfigMonitorConfig
+	s.TailscalePingMonitorConfig = v
+}
+
+// GetTailscalePingMonitorConfig returns TailscalePingMonitorConfig and true boolean if MonitorConfig is TailscalePingMonitorConfig.
+func (s MonitorConfig) GetTailscalePingMonitorConfig() (v TailscalePingMonitorConfig, ok bool) {
+	if !s.IsTailscalePingMonitorConfig() {
+		return v, false
+	}
+	return s.TailscalePingMonitorConfig, true
+}
+
+// NewTailscalePingMonitorConfigMonitorConfig returns new MonitorConfig from TailscalePingMonitorConfig.
+func NewTailscalePingMonitorConfigMonitorConfig(v TailscalePingMonitorConfig) MonitorConfig {
+	var s MonitorConfig
+	s.SetTailscalePingMonitorConfig(v)
+	return s
+}
+
+// SetGroupMonitorConfig sets MonitorConfig to GroupMonitorConfig.
+func (s *MonitorConfig) SetGroupMonitorConfig(v GroupMonitorConfig) {
+	s.Type = GroupMonitorConfigMonitorConfig
+	s.GroupMonitorConfig = v
+}
+
+// GetGroupMonitorConfig returns GroupMonitorConfig and true boolean if MonitorConfig is GroupMonitorConfig.
+func (s MonitorConfig) GetGroupMonitorConfig() (v GroupMonitorConfig, ok bool) {
+	if !s.IsGroupMonitorConfig() {
+		return v, false
+	}
+	return s.GroupMonitorConfig, true
+}
+
+// NewGroupMonitorConfigMonitorConfig returns new MonitorConfig from GroupMonitorConfig.
+func NewGroupMonitorConfigMonitorConfig(v GroupMonitorConfig) MonitorConfig {
+	var s MonitorConfig
+	s.SetGroupMonitorConfig(v)
+	return s
+}
+
+// Input for creating or updating a monitor.
 // Ref: #/components/schemas/MonitorInput
 type MonitorInput struct {
-	// Human-readable display name for this monitor.
-	Name string `json:"name"`
-	// The monitoring protocol or check type to use.
-	Type string `json:"type"`
-	// Whether the monitor should start checking immediately after creation.
-	Active OptBool `json:"active"`
-	// Check interval in seconds.
-	Interval            OptInt                    `json:"interval"`
-	URL                 OptString                 `json:"url"`
-	Hostname            OptString                 `json:"hostname"`
-	Port                OptInt                    `json:"port"`
-	MaxRetries          OptInt                    `json:"maxRetries"`
-	Timeout             OptInt                    `json:"timeout"`
-	RetryInterval       OptInt                    `json:"retryInterval"`
-	Keyword             OptString                 `json:"keyword"`
-	InvertKeyword       OptBool                   `json:"invertKeyword"`
-	JsonPath            OptString                 `json:"jsonPath"`
-	ExpectedValue       OptString                 `json:"expectedValue"`
-	IgnoreTls           OptBool                   `json:"ignoreTls"`
-	MaxRedirects        OptInt                    `json:"maxRedirects"`
-	AcceptedStatusCodes []string                  `json:"acceptedStatusCodes"`
-	Method              OptString                 `json:"method"`
-	Headers             []MonitorInputHeadersItem `json:"headers"`
-	Body                OptString                 `json:"body"`
-	BasicAuthUser       OptString                 `json:"basicAuthUser"`
-	BasicAuthPass       OptString                 `json:"basicAuthPass"`
-	Description         OptString                 `json:"description"`
-	UpsideDown          OptBool                   `json:"upsideDown"`
-	DnsResolveType      OptString                 `json:"dnsResolveType"`
-	DnsResolveServer    OptString                 `json:"dnsResolveServer"`
-	MqttTopic           OptString                 `json:"mqttTopic"`
-	MqttSuccessMessage  OptString                 `json:"mqttSuccessMessage"`
-	MqttUsername        OptString                 `json:"mqttUsername"`
-	MqttPassword        OptString                 `json:"mqttPassword"`
-	DatabaseQuery       OptString                 `json:"databaseQuery"`
-	ProxyId             OptUUID                   `json:"proxyId"`
-	GrpcUrl             OptString                 `json:"grpcUrl"`
-	GrpcServiceName     OptString                 `json:"grpcServiceName"`
-	GrpcMethod          OptString                 `json:"grpcMethod"`
-	GrpcEnableTls       OptBool                   `json:"grpcEnableTls"`
-	ParentId            OptNilUUID                `json:"parentId"`
-	NotificationIds     []uuid.UUID               `json:"notificationIds"`
-	ResendInterval      OptInt                    `json:"resendInterval"`
-	PacketSize          OptInt                    `json:"packetSize"`
-	ExpiryNotification  OptBool                   `json:"expiryNotification"`
+	Name               string        `json:"name"`
+	Type               string        `json:"type"`
+	Active             OptBool       `json:"active"`
+	Interval           OptInt        `json:"interval"`
+	Timeout            OptInt        `json:"timeout"`
+	MaxRetries         OptInt        `json:"maxRetries"`
+	RetryInterval      OptInt        `json:"retryInterval"`
+	Description        OptString     `json:"description"`
+	UpsideDown         OptBool       `json:"upsideDown"`
+	ParentId           OptNilUUID    `json:"parentId"`
+	NotificationIds    []uuid.UUID   `json:"notificationIds"`
+	ResendInterval     OptInt        `json:"resendInterval"`
+	ExpiryNotification OptBool       `json:"expiryNotification"`
+	Config             MonitorConfig `json:"config"`
 }
 
 // GetName returns the value of Name.
@@ -2826,19 +3277,9 @@ func (s *MonitorInput) GetInterval() OptInt {
 	return s.Interval
 }
 
-// GetURL returns the value of URL.
-func (s *MonitorInput) GetURL() OptString {
-	return s.URL
-}
-
-// GetHostname returns the value of Hostname.
-func (s *MonitorInput) GetHostname() OptString {
-	return s.Hostname
-}
-
-// GetPort returns the value of Port.
-func (s *MonitorInput) GetPort() OptInt {
-	return s.Port
+// GetTimeout returns the value of Timeout.
+func (s *MonitorInput) GetTimeout() OptInt {
+	return s.Timeout
 }
 
 // GetMaxRetries returns the value of MaxRetries.
@@ -2846,74 +3287,9 @@ func (s *MonitorInput) GetMaxRetries() OptInt {
 	return s.MaxRetries
 }
 
-// GetTimeout returns the value of Timeout.
-func (s *MonitorInput) GetTimeout() OptInt {
-	return s.Timeout
-}
-
 // GetRetryInterval returns the value of RetryInterval.
 func (s *MonitorInput) GetRetryInterval() OptInt {
 	return s.RetryInterval
-}
-
-// GetKeyword returns the value of Keyword.
-func (s *MonitorInput) GetKeyword() OptString {
-	return s.Keyword
-}
-
-// GetInvertKeyword returns the value of InvertKeyword.
-func (s *MonitorInput) GetInvertKeyword() OptBool {
-	return s.InvertKeyword
-}
-
-// GetJsonPath returns the value of JsonPath.
-func (s *MonitorInput) GetJsonPath() OptString {
-	return s.JsonPath
-}
-
-// GetExpectedValue returns the value of ExpectedValue.
-func (s *MonitorInput) GetExpectedValue() OptString {
-	return s.ExpectedValue
-}
-
-// GetIgnoreTls returns the value of IgnoreTls.
-func (s *MonitorInput) GetIgnoreTls() OptBool {
-	return s.IgnoreTls
-}
-
-// GetMaxRedirects returns the value of MaxRedirects.
-func (s *MonitorInput) GetMaxRedirects() OptInt {
-	return s.MaxRedirects
-}
-
-// GetAcceptedStatusCodes returns the value of AcceptedStatusCodes.
-func (s *MonitorInput) GetAcceptedStatusCodes() []string {
-	return s.AcceptedStatusCodes
-}
-
-// GetMethod returns the value of Method.
-func (s *MonitorInput) GetMethod() OptString {
-	return s.Method
-}
-
-// GetHeaders returns the value of Headers.
-func (s *MonitorInput) GetHeaders() []MonitorInputHeadersItem {
-	return s.Headers
-}
-
-// GetBody returns the value of Body.
-func (s *MonitorInput) GetBody() OptString {
-	return s.Body
-}
-
-// GetBasicAuthUser returns the value of BasicAuthUser.
-func (s *MonitorInput) GetBasicAuthUser() OptString {
-	return s.BasicAuthUser
-}
-
-// GetBasicAuthPass returns the value of BasicAuthPass.
-func (s *MonitorInput) GetBasicAuthPass() OptString {
-	return s.BasicAuthPass
 }
 
 // GetDescription returns the value of Description.
@@ -2924,66 +3300,6 @@ func (s *MonitorInput) GetDescription() OptString {
 // GetUpsideDown returns the value of UpsideDown.
 func (s *MonitorInput) GetUpsideDown() OptBool {
 	return s.UpsideDown
-}
-
-// GetDnsResolveType returns the value of DnsResolveType.
-func (s *MonitorInput) GetDnsResolveType() OptString {
-	return s.DnsResolveType
-}
-
-// GetDnsResolveServer returns the value of DnsResolveServer.
-func (s *MonitorInput) GetDnsResolveServer() OptString {
-	return s.DnsResolveServer
-}
-
-// GetMqttTopic returns the value of MqttTopic.
-func (s *MonitorInput) GetMqttTopic() OptString {
-	return s.MqttTopic
-}
-
-// GetMqttSuccessMessage returns the value of MqttSuccessMessage.
-func (s *MonitorInput) GetMqttSuccessMessage() OptString {
-	return s.MqttSuccessMessage
-}
-
-// GetMqttUsername returns the value of MqttUsername.
-func (s *MonitorInput) GetMqttUsername() OptString {
-	return s.MqttUsername
-}
-
-// GetMqttPassword returns the value of MqttPassword.
-func (s *MonitorInput) GetMqttPassword() OptString {
-	return s.MqttPassword
-}
-
-// GetDatabaseQuery returns the value of DatabaseQuery.
-func (s *MonitorInput) GetDatabaseQuery() OptString {
-	return s.DatabaseQuery
-}
-
-// GetProxyId returns the value of ProxyId.
-func (s *MonitorInput) GetProxyId() OptUUID {
-	return s.ProxyId
-}
-
-// GetGrpcUrl returns the value of GrpcUrl.
-func (s *MonitorInput) GetGrpcUrl() OptString {
-	return s.GrpcUrl
-}
-
-// GetGrpcServiceName returns the value of GrpcServiceName.
-func (s *MonitorInput) GetGrpcServiceName() OptString {
-	return s.GrpcServiceName
-}
-
-// GetGrpcMethod returns the value of GrpcMethod.
-func (s *MonitorInput) GetGrpcMethod() OptString {
-	return s.GrpcMethod
-}
-
-// GetGrpcEnableTls returns the value of GrpcEnableTls.
-func (s *MonitorInput) GetGrpcEnableTls() OptBool {
-	return s.GrpcEnableTls
 }
 
 // GetParentId returns the value of ParentId.
@@ -3001,14 +3317,14 @@ func (s *MonitorInput) GetResendInterval() OptInt {
 	return s.ResendInterval
 }
 
-// GetPacketSize returns the value of PacketSize.
-func (s *MonitorInput) GetPacketSize() OptInt {
-	return s.PacketSize
-}
-
 // GetExpiryNotification returns the value of ExpiryNotification.
 func (s *MonitorInput) GetExpiryNotification() OptBool {
 	return s.ExpiryNotification
+}
+
+// GetConfig returns the value of Config.
+func (s *MonitorInput) GetConfig() MonitorConfig {
+	return s.Config
 }
 
 // SetName sets the value of Name.
@@ -3031,19 +3347,9 @@ func (s *MonitorInput) SetInterval(val OptInt) {
 	s.Interval = val
 }
 
-// SetURL sets the value of URL.
-func (s *MonitorInput) SetURL(val OptString) {
-	s.URL = val
-}
-
-// SetHostname sets the value of Hostname.
-func (s *MonitorInput) SetHostname(val OptString) {
-	s.Hostname = val
-}
-
-// SetPort sets the value of Port.
-func (s *MonitorInput) SetPort(val OptInt) {
-	s.Port = val
+// SetTimeout sets the value of Timeout.
+func (s *MonitorInput) SetTimeout(val OptInt) {
+	s.Timeout = val
 }
 
 // SetMaxRetries sets the value of MaxRetries.
@@ -3051,74 +3357,9 @@ func (s *MonitorInput) SetMaxRetries(val OptInt) {
 	s.MaxRetries = val
 }
 
-// SetTimeout sets the value of Timeout.
-func (s *MonitorInput) SetTimeout(val OptInt) {
-	s.Timeout = val
-}
-
 // SetRetryInterval sets the value of RetryInterval.
 func (s *MonitorInput) SetRetryInterval(val OptInt) {
 	s.RetryInterval = val
-}
-
-// SetKeyword sets the value of Keyword.
-func (s *MonitorInput) SetKeyword(val OptString) {
-	s.Keyword = val
-}
-
-// SetInvertKeyword sets the value of InvertKeyword.
-func (s *MonitorInput) SetInvertKeyword(val OptBool) {
-	s.InvertKeyword = val
-}
-
-// SetJsonPath sets the value of JsonPath.
-func (s *MonitorInput) SetJsonPath(val OptString) {
-	s.JsonPath = val
-}
-
-// SetExpectedValue sets the value of ExpectedValue.
-func (s *MonitorInput) SetExpectedValue(val OptString) {
-	s.ExpectedValue = val
-}
-
-// SetIgnoreTls sets the value of IgnoreTls.
-func (s *MonitorInput) SetIgnoreTls(val OptBool) {
-	s.IgnoreTls = val
-}
-
-// SetMaxRedirects sets the value of MaxRedirects.
-func (s *MonitorInput) SetMaxRedirects(val OptInt) {
-	s.MaxRedirects = val
-}
-
-// SetAcceptedStatusCodes sets the value of AcceptedStatusCodes.
-func (s *MonitorInput) SetAcceptedStatusCodes(val []string) {
-	s.AcceptedStatusCodes = val
-}
-
-// SetMethod sets the value of Method.
-func (s *MonitorInput) SetMethod(val OptString) {
-	s.Method = val
-}
-
-// SetHeaders sets the value of Headers.
-func (s *MonitorInput) SetHeaders(val []MonitorInputHeadersItem) {
-	s.Headers = val
-}
-
-// SetBody sets the value of Body.
-func (s *MonitorInput) SetBody(val OptString) {
-	s.Body = val
-}
-
-// SetBasicAuthUser sets the value of BasicAuthUser.
-func (s *MonitorInput) SetBasicAuthUser(val OptString) {
-	s.BasicAuthUser = val
-}
-
-// SetBasicAuthPass sets the value of BasicAuthPass.
-func (s *MonitorInput) SetBasicAuthPass(val OptString) {
-	s.BasicAuthPass = val
 }
 
 // SetDescription sets the value of Description.
@@ -3129,66 +3370,6 @@ func (s *MonitorInput) SetDescription(val OptString) {
 // SetUpsideDown sets the value of UpsideDown.
 func (s *MonitorInput) SetUpsideDown(val OptBool) {
 	s.UpsideDown = val
-}
-
-// SetDnsResolveType sets the value of DnsResolveType.
-func (s *MonitorInput) SetDnsResolveType(val OptString) {
-	s.DnsResolveType = val
-}
-
-// SetDnsResolveServer sets the value of DnsResolveServer.
-func (s *MonitorInput) SetDnsResolveServer(val OptString) {
-	s.DnsResolveServer = val
-}
-
-// SetMqttTopic sets the value of MqttTopic.
-func (s *MonitorInput) SetMqttTopic(val OptString) {
-	s.MqttTopic = val
-}
-
-// SetMqttSuccessMessage sets the value of MqttSuccessMessage.
-func (s *MonitorInput) SetMqttSuccessMessage(val OptString) {
-	s.MqttSuccessMessage = val
-}
-
-// SetMqttUsername sets the value of MqttUsername.
-func (s *MonitorInput) SetMqttUsername(val OptString) {
-	s.MqttUsername = val
-}
-
-// SetMqttPassword sets the value of MqttPassword.
-func (s *MonitorInput) SetMqttPassword(val OptString) {
-	s.MqttPassword = val
-}
-
-// SetDatabaseQuery sets the value of DatabaseQuery.
-func (s *MonitorInput) SetDatabaseQuery(val OptString) {
-	s.DatabaseQuery = val
-}
-
-// SetProxyId sets the value of ProxyId.
-func (s *MonitorInput) SetProxyId(val OptUUID) {
-	s.ProxyId = val
-}
-
-// SetGrpcUrl sets the value of GrpcUrl.
-func (s *MonitorInput) SetGrpcUrl(val OptString) {
-	s.GrpcUrl = val
-}
-
-// SetGrpcServiceName sets the value of GrpcServiceName.
-func (s *MonitorInput) SetGrpcServiceName(val OptString) {
-	s.GrpcServiceName = val
-}
-
-// SetGrpcMethod sets the value of GrpcMethod.
-func (s *MonitorInput) SetGrpcMethod(val OptString) {
-	s.GrpcMethod = val
-}
-
-// SetGrpcEnableTls sets the value of GrpcEnableTls.
-func (s *MonitorInput) SetGrpcEnableTls(val OptBool) {
-	s.GrpcEnableTls = val
 }
 
 // SetParentId sets the value of ParentId.
@@ -3206,116 +3387,14 @@ func (s *MonitorInput) SetResendInterval(val OptInt) {
 	s.ResendInterval = val
 }
 
-// SetPacketSize sets the value of PacketSize.
-func (s *MonitorInput) SetPacketSize(val OptInt) {
-	s.PacketSize = val
-}
-
 // SetExpiryNotification sets the value of ExpiryNotification.
 func (s *MonitorInput) SetExpiryNotification(val OptBool) {
 	s.ExpiryNotification = val
 }
 
-type MonitorInputHeadersItem struct {
-	Name  string `json:"name"`
-	Value string `json:"value"`
-}
-
-// GetName returns the value of Name.
-func (s *MonitorInputHeadersItem) GetName() string {
-	return s.Name
-}
-
-// GetValue returns the value of Value.
-func (s *MonitorInputHeadersItem) GetValue() string {
-	return s.Value
-}
-
-// SetName sets the value of Name.
-func (s *MonitorInputHeadersItem) SetName(val string) {
-	s.Name = val
-}
-
-// SetValue sets the value of Value.
-func (s *MonitorInputHeadersItem) SetValue(val string) {
-	s.Value = val
-}
-
-// HTTP method to use for HTTP-based monitors.
-type MonitorMethod string
-
-const (
-	MonitorMethodGET     MonitorMethod = "GET"
-	MonitorMethodPOST    MonitorMethod = "POST"
-	MonitorMethodPUT     MonitorMethod = "PUT"
-	MonitorMethodPATCH   MonitorMethod = "PATCH"
-	MonitorMethodDELETE  MonitorMethod = "DELETE"
-	MonitorMethodHEAD    MonitorMethod = "HEAD"
-	MonitorMethodOPTIONS MonitorMethod = "OPTIONS"
-)
-
-// AllValues returns all MonitorMethod values.
-func (MonitorMethod) AllValues() []MonitorMethod {
-	return []MonitorMethod{
-		MonitorMethodGET,
-		MonitorMethodPOST,
-		MonitorMethodPUT,
-		MonitorMethodPATCH,
-		MonitorMethodDELETE,
-		MonitorMethodHEAD,
-		MonitorMethodOPTIONS,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s MonitorMethod) MarshalText() ([]byte, error) {
-	switch s {
-	case MonitorMethodGET:
-		return []byte(s), nil
-	case MonitorMethodPOST:
-		return []byte(s), nil
-	case MonitorMethodPUT:
-		return []byte(s), nil
-	case MonitorMethodPATCH:
-		return []byte(s), nil
-	case MonitorMethodDELETE:
-		return []byte(s), nil
-	case MonitorMethodHEAD:
-		return []byte(s), nil
-	case MonitorMethodOPTIONS:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *MonitorMethod) UnmarshalText(data []byte) error {
-	switch MonitorMethod(data) {
-	case MonitorMethodGET:
-		*s = MonitorMethodGET
-		return nil
-	case MonitorMethodPOST:
-		*s = MonitorMethodPOST
-		return nil
-	case MonitorMethodPUT:
-		*s = MonitorMethodPUT
-		return nil
-	case MonitorMethodPATCH:
-		*s = MonitorMethodPATCH
-		return nil
-	case MonitorMethodDELETE:
-		*s = MonitorMethodDELETE
-		return nil
-	case MonitorMethodHEAD:
-		*s = MonitorMethodHEAD
-		return nil
-	case MonitorMethodOPTIONS:
-		*s = MonitorMethodOPTIONS
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
+// SetConfig sets the value of Config.
+func (s *MonitorInput) SetConfig(val MonitorConfig) {
+	s.Config = val
 }
 
 // A tag assignment on a monitor, optionally with a per-monitor value.
@@ -3371,7 +3450,6 @@ func (s *MonitorTag) SetValue(val OptString) {
 	s.Value = val
 }
 
-// The monitoring protocol or check type to use.
 type MonitorType string
 
 const (
@@ -3554,6 +3632,132 @@ func (s *MonitorType) UnmarshalText(data []byte) error {
 		return nil
 	case MonitorTypeManual:
 		*s = MonitorTypeManual
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// Ref: #/components/schemas/MqttMonitorConfig
+type MqttMonitorConfig struct {
+	Kind               MqttMonitorConfigKind `json:"kind"`
+	Hostname           OptString             `json:"hostname"`
+	Port               OptInt                `json:"port"`
+	MqttTopic          OptString             `json:"mqttTopic"`
+	MqttSuccessMessage OptString             `json:"mqttSuccessMessage"`
+	MqttUsername       OptString             `json:"mqttUsername"`
+	MqttPassword       OptString             `json:"mqttPassword"`
+	IgnoreTls          OptBool               `json:"ignoreTls"`
+}
+
+// GetKind returns the value of Kind.
+func (s *MqttMonitorConfig) GetKind() MqttMonitorConfigKind {
+	return s.Kind
+}
+
+// GetHostname returns the value of Hostname.
+func (s *MqttMonitorConfig) GetHostname() OptString {
+	return s.Hostname
+}
+
+// GetPort returns the value of Port.
+func (s *MqttMonitorConfig) GetPort() OptInt {
+	return s.Port
+}
+
+// GetMqttTopic returns the value of MqttTopic.
+func (s *MqttMonitorConfig) GetMqttTopic() OptString {
+	return s.MqttTopic
+}
+
+// GetMqttSuccessMessage returns the value of MqttSuccessMessage.
+func (s *MqttMonitorConfig) GetMqttSuccessMessage() OptString {
+	return s.MqttSuccessMessage
+}
+
+// GetMqttUsername returns the value of MqttUsername.
+func (s *MqttMonitorConfig) GetMqttUsername() OptString {
+	return s.MqttUsername
+}
+
+// GetMqttPassword returns the value of MqttPassword.
+func (s *MqttMonitorConfig) GetMqttPassword() OptString {
+	return s.MqttPassword
+}
+
+// GetIgnoreTls returns the value of IgnoreTls.
+func (s *MqttMonitorConfig) GetIgnoreTls() OptBool {
+	return s.IgnoreTls
+}
+
+// SetKind sets the value of Kind.
+func (s *MqttMonitorConfig) SetKind(val MqttMonitorConfigKind) {
+	s.Kind = val
+}
+
+// SetHostname sets the value of Hostname.
+func (s *MqttMonitorConfig) SetHostname(val OptString) {
+	s.Hostname = val
+}
+
+// SetPort sets the value of Port.
+func (s *MqttMonitorConfig) SetPort(val OptInt) {
+	s.Port = val
+}
+
+// SetMqttTopic sets the value of MqttTopic.
+func (s *MqttMonitorConfig) SetMqttTopic(val OptString) {
+	s.MqttTopic = val
+}
+
+// SetMqttSuccessMessage sets the value of MqttSuccessMessage.
+func (s *MqttMonitorConfig) SetMqttSuccessMessage(val OptString) {
+	s.MqttSuccessMessage = val
+}
+
+// SetMqttUsername sets the value of MqttUsername.
+func (s *MqttMonitorConfig) SetMqttUsername(val OptString) {
+	s.MqttUsername = val
+}
+
+// SetMqttPassword sets the value of MqttPassword.
+func (s *MqttMonitorConfig) SetMqttPassword(val OptString) {
+	s.MqttPassword = val
+}
+
+// SetIgnoreTls sets the value of IgnoreTls.
+func (s *MqttMonitorConfig) SetIgnoreTls(val OptBool) {
+	s.IgnoreTls = val
+}
+
+type MqttMonitorConfigKind string
+
+const (
+	MqttMonitorConfigKindMqtt MqttMonitorConfigKind = "mqtt"
+)
+
+// AllValues returns all MqttMonitorConfigKind values.
+func (MqttMonitorConfigKind) AllValues() []MqttMonitorConfigKind {
+	return []MqttMonitorConfigKind{
+		MqttMonitorConfigKindMqtt,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s MqttMonitorConfigKind) MarshalText() ([]byte, error) {
+	switch s {
+	case MqttMonitorConfigKindMqtt:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *MqttMonitorConfigKind) UnmarshalText(data []byte) error {
+	switch MqttMonitorConfigKind(data) {
+	case MqttMonitorConfigKindMqtt:
+		*s = MqttMonitorConfigKindMqtt
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -3868,6 +4072,52 @@ func (o OptDateTime) Or(d time.Time) time.Time {
 	return d
 }
 
+// NewOptDnsMonitorConfigDnsResolveType returns new OptDnsMonitorConfigDnsResolveType with value set to v.
+func NewOptDnsMonitorConfigDnsResolveType(v DnsMonitorConfigDnsResolveType) OptDnsMonitorConfigDnsResolveType {
+	return OptDnsMonitorConfigDnsResolveType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptDnsMonitorConfigDnsResolveType is optional DnsMonitorConfigDnsResolveType.
+type OptDnsMonitorConfigDnsResolveType struct {
+	Value DnsMonitorConfigDnsResolveType
+	Set   bool
+}
+
+// IsSet returns true if OptDnsMonitorConfigDnsResolveType was set.
+func (o OptDnsMonitorConfigDnsResolveType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptDnsMonitorConfigDnsResolveType) Reset() {
+	var v DnsMonitorConfigDnsResolveType
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptDnsMonitorConfigDnsResolveType) SetTo(v DnsMonitorConfigDnsResolveType) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptDnsMonitorConfigDnsResolveType) Get() (v DnsMonitorConfigDnsResolveType, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptDnsMonitorConfigDnsResolveType) Or(d DnsMonitorConfigDnsResolveType) DnsMonitorConfigDnsResolveType {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptFloat64 returns new OptFloat64 with value set to v.
 func NewOptFloat64(v float64) OptFloat64 {
 	return OptFloat64{
@@ -4098,6 +4348,52 @@ func (o OptGetStatusPageHeartbeatsOKUptimeList) Or(d GetStatusPageHeartbeatsOKUp
 	return d
 }
 
+// NewOptHttpMonitorConfigMethod returns new OptHttpMonitorConfigMethod with value set to v.
+func NewOptHttpMonitorConfigMethod(v HttpMonitorConfigMethod) OptHttpMonitorConfigMethod {
+	return OptHttpMonitorConfigMethod{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptHttpMonitorConfigMethod is optional HttpMonitorConfigMethod.
+type OptHttpMonitorConfigMethod struct {
+	Value HttpMonitorConfigMethod
+	Set   bool
+}
+
+// IsSet returns true if OptHttpMonitorConfigMethod was set.
+func (o OptHttpMonitorConfigMethod) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptHttpMonitorConfigMethod) Reset() {
+	var v HttpMonitorConfigMethod
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptHttpMonitorConfigMethod) SetTo(v HttpMonitorConfigMethod) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptHttpMonitorConfigMethod) Get() (v HttpMonitorConfigMethod, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptHttpMonitorConfigMethod) Or(d HttpMonitorConfigMethod) HttpMonitorConfigMethod {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptInt returns new OptInt with value set to v.
 func NewOptInt(v int) OptInt {
 	return OptInt{
@@ -4190,38 +4486,38 @@ func (o OptInt64) Or(d int64) int64 {
 	return d
 }
 
-// NewOptMonitorDnsResolveType returns new OptMonitorDnsResolveType with value set to v.
-func NewOptMonitorDnsResolveType(v MonitorDnsResolveType) OptMonitorDnsResolveType {
-	return OptMonitorDnsResolveType{
+// NewOptMonitorConfig returns new OptMonitorConfig with value set to v.
+func NewOptMonitorConfig(v MonitorConfig) OptMonitorConfig {
+	return OptMonitorConfig{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptMonitorDnsResolveType is optional MonitorDnsResolveType.
-type OptMonitorDnsResolveType struct {
-	Value MonitorDnsResolveType
+// OptMonitorConfig is optional MonitorConfig.
+type OptMonitorConfig struct {
+	Value MonitorConfig
 	Set   bool
 }
 
-// IsSet returns true if OptMonitorDnsResolveType was set.
-func (o OptMonitorDnsResolveType) IsSet() bool { return o.Set }
+// IsSet returns true if OptMonitorConfig was set.
+func (o OptMonitorConfig) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptMonitorDnsResolveType) Reset() {
-	var v MonitorDnsResolveType
+func (o *OptMonitorConfig) Reset() {
+	var v MonitorConfig
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptMonitorDnsResolveType) SetTo(v MonitorDnsResolveType) {
+func (o *OptMonitorConfig) SetTo(v MonitorConfig) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptMonitorDnsResolveType) Get() (v MonitorDnsResolveType, ok bool) {
+func (o OptMonitorConfig) Get() (v MonitorConfig, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -4229,53 +4525,7 @@ func (o OptMonitorDnsResolveType) Get() (v MonitorDnsResolveType, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptMonitorDnsResolveType) Or(d MonitorDnsResolveType) MonitorDnsResolveType {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptMonitorMethod returns new OptMonitorMethod with value set to v.
-func NewOptMonitorMethod(v MonitorMethod) OptMonitorMethod {
-	return OptMonitorMethod{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptMonitorMethod is optional MonitorMethod.
-type OptMonitorMethod struct {
-	Value MonitorMethod
-	Set   bool
-}
-
-// IsSet returns true if OptMonitorMethod was set.
-func (o OptMonitorMethod) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptMonitorMethod) Reset() {
-	var v MonitorMethod
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptMonitorMethod) SetTo(v MonitorMethod) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptMonitorMethod) Get() (v MonitorMethod, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptMonitorMethod) Or(d MonitorMethod) MonitorMethod {
+func (o OptMonitorConfig) Or(d MonitorConfig) MonitorConfig {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -4665,6 +4915,159 @@ func (o OptUUID) Or(d uuid.UUID) uuid.UUID {
 		return v
 	}
 	return d
+}
+
+// Ref: #/components/schemas/PingMonitorConfig
+type PingMonitorConfig struct {
+	Kind       PingMonitorConfigKind `json:"kind"`
+	Hostname   OptString             `json:"hostname"`
+	PacketSize OptInt                `json:"packetSize"`
+}
+
+// GetKind returns the value of Kind.
+func (s *PingMonitorConfig) GetKind() PingMonitorConfigKind {
+	return s.Kind
+}
+
+// GetHostname returns the value of Hostname.
+func (s *PingMonitorConfig) GetHostname() OptString {
+	return s.Hostname
+}
+
+// GetPacketSize returns the value of PacketSize.
+func (s *PingMonitorConfig) GetPacketSize() OptInt {
+	return s.PacketSize
+}
+
+// SetKind sets the value of Kind.
+func (s *PingMonitorConfig) SetKind(val PingMonitorConfigKind) {
+	s.Kind = val
+}
+
+// SetHostname sets the value of Hostname.
+func (s *PingMonitorConfig) SetHostname(val OptString) {
+	s.Hostname = val
+}
+
+// SetPacketSize sets the value of PacketSize.
+func (s *PingMonitorConfig) SetPacketSize(val OptInt) {
+	s.PacketSize = val
+}
+
+type PingMonitorConfigKind string
+
+const (
+	PingMonitorConfigKindPing PingMonitorConfigKind = "ping"
+)
+
+// AllValues returns all PingMonitorConfigKind values.
+func (PingMonitorConfigKind) AllValues() []PingMonitorConfigKind {
+	return []PingMonitorConfigKind{
+		PingMonitorConfigKindPing,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s PingMonitorConfigKind) MarshalText() ([]byte, error) {
+	switch s {
+	case PingMonitorConfigKindPing:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *PingMonitorConfigKind) UnmarshalText(data []byte) error {
+	switch PingMonitorConfigKind(data) {
+	case PingMonitorConfigKindPing:
+		*s = PingMonitorConfigKindPing
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// Ref: #/components/schemas/PortMonitorConfig
+type PortMonitorConfig struct {
+	Kind      PortMonitorConfigKind `json:"kind"`
+	Hostname  OptString             `json:"hostname"`
+	Port      OptInt                `json:"port"`
+	IgnoreTls OptBool               `json:"ignoreTls"`
+}
+
+// GetKind returns the value of Kind.
+func (s *PortMonitorConfig) GetKind() PortMonitorConfigKind {
+	return s.Kind
+}
+
+// GetHostname returns the value of Hostname.
+func (s *PortMonitorConfig) GetHostname() OptString {
+	return s.Hostname
+}
+
+// GetPort returns the value of Port.
+func (s *PortMonitorConfig) GetPort() OptInt {
+	return s.Port
+}
+
+// GetIgnoreTls returns the value of IgnoreTls.
+func (s *PortMonitorConfig) GetIgnoreTls() OptBool {
+	return s.IgnoreTls
+}
+
+// SetKind sets the value of Kind.
+func (s *PortMonitorConfig) SetKind(val PortMonitorConfigKind) {
+	s.Kind = val
+}
+
+// SetHostname sets the value of Hostname.
+func (s *PortMonitorConfig) SetHostname(val OptString) {
+	s.Hostname = val
+}
+
+// SetPort sets the value of Port.
+func (s *PortMonitorConfig) SetPort(val OptInt) {
+	s.Port = val
+}
+
+// SetIgnoreTls sets the value of IgnoreTls.
+func (s *PortMonitorConfig) SetIgnoreTls(val OptBool) {
+	s.IgnoreTls = val
+}
+
+type PortMonitorConfigKind string
+
+const (
+	PortMonitorConfigKindPort PortMonitorConfigKind = "port"
+)
+
+// AllValues returns all PortMonitorConfigKind values.
+func (PortMonitorConfigKind) AllValues() []PortMonitorConfigKind {
+	return []PortMonitorConfigKind{
+		PortMonitorConfigKindPort,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s PortMonitorConfigKind) MarshalText() ([]byte, error) {
+	switch s {
+	case PortMonitorConfigKindPort:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *PortMonitorConfigKind) UnmarshalText(data []byte) error {
+	switch PortMonitorConfigKind(data) {
+	case PortMonitorConfigKindPort:
+		*s = PortMonitorConfigKindPort
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 type Prepare2FAOK struct {
@@ -5114,6 +5517,137 @@ func (s *PushHeartbeatStatus) UnmarshalText(data []byte) error {
 	}
 }
 
+// Ref: #/components/schemas/PushMonitorConfig
+type PushMonitorConfig struct {
+	Kind PushMonitorConfigKind `json:"kind"`
+}
+
+// GetKind returns the value of Kind.
+func (s *PushMonitorConfig) GetKind() PushMonitorConfigKind {
+	return s.Kind
+}
+
+// SetKind sets the value of Kind.
+func (s *PushMonitorConfig) SetKind(val PushMonitorConfigKind) {
+	s.Kind = val
+}
+
+type PushMonitorConfigKind string
+
+const (
+	PushMonitorConfigKindPush PushMonitorConfigKind = "push"
+)
+
+// AllValues returns all PushMonitorConfigKind values.
+func (PushMonitorConfigKind) AllValues() []PushMonitorConfigKind {
+	return []PushMonitorConfigKind{
+		PushMonitorConfigKindPush,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s PushMonitorConfigKind) MarshalText() ([]byte, error) {
+	switch s {
+	case PushMonitorConfigKindPush:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *PushMonitorConfigKind) UnmarshalText(data []byte) error {
+	switch PushMonitorConfigKind(data) {
+	case PushMonitorConfigKindPush:
+		*s = PushMonitorConfigKindPush
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// Ref: #/components/schemas/RedisMonitorConfig
+type RedisMonitorConfig struct {
+	Kind          RedisMonitorConfigKind `json:"kind"`
+	Hostname      OptString              `json:"hostname"`
+	Port          OptInt                 `json:"port"`
+	DatabaseQuery OptString              `json:"databaseQuery"`
+}
+
+// GetKind returns the value of Kind.
+func (s *RedisMonitorConfig) GetKind() RedisMonitorConfigKind {
+	return s.Kind
+}
+
+// GetHostname returns the value of Hostname.
+func (s *RedisMonitorConfig) GetHostname() OptString {
+	return s.Hostname
+}
+
+// GetPort returns the value of Port.
+func (s *RedisMonitorConfig) GetPort() OptInt {
+	return s.Port
+}
+
+// GetDatabaseQuery returns the value of DatabaseQuery.
+func (s *RedisMonitorConfig) GetDatabaseQuery() OptString {
+	return s.DatabaseQuery
+}
+
+// SetKind sets the value of Kind.
+func (s *RedisMonitorConfig) SetKind(val RedisMonitorConfigKind) {
+	s.Kind = val
+}
+
+// SetHostname sets the value of Hostname.
+func (s *RedisMonitorConfig) SetHostname(val OptString) {
+	s.Hostname = val
+}
+
+// SetPort sets the value of Port.
+func (s *RedisMonitorConfig) SetPort(val OptInt) {
+	s.Port = val
+}
+
+// SetDatabaseQuery sets the value of DatabaseQuery.
+func (s *RedisMonitorConfig) SetDatabaseQuery(val OptString) {
+	s.DatabaseQuery = val
+}
+
+type RedisMonitorConfigKind string
+
+const (
+	RedisMonitorConfigKindRedis RedisMonitorConfigKind = "redis"
+)
+
+// AllValues returns all RedisMonitorConfigKind values.
+func (RedisMonitorConfigKind) AllValues() []RedisMonitorConfigKind {
+	return []RedisMonitorConfigKind{
+		RedisMonitorConfigKindRedis,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s RedisMonitorConfigKind) MarshalText() ([]byte, error) {
+	switch s {
+	case RedisMonitorConfigKindRedis:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *RedisMonitorConfigKind) UnmarshalText(data []byte) error {
+	switch RedisMonitorConfigKind(data) {
+	case RedisMonitorConfigKindRedis:
+		*s = RedisMonitorConfigKindRedis
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
 // Request body for refreshing an access token.
 // Ref: #/components/schemas/RefreshTokenRequest
 type RefreshTokenRequest struct {
@@ -5350,6 +5884,88 @@ func (s *SetupReq) SetUsername(val string) {
 // SetPassword sets the value of Password.
 func (s *SetupReq) SetPassword(val string) {
 	s.Password = val
+}
+
+// Ref: #/components/schemas/SmtpMonitorConfig
+type SmtpMonitorConfig struct {
+	Kind      SmtpMonitorConfigKind `json:"kind"`
+	Hostname  OptString             `json:"hostname"`
+	Port      OptInt                `json:"port"`
+	IgnoreTls OptBool               `json:"ignoreTls"`
+}
+
+// GetKind returns the value of Kind.
+func (s *SmtpMonitorConfig) GetKind() SmtpMonitorConfigKind {
+	return s.Kind
+}
+
+// GetHostname returns the value of Hostname.
+func (s *SmtpMonitorConfig) GetHostname() OptString {
+	return s.Hostname
+}
+
+// GetPort returns the value of Port.
+func (s *SmtpMonitorConfig) GetPort() OptInt {
+	return s.Port
+}
+
+// GetIgnoreTls returns the value of IgnoreTls.
+func (s *SmtpMonitorConfig) GetIgnoreTls() OptBool {
+	return s.IgnoreTls
+}
+
+// SetKind sets the value of Kind.
+func (s *SmtpMonitorConfig) SetKind(val SmtpMonitorConfigKind) {
+	s.Kind = val
+}
+
+// SetHostname sets the value of Hostname.
+func (s *SmtpMonitorConfig) SetHostname(val OptString) {
+	s.Hostname = val
+}
+
+// SetPort sets the value of Port.
+func (s *SmtpMonitorConfig) SetPort(val OptInt) {
+	s.Port = val
+}
+
+// SetIgnoreTls sets the value of IgnoreTls.
+func (s *SmtpMonitorConfig) SetIgnoreTls(val OptBool) {
+	s.IgnoreTls = val
+}
+
+type SmtpMonitorConfigKind string
+
+const (
+	SmtpMonitorConfigKindSMTP SmtpMonitorConfigKind = "smtp"
+)
+
+// AllValues returns all SmtpMonitorConfigKind values.
+func (SmtpMonitorConfigKind) AllValues() []SmtpMonitorConfigKind {
+	return []SmtpMonitorConfigKind{
+		SmtpMonitorConfigKindSMTP,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s SmtpMonitorConfigKind) MarshalText() ([]byte, error) {
+	switch s {
+	case SmtpMonitorConfigKindSMTP:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *SmtpMonitorConfigKind) UnmarshalText(data []byte) error {
+	switch SmtpMonitorConfigKind(data) {
+	case SmtpMonitorConfigKindSMTP:
+		*s = SmtpMonitorConfigKindSMTP
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 // A public-facing status page that displays the health of one or more monitors. Accessible without
@@ -5896,6 +6512,66 @@ func (s *TagInput) SetName(val string) {
 // SetColor sets the value of Color.
 func (s *TagInput) SetColor(val string) {
 	s.Color = val
+}
+
+// Ref: #/components/schemas/TailscalePingMonitorConfig
+type TailscalePingMonitorConfig struct {
+	Kind     TailscalePingMonitorConfigKind `json:"kind"`
+	Hostname OptString                      `json:"hostname"`
+}
+
+// GetKind returns the value of Kind.
+func (s *TailscalePingMonitorConfig) GetKind() TailscalePingMonitorConfigKind {
+	return s.Kind
+}
+
+// GetHostname returns the value of Hostname.
+func (s *TailscalePingMonitorConfig) GetHostname() OptString {
+	return s.Hostname
+}
+
+// SetKind sets the value of Kind.
+func (s *TailscalePingMonitorConfig) SetKind(val TailscalePingMonitorConfigKind) {
+	s.Kind = val
+}
+
+// SetHostname sets the value of Hostname.
+func (s *TailscalePingMonitorConfig) SetHostname(val OptString) {
+	s.Hostname = val
+}
+
+type TailscalePingMonitorConfigKind string
+
+const (
+	TailscalePingMonitorConfigKindTailscalePing TailscalePingMonitorConfigKind = "tailscale-ping"
+)
+
+// AllValues returns all TailscalePingMonitorConfigKind values.
+func (TailscalePingMonitorConfigKind) AllValues() []TailscalePingMonitorConfigKind {
+	return []TailscalePingMonitorConfigKind{
+		TailscalePingMonitorConfigKindTailscalePing,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s TailscalePingMonitorConfigKind) MarshalText() ([]byte, error) {
+	switch s {
+	case TailscalePingMonitorConfigKindTailscalePing:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *TailscalePingMonitorConfigKind) UnmarshalText(data []byte) error {
+	switch TailscalePingMonitorConfigKind(data) {
+	case TailscalePingMonitorConfigKindTailscalePing:
+		*s = TailscalePingMonitorConfigKindTailscalePing
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 // Response containing a fresh JWT token.

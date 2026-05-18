@@ -1435,6 +1435,262 @@ func (s *Disable2FAReq) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
+func (s *DnsMonitorConfig) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *DnsMonitorConfig) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("kind")
+		s.Kind.Encode(e)
+	}
+	{
+		if s.Hostname.Set {
+			e.FieldStart("hostname")
+			s.Hostname.Encode(e)
+		}
+	}
+	{
+		if s.Port.Set {
+			e.FieldStart("port")
+			s.Port.Encode(e)
+		}
+	}
+	{
+		if s.DnsResolveType.Set {
+			e.FieldStart("dnsResolveType")
+			s.DnsResolveType.Encode(e)
+		}
+	}
+	{
+		if s.DnsResolveServer.Set {
+			e.FieldStart("dnsResolveServer")
+			s.DnsResolveServer.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfDnsMonitorConfig = [5]string{
+	0: "kind",
+	1: "hostname",
+	2: "port",
+	3: "dnsResolveType",
+	4: "dnsResolveServer",
+}
+
+// Decode decodes DnsMonitorConfig from json.
+func (s *DnsMonitorConfig) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode DnsMonitorConfig to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "kind":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				if err := s.Kind.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"kind\"")
+			}
+		case "hostname":
+			if err := func() error {
+				s.Hostname.Reset()
+				if err := s.Hostname.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hostname\"")
+			}
+		case "port":
+			if err := func() error {
+				s.Port.Reset()
+				if err := s.Port.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"port\"")
+			}
+		case "dnsResolveType":
+			if err := func() error {
+				s.DnsResolveType.Reset()
+				if err := s.DnsResolveType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"dnsResolveType\"")
+			}
+		case "dnsResolveServer":
+			if err := func() error {
+				s.DnsResolveServer.Reset()
+				if err := s.DnsResolveServer.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"dnsResolveServer\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode DnsMonitorConfig")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfDnsMonitorConfig) {
+					name = jsonFieldsNameOfDnsMonitorConfig[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *DnsMonitorConfig) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *DnsMonitorConfig) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes DnsMonitorConfigDnsResolveType as json.
+func (s DnsMonitorConfigDnsResolveType) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes DnsMonitorConfigDnsResolveType from json.
+func (s *DnsMonitorConfigDnsResolveType) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode DnsMonitorConfigDnsResolveType to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch DnsMonitorConfigDnsResolveType(v) {
+	case DnsMonitorConfigDnsResolveTypeA:
+		*s = DnsMonitorConfigDnsResolveTypeA
+	case DnsMonitorConfigDnsResolveTypeAAAA:
+		*s = DnsMonitorConfigDnsResolveTypeAAAA
+	case DnsMonitorConfigDnsResolveTypeCAA:
+		*s = DnsMonitorConfigDnsResolveTypeCAA
+	case DnsMonitorConfigDnsResolveTypeCNAME:
+		*s = DnsMonitorConfigDnsResolveTypeCNAME
+	case DnsMonitorConfigDnsResolveTypeMX:
+		*s = DnsMonitorConfigDnsResolveTypeMX
+	case DnsMonitorConfigDnsResolveTypeNS:
+		*s = DnsMonitorConfigDnsResolveTypeNS
+	case DnsMonitorConfigDnsResolveTypePTR:
+		*s = DnsMonitorConfigDnsResolveTypePTR
+	case DnsMonitorConfigDnsResolveTypeSOA:
+		*s = DnsMonitorConfigDnsResolveTypeSOA
+	case DnsMonitorConfigDnsResolveTypeSRV:
+		*s = DnsMonitorConfigDnsResolveTypeSRV
+	case DnsMonitorConfigDnsResolveTypeTXT:
+		*s = DnsMonitorConfigDnsResolveTypeTXT
+	default:
+		*s = DnsMonitorConfigDnsResolveType(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s DnsMonitorConfigDnsResolveType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *DnsMonitorConfigDnsResolveType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes DnsMonitorConfigKind as json.
+func (s DnsMonitorConfigKind) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes DnsMonitorConfigKind from json.
+func (s *DnsMonitorConfigKind) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode DnsMonitorConfigKind to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch DnsMonitorConfigKind(v) {
+	case DnsMonitorConfigKindDNS:
+		*s = DnsMonitorConfigKindDNS
+	default:
+		*s = DnsMonitorConfigKind(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s DnsMonitorConfigKind) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *DnsMonitorConfigKind) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *Enable2FAReq) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -2506,6 +2762,355 @@ func (s *GetStatusPageHeartbeatsOKUptimeList) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
+func (s *GroupMonitorConfig) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *GroupMonitorConfig) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("kind")
+		s.Kind.Encode(e)
+	}
+}
+
+var jsonFieldsNameOfGroupMonitorConfig = [1]string{
+	0: "kind",
+}
+
+// Decode decodes GroupMonitorConfig from json.
+func (s *GroupMonitorConfig) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GroupMonitorConfig to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "kind":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				if err := s.Kind.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"kind\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode GroupMonitorConfig")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfGroupMonitorConfig) {
+					name = jsonFieldsNameOfGroupMonitorConfig[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *GroupMonitorConfig) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GroupMonitorConfig) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes GroupMonitorConfigKind as json.
+func (s GroupMonitorConfigKind) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes GroupMonitorConfigKind from json.
+func (s *GroupMonitorConfigKind) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GroupMonitorConfigKind to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch GroupMonitorConfigKind(v) {
+	case GroupMonitorConfigKindGroup:
+		*s = GroupMonitorConfigKindGroup
+	default:
+		*s = GroupMonitorConfigKind(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s GroupMonitorConfigKind) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GroupMonitorConfigKind) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *GrpcMonitorConfig) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *GrpcMonitorConfig) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("kind")
+		s.Kind.Encode(e)
+	}
+	{
+		if s.GrpcUrl.Set {
+			e.FieldStart("grpcUrl")
+			s.GrpcUrl.Encode(e)
+		}
+	}
+	{
+		if s.GrpcServiceName.Set {
+			e.FieldStart("grpcServiceName")
+			s.GrpcServiceName.Encode(e)
+		}
+	}
+	{
+		if s.GrpcMethod.Set {
+			e.FieldStart("grpcMethod")
+			s.GrpcMethod.Encode(e)
+		}
+	}
+	{
+		if s.GrpcEnableTls.Set {
+			e.FieldStart("grpcEnableTls")
+			s.GrpcEnableTls.Encode(e)
+		}
+	}
+	{
+		if s.IgnoreTls.Set {
+			e.FieldStart("ignoreTls")
+			s.IgnoreTls.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfGrpcMonitorConfig = [6]string{
+	0: "kind",
+	1: "grpcUrl",
+	2: "grpcServiceName",
+	3: "grpcMethod",
+	4: "grpcEnableTls",
+	5: "ignoreTls",
+}
+
+// Decode decodes GrpcMonitorConfig from json.
+func (s *GrpcMonitorConfig) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GrpcMonitorConfig to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "kind":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				if err := s.Kind.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"kind\"")
+			}
+		case "grpcUrl":
+			if err := func() error {
+				s.GrpcUrl.Reset()
+				if err := s.GrpcUrl.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"grpcUrl\"")
+			}
+		case "grpcServiceName":
+			if err := func() error {
+				s.GrpcServiceName.Reset()
+				if err := s.GrpcServiceName.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"grpcServiceName\"")
+			}
+		case "grpcMethod":
+			if err := func() error {
+				s.GrpcMethod.Reset()
+				if err := s.GrpcMethod.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"grpcMethod\"")
+			}
+		case "grpcEnableTls":
+			if err := func() error {
+				s.GrpcEnableTls.Reset()
+				if err := s.GrpcEnableTls.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"grpcEnableTls\"")
+			}
+		case "ignoreTls":
+			if err := func() error {
+				s.IgnoreTls.Reset()
+				if err := s.IgnoreTls.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ignoreTls\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode GrpcMonitorConfig")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfGrpcMonitorConfig) {
+					name = jsonFieldsNameOfGrpcMonitorConfig[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *GrpcMonitorConfig) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GrpcMonitorConfig) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes GrpcMonitorConfigKind as json.
+func (s GrpcMonitorConfigKind) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes GrpcMonitorConfigKind from json.
+func (s *GrpcMonitorConfigKind) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GrpcMonitorConfigKind to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch GrpcMonitorConfigKind(v) {
+	case GrpcMonitorConfigKindGrpcKeyword:
+		*s = GrpcMonitorConfigKindGrpcKeyword
+	default:
+		*s = GrpcMonitorConfigKind(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s GrpcMonitorConfigKind) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GrpcMonitorConfigKind) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *HealthCheckOK) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -2878,6 +3483,565 @@ func (s HeartbeatStatus) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *HeartbeatStatus) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *HttpMonitorConfig) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *HttpMonitorConfig) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("kind")
+		s.Kind.Encode(e)
+	}
+	{
+		if s.URL.Set {
+			e.FieldStart("url")
+			s.URL.Encode(e)
+		}
+	}
+	{
+		if s.Method.Set {
+			e.FieldStart("method")
+			s.Method.Encode(e)
+		}
+	}
+	{
+		if s.Headers != nil {
+			e.FieldStart("headers")
+			e.ArrStart()
+			for _, elem := range s.Headers {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		if s.Body.Set {
+			e.FieldStart("body")
+			s.Body.Encode(e)
+		}
+	}
+	{
+		if s.BasicAuthUser.Set {
+			e.FieldStart("basicAuthUser")
+			s.BasicAuthUser.Encode(e)
+		}
+	}
+	{
+		if s.BasicAuthPass.Set {
+			e.FieldStart("basicAuthPass")
+			s.BasicAuthPass.Encode(e)
+		}
+	}
+	{
+		if s.MaxRedirects.Set {
+			e.FieldStart("maxRedirects")
+			s.MaxRedirects.Encode(e)
+		}
+	}
+	{
+		if s.AcceptedStatusCodes != nil {
+			e.FieldStart("acceptedStatusCodes")
+			e.ArrStart()
+			for _, elem := range s.AcceptedStatusCodes {
+				e.Str(elem)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		if s.IgnoreTls.Set {
+			e.FieldStart("ignoreTls")
+			s.IgnoreTls.Encode(e)
+		}
+	}
+	{
+		if s.Keyword.Set {
+			e.FieldStart("keyword")
+			s.Keyword.Encode(e)
+		}
+	}
+	{
+		if s.InvertKeyword.Set {
+			e.FieldStart("invertKeyword")
+			s.InvertKeyword.Encode(e)
+		}
+	}
+	{
+		if s.JsonPath.Set {
+			e.FieldStart("jsonPath")
+			s.JsonPath.Encode(e)
+		}
+	}
+	{
+		if s.ExpectedValue.Set {
+			e.FieldStart("expectedValue")
+			s.ExpectedValue.Encode(e)
+		}
+	}
+	{
+		if s.ProxyId.Set {
+			e.FieldStart("proxyId")
+			s.ProxyId.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfHttpMonitorConfig = [15]string{
+	0:  "kind",
+	1:  "url",
+	2:  "method",
+	3:  "headers",
+	4:  "body",
+	5:  "basicAuthUser",
+	6:  "basicAuthPass",
+	7:  "maxRedirects",
+	8:  "acceptedStatusCodes",
+	9:  "ignoreTls",
+	10: "keyword",
+	11: "invertKeyword",
+	12: "jsonPath",
+	13: "expectedValue",
+	14: "proxyId",
+}
+
+// Decode decodes HttpMonitorConfig from json.
+func (s *HttpMonitorConfig) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode HttpMonitorConfig to nil")
+	}
+	var requiredBitSet [2]uint8
+	s.setDefaults()
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "kind":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				if err := s.Kind.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"kind\"")
+			}
+		case "url":
+			if err := func() error {
+				s.URL.Reset()
+				if err := s.URL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"url\"")
+			}
+		case "method":
+			if err := func() error {
+				s.Method.Reset()
+				if err := s.Method.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"method\"")
+			}
+		case "headers":
+			if err := func() error {
+				s.Headers = make([]HttpMonitorConfigHeadersItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem HttpMonitorConfigHeadersItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Headers = append(s.Headers, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"headers\"")
+			}
+		case "body":
+			if err := func() error {
+				s.Body.Reset()
+				if err := s.Body.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"body\"")
+			}
+		case "basicAuthUser":
+			if err := func() error {
+				s.BasicAuthUser.Reset()
+				if err := s.BasicAuthUser.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"basicAuthUser\"")
+			}
+		case "basicAuthPass":
+			if err := func() error {
+				s.BasicAuthPass.Reset()
+				if err := s.BasicAuthPass.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"basicAuthPass\"")
+			}
+		case "maxRedirects":
+			if err := func() error {
+				s.MaxRedirects.Reset()
+				if err := s.MaxRedirects.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"maxRedirects\"")
+			}
+		case "acceptedStatusCodes":
+			if err := func() error {
+				s.AcceptedStatusCodes = make([]string, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem string
+					v, err := d.Str()
+					elem = string(v)
+					if err != nil {
+						return err
+					}
+					s.AcceptedStatusCodes = append(s.AcceptedStatusCodes, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"acceptedStatusCodes\"")
+			}
+		case "ignoreTls":
+			if err := func() error {
+				s.IgnoreTls.Reset()
+				if err := s.IgnoreTls.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ignoreTls\"")
+			}
+		case "keyword":
+			if err := func() error {
+				s.Keyword.Reset()
+				if err := s.Keyword.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"keyword\"")
+			}
+		case "invertKeyword":
+			if err := func() error {
+				s.InvertKeyword.Reset()
+				if err := s.InvertKeyword.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"invertKeyword\"")
+			}
+		case "jsonPath":
+			if err := func() error {
+				s.JsonPath.Reset()
+				if err := s.JsonPath.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"jsonPath\"")
+			}
+		case "expectedValue":
+			if err := func() error {
+				s.ExpectedValue.Reset()
+				if err := s.ExpectedValue.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"expectedValue\"")
+			}
+		case "proxyId":
+			if err := func() error {
+				s.ProxyId.Reset()
+				if err := s.ProxyId.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"proxyId\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode HttpMonitorConfig")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [2]uint8{
+		0b00000001,
+		0b00000000,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfHttpMonitorConfig) {
+					name = jsonFieldsNameOfHttpMonitorConfig[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *HttpMonitorConfig) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *HttpMonitorConfig) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *HttpMonitorConfigHeadersItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *HttpMonitorConfigHeadersItem) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("name")
+		e.Str(s.Name)
+	}
+	{
+		e.FieldStart("value")
+		e.Str(s.Value)
+	}
+}
+
+var jsonFieldsNameOfHttpMonitorConfigHeadersItem = [2]string{
+	0: "name",
+	1: "value",
+}
+
+// Decode decodes HttpMonitorConfigHeadersItem from json.
+func (s *HttpMonitorConfigHeadersItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode HttpMonitorConfigHeadersItem to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "name":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Str()
+				s.Name = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"name\"")
+			}
+		case "value":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := d.Str()
+				s.Value = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"value\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode HttpMonitorConfigHeadersItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000011,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfHttpMonitorConfigHeadersItem) {
+					name = jsonFieldsNameOfHttpMonitorConfigHeadersItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *HttpMonitorConfigHeadersItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *HttpMonitorConfigHeadersItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes HttpMonitorConfigKind as json.
+func (s HttpMonitorConfigKind) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes HttpMonitorConfigKind from json.
+func (s *HttpMonitorConfigKind) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode HttpMonitorConfigKind to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch HttpMonitorConfigKind(v) {
+	case HttpMonitorConfigKindHTTP:
+		*s = HttpMonitorConfigKindHTTP
+	default:
+		*s = HttpMonitorConfigKind(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s HttpMonitorConfigKind) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *HttpMonitorConfigKind) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes HttpMonitorConfigMethod as json.
+func (s HttpMonitorConfigMethod) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes HttpMonitorConfigMethod from json.
+func (s *HttpMonitorConfigMethod) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode HttpMonitorConfigMethod to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch HttpMonitorConfigMethod(v) {
+	case HttpMonitorConfigMethodGET:
+		*s = HttpMonitorConfigMethodGET
+	case HttpMonitorConfigMethodPOST:
+		*s = HttpMonitorConfigMethodPOST
+	case HttpMonitorConfigMethodPUT:
+		*s = HttpMonitorConfigMethodPUT
+	case HttpMonitorConfigMethodPATCH:
+		*s = HttpMonitorConfigMethodPATCH
+	case HttpMonitorConfigMethodDELETE:
+		*s = HttpMonitorConfigMethodDELETE
+	case HttpMonitorConfigMethodHEAD:
+		*s = HttpMonitorConfigMethodHEAD
+	case HttpMonitorConfigMethodOPTIONS:
+		*s = HttpMonitorConfigMethodOPTIONS
+	default:
+		*s = HttpMonitorConfigMethod(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s HttpMonitorConfigMethod) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *HttpMonitorConfigMethod) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -4690,21 +5854,9 @@ func (s *Monitor) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.URL.Set {
-			e.FieldStart("url")
-			s.URL.Encode(e)
-		}
-	}
-	{
-		if s.Hostname.Set {
-			e.FieldStart("hostname")
-			s.Hostname.Encode(e)
-		}
-	}
-	{
-		if s.Port.Set {
-			e.FieldStart("port")
-			s.Port.Encode(e)
+		if s.Timeout.Set {
+			e.FieldStart("timeout")
+			s.Timeout.Encode(e)
 		}
 	}
 	{
@@ -4714,101 +5866,9 @@ func (s *Monitor) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Timeout.Set {
-			e.FieldStart("timeout")
-			s.Timeout.Encode(e)
-		}
-	}
-	{
 		if s.RetryInterval.Set {
 			e.FieldStart("retryInterval")
 			s.RetryInterval.Encode(e)
-		}
-	}
-	{
-		if s.Keyword.Set {
-			e.FieldStart("keyword")
-			s.Keyword.Encode(e)
-		}
-	}
-	{
-		if s.InvertKeyword.Set {
-			e.FieldStart("invertKeyword")
-			s.InvertKeyword.Encode(e)
-		}
-	}
-	{
-		if s.JsonPath.Set {
-			e.FieldStart("jsonPath")
-			s.JsonPath.Encode(e)
-		}
-	}
-	{
-		if s.ExpectedValue.Set {
-			e.FieldStart("expectedValue")
-			s.ExpectedValue.Encode(e)
-		}
-	}
-	{
-		if s.IgnoreTls.Set {
-			e.FieldStart("ignoreTls")
-			s.IgnoreTls.Encode(e)
-		}
-	}
-	{
-		if s.MaxRedirects.Set {
-			e.FieldStart("maxRedirects")
-			s.MaxRedirects.Encode(e)
-		}
-	}
-	{
-		if s.AcceptedStatusCodes != nil {
-			e.FieldStart("acceptedStatusCodes")
-			e.ArrStart()
-			for _, elem := range s.AcceptedStatusCodes {
-				e.Str(elem)
-			}
-			e.ArrEnd()
-		}
-	}
-	{
-		if s.Method.Set {
-			e.FieldStart("method")
-			s.Method.Encode(e)
-		}
-	}
-	{
-		if s.Headers != nil {
-			e.FieldStart("headers")
-			e.ArrStart()
-			for _, elem := range s.Headers {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
-		}
-	}
-	{
-		if s.Body.Set {
-			e.FieldStart("body")
-			s.Body.Encode(e)
-		}
-	}
-	{
-		if s.BasicAuthUser.Set {
-			e.FieldStart("basicAuthUser")
-			s.BasicAuthUser.Encode(e)
-		}
-	}
-	{
-		if s.BasicAuthPass.Set {
-			e.FieldStart("basicAuthPass")
-			s.BasicAuthPass.Encode(e)
-		}
-	}
-	{
-		if s.PushToken.Set {
-			e.FieldStart("pushToken")
-			s.PushToken.Encode(e)
 		}
 	}
 	{
@@ -4824,81 +5884,15 @@ func (s *Monitor) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.DnsResolveType.Set {
-			e.FieldStart("dnsResolveType")
-			s.DnsResolveType.Encode(e)
-		}
-	}
-	{
-		if s.DnsResolveServer.Set {
-			e.FieldStart("dnsResolveServer")
-			s.DnsResolveServer.Encode(e)
-		}
-	}
-	{
-		if s.MqttTopic.Set {
-			e.FieldStart("mqttTopic")
-			s.MqttTopic.Encode(e)
-		}
-	}
-	{
-		if s.MqttSuccessMessage.Set {
-			e.FieldStart("mqttSuccessMessage")
-			s.MqttSuccessMessage.Encode(e)
-		}
-	}
-	{
-		if s.MqttUsername.Set {
-			e.FieldStart("mqttUsername")
-			s.MqttUsername.Encode(e)
-		}
-	}
-	{
-		if s.MqttPassword.Set {
-			e.FieldStart("mqttPassword")
-			s.MqttPassword.Encode(e)
-		}
-	}
-	{
-		if s.DatabaseQuery.Set {
-			e.FieldStart("databaseQuery")
-			s.DatabaseQuery.Encode(e)
-		}
-	}
-	{
-		if s.ProxyId.Set {
-			e.FieldStart("proxyId")
-			s.ProxyId.Encode(e)
-		}
-	}
-	{
-		if s.GrpcUrl.Set {
-			e.FieldStart("grpcUrl")
-			s.GrpcUrl.Encode(e)
-		}
-	}
-	{
-		if s.GrpcServiceName.Set {
-			e.FieldStart("grpcServiceName")
-			s.GrpcServiceName.Encode(e)
-		}
-	}
-	{
-		if s.GrpcMethod.Set {
-			e.FieldStart("grpcMethod")
-			s.GrpcMethod.Encode(e)
-		}
-	}
-	{
-		if s.GrpcEnableTls.Set {
-			e.FieldStart("grpcEnableTls")
-			s.GrpcEnableTls.Encode(e)
-		}
-	}
-	{
 		if s.ParentId.Set {
 			e.FieldStart("parentId")
 			s.ParentId.Encode(e)
+		}
+	}
+	{
+		if s.PushToken.Set {
+			e.FieldStart("pushToken")
+			s.PushToken.Encode(e)
 		}
 	}
 	{
@@ -4928,64 +5922,37 @@ func (s *Monitor) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.PacketSize.Set {
-			e.FieldStart("packetSize")
-			s.PacketSize.Encode(e)
-		}
-	}
-	{
 		if s.ExpiryNotification.Set {
 			e.FieldStart("expiryNotification")
 			s.ExpiryNotification.Encode(e)
 		}
 	}
+	{
+		if s.Config.Set {
+			e.FieldStart("config")
+			s.Config.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfMonitor = [44]string{
+var jsonFieldsNameOfMonitor = [17]string{
 	0:  "id",
 	1:  "name",
 	2:  "type",
 	3:  "active",
 	4:  "interval",
-	5:  "url",
-	6:  "hostname",
-	7:  "port",
-	8:  "maxRetries",
-	9:  "timeout",
-	10: "retryInterval",
-	11: "keyword",
-	12: "invertKeyword",
-	13: "jsonPath",
-	14: "expectedValue",
-	15: "ignoreTls",
-	16: "maxRedirects",
-	17: "acceptedStatusCodes",
-	18: "method",
-	19: "headers",
-	20: "body",
-	21: "basicAuthUser",
-	22: "basicAuthPass",
-	23: "pushToken",
-	24: "description",
-	25: "upsideDown",
-	26: "dnsResolveType",
-	27: "dnsResolveServer",
-	28: "mqttTopic",
-	29: "mqttSuccessMessage",
-	30: "mqttUsername",
-	31: "mqttPassword",
-	32: "databaseQuery",
-	33: "proxyId",
-	34: "grpcUrl",
-	35: "grpcServiceName",
-	36: "grpcMethod",
-	37: "grpcEnableTls",
-	38: "parentId",
-	39: "tags",
-	40: "notificationIds",
-	41: "resendInterval",
-	42: "packetSize",
-	43: "expiryNotification",
+	5:  "timeout",
+	6:  "maxRetries",
+	7:  "retryInterval",
+	8:  "description",
+	9:  "upsideDown",
+	10: "parentId",
+	11: "pushToken",
+	12: "tags",
+	13: "notificationIds",
+	14: "resendInterval",
+	15: "expiryNotification",
+	16: "config",
 }
 
 // Decode decodes Monitor from json.
@@ -4993,7 +5960,7 @@ func (s *Monitor) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode Monitor to nil")
 	}
-	var requiredBitSet [6]uint8
+	var requiredBitSet [3]uint8
 	s.setDefaults()
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
@@ -5054,35 +6021,15 @@ func (s *Monitor) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"interval\"")
 			}
-		case "url":
+		case "timeout":
 			if err := func() error {
-				s.URL.Reset()
-				if err := s.URL.Decode(d); err != nil {
+				s.Timeout.Reset()
+				if err := s.Timeout.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"url\"")
-			}
-		case "hostname":
-			if err := func() error {
-				s.Hostname.Reset()
-				if err := s.Hostname.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"hostname\"")
-			}
-		case "port":
-			if err := func() error {
-				s.Port.Reset()
-				if err := s.Port.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"port\"")
+				return errors.Wrap(err, "decode field \"timeout\"")
 			}
 		case "maxRetries":
 			if err := func() error {
@@ -5094,16 +6041,6 @@ func (s *Monitor) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"maxRetries\"")
 			}
-		case "timeout":
-			if err := func() error {
-				s.Timeout.Reset()
-				if err := s.Timeout.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"timeout\"")
-			}
 		case "retryInterval":
 			if err := func() error {
 				s.RetryInterval.Reset()
@@ -5113,152 +6050,6 @@ func (s *Monitor) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"retryInterval\"")
-			}
-		case "keyword":
-			if err := func() error {
-				s.Keyword.Reset()
-				if err := s.Keyword.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"keyword\"")
-			}
-		case "invertKeyword":
-			if err := func() error {
-				s.InvertKeyword.Reset()
-				if err := s.InvertKeyword.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"invertKeyword\"")
-			}
-		case "jsonPath":
-			if err := func() error {
-				s.JsonPath.Reset()
-				if err := s.JsonPath.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"jsonPath\"")
-			}
-		case "expectedValue":
-			if err := func() error {
-				s.ExpectedValue.Reset()
-				if err := s.ExpectedValue.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"expectedValue\"")
-			}
-		case "ignoreTls":
-			if err := func() error {
-				s.IgnoreTls.Reset()
-				if err := s.IgnoreTls.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ignoreTls\"")
-			}
-		case "maxRedirects":
-			if err := func() error {
-				s.MaxRedirects.Reset()
-				if err := s.MaxRedirects.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"maxRedirects\"")
-			}
-		case "acceptedStatusCodes":
-			if err := func() error {
-				s.AcceptedStatusCodes = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.AcceptedStatusCodes = append(s.AcceptedStatusCodes, elem)
-					return nil
-				}); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"acceptedStatusCodes\"")
-			}
-		case "method":
-			if err := func() error {
-				s.Method.Reset()
-				if err := s.Method.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"method\"")
-			}
-		case "headers":
-			if err := func() error {
-				s.Headers = make([]MonitorHeadersItem, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem MonitorHeadersItem
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.Headers = append(s.Headers, elem)
-					return nil
-				}); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"headers\"")
-			}
-		case "body":
-			if err := func() error {
-				s.Body.Reset()
-				if err := s.Body.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"body\"")
-			}
-		case "basicAuthUser":
-			if err := func() error {
-				s.BasicAuthUser.Reset()
-				if err := s.BasicAuthUser.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"basicAuthUser\"")
-			}
-		case "basicAuthPass":
-			if err := func() error {
-				s.BasicAuthPass.Reset()
-				if err := s.BasicAuthPass.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"basicAuthPass\"")
-			}
-		case "pushToken":
-			if err := func() error {
-				s.PushToken.Reset()
-				if err := s.PushToken.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"pushToken\"")
 			}
 		case "description":
 			if err := func() error {
@@ -5280,126 +6071,6 @@ func (s *Monitor) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"upsideDown\"")
 			}
-		case "dnsResolveType":
-			if err := func() error {
-				s.DnsResolveType.Reset()
-				if err := s.DnsResolveType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"dnsResolveType\"")
-			}
-		case "dnsResolveServer":
-			if err := func() error {
-				s.DnsResolveServer.Reset()
-				if err := s.DnsResolveServer.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"dnsResolveServer\"")
-			}
-		case "mqttTopic":
-			if err := func() error {
-				s.MqttTopic.Reset()
-				if err := s.MqttTopic.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"mqttTopic\"")
-			}
-		case "mqttSuccessMessage":
-			if err := func() error {
-				s.MqttSuccessMessage.Reset()
-				if err := s.MqttSuccessMessage.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"mqttSuccessMessage\"")
-			}
-		case "mqttUsername":
-			if err := func() error {
-				s.MqttUsername.Reset()
-				if err := s.MqttUsername.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"mqttUsername\"")
-			}
-		case "mqttPassword":
-			if err := func() error {
-				s.MqttPassword.Reset()
-				if err := s.MqttPassword.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"mqttPassword\"")
-			}
-		case "databaseQuery":
-			if err := func() error {
-				s.DatabaseQuery.Reset()
-				if err := s.DatabaseQuery.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"databaseQuery\"")
-			}
-		case "proxyId":
-			if err := func() error {
-				s.ProxyId.Reset()
-				if err := s.ProxyId.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"proxyId\"")
-			}
-		case "grpcUrl":
-			if err := func() error {
-				s.GrpcUrl.Reset()
-				if err := s.GrpcUrl.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"grpcUrl\"")
-			}
-		case "grpcServiceName":
-			if err := func() error {
-				s.GrpcServiceName.Reset()
-				if err := s.GrpcServiceName.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"grpcServiceName\"")
-			}
-		case "grpcMethod":
-			if err := func() error {
-				s.GrpcMethod.Reset()
-				if err := s.GrpcMethod.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"grpcMethod\"")
-			}
-		case "grpcEnableTls":
-			if err := func() error {
-				s.GrpcEnableTls.Reset()
-				if err := s.GrpcEnableTls.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"grpcEnableTls\"")
-			}
 		case "parentId":
 			if err := func() error {
 				s.ParentId.Reset()
@@ -5409,6 +6080,16 @@ func (s *Monitor) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"parentId\"")
+			}
+		case "pushToken":
+			if err := func() error {
+				s.PushToken.Reset()
+				if err := s.PushToken.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"pushToken\"")
 			}
 		case "tags":
 			if err := func() error {
@@ -5456,16 +6137,6 @@ func (s *Monitor) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"resendInterval\"")
 			}
-		case "packetSize":
-			if err := func() error {
-				s.PacketSize.Reset()
-				if err := s.PacketSize.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"packetSize\"")
-			}
 		case "expiryNotification":
 			if err := func() error {
 				s.ExpiryNotification.Reset()
@@ -5476,6 +6147,16 @@ func (s *Monitor) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"expiryNotification\"")
 			}
+		case "config":
+			if err := func() error {
+				s.Config.Reset()
+				if err := s.Config.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"config\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -5485,11 +6166,8 @@ func (s *Monitor) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [6]uint8{
+	for i, mask := range [3]uint8{
 		0b00001111,
-		0b00000000,
-		0b00000000,
-		0b00000000,
 		0b00000000,
 		0b00000000,
 	} {
@@ -5537,171 +6215,467 @@ func (s *Monitor) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes MonitorDnsResolveType as json.
-func (s MonitorDnsResolveType) Encode(e *jx.Encoder) {
-	e.Str(string(s))
-}
-
-// Decode decodes MonitorDnsResolveType from json.
-func (s *MonitorDnsResolveType) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode MonitorDnsResolveType to nil")
-	}
-	v, err := d.StrBytes()
-	if err != nil {
-		return err
-	}
-	// Try to use constant string.
-	switch MonitorDnsResolveType(v) {
-	case MonitorDnsResolveTypeA:
-		*s = MonitorDnsResolveTypeA
-	case MonitorDnsResolveTypeAAAA:
-		*s = MonitorDnsResolveTypeAAAA
-	case MonitorDnsResolveTypeCAA:
-		*s = MonitorDnsResolveTypeCAA
-	case MonitorDnsResolveTypeCNAME:
-		*s = MonitorDnsResolveTypeCNAME
-	case MonitorDnsResolveTypeMX:
-		*s = MonitorDnsResolveTypeMX
-	case MonitorDnsResolveTypeNS:
-		*s = MonitorDnsResolveTypeNS
-	case MonitorDnsResolveTypePTR:
-		*s = MonitorDnsResolveTypePTR
-	case MonitorDnsResolveTypeSOA:
-		*s = MonitorDnsResolveTypeSOA
-	case MonitorDnsResolveTypeSRV:
-		*s = MonitorDnsResolveTypeSRV
-	case MonitorDnsResolveTypeTXT:
-		*s = MonitorDnsResolveTypeTXT
-	default:
-		*s = MonitorDnsResolveType(v)
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s MonitorDnsResolveType) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *MonitorDnsResolveType) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *MonitorHeadersItem) Encode(e *jx.Encoder) {
+// Encode encodes MonitorConfig as json.
+func (s MonitorConfig) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
-// encodeFields encodes fields.
-func (s *MonitorHeadersItem) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("name")
-		e.Str(s.Name)
-	}
-	{
-		e.FieldStart("value")
-		e.Str(s.Value)
+func (s MonitorConfig) encodeFields(e *jx.Encoder) {
+	switch s.Type {
+	case HttpMonitorConfigMonitorConfig:
+		e.FieldStart("kind")
+		e.Str("http")
+		{
+			s := s.HttpMonitorConfig
+			{
+				if s.URL.Set {
+					e.FieldStart("url")
+					s.URL.Encode(e)
+				}
+			}
+			{
+				if s.Method.Set {
+					e.FieldStart("method")
+					s.Method.Encode(e)
+				}
+			}
+			{
+				if s.Headers != nil {
+					e.FieldStart("headers")
+					e.ArrStart()
+					for _, elem := range s.Headers {
+						elem.Encode(e)
+					}
+					e.ArrEnd()
+				}
+			}
+			{
+				if s.Body.Set {
+					e.FieldStart("body")
+					s.Body.Encode(e)
+				}
+			}
+			{
+				if s.BasicAuthUser.Set {
+					e.FieldStart("basicAuthUser")
+					s.BasicAuthUser.Encode(e)
+				}
+			}
+			{
+				if s.BasicAuthPass.Set {
+					e.FieldStart("basicAuthPass")
+					s.BasicAuthPass.Encode(e)
+				}
+			}
+			{
+				if s.MaxRedirects.Set {
+					e.FieldStart("maxRedirects")
+					s.MaxRedirects.Encode(e)
+				}
+			}
+			{
+				if s.AcceptedStatusCodes != nil {
+					e.FieldStart("acceptedStatusCodes")
+					e.ArrStart()
+					for _, elem := range s.AcceptedStatusCodes {
+						e.Str(elem)
+					}
+					e.ArrEnd()
+				}
+			}
+			{
+				if s.IgnoreTls.Set {
+					e.FieldStart("ignoreTls")
+					s.IgnoreTls.Encode(e)
+				}
+			}
+			{
+				if s.Keyword.Set {
+					e.FieldStart("keyword")
+					s.Keyword.Encode(e)
+				}
+			}
+			{
+				if s.InvertKeyword.Set {
+					e.FieldStart("invertKeyword")
+					s.InvertKeyword.Encode(e)
+				}
+			}
+			{
+				if s.JsonPath.Set {
+					e.FieldStart("jsonPath")
+					s.JsonPath.Encode(e)
+				}
+			}
+			{
+				if s.ExpectedValue.Set {
+					e.FieldStart("expectedValue")
+					s.ExpectedValue.Encode(e)
+				}
+			}
+			{
+				if s.ProxyId.Set {
+					e.FieldStart("proxyId")
+					s.ProxyId.Encode(e)
+				}
+			}
+		}
+	case PortMonitorConfigMonitorConfig:
+		e.FieldStart("kind")
+		e.Str("port")
+		{
+			s := s.PortMonitorConfig
+			{
+				if s.Hostname.Set {
+					e.FieldStart("hostname")
+					s.Hostname.Encode(e)
+				}
+			}
+			{
+				if s.Port.Set {
+					e.FieldStart("port")
+					s.Port.Encode(e)
+				}
+			}
+			{
+				if s.IgnoreTls.Set {
+					e.FieldStart("ignoreTls")
+					s.IgnoreTls.Encode(e)
+				}
+			}
+		}
+	case PingMonitorConfigMonitorConfig:
+		e.FieldStart("kind")
+		e.Str("ping")
+		{
+			s := s.PingMonitorConfig
+			{
+				if s.Hostname.Set {
+					e.FieldStart("hostname")
+					s.Hostname.Encode(e)
+				}
+			}
+			{
+				if s.PacketSize.Set {
+					e.FieldStart("packetSize")
+					s.PacketSize.Encode(e)
+				}
+			}
+		}
+	case DnsMonitorConfigMonitorConfig:
+		e.FieldStart("kind")
+		e.Str("dns")
+		{
+			s := s.DnsMonitorConfig
+			{
+				if s.Hostname.Set {
+					e.FieldStart("hostname")
+					s.Hostname.Encode(e)
+				}
+			}
+			{
+				if s.Port.Set {
+					e.FieldStart("port")
+					s.Port.Encode(e)
+				}
+			}
+			{
+				if s.DnsResolveType.Set {
+					e.FieldStart("dnsResolveType")
+					s.DnsResolveType.Encode(e)
+				}
+			}
+			{
+				if s.DnsResolveServer.Set {
+					e.FieldStart("dnsResolveServer")
+					s.DnsResolveServer.Encode(e)
+				}
+			}
+		}
+	case GrpcMonitorConfigMonitorConfig:
+		e.FieldStart("kind")
+		e.Str("grpc-keyword")
+		{
+			s := s.GrpcMonitorConfig
+			{
+				if s.GrpcUrl.Set {
+					e.FieldStart("grpcUrl")
+					s.GrpcUrl.Encode(e)
+				}
+			}
+			{
+				if s.GrpcServiceName.Set {
+					e.FieldStart("grpcServiceName")
+					s.GrpcServiceName.Encode(e)
+				}
+			}
+			{
+				if s.GrpcMethod.Set {
+					e.FieldStart("grpcMethod")
+					s.GrpcMethod.Encode(e)
+				}
+			}
+			{
+				if s.GrpcEnableTls.Set {
+					e.FieldStart("grpcEnableTls")
+					s.GrpcEnableTls.Encode(e)
+				}
+			}
+			{
+				if s.IgnoreTls.Set {
+					e.FieldStart("ignoreTls")
+					s.IgnoreTls.Encode(e)
+				}
+			}
+		}
+	case MqttMonitorConfigMonitorConfig:
+		e.FieldStart("kind")
+		e.Str("mqtt")
+		{
+			s := s.MqttMonitorConfig
+			{
+				if s.Hostname.Set {
+					e.FieldStart("hostname")
+					s.Hostname.Encode(e)
+				}
+			}
+			{
+				if s.Port.Set {
+					e.FieldStart("port")
+					s.Port.Encode(e)
+				}
+			}
+			{
+				if s.MqttTopic.Set {
+					e.FieldStart("mqttTopic")
+					s.MqttTopic.Encode(e)
+				}
+			}
+			{
+				if s.MqttSuccessMessage.Set {
+					e.FieldStart("mqttSuccessMessage")
+					s.MqttSuccessMessage.Encode(e)
+				}
+			}
+			{
+				if s.MqttUsername.Set {
+					e.FieldStart("mqttUsername")
+					s.MqttUsername.Encode(e)
+				}
+			}
+			{
+				if s.MqttPassword.Set {
+					e.FieldStart("mqttPassword")
+					s.MqttPassword.Encode(e)
+				}
+			}
+			{
+				if s.IgnoreTls.Set {
+					e.FieldStart("ignoreTls")
+					s.IgnoreTls.Encode(e)
+				}
+			}
+		}
+	case RedisMonitorConfigMonitorConfig:
+		e.FieldStart("kind")
+		e.Str("redis")
+		{
+			s := s.RedisMonitorConfig
+			{
+				if s.Hostname.Set {
+					e.FieldStart("hostname")
+					s.Hostname.Encode(e)
+				}
+			}
+			{
+				if s.Port.Set {
+					e.FieldStart("port")
+					s.Port.Encode(e)
+				}
+			}
+			{
+				if s.DatabaseQuery.Set {
+					e.FieldStart("databaseQuery")
+					s.DatabaseQuery.Encode(e)
+				}
+			}
+		}
+	case PushMonitorConfigMonitorConfig:
+		e.FieldStart("kind")
+		e.Str("push")
+	case SmtpMonitorConfigMonitorConfig:
+		e.FieldStart("kind")
+		e.Str("smtp")
+		{
+			s := s.SmtpMonitorConfig
+			{
+				if s.Hostname.Set {
+					e.FieldStart("hostname")
+					s.Hostname.Encode(e)
+				}
+			}
+			{
+				if s.Port.Set {
+					e.FieldStart("port")
+					s.Port.Encode(e)
+				}
+			}
+			{
+				if s.IgnoreTls.Set {
+					e.FieldStart("ignoreTls")
+					s.IgnoreTls.Encode(e)
+				}
+			}
+		}
+	case TailscalePingMonitorConfigMonitorConfig:
+		e.FieldStart("kind")
+		e.Str("tailscale-ping")
+		{
+			s := s.TailscalePingMonitorConfig
+			{
+				if s.Hostname.Set {
+					e.FieldStart("hostname")
+					s.Hostname.Encode(e)
+				}
+			}
+		}
+	case GroupMonitorConfigMonitorConfig:
+		e.FieldStart("kind")
+		e.Str("group")
 	}
 }
 
-var jsonFieldsNameOfMonitorHeadersItem = [2]string{
-	0: "name",
-	1: "value",
-}
-
-// Decode decodes MonitorHeadersItem from json.
-func (s *MonitorHeadersItem) Decode(d *jx.Decoder) error {
+// Decode decodes MonitorConfig from json.
+func (s *MonitorConfig) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode MonitorHeadersItem to nil")
+		return errors.New("invalid: unable to decode MonitorConfig to nil")
 	}
-	var requiredBitSet [1]uint8
+	// Sum type discriminator.
+	if typ := d.Next(); typ != jx.Object {
+		return errors.Errorf("unexpected json type %q", typ)
+	}
 
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "name":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				v, err := d.Str()
-				s.Name = string(v)
+	var found bool
+	if err := d.Capture(func(d *jx.Decoder) error {
+		return d.ObjBytes(func(d *jx.Decoder, key []byte) error {
+			if found {
+				return d.Skip()
+			}
+			switch string(key) {
+			case "kind":
+				typ, err := d.Str()
 				if err != nil {
 					return err
 				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"name\"")
-			}
-		case "value":
-			requiredBitSet[0] |= 1 << 1
-			if err := func() error {
-				v, err := d.Str()
-				s.Value = string(v)
-				if err != nil {
-					return err
+				switch typ {
+				case "http":
+					s.Type = HttpMonitorConfigMonitorConfig
+					found = true
+				case "port":
+					s.Type = PortMonitorConfigMonitorConfig
+					found = true
+				case "ping":
+					s.Type = PingMonitorConfigMonitorConfig
+					found = true
+				case "dns":
+					s.Type = DnsMonitorConfigMonitorConfig
+					found = true
+				case "grpc-keyword":
+					s.Type = GrpcMonitorConfigMonitorConfig
+					found = true
+				case "mqtt":
+					s.Type = MqttMonitorConfigMonitorConfig
+					found = true
+				case "redis":
+					s.Type = RedisMonitorConfigMonitorConfig
+					found = true
+				case "push":
+					s.Type = PushMonitorConfigMonitorConfig
+					found = true
+				case "smtp":
+					s.Type = SmtpMonitorConfigMonitorConfig
+					found = true
+				case "tailscale-ping":
+					s.Type = TailscalePingMonitorConfigMonitorConfig
+					found = true
+				case "group":
+					s.Type = GroupMonitorConfigMonitorConfig
+					found = true
+				default:
+					return errors.Errorf("unknown type %s", typ)
 				}
 				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"value\"")
 			}
-		default:
 			return d.Skip()
-		}
-		return nil
+		})
 	}); err != nil {
-		return errors.Wrap(err, "decode MonitorHeadersItem")
+		return errors.Wrap(err, "capture")
 	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000011,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfMonitorHeadersItem) {
-					name = jsonFieldsNameOfMonitorHeadersItem[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
+	if !found {
+		return errors.New("unable to detect sum type variant")
+	}
+	switch s.Type {
+	case HttpMonitorConfigMonitorConfig:
+		if err := s.HttpMonitorConfig.Decode(d); err != nil {
+			return err
 		}
+	case PortMonitorConfigMonitorConfig:
+		if err := s.PortMonitorConfig.Decode(d); err != nil {
+			return err
+		}
+	case PingMonitorConfigMonitorConfig:
+		if err := s.PingMonitorConfig.Decode(d); err != nil {
+			return err
+		}
+	case DnsMonitorConfigMonitorConfig:
+		if err := s.DnsMonitorConfig.Decode(d); err != nil {
+			return err
+		}
+	case GrpcMonitorConfigMonitorConfig:
+		if err := s.GrpcMonitorConfig.Decode(d); err != nil {
+			return err
+		}
+	case MqttMonitorConfigMonitorConfig:
+		if err := s.MqttMonitorConfig.Decode(d); err != nil {
+			return err
+		}
+	case RedisMonitorConfigMonitorConfig:
+		if err := s.RedisMonitorConfig.Decode(d); err != nil {
+			return err
+		}
+	case PushMonitorConfigMonitorConfig:
+		if err := s.PushMonitorConfig.Decode(d); err != nil {
+			return err
+		}
+	case SmtpMonitorConfigMonitorConfig:
+		if err := s.SmtpMonitorConfig.Decode(d); err != nil {
+			return err
+		}
+	case TailscalePingMonitorConfigMonitorConfig:
+		if err := s.TailscalePingMonitorConfig.Decode(d); err != nil {
+			return err
+		}
+	case GroupMonitorConfigMonitorConfig:
+		if err := s.GroupMonitorConfig.Decode(d); err != nil {
+			return err
+		}
+	default:
+		return errors.Errorf("inferred invalid type: %s", s.Type)
 	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *MonitorHeadersItem) MarshalJSON() ([]byte, error) {
+func (s MonitorConfig) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *MonitorHeadersItem) UnmarshalJSON(data []byte) error {
+func (s *MonitorConfig) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -5736,21 +6710,9 @@ func (s *MonitorInput) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.URL.Set {
-			e.FieldStart("url")
-			s.URL.Encode(e)
-		}
-	}
-	{
-		if s.Hostname.Set {
-			e.FieldStart("hostname")
-			s.Hostname.Encode(e)
-		}
-	}
-	{
-		if s.Port.Set {
-			e.FieldStart("port")
-			s.Port.Encode(e)
+		if s.Timeout.Set {
+			e.FieldStart("timeout")
+			s.Timeout.Encode(e)
 		}
 	}
 	{
@@ -5760,95 +6722,9 @@ func (s *MonitorInput) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Timeout.Set {
-			e.FieldStart("timeout")
-			s.Timeout.Encode(e)
-		}
-	}
-	{
 		if s.RetryInterval.Set {
 			e.FieldStart("retryInterval")
 			s.RetryInterval.Encode(e)
-		}
-	}
-	{
-		if s.Keyword.Set {
-			e.FieldStart("keyword")
-			s.Keyword.Encode(e)
-		}
-	}
-	{
-		if s.InvertKeyword.Set {
-			e.FieldStart("invertKeyword")
-			s.InvertKeyword.Encode(e)
-		}
-	}
-	{
-		if s.JsonPath.Set {
-			e.FieldStart("jsonPath")
-			s.JsonPath.Encode(e)
-		}
-	}
-	{
-		if s.ExpectedValue.Set {
-			e.FieldStart("expectedValue")
-			s.ExpectedValue.Encode(e)
-		}
-	}
-	{
-		if s.IgnoreTls.Set {
-			e.FieldStart("ignoreTls")
-			s.IgnoreTls.Encode(e)
-		}
-	}
-	{
-		if s.MaxRedirects.Set {
-			e.FieldStart("maxRedirects")
-			s.MaxRedirects.Encode(e)
-		}
-	}
-	{
-		if s.AcceptedStatusCodes != nil {
-			e.FieldStart("acceptedStatusCodes")
-			e.ArrStart()
-			for _, elem := range s.AcceptedStatusCodes {
-				e.Str(elem)
-			}
-			e.ArrEnd()
-		}
-	}
-	{
-		if s.Method.Set {
-			e.FieldStart("method")
-			s.Method.Encode(e)
-		}
-	}
-	{
-		if s.Headers != nil {
-			e.FieldStart("headers")
-			e.ArrStart()
-			for _, elem := range s.Headers {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
-		}
-	}
-	{
-		if s.Body.Set {
-			e.FieldStart("body")
-			s.Body.Encode(e)
-		}
-	}
-	{
-		if s.BasicAuthUser.Set {
-			e.FieldStart("basicAuthUser")
-			s.BasicAuthUser.Encode(e)
-		}
-	}
-	{
-		if s.BasicAuthPass.Set {
-			e.FieldStart("basicAuthPass")
-			s.BasicAuthPass.Encode(e)
 		}
 	}
 	{
@@ -5861,78 +6737,6 @@ func (s *MonitorInput) encodeFields(e *jx.Encoder) {
 		if s.UpsideDown.Set {
 			e.FieldStart("upsideDown")
 			s.UpsideDown.Encode(e)
-		}
-	}
-	{
-		if s.DnsResolveType.Set {
-			e.FieldStart("dnsResolveType")
-			s.DnsResolveType.Encode(e)
-		}
-	}
-	{
-		if s.DnsResolveServer.Set {
-			e.FieldStart("dnsResolveServer")
-			s.DnsResolveServer.Encode(e)
-		}
-	}
-	{
-		if s.MqttTopic.Set {
-			e.FieldStart("mqttTopic")
-			s.MqttTopic.Encode(e)
-		}
-	}
-	{
-		if s.MqttSuccessMessage.Set {
-			e.FieldStart("mqttSuccessMessage")
-			s.MqttSuccessMessage.Encode(e)
-		}
-	}
-	{
-		if s.MqttUsername.Set {
-			e.FieldStart("mqttUsername")
-			s.MqttUsername.Encode(e)
-		}
-	}
-	{
-		if s.MqttPassword.Set {
-			e.FieldStart("mqttPassword")
-			s.MqttPassword.Encode(e)
-		}
-	}
-	{
-		if s.DatabaseQuery.Set {
-			e.FieldStart("databaseQuery")
-			s.DatabaseQuery.Encode(e)
-		}
-	}
-	{
-		if s.ProxyId.Set {
-			e.FieldStart("proxyId")
-			s.ProxyId.Encode(e)
-		}
-	}
-	{
-		if s.GrpcUrl.Set {
-			e.FieldStart("grpcUrl")
-			s.GrpcUrl.Encode(e)
-		}
-	}
-	{
-		if s.GrpcServiceName.Set {
-			e.FieldStart("grpcServiceName")
-			s.GrpcServiceName.Encode(e)
-		}
-	}
-	{
-		if s.GrpcMethod.Set {
-			e.FieldStart("grpcMethod")
-			s.GrpcMethod.Encode(e)
-		}
-	}
-	{
-		if s.GrpcEnableTls.Set {
-			e.FieldStart("grpcEnableTls")
-			s.GrpcEnableTls.Encode(e)
 		}
 	}
 	{
@@ -5958,61 +6762,32 @@ func (s *MonitorInput) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.PacketSize.Set {
-			e.FieldStart("packetSize")
-			s.PacketSize.Encode(e)
-		}
-	}
-	{
 		if s.ExpiryNotification.Set {
 			e.FieldStart("expiryNotification")
 			s.ExpiryNotification.Encode(e)
 		}
 	}
+	{
+		e.FieldStart("config")
+		s.Config.Encode(e)
+	}
 }
 
-var jsonFieldsNameOfMonitorInput = [41]string{
+var jsonFieldsNameOfMonitorInput = [14]string{
 	0:  "name",
 	1:  "type",
 	2:  "active",
 	3:  "interval",
-	4:  "url",
-	5:  "hostname",
-	6:  "port",
-	7:  "maxRetries",
-	8:  "timeout",
-	9:  "retryInterval",
-	10: "keyword",
-	11: "invertKeyword",
-	12: "jsonPath",
-	13: "expectedValue",
-	14: "ignoreTls",
-	15: "maxRedirects",
-	16: "acceptedStatusCodes",
-	17: "method",
-	18: "headers",
-	19: "body",
-	20: "basicAuthUser",
-	21: "basicAuthPass",
-	22: "description",
-	23: "upsideDown",
-	24: "dnsResolveType",
-	25: "dnsResolveServer",
-	26: "mqttTopic",
-	27: "mqttSuccessMessage",
-	28: "mqttUsername",
-	29: "mqttPassword",
-	30: "databaseQuery",
-	31: "proxyId",
-	32: "grpcUrl",
-	33: "grpcServiceName",
-	34: "grpcMethod",
-	35: "grpcEnableTls",
-	36: "parentId",
-	37: "notificationIds",
-	38: "resendInterval",
-	39: "packetSize",
-	40: "expiryNotification",
+	4:  "timeout",
+	5:  "maxRetries",
+	6:  "retryInterval",
+	7:  "description",
+	8:  "upsideDown",
+	9:  "parentId",
+	10: "notificationIds",
+	11: "resendInterval",
+	12: "expiryNotification",
+	13: "config",
 }
 
 // Decode decodes MonitorInput from json.
@@ -6020,7 +6795,7 @@ func (s *MonitorInput) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode MonitorInput to nil")
 	}
-	var requiredBitSet [6]uint8
+	var requiredBitSet [2]uint8
 	s.setDefaults()
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
@@ -6069,35 +6844,15 @@ func (s *MonitorInput) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"interval\"")
 			}
-		case "url":
+		case "timeout":
 			if err := func() error {
-				s.URL.Reset()
-				if err := s.URL.Decode(d); err != nil {
+				s.Timeout.Reset()
+				if err := s.Timeout.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"url\"")
-			}
-		case "hostname":
-			if err := func() error {
-				s.Hostname.Reset()
-				if err := s.Hostname.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"hostname\"")
-			}
-		case "port":
-			if err := func() error {
-				s.Port.Reset()
-				if err := s.Port.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"port\"")
+				return errors.Wrap(err, "decode field \"timeout\"")
 			}
 		case "maxRetries":
 			if err := func() error {
@@ -6109,16 +6864,6 @@ func (s *MonitorInput) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"maxRetries\"")
 			}
-		case "timeout":
-			if err := func() error {
-				s.Timeout.Reset()
-				if err := s.Timeout.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"timeout\"")
-			}
 		case "retryInterval":
 			if err := func() error {
 				s.RetryInterval.Reset()
@@ -6128,142 +6873,6 @@ func (s *MonitorInput) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"retryInterval\"")
-			}
-		case "keyword":
-			if err := func() error {
-				s.Keyword.Reset()
-				if err := s.Keyword.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"keyword\"")
-			}
-		case "invertKeyword":
-			if err := func() error {
-				s.InvertKeyword.Reset()
-				if err := s.InvertKeyword.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"invertKeyword\"")
-			}
-		case "jsonPath":
-			if err := func() error {
-				s.JsonPath.Reset()
-				if err := s.JsonPath.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"jsonPath\"")
-			}
-		case "expectedValue":
-			if err := func() error {
-				s.ExpectedValue.Reset()
-				if err := s.ExpectedValue.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"expectedValue\"")
-			}
-		case "ignoreTls":
-			if err := func() error {
-				s.IgnoreTls.Reset()
-				if err := s.IgnoreTls.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ignoreTls\"")
-			}
-		case "maxRedirects":
-			if err := func() error {
-				s.MaxRedirects.Reset()
-				if err := s.MaxRedirects.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"maxRedirects\"")
-			}
-		case "acceptedStatusCodes":
-			if err := func() error {
-				s.AcceptedStatusCodes = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.AcceptedStatusCodes = append(s.AcceptedStatusCodes, elem)
-					return nil
-				}); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"acceptedStatusCodes\"")
-			}
-		case "method":
-			if err := func() error {
-				s.Method.Reset()
-				if err := s.Method.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"method\"")
-			}
-		case "headers":
-			if err := func() error {
-				s.Headers = make([]MonitorInputHeadersItem, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem MonitorInputHeadersItem
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.Headers = append(s.Headers, elem)
-					return nil
-				}); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"headers\"")
-			}
-		case "body":
-			if err := func() error {
-				s.Body.Reset()
-				if err := s.Body.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"body\"")
-			}
-		case "basicAuthUser":
-			if err := func() error {
-				s.BasicAuthUser.Reset()
-				if err := s.BasicAuthUser.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"basicAuthUser\"")
-			}
-		case "basicAuthPass":
-			if err := func() error {
-				s.BasicAuthPass.Reset()
-				if err := s.BasicAuthPass.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"basicAuthPass\"")
 			}
 		case "description":
 			if err := func() error {
@@ -6284,126 +6893,6 @@ func (s *MonitorInput) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"upsideDown\"")
-			}
-		case "dnsResolveType":
-			if err := func() error {
-				s.DnsResolveType.Reset()
-				if err := s.DnsResolveType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"dnsResolveType\"")
-			}
-		case "dnsResolveServer":
-			if err := func() error {
-				s.DnsResolveServer.Reset()
-				if err := s.DnsResolveServer.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"dnsResolveServer\"")
-			}
-		case "mqttTopic":
-			if err := func() error {
-				s.MqttTopic.Reset()
-				if err := s.MqttTopic.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"mqttTopic\"")
-			}
-		case "mqttSuccessMessage":
-			if err := func() error {
-				s.MqttSuccessMessage.Reset()
-				if err := s.MqttSuccessMessage.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"mqttSuccessMessage\"")
-			}
-		case "mqttUsername":
-			if err := func() error {
-				s.MqttUsername.Reset()
-				if err := s.MqttUsername.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"mqttUsername\"")
-			}
-		case "mqttPassword":
-			if err := func() error {
-				s.MqttPassword.Reset()
-				if err := s.MqttPassword.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"mqttPassword\"")
-			}
-		case "databaseQuery":
-			if err := func() error {
-				s.DatabaseQuery.Reset()
-				if err := s.DatabaseQuery.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"databaseQuery\"")
-			}
-		case "proxyId":
-			if err := func() error {
-				s.ProxyId.Reset()
-				if err := s.ProxyId.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"proxyId\"")
-			}
-		case "grpcUrl":
-			if err := func() error {
-				s.GrpcUrl.Reset()
-				if err := s.GrpcUrl.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"grpcUrl\"")
-			}
-		case "grpcServiceName":
-			if err := func() error {
-				s.GrpcServiceName.Reset()
-				if err := s.GrpcServiceName.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"grpcServiceName\"")
-			}
-		case "grpcMethod":
-			if err := func() error {
-				s.GrpcMethod.Reset()
-				if err := s.GrpcMethod.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"grpcMethod\"")
-			}
-		case "grpcEnableTls":
-			if err := func() error {
-				s.GrpcEnableTls.Reset()
-				if err := s.GrpcEnableTls.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"grpcEnableTls\"")
 			}
 		case "parentId":
 			if err := func() error {
@@ -6444,16 +6933,6 @@ func (s *MonitorInput) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"resendInterval\"")
 			}
-		case "packetSize":
-			if err := func() error {
-				s.PacketSize.Reset()
-				if err := s.PacketSize.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"packetSize\"")
-			}
 		case "expiryNotification":
 			if err := func() error {
 				s.ExpiryNotification.Reset()
@@ -6464,6 +6943,16 @@ func (s *MonitorInput) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"expiryNotification\"")
 			}
+		case "config":
+			requiredBitSet[1] |= 1 << 5
+			if err := func() error {
+				if err := s.Config.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"config\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -6473,13 +6962,9 @@ func (s *MonitorInput) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [6]uint8{
+	for i, mask := range [2]uint8{
 		0b00000011,
-		0b00000000,
-		0b00000000,
-		0b00000000,
-		0b00000000,
-		0b00000000,
+		0b00100000,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -6521,169 +7006,6 @@ func (s *MonitorInput) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *MonitorInput) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *MonitorInputHeadersItem) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *MonitorInputHeadersItem) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("name")
-		e.Str(s.Name)
-	}
-	{
-		e.FieldStart("value")
-		e.Str(s.Value)
-	}
-}
-
-var jsonFieldsNameOfMonitorInputHeadersItem = [2]string{
-	0: "name",
-	1: "value",
-}
-
-// Decode decodes MonitorInputHeadersItem from json.
-func (s *MonitorInputHeadersItem) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode MonitorInputHeadersItem to nil")
-	}
-	var requiredBitSet [1]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "name":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				v, err := d.Str()
-				s.Name = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"name\"")
-			}
-		case "value":
-			requiredBitSet[0] |= 1 << 1
-			if err := func() error {
-				v, err := d.Str()
-				s.Value = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"value\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode MonitorInputHeadersItem")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000011,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfMonitorInputHeadersItem) {
-					name = jsonFieldsNameOfMonitorInputHeadersItem[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *MonitorInputHeadersItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *MonitorInputHeadersItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes MonitorMethod as json.
-func (s MonitorMethod) Encode(e *jx.Encoder) {
-	e.Str(string(s))
-}
-
-// Decode decodes MonitorMethod from json.
-func (s *MonitorMethod) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode MonitorMethod to nil")
-	}
-	v, err := d.StrBytes()
-	if err != nil {
-		return err
-	}
-	// Try to use constant string.
-	switch MonitorMethod(v) {
-	case MonitorMethodGET:
-		*s = MonitorMethodGET
-	case MonitorMethodPOST:
-		*s = MonitorMethodPOST
-	case MonitorMethodPUT:
-		*s = MonitorMethodPUT
-	case MonitorMethodPATCH:
-		*s = MonitorMethodPATCH
-	case MonitorMethodDELETE:
-		*s = MonitorMethodDELETE
-	case MonitorMethodHEAD:
-		*s = MonitorMethodHEAD
-	case MonitorMethodOPTIONS:
-		*s = MonitorMethodOPTIONS
-	default:
-		*s = MonitorMethod(v)
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s MonitorMethod) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *MonitorMethod) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -6880,6 +7202,257 @@ func (s MonitorType) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *MonitorType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *MqttMonitorConfig) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *MqttMonitorConfig) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("kind")
+		s.Kind.Encode(e)
+	}
+	{
+		if s.Hostname.Set {
+			e.FieldStart("hostname")
+			s.Hostname.Encode(e)
+		}
+	}
+	{
+		if s.Port.Set {
+			e.FieldStart("port")
+			s.Port.Encode(e)
+		}
+	}
+	{
+		if s.MqttTopic.Set {
+			e.FieldStart("mqttTopic")
+			s.MqttTopic.Encode(e)
+		}
+	}
+	{
+		if s.MqttSuccessMessage.Set {
+			e.FieldStart("mqttSuccessMessage")
+			s.MqttSuccessMessage.Encode(e)
+		}
+	}
+	{
+		if s.MqttUsername.Set {
+			e.FieldStart("mqttUsername")
+			s.MqttUsername.Encode(e)
+		}
+	}
+	{
+		if s.MqttPassword.Set {
+			e.FieldStart("mqttPassword")
+			s.MqttPassword.Encode(e)
+		}
+	}
+	{
+		if s.IgnoreTls.Set {
+			e.FieldStart("ignoreTls")
+			s.IgnoreTls.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfMqttMonitorConfig = [8]string{
+	0: "kind",
+	1: "hostname",
+	2: "port",
+	3: "mqttTopic",
+	4: "mqttSuccessMessage",
+	5: "mqttUsername",
+	6: "mqttPassword",
+	7: "ignoreTls",
+}
+
+// Decode decodes MqttMonitorConfig from json.
+func (s *MqttMonitorConfig) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode MqttMonitorConfig to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "kind":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				if err := s.Kind.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"kind\"")
+			}
+		case "hostname":
+			if err := func() error {
+				s.Hostname.Reset()
+				if err := s.Hostname.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hostname\"")
+			}
+		case "port":
+			if err := func() error {
+				s.Port.Reset()
+				if err := s.Port.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"port\"")
+			}
+		case "mqttTopic":
+			if err := func() error {
+				s.MqttTopic.Reset()
+				if err := s.MqttTopic.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"mqttTopic\"")
+			}
+		case "mqttSuccessMessage":
+			if err := func() error {
+				s.MqttSuccessMessage.Reset()
+				if err := s.MqttSuccessMessage.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"mqttSuccessMessage\"")
+			}
+		case "mqttUsername":
+			if err := func() error {
+				s.MqttUsername.Reset()
+				if err := s.MqttUsername.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"mqttUsername\"")
+			}
+		case "mqttPassword":
+			if err := func() error {
+				s.MqttPassword.Reset()
+				if err := s.MqttPassword.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"mqttPassword\"")
+			}
+		case "ignoreTls":
+			if err := func() error {
+				s.IgnoreTls.Reset()
+				if err := s.IgnoreTls.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ignoreTls\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode MqttMonitorConfig")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfMqttMonitorConfig) {
+					name = jsonFieldsNameOfMqttMonitorConfig[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *MqttMonitorConfig) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *MqttMonitorConfig) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes MqttMonitorConfigKind as json.
+func (s MqttMonitorConfigKind) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes MqttMonitorConfigKind from json.
+func (s *MqttMonitorConfigKind) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode MqttMonitorConfigKind to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch MqttMonitorConfigKind(v) {
+	case MqttMonitorConfigKindMqtt:
+		*s = MqttMonitorConfigKindMqtt
+	default:
+		*s = MqttMonitorConfigKind(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s MqttMonitorConfigKind) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *MqttMonitorConfigKind) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -7515,6 +8088,39 @@ func (s *OptDateTime) UnmarshalJSON(data []byte) error {
 	return s.Decode(d, json.DecodeDateTime)
 }
 
+// Encode encodes DnsMonitorConfigDnsResolveType as json.
+func (o OptDnsMonitorConfigDnsResolveType) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes DnsMonitorConfigDnsResolveType from json.
+func (o *OptDnsMonitorConfigDnsResolveType) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptDnsMonitorConfigDnsResolveType to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptDnsMonitorConfigDnsResolveType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptDnsMonitorConfigDnsResolveType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes float64 as json.
 func (o OptFloat64) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -7652,6 +8258,39 @@ func (s *OptGetStatusPageHeartbeatsOKUptimeList) UnmarshalJSON(data []byte) erro
 	return s.Decode(d)
 }
 
+// Encode encodes HttpMonitorConfigMethod as json.
+func (o OptHttpMonitorConfigMethod) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes HttpMonitorConfigMethod from json.
+func (o *OptHttpMonitorConfigMethod) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptHttpMonitorConfigMethod to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptHttpMonitorConfigMethod) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptHttpMonitorConfigMethod) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes int as json.
 func (o OptInt) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -7722,18 +8361,18 @@ func (s *OptInt64) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes MonitorDnsResolveType as json.
-func (o OptMonitorDnsResolveType) Encode(e *jx.Encoder) {
+// Encode encodes MonitorConfig as json.
+func (o OptMonitorConfig) Encode(e *jx.Encoder) {
 	if !o.Set {
 		return
 	}
-	e.Str(string(o.Value))
+	o.Value.Encode(e)
 }
 
-// Decode decodes MonitorDnsResolveType from json.
-func (o *OptMonitorDnsResolveType) Decode(d *jx.Decoder) error {
+// Decode decodes MonitorConfig from json.
+func (o *OptMonitorConfig) Decode(d *jx.Decoder) error {
 	if o == nil {
-		return errors.New("invalid: unable to decode OptMonitorDnsResolveType to nil")
+		return errors.New("invalid: unable to decode OptMonitorConfig to nil")
 	}
 	o.Set = true
 	if err := o.Value.Decode(d); err != nil {
@@ -7743,47 +8382,14 @@ func (o *OptMonitorDnsResolveType) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s OptMonitorDnsResolveType) MarshalJSON() ([]byte, error) {
+func (s OptMonitorConfig) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptMonitorDnsResolveType) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes MonitorMethod as json.
-func (o OptMonitorMethod) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	e.Str(string(o.Value))
-}
-
-// Decode decodes MonitorMethod from json.
-func (o *OptMonitorMethod) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptMonitorMethod to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptMonitorMethod) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptMonitorMethod) UnmarshalJSON(data []byte) error {
+func (s *OptMonitorConfig) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -8038,6 +8644,356 @@ func (s OptUUID) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptUUID) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *PingMonitorConfig) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *PingMonitorConfig) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("kind")
+		s.Kind.Encode(e)
+	}
+	{
+		if s.Hostname.Set {
+			e.FieldStart("hostname")
+			s.Hostname.Encode(e)
+		}
+	}
+	{
+		if s.PacketSize.Set {
+			e.FieldStart("packetSize")
+			s.PacketSize.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfPingMonitorConfig = [3]string{
+	0: "kind",
+	1: "hostname",
+	2: "packetSize",
+}
+
+// Decode decodes PingMonitorConfig from json.
+func (s *PingMonitorConfig) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode PingMonitorConfig to nil")
+	}
+	var requiredBitSet [1]uint8
+	s.setDefaults()
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "kind":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				if err := s.Kind.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"kind\"")
+			}
+		case "hostname":
+			if err := func() error {
+				s.Hostname.Reset()
+				if err := s.Hostname.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hostname\"")
+			}
+		case "packetSize":
+			if err := func() error {
+				s.PacketSize.Reset()
+				if err := s.PacketSize.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"packetSize\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode PingMonitorConfig")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfPingMonitorConfig) {
+					name = jsonFieldsNameOfPingMonitorConfig[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *PingMonitorConfig) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *PingMonitorConfig) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes PingMonitorConfigKind as json.
+func (s PingMonitorConfigKind) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes PingMonitorConfigKind from json.
+func (s *PingMonitorConfigKind) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode PingMonitorConfigKind to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch PingMonitorConfigKind(v) {
+	case PingMonitorConfigKindPing:
+		*s = PingMonitorConfigKindPing
+	default:
+		*s = PingMonitorConfigKind(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s PingMonitorConfigKind) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *PingMonitorConfigKind) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *PortMonitorConfig) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *PortMonitorConfig) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("kind")
+		s.Kind.Encode(e)
+	}
+	{
+		if s.Hostname.Set {
+			e.FieldStart("hostname")
+			s.Hostname.Encode(e)
+		}
+	}
+	{
+		if s.Port.Set {
+			e.FieldStart("port")
+			s.Port.Encode(e)
+		}
+	}
+	{
+		if s.IgnoreTls.Set {
+			e.FieldStart("ignoreTls")
+			s.IgnoreTls.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfPortMonitorConfig = [4]string{
+	0: "kind",
+	1: "hostname",
+	2: "port",
+	3: "ignoreTls",
+}
+
+// Decode decodes PortMonitorConfig from json.
+func (s *PortMonitorConfig) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode PortMonitorConfig to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "kind":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				if err := s.Kind.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"kind\"")
+			}
+		case "hostname":
+			if err := func() error {
+				s.Hostname.Reset()
+				if err := s.Hostname.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hostname\"")
+			}
+		case "port":
+			if err := func() error {
+				s.Port.Reset()
+				if err := s.Port.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"port\"")
+			}
+		case "ignoreTls":
+			if err := func() error {
+				s.IgnoreTls.Reset()
+				if err := s.IgnoreTls.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ignoreTls\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode PortMonitorConfig")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfPortMonitorConfig) {
+					name = jsonFieldsNameOfPortMonitorConfig[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *PortMonitorConfig) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *PortMonitorConfig) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes PortMonitorConfigKind as json.
+func (s PortMonitorConfigKind) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes PortMonitorConfigKind from json.
+func (s *PortMonitorConfigKind) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode PortMonitorConfigKind to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch PortMonitorConfigKind(v) {
+	case PortMonitorConfigKindPort:
+		*s = PortMonitorConfigKindPort
+	default:
+		*s = PortMonitorConfigKind(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s PortMonitorConfigKind) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *PortMonitorConfigKind) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -8811,6 +9767,321 @@ func (s *ProxyProtocol) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
+func (s *PushMonitorConfig) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *PushMonitorConfig) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("kind")
+		s.Kind.Encode(e)
+	}
+}
+
+var jsonFieldsNameOfPushMonitorConfig = [1]string{
+	0: "kind",
+}
+
+// Decode decodes PushMonitorConfig from json.
+func (s *PushMonitorConfig) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode PushMonitorConfig to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "kind":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				if err := s.Kind.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"kind\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode PushMonitorConfig")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfPushMonitorConfig) {
+					name = jsonFieldsNameOfPushMonitorConfig[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *PushMonitorConfig) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *PushMonitorConfig) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes PushMonitorConfigKind as json.
+func (s PushMonitorConfigKind) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes PushMonitorConfigKind from json.
+func (s *PushMonitorConfigKind) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode PushMonitorConfigKind to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch PushMonitorConfigKind(v) {
+	case PushMonitorConfigKindPush:
+		*s = PushMonitorConfigKindPush
+	default:
+		*s = PushMonitorConfigKind(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s PushMonitorConfigKind) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *PushMonitorConfigKind) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *RedisMonitorConfig) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *RedisMonitorConfig) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("kind")
+		s.Kind.Encode(e)
+	}
+	{
+		if s.Hostname.Set {
+			e.FieldStart("hostname")
+			s.Hostname.Encode(e)
+		}
+	}
+	{
+		if s.Port.Set {
+			e.FieldStart("port")
+			s.Port.Encode(e)
+		}
+	}
+	{
+		if s.DatabaseQuery.Set {
+			e.FieldStart("databaseQuery")
+			s.DatabaseQuery.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfRedisMonitorConfig = [4]string{
+	0: "kind",
+	1: "hostname",
+	2: "port",
+	3: "databaseQuery",
+}
+
+// Decode decodes RedisMonitorConfig from json.
+func (s *RedisMonitorConfig) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode RedisMonitorConfig to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "kind":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				if err := s.Kind.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"kind\"")
+			}
+		case "hostname":
+			if err := func() error {
+				s.Hostname.Reset()
+				if err := s.Hostname.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hostname\"")
+			}
+		case "port":
+			if err := func() error {
+				s.Port.Reset()
+				if err := s.Port.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"port\"")
+			}
+		case "databaseQuery":
+			if err := func() error {
+				s.DatabaseQuery.Reset()
+				if err := s.DatabaseQuery.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"databaseQuery\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode RedisMonitorConfig")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfRedisMonitorConfig) {
+					name = jsonFieldsNameOfRedisMonitorConfig[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *RedisMonitorConfig) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *RedisMonitorConfig) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes RedisMonitorConfigKind as json.
+func (s RedisMonitorConfigKind) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes RedisMonitorConfigKind from json.
+func (s *RedisMonitorConfigKind) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode RedisMonitorConfigKind to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch RedisMonitorConfigKind(v) {
+	case RedisMonitorConfigKindRedis:
+		*s = RedisMonitorConfigKindRedis
+	default:
+		*s = RedisMonitorConfigKind(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s RedisMonitorConfigKind) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *RedisMonitorConfigKind) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *RefreshTokenRequest) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -9453,6 +10724,189 @@ func (s *SetupReq) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *SetupReq) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *SmtpMonitorConfig) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *SmtpMonitorConfig) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("kind")
+		s.Kind.Encode(e)
+	}
+	{
+		if s.Hostname.Set {
+			e.FieldStart("hostname")
+			s.Hostname.Encode(e)
+		}
+	}
+	{
+		if s.Port.Set {
+			e.FieldStart("port")
+			s.Port.Encode(e)
+		}
+	}
+	{
+		if s.IgnoreTls.Set {
+			e.FieldStart("ignoreTls")
+			s.IgnoreTls.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfSmtpMonitorConfig = [4]string{
+	0: "kind",
+	1: "hostname",
+	2: "port",
+	3: "ignoreTls",
+}
+
+// Decode decodes SmtpMonitorConfig from json.
+func (s *SmtpMonitorConfig) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode SmtpMonitorConfig to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "kind":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				if err := s.Kind.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"kind\"")
+			}
+		case "hostname":
+			if err := func() error {
+				s.Hostname.Reset()
+				if err := s.Hostname.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hostname\"")
+			}
+		case "port":
+			if err := func() error {
+				s.Port.Reset()
+				if err := s.Port.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"port\"")
+			}
+		case "ignoreTls":
+			if err := func() error {
+				s.IgnoreTls.Reset()
+				if err := s.IgnoreTls.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ignoreTls\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode SmtpMonitorConfig")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfSmtpMonitorConfig) {
+					name = jsonFieldsNameOfSmtpMonitorConfig[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *SmtpMonitorConfig) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *SmtpMonitorConfig) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes SmtpMonitorConfigKind as json.
+func (s SmtpMonitorConfigKind) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes SmtpMonitorConfigKind from json.
+func (s *SmtpMonitorConfigKind) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode SmtpMonitorConfigKind to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch SmtpMonitorConfigKind(v) {
+	case SmtpMonitorConfigKindSMTP:
+		*s = SmtpMonitorConfigKindSMTP
+	default:
+		*s = SmtpMonitorConfigKind(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s SmtpMonitorConfigKind) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *SmtpMonitorConfigKind) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -10565,6 +12019,155 @@ func (s *TagInput) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *TagInput) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *TailscalePingMonitorConfig) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *TailscalePingMonitorConfig) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("kind")
+		s.Kind.Encode(e)
+	}
+	{
+		if s.Hostname.Set {
+			e.FieldStart("hostname")
+			s.Hostname.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfTailscalePingMonitorConfig = [2]string{
+	0: "kind",
+	1: "hostname",
+}
+
+// Decode decodes TailscalePingMonitorConfig from json.
+func (s *TailscalePingMonitorConfig) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode TailscalePingMonitorConfig to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "kind":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				if err := s.Kind.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"kind\"")
+			}
+		case "hostname":
+			if err := func() error {
+				s.Hostname.Reset()
+				if err := s.Hostname.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hostname\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode TailscalePingMonitorConfig")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfTailscalePingMonitorConfig) {
+					name = jsonFieldsNameOfTailscalePingMonitorConfig[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *TailscalePingMonitorConfig) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *TailscalePingMonitorConfig) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes TailscalePingMonitorConfigKind as json.
+func (s TailscalePingMonitorConfigKind) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes TailscalePingMonitorConfigKind from json.
+func (s *TailscalePingMonitorConfigKind) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode TailscalePingMonitorConfigKind to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch TailscalePingMonitorConfigKind(v) {
+	case TailscalePingMonitorConfigKindTailscalePing:
+		*s = TailscalePingMonitorConfigKindTailscalePing
+	default:
+		*s = TailscalePingMonitorConfigKind(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s TailscalePingMonitorConfigKind) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *TailscalePingMonitorConfigKind) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

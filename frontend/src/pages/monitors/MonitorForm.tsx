@@ -20,6 +20,7 @@ import { AlertFields } from './fields/AlertFields';
 import { NotificationSelector } from './fields/NotificationSelector';
 import { TagSelector } from '../../components/TagSelector';
 import { mergeContentType, extractContentType } from './headerUtils';
+import { buildConfigFromForm, flattenConfigToForm } from './configUtils';
 
 const { Title, Text } = Typography;
 
@@ -52,6 +53,11 @@ export function MonitorForm({ mode }: { mode?: 'clone' }) {
       if (values.parentId === null) {
         delete values.parentId;
       }
+
+      // Flatten config fields into top-level form values
+      const configFields = flattenConfigToForm(values);
+      delete values.config;
+      Object.assign(values, configFields);
 
       // Extract Content-Type from headers into bodyContentType for the form
       const hdrs = (values.headers ?? []) as { name: string; value: string }[];
@@ -111,16 +117,37 @@ export function MonitorForm({ mode }: { mode?: 'clone' }) {
 
   async function handleSubmit(values: MonitorInput) {
     setSaving(true);
-    const input = { ...values, parentId: values.parentId ?? null } as MonitorInput & { bodyContentType?: string };
+    const flat = values as Record<string, unknown>;
 
-    // Merge bodyContentType into the headers array and remove the virtual field
-    if (input.bodyContentType && input.body) {
-      (input as Record<string, unknown>).headers = mergeContentType(
-        ((input.headers ?? []) as { name: string; value: string }[]),
-        input.bodyContentType,
+    // Merge bodyContentType into headers before building config
+    const bodyContentType = flat.bodyContentType as string | undefined;
+    if (bodyContentType && flat.body) {
+      flat.headers = mergeContentType(
+        ((flat.headers ?? []) as { name: string; value: string }[]),
+        bodyContentType,
       );
     }
-    delete input.bodyContentType;
+    delete flat.bodyContentType;
+
+    // Build the discriminated config from flat form fields
+    const config = buildConfigFromForm(flat);
+
+    const input: MonitorInput = {
+      name: values.name,
+      type: values.type,
+      active: values.active,
+      interval: values.interval,
+      timeout: values.timeout,
+      maxRetries: values.maxRetries,
+      retryInterval: values.retryInterval,
+      description: (flat.description as string) || undefined,
+      upsideDown: flat.upsideDown as boolean | undefined,
+      parentId: (flat.parentId as string | null) ?? null,
+      notificationIds: (flat.notificationIds as string[]) || undefined,
+      resendInterval: values.resendInterval,
+      expiryNotification: flat.expiryNotification as boolean | undefined,
+      config,
+    };
 
     try {
       if (isEdit) {

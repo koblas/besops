@@ -3,6 +3,18 @@
 package oas
 
 // setDefaults set default value of fields.
+func (s *HttpMonitorConfig) setDefaults() {
+	{
+		val := HttpMonitorConfigMethod("GET")
+		s.Method.SetTo(val)
+	}
+	{
+		val := int(10)
+		s.MaxRedirects.SetTo(val)
+	}
+}
+
+// setDefaults set default value of fields.
 func (s *IncidentInput) setDefaults() {
 	{
 		val := bool(true)
@@ -25,32 +37,20 @@ func (s *Monitor) setDefaults() {
 		s.Interval.SetTo(val)
 	}
 	{
-		val := int(0)
-		s.MaxRetries.SetTo(val)
-	}
-	{
 		val := int(48)
 		s.Timeout.SetTo(val)
+	}
+	{
+		val := int(0)
+		s.MaxRetries.SetTo(val)
 	}
 	{
 		val := int(60)
 		s.RetryInterval.SetTo(val)
 	}
 	{
-		val := int(10)
-		s.MaxRedirects.SetTo(val)
-	}
-	{
-		val := MonitorMethod("GET")
-		s.Method.SetTo(val)
-	}
-	{
 		val := int(0)
 		s.ResendInterval.SetTo(val)
-	}
-	{
-		val := int(56)
-		s.PacketSize.SetTo(val)
 	}
 }
 
@@ -65,32 +65,20 @@ func (s *MonitorInput) setDefaults() {
 		s.Interval.SetTo(val)
 	}
 	{
-		val := int(0)
-		s.MaxRetries.SetTo(val)
-	}
-	{
 		val := int(48)
 		s.Timeout.SetTo(val)
+	}
+	{
+		val := int(0)
+		s.MaxRetries.SetTo(val)
 	}
 	{
 		val := int(60)
 		s.RetryInterval.SetTo(val)
 	}
 	{
-		val := int(10)
-		s.MaxRedirects.SetTo(val)
-	}
-	{
-		val := string("GET")
-		s.Method.SetTo(val)
-	}
-	{
 		val := int(0)
 		s.ResendInterval.SetTo(val)
-	}
-	{
-		val := int(56)
-		s.PacketSize.SetTo(val)
 	}
 }
 
@@ -103,6 +91,14 @@ func (s *NotificationInput) setDefaults() {
 	{
 		val := bool(false)
 		s.ApplyExisting.SetTo(val)
+	}
+}
+
+// setDefaults set default value of fields.
+func (s *PingMonitorConfig) setDefaults() {
+	{
+		val := int(56)
+		s.PacketSize.SetTo(val)
 	}
 }
 

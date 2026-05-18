@@ -197,119 +197,247 @@ func (h *Handler) loadOASTags(ctx context.Context, monitorID string) []oas.Monit
 }
 
 func monitorToOAS(m *Monitor) oas.Monitor {
+	result := oas.Monitor{
+		ID:                 oasutil.MustParseUUID(m.ID),
+		Name:               m.Name,
+		Type:               oas.MonitorType(m.Type),
+		Active:             m.Active,
+		Interval:           oas.NewOptInt(m.Interval),
+		Timeout:            oas.NewOptInt(m.Timeout),
+		MaxRetries:         oas.NewOptInt(m.MaxRetries),
+		RetryInterval:      oas.NewOptInt(m.RetryInterval),
+		Description:        oasutil.PtrToOptString(m.Description),
+		UpsideDown:         oas.NewOptBool(m.UpsideDown),
+		PushToken:          oasutil.PtrToOptString(m.PushToken),
+		ResendInterval:     oas.NewOptInt(m.ResendInterval),
+		ExpiryNotification: oas.NewOptBool(m.ExpiryNotification),
+	}
+
+	if m.ParentID != nil {
+		result.ParentId = oasutil.NewOptNilUUID(oasutil.MustParseUUID(*m.ParentID))
+	}
+
+	cfg := buildConfigFromDomain(m)
+	result.Config = oas.OptMonitorConfig{Value: cfg, Set: true}
+
+	return result
+}
+
+func buildConfigFromDomain(m *Monitor) oas.MonitorConfig {
+	switch m.Type {
+	case "http":
+		return buildHttpConfig(m)
+	case "port":
+		return buildPortConfig(m)
+	case "ping":
+		return buildPingConfig(m)
+	case "dns":
+		return buildDnsConfig(m)
+	case "grpc-keyword":
+		return buildGrpcConfig(m)
+	case "mqtt":
+		return buildMqttConfig(m)
+	case "redis":
+		return buildRedisConfig(m)
+	case "push":
+		return oas.MonitorConfig{
+			Type:              oas.PushMonitorConfigMonitorConfig,
+			PushMonitorConfig: oas.PushMonitorConfig{Kind: "push"},
+		}
+	case "smtp":
+		return buildSmtpConfig(m)
+	case "tailscale-ping":
+		return buildTailscalePingConfig(m)
+	case "group":
+		return oas.MonitorConfig{
+			Type:               oas.GroupMonitorConfigMonitorConfig,
+			GroupMonitorConfig: oas.GroupMonitorConfig{Kind: "group"},
+		}
+	default:
+		return oas.MonitorConfig{}
+	}
+}
+
+func buildHttpConfig(m *Monitor) oas.MonitorConfig {
 	var codes []string
 	if m.AcceptedStatusCodes != "" {
 		_ = json.Unmarshal([]byte(m.AcceptedStatusCodes), &codes)
 	}
 
-	result := oas.Monitor{
-		ID:                  oasutil.MustParseUUID(m.ID),
-		Name:                m.Name,
-		Type:                oas.MonitorType(m.Type),
-		Active:              m.Active,
-		Interval:            oas.NewOptInt(m.Interval),
+	cfg := oas.HttpMonitorConfig{
+		Kind:                "http",
 		URL:                 oasutil.PtrToOptString(m.URL),
-		Hostname:            oasutil.PtrToOptString(m.Hostname),
-		Port:                oasutil.PtrIntToOptInt(m.Port),
-		MaxRetries:          oas.NewOptInt(m.MaxRetries),
-		Timeout:             oas.NewOptInt(m.Timeout),
-		RetryInterval:       oas.NewOptInt(m.RetryInterval),
-		Keyword:             oasutil.PtrToOptString(m.Keyword),
-		InvertKeyword:       oas.NewOptBool(m.InvertKeyword),
-		JsonPath:            oasutil.PtrToOptString(m.JsonPath),
-		ExpectedValue:       oasutil.PtrToOptString(m.ExpectedValue),
-		IgnoreTls:           oas.NewOptBool(m.IgnoreTLS),
-		MaxRedirects:        oas.NewOptInt(m.MaxRedirects),
-		AcceptedStatusCodes: codes,
-		Method:              newOptMonitorMethod(m.Method),
 		Headers:             headersToOAS(m.Headers),
 		Body:                oasutil.PtrToOptString(m.Body),
 		BasicAuthUser:       oasutil.PtrToOptString(m.BasicAuthUser),
 		BasicAuthPass:       oasutil.PtrToOptString(m.BasicAuthPass),
-		PushToken:           oasutil.PtrToOptString(m.PushToken),
-		Description:         oasutil.PtrToOptString(m.Description),
-		UpsideDown:          oas.NewOptBool(m.UpsideDown),
-		DnsResolveType:      newOptDNSResolveType(m.DNSResolveType),
-		DnsResolveServer:    oasutil.PtrToOptString(m.DNSResolveServer),
-		MqttTopic:           oasutil.PtrToOptString(m.MQTTTopic),
-		MqttSuccessMessage:  oasutil.PtrToOptString(m.MQTTSuccessMessage),
-		MqttUsername:        oasutil.PtrToOptString(m.MQTTUsername),
-		MqttPassword:        oasutil.PtrToOptString(m.MQTTPassword),
-		DatabaseQuery:       oasutil.PtrToOptString(m.DatabaseQuery),
-		GrpcUrl:             oasutil.PtrToOptString(m.GRPCUrl),
-		GrpcServiceName:     oasutil.PtrToOptString(m.GRPCServiceName),
-		GrpcMethod:          oasutil.PtrToOptString(m.GRPCMethod),
-		GrpcEnableTls:       oas.NewOptBool(m.GRPCEnableTLS),
-		ResendInterval:      oas.NewOptInt(m.ResendInterval),
-		PacketSize:          oas.NewOptInt(m.PacketSize),
-		ExpiryNotification:  oas.NewOptBool(m.ExpiryNotification),
+		MaxRedirects:        oas.NewOptInt(m.MaxRedirects),
+		AcceptedStatusCodes: codes,
+		IgnoreTls:           oas.NewOptBool(m.IgnoreTLS),
+		Keyword:             oasutil.PtrToOptString(m.Keyword),
+		InvertKeyword:       oas.NewOptBool(m.InvertKeyword),
+		JsonPath:            oasutil.PtrToOptString(m.JsonPath),
+		ExpectedValue:       oasutil.PtrToOptString(m.ExpectedValue),
 	}
 
+	if m.Method != "" {
+		cfg.Method = oas.OptHttpMonitorConfigMethod{
+			Value: oas.HttpMonitorConfigMethod(strings.ToUpper(m.Method)),
+			Set:   true,
+		}
+	}
 	if m.ProxyID != nil {
-		result.ProxyId = oas.NewOptUUID(oasutil.MustParseUUID(*m.ProxyID))
-	}
-	if m.ParentID != nil {
-		result.ParentId = oasutil.NewOptNilUUID(oasutil.MustParseUUID(*m.ParentID))
+		cfg.ProxyId = oas.OptUUID{Value: oasutil.MustParseUUID(*m.ProxyID), Set: true}
 	}
 
-	return result
+	return oas.MonitorConfig{
+		Type:              oas.HttpMonitorConfigMonitorConfig,
+		HttpMonitorConfig: cfg,
+	}
+}
+
+func buildPortConfig(m *Monitor) oas.MonitorConfig {
+	cfg := oas.PortMonitorConfig{
+		Kind:      "port",
+		Hostname:  oasutil.PtrToOptString(m.Hostname),
+		IgnoreTls: oas.NewOptBool(m.IgnoreTLS),
+	}
+	if m.Port != nil {
+		cfg.Port = oas.NewOptInt(*m.Port)
+	}
+	return oas.MonitorConfig{
+		Type:              oas.PortMonitorConfigMonitorConfig,
+		PortMonitorConfig: cfg,
+	}
+}
+
+func buildPingConfig(m *Monitor) oas.MonitorConfig {
+	cfg := oas.PingMonitorConfig{
+		Kind:       "ping",
+		Hostname:   oasutil.PtrToOptString(m.Hostname),
+		PacketSize: oas.NewOptInt(m.PacketSize),
+	}
+	return oas.MonitorConfig{
+		Type:              oas.PingMonitorConfigMonitorConfig,
+		PingMonitorConfig: cfg,
+	}
+}
+
+func buildDnsConfig(m *Monitor) oas.MonitorConfig {
+	cfg := oas.DnsMonitorConfig{
+		Kind:             "dns",
+		Hostname:         oasutil.PtrToOptString(m.Hostname),
+		DnsResolveServer: oasutil.PtrToOptString(m.DNSResolveServer),
+	}
+	if m.Port != nil {
+		cfg.Port = oas.NewOptInt(*m.Port)
+	}
+	if m.DNSResolveType != "" {
+		cfg.DnsResolveType = oas.OptDnsMonitorConfigDnsResolveType{
+			Value: oas.DnsMonitorConfigDnsResolveType(m.DNSResolveType),
+			Set:   true,
+		}
+	}
+	return oas.MonitorConfig{
+		Type:             oas.DnsMonitorConfigMonitorConfig,
+		DnsMonitorConfig: cfg,
+	}
+}
+
+func buildGrpcConfig(m *Monitor) oas.MonitorConfig {
+	cfg := oas.GrpcMonitorConfig{
+		Kind:            "grpc-keyword",
+		GrpcUrl:         oasutil.PtrToOptString(m.GRPCUrl),
+		GrpcServiceName: oasutil.PtrToOptString(m.GRPCServiceName),
+		GrpcMethod:      oasutil.PtrToOptString(m.GRPCMethod),
+		GrpcEnableTls:   oas.NewOptBool(m.GRPCEnableTLS),
+		IgnoreTls:       oas.NewOptBool(m.IgnoreTLS),
+	}
+	return oas.MonitorConfig{
+		Type:              oas.GrpcMonitorConfigMonitorConfig,
+		GrpcMonitorConfig: cfg,
+	}
+}
+
+func buildMqttConfig(m *Monitor) oas.MonitorConfig {
+	cfg := oas.MqttMonitorConfig{
+		Kind:               "mqtt",
+		Hostname:           oasutil.PtrToOptString(m.Hostname),
+		MqttTopic:          oasutil.PtrToOptString(m.MQTTTopic),
+		MqttSuccessMessage: oasutil.PtrToOptString(m.MQTTSuccessMessage),
+		MqttUsername:       oasutil.PtrToOptString(m.MQTTUsername),
+		MqttPassword:       oasutil.PtrToOptString(m.MQTTPassword),
+		IgnoreTls:          oas.NewOptBool(m.IgnoreTLS),
+	}
+	if m.Port != nil {
+		cfg.Port = oas.NewOptInt(*m.Port)
+	}
+	return oas.MonitorConfig{
+		Type:              oas.MqttMonitorConfigMonitorConfig,
+		MqttMonitorConfig: cfg,
+	}
+}
+
+func buildRedisConfig(m *Monitor) oas.MonitorConfig {
+	cfg := oas.RedisMonitorConfig{
+		Kind:          "redis",
+		Hostname:      oasutil.PtrToOptString(m.Hostname),
+		DatabaseQuery: oasutil.PtrToOptString(m.DatabaseQuery),
+	}
+	if m.Port != nil {
+		cfg.Port = oas.NewOptInt(*m.Port)
+	}
+	return oas.MonitorConfig{
+		Type:               oas.RedisMonitorConfigMonitorConfig,
+		RedisMonitorConfig: cfg,
+	}
+}
+
+func buildSmtpConfig(m *Monitor) oas.MonitorConfig {
+	cfg := oas.SmtpMonitorConfig{
+		Kind:      "smtp",
+		Hostname:  oasutil.PtrToOptString(m.Hostname),
+		IgnoreTls: oas.NewOptBool(m.IgnoreTLS),
+	}
+	if m.Port != nil {
+		cfg.Port = oas.NewOptInt(*m.Port)
+	}
+	return oas.MonitorConfig{
+		Type:              oas.SmtpMonitorConfigMonitorConfig,
+		SmtpMonitorConfig: cfg,
+	}
+}
+
+func buildTailscalePingConfig(m *Monitor) oas.MonitorConfig {
+	cfg := oas.TailscalePingMonitorConfig{
+		Kind:     "tailscale-ping",
+		Hostname: oasutil.PtrToOptString(m.Hostname),
+	}
+	return oas.MonitorConfig{
+		Type:                       oas.TailscalePingMonitorConfigMonitorConfig,
+		TailscalePingMonitorConfig: cfg,
+	}
 }
 
 func monitorFromInput(req *oas.MonitorInput, userID string) *Monitor {
-	var codes string
-	if len(req.AcceptedStatusCodes) > 0 {
-		b, _ := json.Marshal(req.AcceptedStatusCodes)
-		codes = string(b)
-	}
-
 	m := &Monitor{
-		Name:                req.Name,
-		Type:                req.Type,
-		Active:              oasutil.OptBoolValue(req.Active, true),
-		UserID:              userID,
-		Interval:            oasutil.OptIntValue(req.Interval, 60),
-		URL:                 oasutil.OptStringValue(req.URL),
-		Hostname:            oasutil.OptStringValue(req.Hostname),
-		MaxRetries:          oasutil.OptIntValue(req.MaxRetries, 1),
-		Timeout:             oasutil.OptIntValue(req.Timeout, 48),
-		RetryInterval:       oasutil.OptIntValue(req.RetryInterval, 60),
-		Keyword:             oasutil.OptStringValue(req.Keyword),
-		InvertKeyword:       oasutil.OptBoolValue(req.InvertKeyword, false),
-		JsonPath:            oasutil.OptStringValue(req.JsonPath),
-		ExpectedValue:       oasutil.OptStringValue(req.ExpectedValue),
-		IgnoreTLS:           oasutil.OptBoolValue(req.IgnoreTls, false),
-		MaxRedirects:        oasutil.OptIntValue(req.MaxRedirects, 10),
-		AcceptedStatusCodes: codes,
-		Method:              oasutil.OptStringValue(req.Method),
-		Headers:             headersFromOAS(req.Headers),
-		Body:                oasutil.OptStringValue(req.Body),
-		BasicAuthUser:       oasutil.OptStringValue(req.BasicAuthUser),
-		BasicAuthPass:       oasutil.OptStringValue(req.BasicAuthPass),
-		Description:         oasutil.OptStringValue(req.Description),
-		UpsideDown:          oasutil.OptBoolValue(req.UpsideDown, false),
-		DNSResolveType:      oasutil.OptStringValue(req.DnsResolveType),
-		DNSResolveServer:    oasutil.OptStringValue(req.DnsResolveServer),
-		MQTTTopic:           oasutil.OptStringValue(req.MqttTopic),
-		MQTTSuccessMessage:  oasutil.OptStringValue(req.MqttSuccessMessage),
-		MQTTUsername:        oasutil.OptStringValue(req.MqttUsername),
-		MQTTPassword:        oasutil.OptStringValue(req.MqttPassword),
-		DatabaseQuery:       oasutil.OptStringValue(req.DatabaseQuery),
-		ProxyID:             oasutil.OptUUIDPtr(req.ProxyId),
-		GRPCUrl:             oasutil.OptStringValue(req.GrpcUrl),
-		GRPCServiceName:     oasutil.OptStringValue(req.GrpcServiceName),
-		GRPCMethod:          oasutil.OptStringValue(req.GrpcMethod),
-		GRPCEnableTLS:       oasutil.OptBoolValue(req.GrpcEnableTls, false),
-		ParentID:            oasutil.OptNilUUIDPtr(req.ParentId),
-		ResendInterval:      oasutil.OptIntValue(req.ResendInterval, 0),
-		PacketSize:          oasutil.OptIntValue(req.PacketSize, 56),
-		ExpiryNotification:  oasutil.OptBoolValue(req.ExpiryNotification, false),
-		PushToken:           uuid.New().String(),
+		Name:               req.Name,
+		Type:               req.Type,
+		Active:             oasutil.OptBoolValue(req.Active, true),
+		UserID:             userID,
+		Interval:           oasutil.OptIntValue(req.Interval, 60),
+		MaxRetries:         oasutil.OptIntValue(req.MaxRetries, 1),
+		Timeout:            oasutil.OptIntValue(req.Timeout, 48),
+		RetryInterval:      oasutil.OptIntValue(req.RetryInterval, 60),
+		Description:        oasutil.OptStringValue(req.Description),
+		UpsideDown:         oasutil.OptBoolValue(req.UpsideDown, false),
+		ParentID:           oasutil.OptNilUUIDPtr(req.ParentId),
+		ResendInterval:     oasutil.OptIntValue(req.ResendInterval, 0),
+		ExpiryNotification: oasutil.OptBoolValue(req.ExpiryNotification, false),
+		PushToken:          uuid.New().String(),
 	}
 
-	if req.Port.IsSet() {
-		p := req.Port.Value
-		m.Port = &p
-	}
+	applyConfig(m, &req.Config)
 
 	return m
 }
@@ -324,16 +452,6 @@ func applyMonitorInput(m *Monitor, req *oas.MonitorInput) {
 	if req.Interval.IsSet() {
 		m.Interval = req.Interval.Value
 	}
-	if req.URL.IsSet() {
-		m.URL = req.URL.Value
-	}
-	if req.Hostname.IsSet() {
-		m.Hostname = req.Hostname.Value
-	}
-	if req.Port.IsSet() {
-		p := req.Port.Value
-		m.Port = &p
-	}
 	if req.MaxRetries.IsSet() {
 		m.MaxRetries = req.MaxRetries.Value
 	}
@@ -343,84 +461,11 @@ func applyMonitorInput(m *Monitor, req *oas.MonitorInput) {
 	if req.RetryInterval.IsSet() {
 		m.RetryInterval = req.RetryInterval.Value
 	}
-	if req.Keyword.IsSet() {
-		m.Keyword = req.Keyword.Value
-	}
-	if req.InvertKeyword.IsSet() {
-		m.InvertKeyword = req.InvertKeyword.Value
-	}
-	if req.JsonPath.IsSet() {
-		m.JsonPath = req.JsonPath.Value
-	}
-	if req.ExpectedValue.IsSet() {
-		m.ExpectedValue = req.ExpectedValue.Value
-	}
-	if req.IgnoreTls.IsSet() {
-		m.IgnoreTLS = req.IgnoreTls.Value
-	}
-	if req.MaxRedirects.IsSet() {
-		m.MaxRedirects = req.MaxRedirects.Value
-	}
-	if len(req.AcceptedStatusCodes) > 0 {
-		b, _ := json.Marshal(req.AcceptedStatusCodes)
-		m.AcceptedStatusCodes = string(b)
-	}
-	if req.Method.IsSet() {
-		m.Method = req.Method.Value
-	}
-	if len(req.Headers) > 0 {
-		m.Headers = headersFromOAS(req.Headers)
-	}
-	if req.Body.IsSet() {
-		m.Body = req.Body.Value
-	}
-	if req.BasicAuthUser.IsSet() {
-		m.BasicAuthUser = req.BasicAuthUser.Value
-	}
-	if req.BasicAuthPass.IsSet() {
-		m.BasicAuthPass = req.BasicAuthPass.Value
-	}
 	if req.Description.IsSet() {
 		m.Description = req.Description.Value
 	}
 	if req.UpsideDown.IsSet() {
 		m.UpsideDown = req.UpsideDown.Value
-	}
-	if req.DnsResolveType.IsSet() {
-		m.DNSResolveType = req.DnsResolveType.Value
-	}
-	if req.DnsResolveServer.IsSet() {
-		m.DNSResolveServer = req.DnsResolveServer.Value
-	}
-	if req.MqttTopic.IsSet() {
-		m.MQTTTopic = req.MqttTopic.Value
-	}
-	if req.MqttSuccessMessage.IsSet() {
-		m.MQTTSuccessMessage = req.MqttSuccessMessage.Value
-	}
-	if req.MqttUsername.IsSet() {
-		m.MQTTUsername = req.MqttUsername.Value
-	}
-	if req.MqttPassword.IsSet() {
-		m.MQTTPassword = req.MqttPassword.Value
-	}
-	if req.DatabaseQuery.IsSet() {
-		m.DatabaseQuery = req.DatabaseQuery.Value
-	}
-	if req.ProxyId.IsSet() {
-		m.ProxyID = oasutil.OptUUIDPtr(req.ProxyId)
-	}
-	if req.GrpcUrl.IsSet() {
-		m.GRPCUrl = req.GrpcUrl.Value
-	}
-	if req.GrpcServiceName.IsSet() {
-		m.GRPCServiceName = req.GrpcServiceName.Value
-	}
-	if req.GrpcMethod.IsSet() {
-		m.GRPCMethod = req.GrpcMethod.Value
-	}
-	if req.GrpcEnableTls.IsSet() {
-		m.GRPCEnableTLS = req.GrpcEnableTls.Value
 	}
 	if req.ParentId.IsSet() {
 		m.ParentID = oasutil.OptNilUUIDPtr(req.ParentId)
@@ -428,29 +473,196 @@ func applyMonitorInput(m *Monitor, req *oas.MonitorInput) {
 	if req.ResendInterval.IsSet() {
 		m.ResendInterval = req.ResendInterval.Value
 	}
-	if req.PacketSize.IsSet() {
-		m.PacketSize = req.PacketSize.Value
-	}
 	if req.ExpiryNotification.IsSet() {
 		m.ExpiryNotification = req.ExpiryNotification.Value
 	}
+
+	applyConfig(m, &req.Config)
 }
 
-func newOptMonitorMethod(s string) oas.OptMonitorMethod {
-	if s == "" {
-		return oas.OptMonitorMethod{}
+func applyConfig(m *Monitor, cfg *oas.MonitorConfig) {
+	switch cfg.Type {
+	case oas.HttpMonitorConfigMonitorConfig:
+		applyHttpConfig(m, &cfg.HttpMonitorConfig)
+	case oas.PortMonitorConfigMonitorConfig:
+		applyPortConfig(m, &cfg.PortMonitorConfig)
+	case oas.PingMonitorConfigMonitorConfig:
+		applyPingConfig(m, &cfg.PingMonitorConfig)
+	case oas.DnsMonitorConfigMonitorConfig:
+		applyDnsConfig(m, &cfg.DnsMonitorConfig)
+	case oas.GrpcMonitorConfigMonitorConfig:
+		applyGrpcConfig(m, &cfg.GrpcMonitorConfig)
+	case oas.MqttMonitorConfigMonitorConfig:
+		applyMqttConfig(m, &cfg.MqttMonitorConfig)
+	case oas.RedisMonitorConfigMonitorConfig:
+		applyRedisConfig(m, &cfg.RedisMonitorConfig)
+	case oas.SmtpMonitorConfigMonitorConfig:
+		applySmtpConfig(m, &cfg.SmtpMonitorConfig)
+	case oas.TailscalePingMonitorConfigMonitorConfig:
+		applyTailscalePingConfig(m, &cfg.TailscalePingMonitorConfig)
+	case oas.PushMonitorConfigMonitorConfig, oas.GroupMonitorConfigMonitorConfig:
+		// no type-specific fields
 	}
-	return oas.OptMonitorMethod{Value: oas.MonitorMethod(strings.ToUpper(s)), Set: true}
 }
 
-func newOptDNSResolveType(s string) oas.OptMonitorDnsResolveType {
-	if s == "" {
-		return oas.OptMonitorDnsResolveType{}
+func applyHttpConfig(m *Monitor, cfg *oas.HttpMonitorConfig) {
+	if cfg.URL.IsSet() {
+		m.URL = cfg.URL.Value
 	}
-	return oas.OptMonitorDnsResolveType{Value: oas.MonitorDnsResolveType(s), Set: true}
+	if cfg.Method.IsSet() {
+		m.Method = string(cfg.Method.Value)
+	}
+	m.Headers = headersFromOAS(cfg.Headers)
+	if cfg.Body.IsSet() {
+		m.Body = cfg.Body.Value
+	}
+	if cfg.BasicAuthUser.IsSet() {
+		m.BasicAuthUser = cfg.BasicAuthUser.Value
+	}
+	if cfg.BasicAuthPass.IsSet() {
+		m.BasicAuthPass = cfg.BasicAuthPass.Value
+	}
+	if cfg.MaxRedirects.IsSet() {
+		m.MaxRedirects = cfg.MaxRedirects.Value
+	}
+	if len(cfg.AcceptedStatusCodes) > 0 {
+		b, _ := json.Marshal(cfg.AcceptedStatusCodes)
+		m.AcceptedStatusCodes = string(b)
+	}
+	if cfg.IgnoreTls.IsSet() {
+		m.IgnoreTLS = cfg.IgnoreTls.Value
+	}
+	if cfg.Keyword.IsSet() {
+		m.Keyword = cfg.Keyword.Value
+	}
+	if cfg.InvertKeyword.IsSet() {
+		m.InvertKeyword = cfg.InvertKeyword.Value
+	}
+	if cfg.JsonPath.IsSet() {
+		m.JsonPath = cfg.JsonPath.Value
+	}
+	if cfg.ExpectedValue.IsSet() {
+		m.ExpectedValue = cfg.ExpectedValue.Value
+	}
+	if cfg.ProxyId.IsSet() {
+		m.ProxyID = oasutil.OptUUIDPtr(cfg.ProxyId)
+	}
 }
 
-func headersToOAS(raw string) []oas.MonitorHeadersItem {
+func applyPortConfig(m *Monitor, cfg *oas.PortMonitorConfig) {
+	if cfg.Hostname.IsSet() {
+		m.Hostname = cfg.Hostname.Value
+	}
+	if cfg.Port.IsSet() {
+		p := cfg.Port.Value
+		m.Port = &p
+	}
+	if cfg.IgnoreTls.IsSet() {
+		m.IgnoreTLS = cfg.IgnoreTls.Value
+	}
+}
+
+func applyPingConfig(m *Monitor, cfg *oas.PingMonitorConfig) {
+	if cfg.Hostname.IsSet() {
+		m.Hostname = cfg.Hostname.Value
+	}
+	if cfg.PacketSize.IsSet() {
+		m.PacketSize = cfg.PacketSize.Value
+	}
+}
+
+func applyDnsConfig(m *Monitor, cfg *oas.DnsMonitorConfig) {
+	if cfg.Hostname.IsSet() {
+		m.Hostname = cfg.Hostname.Value
+	}
+	if cfg.Port.IsSet() {
+		p := cfg.Port.Value
+		m.Port = &p
+	}
+	if cfg.DnsResolveType.IsSet() {
+		m.DNSResolveType = string(cfg.DnsResolveType.Value)
+	}
+	if cfg.DnsResolveServer.IsSet() {
+		m.DNSResolveServer = cfg.DnsResolveServer.Value
+	}
+}
+
+func applyGrpcConfig(m *Monitor, cfg *oas.GrpcMonitorConfig) {
+	if cfg.GrpcUrl.IsSet() {
+		m.GRPCUrl = cfg.GrpcUrl.Value
+	}
+	if cfg.GrpcServiceName.IsSet() {
+		m.GRPCServiceName = cfg.GrpcServiceName.Value
+	}
+	if cfg.GrpcMethod.IsSet() {
+		m.GRPCMethod = cfg.GrpcMethod.Value
+	}
+	if cfg.GrpcEnableTls.IsSet() {
+		m.GRPCEnableTLS = cfg.GrpcEnableTls.Value
+	}
+	if cfg.IgnoreTls.IsSet() {
+		m.IgnoreTLS = cfg.IgnoreTls.Value
+	}
+}
+
+func applyMqttConfig(m *Monitor, cfg *oas.MqttMonitorConfig) {
+	if cfg.Hostname.IsSet() {
+		m.Hostname = cfg.Hostname.Value
+	}
+	if cfg.Port.IsSet() {
+		p := cfg.Port.Value
+		m.Port = &p
+	}
+	if cfg.MqttTopic.IsSet() {
+		m.MQTTTopic = cfg.MqttTopic.Value
+	}
+	if cfg.MqttSuccessMessage.IsSet() {
+		m.MQTTSuccessMessage = cfg.MqttSuccessMessage.Value
+	}
+	if cfg.MqttUsername.IsSet() {
+		m.MQTTUsername = cfg.MqttUsername.Value
+	}
+	if cfg.MqttPassword.IsSet() {
+		m.MQTTPassword = cfg.MqttPassword.Value
+	}
+	if cfg.IgnoreTls.IsSet() {
+		m.IgnoreTLS = cfg.IgnoreTls.Value
+	}
+}
+
+func applyRedisConfig(m *Monitor, cfg *oas.RedisMonitorConfig) {
+	if cfg.Hostname.IsSet() {
+		m.Hostname = cfg.Hostname.Value
+	}
+	if cfg.Port.IsSet() {
+		p := cfg.Port.Value
+		m.Port = &p
+	}
+	if cfg.DatabaseQuery.IsSet() {
+		m.DatabaseQuery = cfg.DatabaseQuery.Value
+	}
+}
+
+func applySmtpConfig(m *Monitor, cfg *oas.SmtpMonitorConfig) {
+	if cfg.Hostname.IsSet() {
+		m.Hostname = cfg.Hostname.Value
+	}
+	if cfg.Port.IsSet() {
+		p := cfg.Port.Value
+		m.Port = &p
+	}
+	if cfg.IgnoreTls.IsSet() {
+		m.IgnoreTLS = cfg.IgnoreTls.Value
+	}
+}
+
+func applyTailscalePingConfig(m *Monitor, cfg *oas.TailscalePingMonitorConfig) {
+	if cfg.Hostname.IsSet() {
+		m.Hostname = cfg.Hostname.Value
+	}
+}
+
+func headersToOAS(raw string) []oas.HttpMonitorConfigHeadersItem {
 	if raw == "" {
 		return nil
 	}
@@ -458,14 +670,14 @@ func headersToOAS(raw string) []oas.MonitorHeadersItem {
 	if err := json.Unmarshal([]byte(raw), &m); err != nil {
 		return nil
 	}
-	items := make([]oas.MonitorHeadersItem, 0, len(m))
+	items := make([]oas.HttpMonitorConfigHeadersItem, 0, len(m))
 	for k, v := range m {
-		items = append(items, oas.MonitorHeadersItem{Name: k, Value: v})
+		items = append(items, oas.HttpMonitorConfigHeadersItem{Name: k, Value: v})
 	}
 	return items
 }
 
-func headersFromOAS(items []oas.MonitorInputHeadersItem) string {
+func headersFromOAS(items []oas.HttpMonitorConfigHeadersItem) string {
 	if len(items) == 0 {
 		return ""
 	}

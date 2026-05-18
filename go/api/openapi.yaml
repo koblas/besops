@@ -1948,23 +1948,20 @@ components:
           description: Newly issued JWT bearer token.
 
     Monitor:
-      description: A monitor represents a single endpoint or service being monitored for uptime. Each monitor periodically checks its target and records heartbeats with status and response time.
+      description: A monitor represents a single endpoint or service being monitored for uptime.
       type: object
       required: [id, name, type, active]
       properties:
         id:
           type: string
           format: uuid
-          description: Unique identifier for this monitor.
         name:
           type: string
           minLength: 1
           maxLength: 150
-          description: Human-readable display name for this monitor.
         type:
           type: string
           maxLength: 30
-          description: The monitoring protocol or check type to use.
           enum:
             - http
             - port
@@ -1991,273 +1988,161 @@ components:
             - manual
         active:
           type: boolean
-          description: Whether this monitor is currently active and performing checks.
         interval:
           type: integer
           minimum: 20
           maximum: 86400
-          description: How often (in seconds) the monitor performs a check.
           default: 60
-        url:
-          type: string
-          maxLength: 2048
-          description: Target URL for HTTP/keyword/JSON-query monitors.
-        hostname:
-          type: string
-          maxLength: 255
-          description: Target hostname for ping, DNS, TCP, and other hostname-based monitors.
-        port:
+        timeout:
           type: integer
           minimum: 1
-          maximum: 65535
-          description: Target port number for TCP, SMTP, and other port-based monitors.
+          maximum: 600
+          default: 48
         maxRetries:
           type: integer
           minimum: 0
           maximum: 100
           default: 0
-          description: Number of consecutive failures before the monitor is marked DOWN. During retries, status is PENDING.
-        timeout:
-          type: integer
-          minimum: 1
-          maximum: 600
-          description: Maximum time (in seconds) to wait for a response before considering the check failed.
-          default: 48
         retryInterval:
           type: integer
           minimum: 5
           maximum: 86400
           default: 60
-          description: Time (in seconds) between retry attempts when the monitor is in PENDING state.
-        keyword:
-          type: string
-          maxLength: 500
-          description: Text to search for in the response body.
-        invertKeyword:
-          type: boolean
-          description: If true, the monitor is UP when the keyword is NOT found in the response.
-        jsonPath:
-          type: string
-          maxLength: 255
-          description: JSONPath expression to evaluate against the response body.
-        expectedValue:
-          type: string
-          maxLength: 255
-          description: Expected value to compare against the JSONPath result.
-        ignoreTls:
-          type: boolean
-          description: If true, TLS certificate errors are ignored when connecting to the target.
-        maxRedirects:
-          type: integer
-          minimum: 0
-          maximum: 50
-          default: 10
-          description: Maximum number of HTTP redirects to follow.
-        acceptedStatusCodes:
-          type: array
-          maxItems: 50
-          items:
-            type: string
-            maxLength: 20
-          description: "List of accepted HTTP status codes or ranges (e.g., ['200-299', '301'])."
-        method:
-          type: string
-          enum: [GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS]
-          default: GET
-          description: HTTP method to use for HTTP-based monitors.
-        headers:
-          type: array
-          maxItems: 50
-          description: HTTP headers to send with the request.
-          items:
-            type: object
-            required: [name, value]
-            properties:
-              name:
-                type: string
-                maxLength: 255
-              value:
-                type: string
-                maxLength: 2000
-        body:
-          type: string
-          maxLength: 10000
-          description: HTTP request body for POST/PUT/PATCH monitors.
-        basicAuthUser:
-          type: string
-          maxLength: 255
-          description: Username for HTTP Basic Authentication.
-        basicAuthPass:
-          type: string
-          maxLength: 255
-          description: Password for HTTP Basic Authentication.
-        pushToken:
-          type: string
-          maxLength: 64
-          description: Unique token for push-based monitors. External systems POST to /push/{pushToken} to report status.
         description:
           type: string
           maxLength: 1000
-          description: Optional notes or description for this monitor.
         upsideDown:
           type: boolean
-          description: If true, inverts the status logic (DOWN becomes UP and vice versa).
-        dnsResolveType:
-          type: string
-          enum: [A, AAAA, CAA, CNAME, MX, NS, PTR, SOA, SRV, TXT]
-          description: DNS record type to query for DNS monitors.
-        dnsResolveServer:
-          type: string
-          maxLength: 255
-          description: Custom DNS server to query (e.g., '8.8.8.8'). Uses system resolver if empty.
-        mqttTopic:
-          type: string
-          maxLength: 255
-          description: MQTT topic to subscribe to for MQTT monitors.
-        mqttSuccessMessage:
-          type: string
-          maxLength: 255
-          description: Expected message content on the MQTT topic for a successful check.
-        mqttUsername:
-          type: string
-          maxLength: 255
-          description: MQTT broker authentication username.
-        mqttPassword:
-          type: string
-          maxLength: 255
-          description: MQTT broker authentication password.
-        databaseQuery:
-          type: string
-          maxLength: 2000
-          description: SQL query to execute for database monitors. A successful query execution indicates UP.
-        proxyId:
-          type: string
-          format: uuid
-          description: ID of the proxy to use for outbound connections.
-        grpcUrl:
-          type: string
-          maxLength: 2048
-          description: Target URL for gRPC health check monitors.
-        grpcServiceName:
-          type: string
-          maxLength: 255
-          description: gRPC service name to check.
-        grpcMethod:
-          type: string
-          maxLength: 255
-          description: gRPC method to invoke.
-        grpcEnableTls:
-          type: boolean
-          description: Whether to use TLS for gRPC connections.
         parentId:
           type: string
           format: uuid
           nullable: true
-          description: ID of the parent monitor for grouped/nested monitors.
+        pushToken:
+          type: string
+          maxLength: 64
+          description: Server-generated token for push monitors.
         tags:
           type: array
           maxItems: 50
           items:
             $ref: "#/components/schemas/MonitorTag"
-          description: Tags assigned to this monitor with optional per-monitor values.
         notificationIds:
           type: array
           maxItems: 50
           items:
             type: string
             format: uuid
-          description: IDs of notification providers that receive alerts for this monitor.
         resendInterval:
           type: integer
           minimum: 0
           maximum: 1000
           default: 0
-          description: Interval (in number of checks) between repeated DOWN notifications. 0 means no resending.
-        packetSize:
-          type: integer
-          minimum: 1
-          maximum: 65500
-          default: 56
-          description: ICMP packet size in bytes for ping monitors.
         expiryNotification:
           type: boolean
-          description: If true, sends a notification when the TLS certificate is approaching expiry.
+        config:
+          $ref: "#/components/schemas/MonitorConfig"
 
     MonitorInput:
-      description: Input for creating or updating a monitor. Only name and type are required; all other fields are optional and type-dependent.
+      description: Input for creating or updating a monitor.
       type: object
-      required: [name, type]
+      required: [name, type, config]
       properties:
         name:
           type: string
           minLength: 1
           maxLength: 150
-          description: Human-readable display name for this monitor.
         type:
           type: string
           maxLength: 30
-          description: The monitoring protocol or check type to use.
         active:
           type: boolean
           default: true
-          description: Whether the monitor should start checking immediately after creation.
         interval:
           type: integer
           minimum: 20
           maximum: 86400
           default: 60
-          description: Check interval in seconds.
-        url:
-          type: string
-          maxLength: 2048
-        hostname:
-          type: string
-          maxLength: 255
-        port:
-          type: integer
-          minimum: 1
-          maximum: 65535
-        maxRetries:
-          type: integer
-          minimum: 0
-          maximum: 100
-          default: 0
         timeout:
           type: integer
           minimum: 1
           maximum: 600
           default: 48
+        maxRetries:
+          type: integer
+          minimum: 0
+          maximum: 100
+          default: 0
         retryInterval:
           type: integer
           minimum: 5
           maximum: 86400
           default: 60
-        keyword:
+        description:
           type: string
-          maxLength: 500
-        invertKeyword:
+          maxLength: 1000
+        upsideDown:
           type: boolean
-        jsonPath:
+        parentId:
           type: string
-          maxLength: 255
-        expectedValue:
-          type: string
-          maxLength: 255
-        ignoreTls:
-          type: boolean
-        maxRedirects:
-          type: integer
-          minimum: 0
-          maximum: 50
-          default: 10
-        acceptedStatusCodes:
+          format: uuid
+          nullable: true
+        notificationIds:
           type: array
           maxItems: 50
           items:
             type: string
-            maxLength: 20
+            format: uuid
+        resendInterval:
+          type: integer
+          minimum: 0
+          maximum: 1000
+          default: 0
+        expiryNotification:
+          type: boolean
+        config:
+          $ref: "#/components/schemas/MonitorConfig"
+
+    MonitorConfig:
+      oneOf:
+        - $ref: "#/components/schemas/HttpMonitorConfig"
+        - $ref: "#/components/schemas/PortMonitorConfig"
+        - $ref: "#/components/schemas/PingMonitorConfig"
+        - $ref: "#/components/schemas/DnsMonitorConfig"
+        - $ref: "#/components/schemas/GrpcMonitorConfig"
+        - $ref: "#/components/schemas/MqttMonitorConfig"
+        - $ref: "#/components/schemas/RedisMonitorConfig"
+        - $ref: "#/components/schemas/PushMonitorConfig"
+        - $ref: "#/components/schemas/SmtpMonitorConfig"
+        - $ref: "#/components/schemas/TailscalePingMonitorConfig"
+        - $ref: "#/components/schemas/GroupMonitorConfig"
+      discriminator:
+        propertyName: kind
+        mapping:
+          http: "#/components/schemas/HttpMonitorConfig"
+          port: "#/components/schemas/PortMonitorConfig"
+          ping: "#/components/schemas/PingMonitorConfig"
+          dns: "#/components/schemas/DnsMonitorConfig"
+          grpc-keyword: "#/components/schemas/GrpcMonitorConfig"
+          mqtt: "#/components/schemas/MqttMonitorConfig"
+          redis: "#/components/schemas/RedisMonitorConfig"
+          push: "#/components/schemas/PushMonitorConfig"
+          smtp: "#/components/schemas/SmtpMonitorConfig"
+          tailscale-ping: "#/components/schemas/TailscalePingMonitorConfig"
+          group: "#/components/schemas/GroupMonitorConfig"
+
+    HttpMonitorConfig:
+      type: object
+      required: [kind]
+      properties:
+        kind:
+          type: string
+          enum: [http]
+        url:
+          type: string
+          maxLength: 2048
         method:
           type: string
+          enum: [GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS]
           default: GET
         headers:
           type: array
@@ -2281,17 +2166,123 @@ components:
         basicAuthPass:
           type: string
           maxLength: 255
-        description:
-          type: string
-          maxLength: 1000
-        upsideDown:
+        maxRedirects:
+          type: integer
+          minimum: 0
+          maximum: 50
+          default: 10
+        acceptedStatusCodes:
+          type: array
+          maxItems: 50
+          items:
+            type: string
+            maxLength: 20
+        ignoreTls:
           type: boolean
+        keyword:
+          type: string
+          maxLength: 500
+        invertKeyword:
+          type: boolean
+        jsonPath:
+          type: string
+          maxLength: 255
+        expectedValue:
+          type: string
+          maxLength: 255
+        proxyId:
+          type: string
+          format: uuid
+
+    PortMonitorConfig:
+      type: object
+      required: [kind]
+      properties:
+        kind:
+          type: string
+          enum: [port]
+        hostname:
+          type: string
+          maxLength: 255
+        port:
+          type: integer
+          minimum: 1
+          maximum: 65535
+        ignoreTls:
+          type: boolean
+
+    PingMonitorConfig:
+      type: object
+      required: [kind]
+      properties:
+        kind:
+          type: string
+          enum: [ping]
+        hostname:
+          type: string
+          maxLength: 255
+        packetSize:
+          type: integer
+          minimum: 1
+          maximum: 65500
+          default: 56
+
+    DnsMonitorConfig:
+      type: object
+      required: [kind]
+      properties:
+        kind:
+          type: string
+          enum: [dns]
+        hostname:
+          type: string
+          maxLength: 255
+        port:
+          type: integer
+          minimum: 1
+          maximum: 65535
         dnsResolveType:
           type: string
-          maxLength: 10
+          enum: [A, AAAA, CAA, CNAME, MX, NS, PTR, SOA, SRV, TXT]
         dnsResolveServer:
           type: string
           maxLength: 255
+
+    GrpcMonitorConfig:
+      type: object
+      required: [kind]
+      properties:
+        kind:
+          type: string
+          enum: [grpc-keyword]
+        grpcUrl:
+          type: string
+          maxLength: 2048
+        grpcServiceName:
+          type: string
+          maxLength: 255
+        grpcMethod:
+          type: string
+          maxLength: 255
+        grpcEnableTls:
+          type: boolean
+        ignoreTls:
+          type: boolean
+
+    MqttMonitorConfig:
+      type: object
+      required: [kind]
+      properties:
+        kind:
+          type: string
+          enum: [mqtt]
+        hostname:
+          type: string
+          maxLength: 255
+        port:
+          type: integer
+          minimum: 1
+          maximum: 65535
         mqttTopic:
           type: string
           maxLength: 255
@@ -2304,45 +2295,70 @@ components:
         mqttPassword:
           type: string
           maxLength: 255
+        ignoreTls:
+          type: boolean
+
+    RedisMonitorConfig:
+      type: object
+      required: [kind]
+      properties:
+        kind:
+          type: string
+          enum: [redis]
+        hostname:
+          type: string
+          maxLength: 255
+        port:
+          type: integer
+          minimum: 1
+          maximum: 65535
         databaseQuery:
           type: string
           maxLength: 2000
-        proxyId:
+
+    PushMonitorConfig:
+      type: object
+      required: [kind]
+      properties:
+        kind:
           type: string
-          format: uuid
-        grpcUrl:
+          enum: [push]
+
+    SmtpMonitorConfig:
+      type: object
+      required: [kind]
+      properties:
+        kind:
           type: string
-          maxLength: 2048
-        grpcServiceName:
+          enum: [smtp]
+        hostname:
           type: string
           maxLength: 255
-        grpcMethod:
-          type: string
-          maxLength: 255
-        grpcEnableTls:
-          type: boolean
-        parentId:
-          type: string
-          format: uuid
-          nullable: true
-        notificationIds:
-          type: array
-          maxItems: 50
-          items:
-            type: string
-            format: uuid
-        resendInterval:
-          type: integer
-          minimum: 0
-          maximum: 1000
-          default: 0
-        packetSize:
+        port:
           type: integer
           minimum: 1
-          maximum: 65500
-          default: 56
-        expiryNotification:
+          maximum: 65535
+        ignoreTls:
           type: boolean
+
+    TailscalePingMonitorConfig:
+      type: object
+      required: [kind]
+      properties:
+        kind:
+          type: string
+          enum: [tailscale-ping]
+        hostname:
+          type: string
+          maxLength: 255
+
+    GroupMonitorConfig:
+      type: object
+      required: [kind]
+      properties:
+        kind:
+          type: string
+          enum: [group]
 
     Heartbeat:
       description: A single check result recording the status and response time of a monitor at a point in time.

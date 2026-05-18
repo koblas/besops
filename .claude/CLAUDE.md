@@ -55,11 +55,9 @@ After I correct you, propose an update to this file (or the relevant doc in `doc
 - **How**: <stack; entrypoints; how to run, test, lint; where deeper docs live>
 
 ## Tooling (defer to these — don't reimplement in prose)
-<!-- Replace placeholders. -->
-- Formatter: `<command>` — run before commit; never argue with its output
-- Linter: `<command>` — fix lints, don't disable them
-- Tests: `<command>` — full suite must pass before "done"
-- Type check: `<command>`
+- Formatter — run before commit; never argue with its output
+- Linter — fix lints, don't disable them
+- Tests — full suite must pass before "done"
 
 ## Deeper docs (read on demand, not every session)
 <!-- Pointers, not embedded content. Use file:line refs instead of pasting code. -->

@@ -1157,205 +1157,189 @@ export interface components {
             /** @description Newly issued JWT bearer token. */
             token: string;
         };
-        /** @description A monitor represents a single endpoint or service being monitored for uptime. Each monitor periodically checks its target and records heartbeats with status and response time. */
+        /** @description A monitor represents a single endpoint or service being monitored for uptime. */
         Monitor: {
-            /**
-             * Format: uuid
-             * @description Unique identifier for this monitor.
-             */
+            /** Format: uuid */
             id: string;
-            /** @description Human-readable display name for this monitor. */
             name: string;
+            /** @enum {string} */
+            type: "http" | "port" | "ping" | "keyword" | "json-query" | "grpc-keyword" | "dns" | "push" | "steam" | "gamedig" | "mqtt" | "sqlserver" | "postgres" | "mysql" | "mongodb" | "radius" | "redis" | "group" | "snmp" | "rabbitmq" | "tailscale-ping" | "real-browser" | "manual";
+            active: boolean;
+            /** @default 60 */
+            interval: number;
+            /** @default 48 */
+            timeout: number;
+            /** @default 0 */
+            maxRetries: number;
+            /** @default 60 */
+            retryInterval: number;
+            description?: string;
+            upsideDown?: boolean;
+            /** Format: uuid */
+            parentId?: string | null;
+            /** @description Server-generated token for push monitors. */
+            pushToken?: string;
+            tags?: components["schemas"]["MonitorTag"][];
+            notificationIds?: string[];
+            /** @default 0 */
+            resendInterval: number;
+            expiryNotification?: boolean;
+            config?: components["schemas"]["MonitorConfig"];
+        };
+        /** @description Input for creating or updating a monitor. */
+        MonitorInput: {
+            name: string;
+            type: string;
+            /** @default true */
+            active: boolean;
+            /** @default 60 */
+            interval: number;
+            /** @default 48 */
+            timeout: number;
+            /** @default 0 */
+            maxRetries: number;
+            /** @default 60 */
+            retryInterval: number;
+            description?: string;
+            upsideDown?: boolean;
+            /** Format: uuid */
+            parentId?: string | null;
+            notificationIds?: string[];
+            /** @default 0 */
+            resendInterval: number;
+            expiryNotification?: boolean;
+            config: components["schemas"]["MonitorConfig"];
+        };
+        MonitorConfig: components["schemas"]["HttpMonitorConfig"] | components["schemas"]["PortMonitorConfig"] | components["schemas"]["PingMonitorConfig"] | components["schemas"]["DnsMonitorConfig"] | components["schemas"]["GrpcMonitorConfig"] | components["schemas"]["MqttMonitorConfig"] | components["schemas"]["RedisMonitorConfig"] | components["schemas"]["PushMonitorConfig"] | components["schemas"]["SmtpMonitorConfig"] | components["schemas"]["TailscalePingMonitorConfig"] | components["schemas"]["GroupMonitorConfig"];
+        HttpMonitorConfig: {
             /**
-             * @description The monitoring protocol or check type to use.
+             * @description discriminator enum property added by openapi-typescript
              * @enum {string}
              */
-            type: "http" | "port" | "ping" | "keyword" | "json-query" | "grpc-keyword" | "dns" | "push" | "steam" | "gamedig" | "mqtt" | "sqlserver" | "postgres" | "mysql" | "mongodb" | "radius" | "redis" | "group" | "snmp" | "rabbitmq" | "tailscale-ping" | "real-browser" | "manual";
-            /** @description Whether this monitor is currently active and performing checks. */
-            active: boolean;
-            /**
-             * @description How often (in seconds) the monitor performs a check.
-             * @default 60
-             */
-            interval: number;
-            /** @description Target URL for HTTP/keyword/JSON-query monitors. */
+            kind: "http";
             url?: string;
-            /** @description Target hostname for ping, DNS, TCP, and other hostname-based monitors. */
-            hostname?: string;
-            /** @description Target port number for TCP, SMTP, and other port-based monitors. */
-            port?: number;
             /**
-             * @description Number of consecutive failures before the monitor is marked DOWN. During retries, status is PENDING.
-             * @default 0
-             */
-            maxRetries: number;
-            /**
-             * @description Maximum time (in seconds) to wait for a response before considering the check failed.
-             * @default 48
-             */
-            timeout: number;
-            /**
-             * @description Time (in seconds) between retry attempts when the monitor is in PENDING state.
-             * @default 60
-             */
-            retryInterval: number;
-            /** @description Text to search for in the response body. */
-            keyword?: string;
-            /** @description If true, the monitor is UP when the keyword is NOT found in the response. */
-            invertKeyword?: boolean;
-            /** @description JSONPath expression to evaluate against the response body. */
-            jsonPath?: string;
-            /** @description Expected value to compare against the JSONPath result. */
-            expectedValue?: string;
-            /** @description If true, TLS certificate errors are ignored when connecting to the target. */
-            ignoreTls?: boolean;
-            /**
-             * @description Maximum number of HTTP redirects to follow.
-             * @default 10
-             */
-            maxRedirects: number;
-            /** @description List of accepted HTTP status codes or ranges (e.g., ['200-299', '301']). */
-            acceptedStatusCodes?: string[];
-            /**
-             * @description HTTP method to use for HTTP-based monitors.
              * @default GET
              * @enum {string}
              */
             method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS";
-            /** @description HTTP headers to send with the request. */
             headers?: {
                 name: string;
                 value: string;
             }[];
-            /** @description HTTP request body for POST/PUT/PATCH monitors. */
             body?: string;
-            /** @description Username for HTTP Basic Authentication. */
             basicAuthUser?: string;
-            /** @description Password for HTTP Basic Authentication. */
             basicAuthPass?: string;
-            /** @description Unique token for push-based monitors. External systems POST to /push/{pushToken} to report status. */
-            pushToken?: string;
-            /** @description Optional notes or description for this monitor. */
-            description?: string;
-            /** @description If true, inverts the status logic (DOWN becomes UP and vice versa). */
-            upsideDown?: boolean;
-            /**
-             * @description DNS record type to query for DNS monitors.
-             * @enum {string}
-             */
-            dnsResolveType?: "A" | "AAAA" | "CAA" | "CNAME" | "MX" | "NS" | "PTR" | "SOA" | "SRV" | "TXT";
-            /** @description Custom DNS server to query (e.g., '8.8.8.8'). Uses system resolver if empty. */
-            dnsResolveServer?: string;
-            /** @description MQTT topic to subscribe to for MQTT monitors. */
-            mqttTopic?: string;
-            /** @description Expected message content on the MQTT topic for a successful check. */
-            mqttSuccessMessage?: string;
-            /** @description MQTT broker authentication username. */
-            mqttUsername?: string;
-            /** @description MQTT broker authentication password. */
-            mqttPassword?: string;
-            /** @description SQL query to execute for database monitors. A successful query execution indicates UP. */
-            databaseQuery?: string;
-            /**
-             * Format: uuid
-             * @description ID of the proxy to use for outbound connections.
-             */
-            proxyId?: string;
-            /** @description Target URL for gRPC health check monitors. */
-            grpcUrl?: string;
-            /** @description gRPC service name to check. */
-            grpcServiceName?: string;
-            /** @description gRPC method to invoke. */
-            grpcMethod?: string;
-            /** @description Whether to use TLS for gRPC connections. */
-            grpcEnableTls?: boolean;
-            /**
-             * Format: uuid
-             * @description ID of the parent monitor for grouped/nested monitors.
-             */
-            parentId?: string | null;
-            /** @description Tags assigned to this monitor with optional per-monitor values. */
-            tags?: components["schemas"]["MonitorTag"][];
-            /** @description IDs of notification providers that receive alerts for this monitor. */
-            notificationIds?: string[];
-            /**
-             * @description Interval (in number of checks) between repeated DOWN notifications. 0 means no resending.
-             * @default 0
-             */
-            resendInterval: number;
-            /**
-             * @description ICMP packet size in bytes for ping monitors.
-             * @default 56
-             */
-            packetSize: number;
-            /** @description If true, sends a notification when the TLS certificate is approaching expiry. */
-            expiryNotification?: boolean;
-        };
-        /** @description Input for creating or updating a monitor. Only name and type are required; all other fields are optional and type-dependent. */
-        MonitorInput: {
-            /** @description Human-readable display name for this monitor. */
-            name: string;
-            /** @description The monitoring protocol or check type to use. */
-            type: string;
-            /**
-             * @description Whether the monitor should start checking immediately after creation.
-             * @default true
-             */
-            active: boolean;
-            /**
-             * @description Check interval in seconds.
-             * @default 60
-             */
-            interval: number;
-            url?: string;
-            hostname?: string;
-            port?: number;
-            /** @default 0 */
-            maxRetries: number;
-            /** @default 48 */
-            timeout: number;
-            /** @default 60 */
-            retryInterval: number;
+            /** @default 10 */
+            maxRedirects: number;
+            acceptedStatusCodes?: string[];
+            ignoreTls?: boolean;
             keyword?: string;
             invertKeyword?: boolean;
             jsonPath?: string;
             expectedValue?: string;
-            ignoreTls?: boolean;
-            /** @default 10 */
-            maxRedirects: number;
-            acceptedStatusCodes?: string[];
-            /** @default GET */
-            method: string;
-            headers?: {
-                name: string;
-                value: string;
-            }[];
-            body?: string;
-            basicAuthUser?: string;
-            basicAuthPass?: string;
-            description?: string;
-            upsideDown?: boolean;
-            dnsResolveType?: string;
-            dnsResolveServer?: string;
-            mqttTopic?: string;
-            mqttSuccessMessage?: string;
-            mqttUsername?: string;
-            mqttPassword?: string;
-            databaseQuery?: string;
             /** Format: uuid */
             proxyId?: string;
+        };
+        PortMonitorConfig: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "port";
+            hostname?: string;
+            port?: number;
+            ignoreTls?: boolean;
+        };
+        PingMonitorConfig: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "ping";
+            hostname?: string;
+            /** @default 56 */
+            packetSize: number;
+        };
+        DnsMonitorConfig: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "dns";
+            hostname?: string;
+            port?: number;
+            /** @enum {string} */
+            dnsResolveType?: "A" | "AAAA" | "CAA" | "CNAME" | "MX" | "NS" | "PTR" | "SOA" | "SRV" | "TXT";
+            dnsResolveServer?: string;
+        };
+        GrpcMonitorConfig: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "grpc-keyword";
             grpcUrl?: string;
             grpcServiceName?: string;
             grpcMethod?: string;
             grpcEnableTls?: boolean;
-            /** Format: uuid */
-            parentId?: string | null;
-            notificationIds?: string[];
-            /** @default 0 */
-            resendInterval: number;
-            /** @default 56 */
-            packetSize: number;
-            expiryNotification?: boolean;
+            ignoreTls?: boolean;
+        };
+        MqttMonitorConfig: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "mqtt";
+            hostname?: string;
+            port?: number;
+            mqttTopic?: string;
+            mqttSuccessMessage?: string;
+            mqttUsername?: string;
+            mqttPassword?: string;
+            ignoreTls?: boolean;
+        };
+        RedisMonitorConfig: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "redis";
+            hostname?: string;
+            port?: number;
+            databaseQuery?: string;
+        };
+        PushMonitorConfig: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "push";
+        };
+        SmtpMonitorConfig: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "smtp";
+            hostname?: string;
+            port?: number;
+            ignoreTls?: boolean;
+        };
+        TailscalePingMonitorConfig: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "tailscale-ping";
+            hostname?: string;
+        };
+        GroupMonitorConfig: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "group";
         };
         /** @description A single check result recording the status and response time of a monitor at a point in time. */
         Heartbeat: {
