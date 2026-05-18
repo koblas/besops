@@ -89,12 +89,12 @@ func (c *DNSChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.Ch
 		}, nil
 	}
 
-	ping := time.Since(start).Milliseconds()
+	latency := time.Since(start).Milliseconds()
 
 	if lookupErr != nil {
 		return monitor.CheckResult{
 			Status:  status.Down,
-			Ping:    ping,
+			Latency: latency,
 			Message: fmt.Sprintf("DNS lookup failed: %v", lookupErr),
 		}, nil
 	}
@@ -102,14 +102,14 @@ func (c *DNSChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.Ch
 	if len(records) == 0 {
 		return monitor.CheckResult{
 			Status:  status.Down,
-			Ping:    ping,
+			Latency: latency,
 			Message: "no records found",
 		}, nil
 	}
 
 	return monitor.CheckResult{
 		Status:  status.Up,
-		Ping:    ping,
+		Latency: latency,
 		Message: strings.Join(records, ", "),
 	}, nil
 }

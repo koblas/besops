@@ -66,7 +66,7 @@ var (
 		"GET":    "Authorization",
 		"PUT":    "Authorization,Content-Type",
 	}
-	rn52AllowedHeaders = map[string]string{
+	rn54AllowedHeaders = map[string]string{
 		"GET": "Authorization",
 		"PUT": "Authorization,Content-Type",
 	}
@@ -76,7 +76,7 @@ var (
 	rn80AllowedHeaders = map[string]string{
 		"POST": "Authorization",
 	}
-	rn54AllowedHeaders = map[string]string{
+	rn56AllowedHeaders = map[string]string{
 		"GET": "Authorization",
 		"PUT": "Authorization,Content-Type",
 	}
@@ -84,7 +84,7 @@ var (
 		"GET":  "Authorization",
 		"POST": "Authorization,Content-Type",
 	}
-	rn55AllowedHeaders = map[string]string{
+	rn57AllowedHeaders = map[string]string{
 		"GET": "Authorization",
 	}
 	rn2AllowedHeaders = map[string]string{
@@ -704,9 +704,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							return
 						}
 
-					case 'p': // Prefix: "ping"
+					case 'l': // Prefix: "latency"
 
-						if l := len("ping"); len(elem) >= l && elem[0:l] == "ping" {
+						if l := len("latency"); len(elem) >= l && elem[0:l] == "latency" {
 							elem = elem[l:]
 						} else {
 							break
@@ -716,7 +716,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							// Leaf node.
 							switch r.Method {
 							case "GET":
-								s.handleGetPingBadgeRequest([1]string{
+								s.handleGetLatencyBadgeRequest([1]string{
 									args[0],
 								}, elemIsEscaped, w, r)
 							default:
@@ -1045,7 +1045,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									default:
 										s.notAllowed(w, r, notAllowedParams{
 											allowedMethods: "GET,PUT",
-											allowedHeaders: rn52AllowedHeaders,
+											allowedHeaders: rn54AllowedHeaders,
 											acceptPost:     "",
 											acceptPatch:    "",
 										})
@@ -1130,7 +1130,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 									default:
 										s.notAllowed(w, r, notAllowedParams{
 											allowedMethods: "GET,PUT",
-											allowedHeaders: rn54AllowedHeaders,
+											allowedHeaders: rn56AllowedHeaders,
 											acceptPost:     "",
 											acceptPatch:    "",
 										})
@@ -1199,7 +1199,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								default:
 									s.notAllowed(w, r, notAllowedParams{
 										allowedMethods: "GET",
-										allowedHeaders: rn55AllowedHeaders,
+										allowedHeaders: rn57AllowedHeaders,
 										acceptPost:     "",
 										acceptPatch:    "",
 									})
@@ -2764,9 +2764,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							}
 						}
 
-					case 'p': // Prefix: "ping"
+					case 'l': // Prefix: "latency"
 
-						if l := len("ping"); len(elem) >= l && elem[0:l] == "ping" {
+						if l := len("latency"); len(elem) >= l && elem[0:l] == "latency" {
 							elem = elem[l:]
 						} else {
 							break
@@ -2776,11 +2776,11 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							// Leaf node.
 							switch method {
 							case "GET":
-								r.name = GetPingBadgeOperation
-								r.summary = "Get average ping badge SVG"
-								r.operationID = "getPingBadge"
+								r.name = GetLatencyBadgeOperation
+								r.summary = "Get average latency badge SVG"
+								r.operationID = "getLatencyBadge"
 								r.operationGroup = "Badge"
-								r.pathPattern = "/badges/{monitorId}/ping"
+								r.pathPattern = "/badges/{monitorId}/latency"
 								r.args = args
 								r.count = 1
 								return r, true

@@ -220,7 +220,7 @@ type resultRecorder struct {
 }
 
 func (r *resultRecorder) HandleResult(ctx context.Context, monitorID string, result CheckResult, retries int) {
-	slog.DebugContext(ctx, "recording result", slog.String("monitor", monitorID), slog.String("status", result.Status.String()), slog.Int64("ping", result.Ping), slog.Int("retries", retries))
+	slog.DebugContext(ctx, "recording result", slog.String("monitor", monitorID), slog.String("status", result.Status.String()), slog.Int64("latency_ms", result.Latency), slog.Int("retries", retries))
 
 	// Check if monitor is in a maintenance window — if so, override status and suppress notifications.
 	inMaintenance := false
@@ -252,9 +252,9 @@ func (r *resultRecorder) HandleResult(ctx context.Context, monitorID string, res
 		Retries:   retries,
 		Important: prevErr != nil || prevStatus != recordedStatus,
 	}
-	if result.Ping > 0 {
-		ping := result.Ping
-		hb.Ping = &ping
+	if result.Latency > 0 {
+		l := result.Latency
+		hb.Latency = &l
 	}
 
 	if err := r.hbStore.Insert(ctx, hb); err != nil {
@@ -264,8 +264,8 @@ func (r *resultRecorder) HandleResult(ctx context.Context, monitorID string, res
 
 	if r.metrics != nil {
 		var latency int64
-		if hb.Ping != nil {
-			latency = *hb.Ping
+		if hb.Latency != nil {
+			latency = *hb.Latency
 		}
 		r.metrics.Record(ctx, &monitorMetricInfo{
 			id:        monitorID,

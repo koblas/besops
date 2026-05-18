@@ -42,8 +42,8 @@ var StatDailies = Table[
 			Generated: false,
 			AutoIncr:  false,
 		},
-		Ping: column{
-			Name:      "ping",
+		Latency: column{
+			Name:      "latency",
 			DBType:    "REAL",
 			Default:   "NULL",
 			Comment:   "",
@@ -51,8 +51,8 @@ var StatDailies = Table[
 			Generated: false,
 			AutoIncr:  false,
 		},
-		PingMin: column{
-			Name:      "ping_min",
+		LatencyMin: column{
+			Name:      "latency_min",
 			DBType:    "INTEGER",
 			Default:   "NULL",
 			Comment:   "",
@@ -60,8 +60,8 @@ var StatDailies = Table[
 			Generated: false,
 			AutoIncr:  false,
 		},
-		PingMax: column{
-			Name:      "ping_max",
+		LatencyMax: column{
+			Name:      "latency_max",
 			DBType:    "INTEGER",
 			Default:   "NULL",
 			Comment:   "",
@@ -144,19 +144,19 @@ var StatDailies = Table[
 }
 
 type statDailyColumns struct {
-	ID        column
-	MonitorID column
-	Timestamp column
-	Ping      column
-	PingMin   column
-	PingMax   column
-	Up        column
-	Down      column
+	ID         column
+	MonitorID  column
+	Timestamp  column
+	Latency    column
+	LatencyMin column
+	LatencyMax column
+	Up         column
+	Down       column
 }
 
 func (c statDailyColumns) AsSlice() []column {
 	return []column{
-		c.ID, c.MonitorID, c.Timestamp, c.Ping, c.PingMin, c.PingMax, c.Up, c.Down,
+		c.ID, c.MonitorID, c.Timestamp, c.Latency, c.LatencyMin, c.LatencyMax, c.Up, c.Down,
 	}
 }
 

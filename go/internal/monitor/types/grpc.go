@@ -80,7 +80,7 @@ func (c *GRPCChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.C
 	outputMsg := dynamicpb.NewMessage(methodDesc.Output())
 
 	invokeErr := conn.Invoke(ctx, fullMethod, inputMsg, outputMsg)
-	ping := time.Since(start).Milliseconds()
+	latency := time.Since(start).Milliseconds()
 
 	var response string
 	if invokeErr != nil {
@@ -101,14 +101,14 @@ func (c *GRPCChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.C
 			}
 			return monitor.CheckResult{
 				Status:  status.Down,
-				Ping:    ping,
+				Latency: latency,
 				Message: fmt.Sprintf("keyword [%s] %s in response: %s", cfg.Keyword, boolToPresence(!expectFound), truncated),
 			}, nil
 		}
 
 		return monitor.CheckResult{
 			Status:  status.Up,
-			Ping:    ping,
+			Latency: latency,
 			Message: fmt.Sprintf("keyword [%s] %s", cfg.Keyword, boolToPresence(expectFound)),
 		}, nil
 	}
@@ -116,14 +116,14 @@ func (c *GRPCChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.C
 	if invokeErr != nil {
 		return monitor.CheckResult{
 			Status:  status.Down,
-			Ping:    ping,
+			Latency: latency,
 			Message: fmt.Sprintf("gRPC call failed: %v", invokeErr),
 		}, nil
 	}
 
 	return monitor.CheckResult{
 		Status:  status.Up,
-		Ping:    ping,
+		Latency: latency,
 		Message: response,
 	}, nil
 }

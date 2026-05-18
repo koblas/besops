@@ -256,11 +256,11 @@ type ChartPoint struct {
 	// Number of failed checks in this interval.
 	Down OptInt `json:"down"`
 	// Average response time in milliseconds for this interval.
-	Ping OptFloat64 `json:"ping"`
+	Latency OptFloat64 `json:"latency"`
 	// Minimum response time in milliseconds for this interval.
-	PingMin OptInt `json:"pingMin"`
+	LatencyMin OptInt `json:"latencyMin"`
 	// Maximum response time in milliseconds for this interval.
-	PingMax OptInt `json:"pingMax"`
+	LatencyMax OptInt `json:"latencyMax"`
 }
 
 // GetTimestamp returns the value of Timestamp.
@@ -278,19 +278,19 @@ func (s *ChartPoint) GetDown() OptInt {
 	return s.Down
 }
 
-// GetPing returns the value of Ping.
-func (s *ChartPoint) GetPing() OptFloat64 {
-	return s.Ping
+// GetLatency returns the value of Latency.
+func (s *ChartPoint) GetLatency() OptFloat64 {
+	return s.Latency
 }
 
-// GetPingMin returns the value of PingMin.
-func (s *ChartPoint) GetPingMin() OptInt {
-	return s.PingMin
+// GetLatencyMin returns the value of LatencyMin.
+func (s *ChartPoint) GetLatencyMin() OptInt {
+	return s.LatencyMin
 }
 
-// GetPingMax returns the value of PingMax.
-func (s *ChartPoint) GetPingMax() OptInt {
-	return s.PingMax
+// GetLatencyMax returns the value of LatencyMax.
+func (s *ChartPoint) GetLatencyMax() OptInt {
+	return s.LatencyMax
 }
 
 // SetTimestamp sets the value of Timestamp.
@@ -308,19 +308,19 @@ func (s *ChartPoint) SetDown(val OptInt) {
 	s.Down = val
 }
 
-// SetPing sets the value of Ping.
-func (s *ChartPoint) SetPing(val OptFloat64) {
-	s.Ping = val
+// SetLatency sets the value of Latency.
+func (s *ChartPoint) SetLatency(val OptFloat64) {
+	s.Latency = val
 }
 
-// SetPingMin sets the value of PingMin.
-func (s *ChartPoint) SetPingMin(val OptInt) {
-	s.PingMin = val
+// SetLatencyMin sets the value of LatencyMin.
+func (s *ChartPoint) SetLatencyMin(val OptInt) {
+	s.LatencyMin = val
 }
 
-// SetPingMax sets the value of PingMax.
-func (s *ChartPoint) SetPingMax(val OptInt) {
-	s.PingMax = val
+// SetLatencyMax sets the value of LatencyMax.
+func (s *ChartPoint) SetLatencyMax(val OptInt) {
+	s.LatencyMax = val
 }
 
 type CheckDomainOK struct {
@@ -1052,7 +1052,7 @@ type Heartbeat struct {
 	// Human-readable status message (e.g., error details when DOWN, or response info when UP).
 	Msg OptString `json:"msg"`
 	// Response time in milliseconds. Null if the check did not complete.
-	Ping OptInt64 `json:"ping"`
+	Latency OptInt64 `json:"latency"`
 	// True if this heartbeat represents a status change (e.g., UP→DOWN transition).
 	Important OptBool `json:"important"`
 	// Duration in seconds that the monitor has been in the current status.
@@ -1084,9 +1084,9 @@ func (s *Heartbeat) GetMsg() OptString {
 	return s.Msg
 }
 
-// GetPing returns the value of Ping.
-func (s *Heartbeat) GetPing() OptInt64 {
-	return s.Ping
+// GetLatency returns the value of Latency.
+func (s *Heartbeat) GetLatency() OptInt64 {
+	return s.Latency
 }
 
 // GetImportant returns the value of Important.
@@ -1124,9 +1124,9 @@ func (s *Heartbeat) SetMsg(val OptString) {
 	s.Msg = val
 }
 
-// SetPing sets the value of Ping.
-func (s *Heartbeat) SetPing(val OptInt64) {
-	s.Ping = val
+// SetLatency sets the value of Latency.
+func (s *Heartbeat) SetLatency(val OptInt64) {
+	s.Latency = val
 }
 
 // SetImportant sets the value of Important.

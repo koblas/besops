@@ -42,10 +42,10 @@ func (c *SMTPMonitorChecker) Check(ctx context.Context, cfg *monitor.Config) (mo
 		dialer := &tls.Dialer{Config: tlsConfig, NetDialer: &net.Dialer{Timeout: timeout}}
 		conn, err := dialer.DialContext(ctx, "tcp", addr)
 		if err != nil {
-			ping := time.Since(start).Milliseconds()
+			latency := time.Since(start).Milliseconds()
 			return monitor.CheckResult{
 				Status:  status.Down,
-				Ping:    ping,
+				Latency: latency,
 				Message: fmt.Sprintf("TLS connection failed: %v", err),
 			}, nil
 		}
@@ -57,10 +57,10 @@ func (c *SMTPMonitorChecker) Check(ctx context.Context, cfg *monitor.Config) (mo
 		dialer := &net.Dialer{Timeout: timeout}
 		conn, err := dialer.DialContext(ctx, "tcp", addr)
 		if err != nil {
-			ping := time.Since(start).Milliseconds()
+			latency := time.Since(start).Milliseconds()
 			return monitor.CheckResult{
 				Status:  status.Down,
-				Ping:    ping,
+				Latency: latency,
 				Message: fmt.Sprintf("connection failed: %v", err),
 			}, nil
 		}
@@ -70,12 +70,12 @@ func (c *SMTPMonitorChecker) Check(ctx context.Context, cfg *monitor.Config) (mo
 		}
 	}
 
-	ping := time.Since(start).Milliseconds()
+	latency := time.Since(start).Milliseconds()
 
 	if connErr != nil {
 		return monitor.CheckResult{
 			Status:  status.Down,
-			Ping:    ping,
+			Latency: latency,
 			Message: fmt.Sprintf("SMTP client creation failed: %v", connErr),
 		}, nil
 	}
@@ -89,7 +89,7 @@ func (c *SMTPMonitorChecker) Check(ctx context.Context, cfg *monitor.Config) (mo
 		if err := client.StartTLS(tlsConfig); err != nil {
 			return monitor.CheckResult{
 				Status:  status.Down,
-				Ping:    ping,
+				Latency: latency,
 				Message: fmt.Sprintf("STARTTLS failed: %v", err),
 			}, nil
 		}
@@ -98,14 +98,14 @@ func (c *SMTPMonitorChecker) Check(ctx context.Context, cfg *monitor.Config) (mo
 	if err := client.Noop(); err != nil {
 		return monitor.CheckResult{
 			Status:  status.Down,
-			Ping:    ping,
+			Latency: latency,
 			Message: fmt.Sprintf("SMTP NOOP failed: %v", err),
 		}, nil
 	}
 
 	return monitor.CheckResult{
 		Status:  status.Up,
-		Ping:    ping,
+		Latency: latency,
 		Message: "SMTP connection verifies successfully",
 	}, nil
 }

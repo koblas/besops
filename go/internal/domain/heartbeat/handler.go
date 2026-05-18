@@ -19,12 +19,12 @@ type PushTokenFinder interface {
 }
 
 type ChartPoint struct {
-	Timestamp int64
-	Up        int
-	Down      int
-	Ping      float64
-	PingMin   int64
-	PingMax   int64
+	Timestamp  int64
+	Up         int
+	Down       int
+	Latency    float64
+	LatencyMin int64
+	LatencyMax int64
 }
 
 type ChartRepository interface {
@@ -137,9 +137,9 @@ func (h *Handler) GetChartData(ctx context.Context, params oas.GetChartDataParam
 			Timestamp: oas.NewOptInt64(p.Timestamp),
 			Up:        oas.NewOptInt(p.Up),
 			Down:      oas.NewOptInt(p.Down),
-			Ping:      oas.NewOptFloat64(p.Ping),
-			PingMin:   oas.NewOptInt(int(p.PingMin)),
-			PingMax:   oas.NewOptInt(int(p.PingMax)),
+			Latency:    oas.NewOptFloat64(p.Latency),
+			LatencyMin: oas.NewOptInt(int(p.LatencyMin)),
+			LatencyMax: oas.NewOptInt(int(p.LatencyMax)),
 		})
 	}
 	return result, nil
@@ -161,10 +161,10 @@ func (h *Handler) PushHeartbeat(ctx context.Context, params oas.PushHeartbeatPar
 	if params.Msg.IsSet() {
 		msg = params.Msg.Value
 	}
-	var ping *int64
-	if params.Ping.IsSet() {
-		p := int64(params.Ping.Value)
-		ping = &p
+	var latency *int64
+	if params.Latency.IsSet() {
+		p := int64(params.Latency.Value)
+		latency = &p
 	}
 
 	hb := &Heartbeat{
@@ -172,7 +172,7 @@ func (h *Handler) PushHeartbeat(ctx context.Context, params oas.PushHeartbeatPar
 		Status:    status,
 		Time:      RFC3339Time(time.Now().UTC()),
 		Msg:       msg,
-		Ping:      ping,
+		Latency:   latency,
 		Important: true,
 	}
 
@@ -193,8 +193,8 @@ func heartbeatToOAS(hb *Heartbeat) oas.Heartbeat {
 	if hb.Msg != "" {
 		result.Msg = oas.NewOptString(hb.Msg)
 	}
-	if hb.Ping != nil {
-		result.Ping = oas.NewOptInt64(*hb.Ping)
+	if hb.Latency != nil {
+		result.Latency = oas.NewOptInt64(*hb.Latency)
 	}
 	if hb.Important {
 		result.Important = oas.NewOptBool(true)

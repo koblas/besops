@@ -171,7 +171,7 @@ func (f *Factory) FromExistingHeartbeat(m *models.Heartbeat) *HeartbeatTemplate 
 	o.Status = func() int64 { return m.Status }
 	o.MSG = func() null.Val[string] { return m.MSG }
 	o.Time = func() time.Time { return m.Time }
-	o.Ping = func() null.Val[int64] { return m.Ping }
+	o.Latency = func() null.Val[int64] { return m.Latency }
 	o.Important = func() bool { return m.Important }
 	o.Duration = func() int64 { return m.Duration }
 	o.DownCount = func() int64 { return m.DownCount }
@@ -904,9 +904,9 @@ func (f *Factory) FromExistingStatDaily(m *models.StatDaily) *StatDailyTemplate 
 	o.ID = func() string { return m.ID }
 	o.MonitorID = func() string { return m.MonitorID }
 	o.Timestamp = func() int64 { return m.Timestamp }
-	o.Ping = func() null.Val[float64] { return m.Ping }
-	o.PingMin = func() null.Val[int64] { return m.PingMin }
-	o.PingMax = func() null.Val[int64] { return m.PingMax }
+	o.Latency = func() null.Val[float64] { return m.Latency }
+	o.LatencyMin = func() null.Val[int64] { return m.LatencyMin }
+	o.LatencyMax = func() null.Val[int64] { return m.LatencyMax }
 	o.Up = func() int64 { return m.Up }
 	o.Down = func() int64 { return m.Down }
 
@@ -940,9 +940,9 @@ func (f *Factory) FromExistingStatHourly(m *models.StatHourly) *StatHourlyTempla
 	o.ID = func() string { return m.ID }
 	o.MonitorID = func() string { return m.MonitorID }
 	o.Timestamp = func() int64 { return m.Timestamp }
-	o.Ping = func() null.Val[float64] { return m.Ping }
-	o.PingMin = func() null.Val[int64] { return m.PingMin }
-	o.PingMax = func() null.Val[int64] { return m.PingMax }
+	o.Latency = func() null.Val[float64] { return m.Latency }
+	o.LatencyMin = func() null.Val[int64] { return m.LatencyMin }
+	o.LatencyMax = func() null.Val[int64] { return m.LatencyMax }
 	o.Up = func() int64 { return m.Up }
 	o.Down = func() int64 { return m.Down }
 
@@ -976,9 +976,9 @@ func (f *Factory) FromExistingStatMinutely(m *models.StatMinutely) *StatMinutely
 	o.ID = func() string { return m.ID }
 	o.MonitorID = func() string { return m.MonitorID }
 	o.Timestamp = func() int64 { return m.Timestamp }
-	o.Ping = func() null.Val[float64] { return m.Ping }
-	o.PingMin = func() null.Val[int64] { return m.PingMin }
-	o.PingMax = func() null.Val[int64] { return m.PingMax }
+	o.Latency = func() null.Val[float64] { return m.Latency }
+	o.LatencyMin = func() null.Val[int64] { return m.LatencyMin }
+	o.LatencyMax = func() null.Val[int64] { return m.LatencyMax }
 	o.Up = func() int64 { return m.Up }
 	o.Down = func() int64 { return m.Down }
 

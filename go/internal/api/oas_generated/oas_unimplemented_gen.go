@@ -321,6 +321,15 @@ func (UnimplementedHandler) GetInfo(ctx context.Context) (r *GetInfoOK, _ error)
 	return r, ht.ErrNotImplemented
 }
 
+// GetLatencyBadge implements getLatencyBadge operation.
+//
+// Get average latency badge SVG.
+//
+// GET /badges/{monitorId}/latency
+func (UnimplementedHandler) GetLatencyBadge(ctx context.Context, params GetLatencyBadgeParams) (r SVGBadge, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetMaintenance implements getMaintenance operation.
 //
 // Get a maintenance window.
@@ -363,15 +372,6 @@ func (UnimplementedHandler) GetMonitor(ctx context.Context, params GetMonitorPar
 //
 // GET /monitors/uptimes
 func (UnimplementedHandler) GetMonitorUptimes(ctx context.Context) (r GetMonitorUptimesOK, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// GetPingBadge implements getPingBadge operation.
-//
-// Get average ping badge SVG.
-//
-// GET /badges/{monitorId}/ping
-func (UnimplementedHandler) GetPingBadge(ctx context.Context, params GetPingBadgeParams) (r SVGBadge, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

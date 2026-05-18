@@ -24,14 +24,14 @@ import (
 
 // StatDaily is an object representing the database table.
 type StatDaily struct {
-	ID        string            `db:"id,pk" `
-	MonitorID string            `db:"monitor_id" `
-	Timestamp int64             `db:"timestamp" `
-	Ping      null.Val[float64] `db:"ping" `
-	PingMin   null.Val[int64]   `db:"ping_min" `
-	PingMax   null.Val[int64]   `db:"ping_max" `
-	Up        int64             `db:"up" `
-	Down      int64             `db:"down" `
+	ID         string            `db:"id,pk" `
+	MonitorID  string            `db:"monitor_id" `
+	Timestamp  int64             `db:"timestamp" `
+	Latency    null.Val[float64] `db:"latency" `
+	LatencyMin null.Val[int64]   `db:"latency_min" `
+	LatencyMax null.Val[int64]   `db:"latency_max" `
+	Up         int64             `db:"up" `
+	Down       int64             `db:"down" `
 
 	R statDailyR `db:"-" `
 }
@@ -53,7 +53,7 @@ type statDailyR struct {
 
 func buildStatDailyColumns(tableName string) statDailyColumns {
 	columnsExpr := expr.NewColumnsExpr(
-		"id", "monitor_id", "timestamp", "ping", "ping_min", "ping_max", "up", "down",
+		"id", "monitor_id", "timestamp", "latency", "latency_min", "latency_max", "up", "down",
 	)
 	if tableName != "" {
 		columnsExpr = columnsExpr.WithParent(tableName)
@@ -64,9 +64,9 @@ func buildStatDailyColumns(tableName string) statDailyColumns {
 		ID:          sqlite.Quote(tableName, "id"),
 		MonitorID:   sqlite.Quote(tableName, "monitor_id"),
 		Timestamp:   sqlite.Quote(tableName, "timestamp"),
-		Ping:        sqlite.Quote(tableName, "ping"),
-		PingMin:     sqlite.Quote(tableName, "ping_min"),
-		PingMax:     sqlite.Quote(tableName, "ping_max"),
+		Latency:     sqlite.Quote(tableName, "latency"),
+		LatencyMin:  sqlite.Quote(tableName, "latency_min"),
+		LatencyMax:  sqlite.Quote(tableName, "latency_max"),
 		Up:          sqlite.Quote(tableName, "up"),
 		Down:        sqlite.Quote(tableName, "down"),
 	}
@@ -78,9 +78,9 @@ type statDailyColumns struct {
 	ID         sqlite.Expression
 	MonitorID  sqlite.Expression
 	Timestamp  sqlite.Expression
-	Ping       sqlite.Expression
-	PingMin    sqlite.Expression
-	PingMax    sqlite.Expression
+	Latency    sqlite.Expression
+	LatencyMin sqlite.Expression
+	LatencyMax sqlite.Expression
 	Up         sqlite.Expression
 	Down       sqlite.Expression
 }
@@ -101,14 +101,14 @@ func (c statDailyColumns) Unqualified() statDailyColumns {
 // All values are optional, and do not have to be set
 // Generated columns are not included
 type StatDailySetter struct {
-	ID        omit.Val[string]      `db:"id,pk" `
-	MonitorID omit.Val[string]      `db:"monitor_id" `
-	Timestamp omit.Val[int64]       `db:"timestamp" `
-	Ping      omitnull.Val[float64] `db:"ping" `
-	PingMin   omitnull.Val[int64]   `db:"ping_min" `
-	PingMax   omitnull.Val[int64]   `db:"ping_max" `
-	Up        omit.Val[int64]       `db:"up" `
-	Down      omit.Val[int64]       `db:"down" `
+	ID         omit.Val[string]      `db:"id,pk" `
+	MonitorID  omit.Val[string]      `db:"monitor_id" `
+	Timestamp  omit.Val[int64]       `db:"timestamp" `
+	Latency    omitnull.Val[float64] `db:"latency" `
+	LatencyMin omitnull.Val[int64]   `db:"latency_min" `
+	LatencyMax omitnull.Val[int64]   `db:"latency_max" `
+	Up         omit.Val[int64]       `db:"up" `
+	Down       omit.Val[int64]       `db:"down" `
 }
 
 func (s StatDailySetter) SetColumns() []string {
@@ -122,14 +122,14 @@ func (s StatDailySetter) SetColumns() []string {
 	if s.Timestamp.IsValue() {
 		vals = append(vals, "timestamp")
 	}
-	if !s.Ping.IsUnset() {
-		vals = append(vals, "ping")
+	if !s.Latency.IsUnset() {
+		vals = append(vals, "latency")
 	}
-	if !s.PingMin.IsUnset() {
-		vals = append(vals, "ping_min")
+	if !s.LatencyMin.IsUnset() {
+		vals = append(vals, "latency_min")
 	}
-	if !s.PingMax.IsUnset() {
-		vals = append(vals, "ping_max")
+	if !s.LatencyMax.IsUnset() {
+		vals = append(vals, "latency_max")
 	}
 	if s.Up.IsValue() {
 		vals = append(vals, "up")
@@ -150,14 +150,14 @@ func (s StatDailySetter) Overwrite(t *StatDaily) {
 	if s.Timestamp.IsValue() {
 		t.Timestamp = s.Timestamp.MustGet()
 	}
-	if !s.Ping.IsUnset() {
-		t.Ping = s.Ping.MustGetNull()
+	if !s.Latency.IsUnset() {
+		t.Latency = s.Latency.MustGetNull()
 	}
-	if !s.PingMin.IsUnset() {
-		t.PingMin = s.PingMin.MustGetNull()
+	if !s.LatencyMin.IsUnset() {
+		t.LatencyMin = s.LatencyMin.MustGetNull()
 	}
-	if !s.PingMax.IsUnset() {
-		t.PingMax = s.PingMax.MustGetNull()
+	if !s.LatencyMax.IsUnset() {
+		t.LatencyMax = s.LatencyMax.MustGetNull()
 	}
 	if s.Up.IsValue() {
 		t.Up = s.Up.MustGet()
@@ -194,16 +194,16 @@ func (s *StatDailySetter) Apply(q *dialect.InsertQuery) {
 			vals = append(vals, sqlite.Arg(s.Timestamp.MustGet()))
 		}
 
-		if !s.Ping.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.Ping.MustGetNull()))
+		if !s.Latency.IsUnset() {
+			vals = append(vals, sqlite.Arg(s.Latency.MustGetNull()))
 		}
 
-		if !s.PingMin.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.PingMin.MustGetNull()))
+		if !s.LatencyMin.IsUnset() {
+			vals = append(vals, sqlite.Arg(s.LatencyMin.MustGetNull()))
 		}
 
-		if !s.PingMax.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.PingMax.MustGetNull()))
+		if !s.LatencyMax.IsUnset() {
+			vals = append(vals, sqlite.Arg(s.LatencyMax.MustGetNull()))
 		}
 
 		if s.Up.IsValue() {
@@ -250,24 +250,24 @@ func (s StatDailySetter) Expressions(prefix ...string) []bob.Expression {
 		}})
 	}
 
-	if !s.Ping.IsUnset() {
+	if !s.Latency.IsUnset() {
 		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "ping")...),
-			sqlite.Arg(s.Ping),
+			sqlite.Quote(append(prefix, "latency")...),
+			sqlite.Arg(s.Latency),
 		}})
 	}
 
-	if !s.PingMin.IsUnset() {
+	if !s.LatencyMin.IsUnset() {
 		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "ping_min")...),
-			sqlite.Arg(s.PingMin),
+			sqlite.Quote(append(prefix, "latency_min")...),
+			sqlite.Arg(s.LatencyMin),
 		}})
 	}
 
-	if !s.PingMax.IsUnset() {
+	if !s.LatencyMax.IsUnset() {
 		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "ping_max")...),
-			sqlite.Arg(s.PingMax),
+			sqlite.Quote(append(prefix, "latency_max")...),
+			sqlite.Arg(s.LatencyMax),
 		}})
 	}
 
@@ -581,14 +581,14 @@ func (statDaily0 *StatDaily) AttachMonitor(ctx context.Context, exec bob.Executo
 }
 
 type statDailyWhere[Q sqlite.Filterable] struct {
-	ID        sqlite.WhereMod[Q, string]
-	MonitorID sqlite.WhereMod[Q, string]
-	Timestamp sqlite.WhereMod[Q, int64]
-	Ping      sqlite.WhereNullMod[Q, float64]
-	PingMin   sqlite.WhereNullMod[Q, int64]
-	PingMax   sqlite.WhereNullMod[Q, int64]
-	Up        sqlite.WhereMod[Q, int64]
-	Down      sqlite.WhereMod[Q, int64]
+	ID         sqlite.WhereMod[Q, string]
+	MonitorID  sqlite.WhereMod[Q, string]
+	Timestamp  sqlite.WhereMod[Q, int64]
+	Latency    sqlite.WhereNullMod[Q, float64]
+	LatencyMin sqlite.WhereNullMod[Q, int64]
+	LatencyMax sqlite.WhereNullMod[Q, int64]
+	Up         sqlite.WhereMod[Q, int64]
+	Down       sqlite.WhereMod[Q, int64]
 }
 
 func (statDailyWhere[Q]) AliasedAs(alias string) statDailyWhere[Q] {
@@ -597,14 +597,14 @@ func (statDailyWhere[Q]) AliasedAs(alias string) statDailyWhere[Q] {
 
 func buildStatDailyWhere[Q sqlite.Filterable](cols statDailyColumns) statDailyWhere[Q] {
 	return statDailyWhere[Q]{
-		ID:        sqlite.Where[Q, string](cols.ID),
-		MonitorID: sqlite.Where[Q, string](cols.MonitorID),
-		Timestamp: sqlite.Where[Q, int64](cols.Timestamp),
-		Ping:      sqlite.WhereNull[Q, float64](cols.Ping),
-		PingMin:   sqlite.WhereNull[Q, int64](cols.PingMin),
-		PingMax:   sqlite.WhereNull[Q, int64](cols.PingMax),
-		Up:        sqlite.Where[Q, int64](cols.Up),
-		Down:      sqlite.Where[Q, int64](cols.Down),
+		ID:         sqlite.Where[Q, string](cols.ID),
+		MonitorID:  sqlite.Where[Q, string](cols.MonitorID),
+		Timestamp:  sqlite.Where[Q, int64](cols.Timestamp),
+		Latency:    sqlite.WhereNull[Q, float64](cols.Latency),
+		LatencyMin: sqlite.WhereNull[Q, int64](cols.LatencyMin),
+		LatencyMax: sqlite.WhereNull[Q, int64](cols.LatencyMax),
+		Up:         sqlite.Where[Q, int64](cols.Up),
+		Down:       sqlite.Where[Q, int64](cols.Down),
 	}
 }
 

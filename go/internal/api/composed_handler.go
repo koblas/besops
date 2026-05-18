@@ -420,8 +420,8 @@ func (c *ComposedHandler) GetUptimeBadge(ctx context.Context, params oas.GetUpti
 	return c.badges.GetUptimeBadge(ctx, params)
 }
 
-func (c *ComposedHandler) GetPingBadge(ctx context.Context, params oas.GetPingBadgeParams) (oas.SVGBadge, error) {
-	return c.badges.GetPingBadge(ctx, params)
+func (c *ComposedHandler) GetLatencyBadge(ctx context.Context, params oas.GetLatencyBadgeParams) (oas.SVGBadge, error) {
+	return c.badges.GetLatencyBadge(ctx, params)
 }
 
 func (c *ComposedHandler) GetResponseBadge(ctx context.Context, params oas.GetResponseBadgeParams) (oas.SVGBadge, error) {

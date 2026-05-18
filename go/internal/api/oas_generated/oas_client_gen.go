@@ -158,12 +158,12 @@ type BadgeInvoker interface {
 	//
 	// GET /badges/{monitorId}/cert-exp
 	GetCertExpiryBadge(ctx context.Context, params GetCertExpiryBadgeParams) (SVGBadge, error)
-	// GetPingBadge invokes getPingBadge operation.
+	// GetLatencyBadge invokes getLatencyBadge operation.
 	//
-	// Get average ping badge SVG.
+	// Get average latency badge SVG.
 	//
-	// GET /badges/{monitorId}/ping
-	GetPingBadge(ctx context.Context, params GetPingBadgeParams) (SVGBadge, error)
+	// GET /badges/{monitorId}/latency
+	GetLatencyBadge(ctx context.Context, params GetLatencyBadgeParams) (SVGBadge, error)
 	// GetResponseBadge invokes getResponseBadge operation.
 	//
 	// Get last response time badge SVG.
@@ -4833,6 +4833,137 @@ func (c *Client) sendGetInfo(ctx context.Context) (res *GetInfoOK, err error) {
 	return result, nil
 }
 
+// GetLatencyBadge invokes getLatencyBadge operation.
+//
+// Get average latency badge SVG.
+//
+// GET /badges/{monitorId}/latency
+func (c *Client) GetLatencyBadge(ctx context.Context, params GetLatencyBadgeParams) (SVGBadge, error) {
+	res, err := c.sendGetLatencyBadge(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGetLatencyBadge(ctx context.Context, params GetLatencyBadgeParams) (res SVGBadge, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("getLatencyBadge"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.URLTemplateKey.String("/badges/{monitorId}/latency"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, GetLatencyBadgeOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/badges/"
+	{
+		// Encode "monitorId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "monitorId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.UUIDToString(params.MonitorId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/latency"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "duration" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "duration",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Duration.Get(); ok {
+				return e.EncodeValue(conv.IntToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "style" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "style",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Style.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeGetLatencyBadgeResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // GetMaintenance invokes getMaintenance operation.
 //
 // Get a maintenance window.
@@ -5435,137 +5566,6 @@ func (c *Client) sendGetMonitorUptimes(ctx context.Context) (res GetMonitorUptim
 
 	stage = "DecodeResponse"
 	result, err := decodeGetMonitorUptimesResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// GetPingBadge invokes getPingBadge operation.
-//
-// Get average ping badge SVG.
-//
-// GET /badges/{monitorId}/ping
-func (c *Client) GetPingBadge(ctx context.Context, params GetPingBadgeParams) (SVGBadge, error) {
-	res, err := c.sendGetPingBadge(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendGetPingBadge(ctx context.Context, params GetPingBadgeParams) (res SVGBadge, err error) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("getPingBadge"),
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.URLTemplateKey.String("/badges/{monitorId}/ping"),
-	}
-	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, GetPingBadgeOperation,
-		trace.WithAttributes(otelAttrs...),
-		clientSpanKind,
-	)
-	// Track stage for error reporting.
-	var stage string
-	defer func() {
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		span.End()
-	}()
-
-	stage = "BuildURL"
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/badges/"
-	{
-		// Encode "monitorId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "monitorId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.UUIDToString(params.MonitorId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/ping"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	stage = "EncodeQueryParams"
-	q := uri.NewQueryEncoder()
-	{
-		// Encode "duration" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "duration",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Duration.Get(); ok {
-				return e.EncodeValue(conv.IntToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "style" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "style",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Style.Get(); ok {
-				return e.EncodeValue(conv.StringToString(string(val)))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	u.RawQuery = q.Values().Encode()
-
-	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	stage = "SendRequest"
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	body := resp.Body
-	defer body.Close()
-
-	stage = "DecodeResponse"
-	result, err := decodeGetPingBadgeResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -8094,15 +8094,15 @@ func (c *Client) sendPushHeartbeat(ctx context.Context, params PushHeartbeatPara
 		}
 	}
 	{
-		// Encode "ping" parameter.
+		// Encode "latency" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "ping",
+			Name:    "latency",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Ping.Get(); ok {
+			if val, ok := params.Latency.Get(); ok {
 				return e.EncodeValue(conv.Float64ToString(val))
 			}
 			return nil

@@ -103,7 +103,7 @@ func TestSchedulerImmediateCheck(t *testing.T) {
 		"m1": {ID: "m1", Name: "test", Type: "http", URL: "http://example.com", Interval: 3600, Timeout: 5, Active: true, Method: "GET"},
 	}}
 	hbStore := &mockHBStore{}
-	checker := &mockCheckerSched{results: []CheckResult{{Status: status.Up, Ping: 42, Message: "ok"}}}
+	checker := &mockCheckerSched{results: []CheckResult{{Status: status.Up, Latency: 42, Message: "ok"}}}
 	sched := newTestScheduler(store, hbStore, checker)
 
 	require.NoError(t, sched.Start(t.Context()))
@@ -121,7 +121,7 @@ func TestSchedulerInterval(t *testing.T) {
 		"m1": {ID: "m1", Name: "test", Type: "http", URL: "http://example.com", Interval: 1, Timeout: 5, Active: true, Method: "GET"},
 	}}
 	hbStore := &mockHBStore{}
-	checker := &mockCheckerSched{results: []CheckResult{{Status: status.Up, Ping: 10, Message: "ok"}}}
+	checker := &mockCheckerSched{results: []CheckResult{{Status: status.Up, Latency: 10, Message: "ok"}}}
 	sched := newTestScheduler(store, hbStore, checker)
 
 	require.NoError(t, sched.Start(t.Context()))
@@ -178,7 +178,7 @@ func TestSchedulerRescheduleOnConfigChange(t *testing.T) {
 		"m1": {ID: "m1", Name: "slow", Type: "http", URL: "http://example.com", Interval: 3600, Timeout: 5, Active: true, Method: "GET"},
 	}}
 	hbStore := &mockHBStore{}
-	checker := &mockCheckerSched{results: []CheckResult{{Status: status.Up, Ping: 10, Message: "ok"}}}
+	checker := &mockCheckerSched{results: []CheckResult{{Status: status.Up, Latency: 10, Message: "ok"}}}
 	sched := newTestScheduler(store, hbStore, checker)
 
 	ctx := t.Context()
@@ -209,7 +209,7 @@ func TestSchedulerRemoveMonitor(t *testing.T) {
 		"m1": {ID: "m1", Name: "toremove", Type: "http", URL: "http://example.com", Interval: 1, Timeout: 5, Active: true, Method: "GET"},
 	}}
 	hbStore := &mockHBStore{}
-	checker := &mockCheckerSched{results: []CheckResult{{Status: status.Up, Ping: 10, Message: "ok"}}}
+	checker := &mockCheckerSched{results: []CheckResult{{Status: status.Up, Latency: 10, Message: "ok"}}}
 	sched := newTestScheduler(store, hbStore, checker)
 
 	ctx := t.Context()
@@ -230,7 +230,7 @@ func TestSchedulerCheckNow(t *testing.T) {
 		"m1": {ID: "m1", Name: "checknow", Type: "http", URL: "http://example.com", Interval: 3600, Timeout: 5, Active: true, Method: "GET"},
 	}}
 	hbStore := &mockHBStore{}
-	checker := &mockCheckerSched{results: []CheckResult{{Status: status.Up, Ping: 10, Message: "ok"}}}
+	checker := &mockCheckerSched{results: []CheckResult{{Status: status.Up, Latency: 10, Message: "ok"}}}
 	sched := newTestScheduler(store, hbStore, checker)
 
 	ctx := t.Context()

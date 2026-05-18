@@ -46,7 +46,7 @@ func main() {
 
 	db, err := database.Open(cfg.DatabaseURL)
 	if err != nil {
-		log.Fatalf("open database: %v", err)
+		log.Fatalf("open database %q: %v", cfg.DatabaseURL, err)
 	}
 	defer db.Close()
 

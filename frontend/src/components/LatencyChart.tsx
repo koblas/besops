@@ -33,7 +33,7 @@ ChartJS.register(
   Legend,
 );
 
-interface PingChartProps {
+interface LatencyChartProps {
   monitorId: string;
   heartbeats?: Heartbeat[];
 }
@@ -74,7 +74,7 @@ interface XYPoint {
 }
 
 function buildRecentData(heartbeats: Heartbeat[], monitorInterval: number | undefined) {
-  const pingData: XYPoint[] = [];
+  const latencyData: XYPoint[] = [];
   const downData: XYPoint[] = [];
   const colorData: string[] = [];
 
@@ -90,16 +90,16 @@ function buildRecentData(heartbeats: Heartbeat[], monitorInterval: number | unde
         const gapStart = new Date(lastTime.getTime() + monitorInterval * 1000).toISOString();
         const gapEnd = new Date(beatTime.getTime() - monitorInterval * 1000).toISOString();
         for (const gx of [gapStart, gapEnd]) {
-          pingData.push({ x: gx, y: null });
+          latencyData.push({ x: gx, y: null });
           downData.push({ x: gx, y: null });
           colorData.push('#000');
         }
       }
     }
 
-    pingData.push({
+    latencyData.push({
       x,
-      y: beat.status === STATUS.UP && beat.ping ? beat.ping : null,
+      y: beat.status === STATUS.UP && beat.latency ? beat.latency : null,
     });
     downData.push({
       x,
@@ -109,16 +109,16 @@ function buildRecentData(heartbeats: Heartbeat[], monitorInterval: number | unde
     lastTime = beatTime;
   }
 
-  return { pingData, downData, colorData };
+  return { latencyData, downData, colorData };
 }
 
 interface AggPoint {
   timestamp: number;
   up: number;
   down: number;
-  avgPing: number;
-  minPing: number;
-  maxPing: number;
+  avgLatency: number;
+  minLatency: number;
+  maxLatency: number;
   maintenance?: number;
 }
 
@@ -126,25 +126,25 @@ function getAverage(points: AggPoint[]): AggPoint {
   const totalUp = points.reduce((sum, p) => sum + p.up, 0);
   const totalDown = points.reduce((sum, p) => sum + p.down, 0);
   const totalMaintenance = points.reduce((sum, p) => sum + (p.maintenance || 0), 0);
-  const totalPing = points.reduce((sum, p) => sum + p.avgPing * p.up, 0);
-  const minPing = points.reduce((min, p) => Math.min(min, p.minPing), Infinity);
-  const maxPing = points.reduce((max, p) => Math.max(max, p.maxPing), 0);
+  const totalLatency = points.reduce((sum, p) => sum + p.avgLatency * p.up, 0);
+  const minLatency = points.reduce((min, p) => Math.min(min, p.minLatency), Infinity);
+  const maxLatency = points.reduce((max, p) => Math.max(max, p.maxLatency), 0);
   const mid = Math.floor(points.length / 2);
   return {
     timestamp: points[mid].timestamp,
     up: totalUp,
     down: totalDown,
     maintenance: totalMaintenance > 0 ? totalMaintenance : undefined,
-    avgPing: totalUp > 0 ? totalPing / totalUp : 0,
-    minPing,
-    maxPing,
+    avgLatency: totalUp > 0 ? totalLatency / totalUp : 0,
+    minLatency,
+    maxLatency,
   };
 }
 
 function buildStatsData(chartPoints: ChartPoint[], monitorInterval: number | undefined, period: number) {
-  const avgPingData: XYPoint[] = [];
-  const minPingData: XYPoint[] = [];
-  const maxPingData: XYPoint[] = [];
+  const avgLatencyData: XYPoint[] = [];
+  const minLatencyData: XYPoint[] = [];
+  const maxLatencyData: XYPoint[] = [];
   const downData: XYPoint[] = [];
   const colorData: string[] = [];
 
@@ -154,17 +154,17 @@ function buildStatsData(chartPoints: ChartPoint[], monitorInterval: number | und
 
   function pushPoint(dp: AggPoint) {
     const x = new Date(dp.timestamp * 1000).toISOString();
-    avgPingData.push({ x, y: dp.up > 0 && dp.avgPing != null ? dp.avgPing : null });
-    minPingData.push({ x, y: dp.up > 0 && dp.avgPing != null ? dp.minPing : null });
-    maxPingData.push({ x, y: dp.up > 0 && dp.avgPing != null ? dp.maxPing : null });
+    avgLatencyData.push({ x, y: dp.up > 0 && dp.avgLatency != null ? dp.avgLatency : null });
+    minLatencyData.push({ x, y: dp.up > 0 && dp.avgLatency != null ? dp.minLatency : null });
+    maxLatencyData.push({ x, y: dp.up > 0 && dp.avgLatency != null ? dp.maxLatency : null });
     downData.push({ x, y: dp.down + (dp.maintenance || 0) });
     colorData.push(getBarColor(dp));
   }
 
   function pushNulls(x: string) {
-    avgPingData.push({ x, y: null });
-    minPingData.push({ x, y: null });
-    maxPingData.push({ x, y: null });
+    avgLatencyData.push({ x, y: null });
+    minLatencyData.push({ x, y: null });
+    maxLatencyData.push({ x, y: null });
     downData.push({ x, y: null });
     colorData.push('#000');
   }
@@ -174,9 +174,9 @@ function buildStatsData(chartPoints: ChartPoint[], monitorInterval: number | und
       timestamp: raw.timestamp ?? 0,
       up: raw.up ?? 0,
       down: raw.down ?? 0,
-      avgPing: raw.ping ?? 0,
-      minPing: raw.pingMin ?? 0,
-      maxPing: raw.pingMax ?? 0,
+      avgLatency: raw.latency ?? 0,
+      minLatency: raw.latencyMin ?? 0,
+      maxLatency: raw.latencyMax ?? 0,
     };
 
     if (dp.up === 0 && dp.down === 0) continue;
@@ -224,10 +224,10 @@ function buildStatsData(chartPoints: ChartPoint[], monitorInterval: number | und
     pushPoint(getAverage(aggregateBuffer));
   }
 
-  return { avgPingData, minPingData, maxPingData, downData, colorData };
+  return { avgLatencyData, minLatencyData, maxLatencyData, downData, colorData };
 }
 
-export function PingChart({ monitorId, heartbeats = [] }: PingChartProps) {
+export function LatencyChart({ monitorId, heartbeats = [] }: LatencyChartProps) {
   const [period, setPeriod] = useState(0);
   const { data: chartPoints } = useChartData(monitorId, period || undefined);
   const { data: monitor } = useMonitor(monitorId);
@@ -235,12 +235,12 @@ export function PingChart({ monitorId, heartbeats = [] }: PingChartProps) {
 
   const chartData = useMemo(() => {
     if (period === 0) {
-      const { pingData, downData, colorData } = buildRecentData(heartbeats, monitorInterval);
+      const { latencyData, downData, colorData } = buildRecentData(heartbeats, monitorInterval);
       return {
         datasets: [
           {
-            label: 'Ping',
-            data: pingData,
+            label: 'Latency',
+            data: latencyData,
             fill: 'origin',
             tension: 0.2,
             borderColor: STATUS_COLORS[STATUS.UP],
@@ -266,13 +266,13 @@ export function PingChart({ monitorId, heartbeats = [] }: PingChartProps) {
 
     if (!chartPoints) return { datasets: [] };
 
-    const { avgPingData, minPingData, maxPingData, downData, colorData } = buildStatsData(chartPoints, monitorInterval, period);
+    const { avgLatencyData, minLatencyData, maxLatencyData, downData, colorData } = buildStatsData(chartPoints, monitorInterval, period);
 
     return {
       datasets: [
         {
           label: 'Min',
-          data: minPingData,
+          data: minLatencyData,
           fill: 'origin',
           tension: 0.2,
           borderColor: '#126331',
@@ -282,8 +282,8 @@ export function PingChart({ monitorId, heartbeats = [] }: PingChartProps) {
           pointHitRadius: 100,
         },
         {
-          label: 'Avg Ping',
-          data: avgPingData,
+          label: 'Avg Latency',
+          data: avgLatencyData,
           fill: 'origin',
           tension: 0.2,
           borderColor: STATUS_COLORS[STATUS.UP],
@@ -294,7 +294,7 @@ export function PingChart({ monitorId, heartbeats = [] }: PingChartProps) {
         },
         {
           label: 'Max',
-          data: maxPingData,
+          data: maxLatencyData,
           fill: 'origin',
           tension: 0.2,
           borderColor: '#21b55a',

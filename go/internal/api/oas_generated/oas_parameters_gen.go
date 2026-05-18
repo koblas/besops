@@ -2021,6 +2021,226 @@ func decodeGetImportantHeartbeatsParams(args [1]string, argsEscaped bool, r *htt
 	return params, nil
 }
 
+// GetLatencyBadgeParams is parameters of getLatencyBadge operation.
+type GetLatencyBadgeParams struct {
+	Duration OptInt `json:",omitempty,omitzero"`
+	// Visual style of the rendered SVG badge.
+	Style OptBadgeStyle `json:",omitempty,omitzero"`
+	// Unique identifier of the monitor.
+	MonitorId uuid.UUID
+}
+
+func unpackGetLatencyBadgeParams(packed middleware.Parameters) (params GetLatencyBadgeParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "duration",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Duration = v.(OptInt)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "style",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Style = v.(OptBadgeStyle)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "monitorId",
+			In:   "path",
+		}
+		params.MonitorId = packed[key].(uuid.UUID)
+	}
+	return params
+}
+
+func decodeGetLatencyBadgeParams(args [1]string, argsEscaped bool, r *http.Request) (params GetLatencyBadgeParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Set default value for query: duration.
+	{
+		val := int(24)
+		params.Duration.SetTo(val)
+	}
+	// Decode query: duration.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "duration",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotDurationVal int
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToInt(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotDurationVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Duration.SetTo(paramsDotDurationVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.Duration.Get(); ok {
+					if err := func() error {
+						if err := (validate.Int{
+							MinSet:        true,
+							Min:           1,
+							MaxSet:        true,
+							Max:           8760,
+							MinExclusive:  false,
+							MaxExclusive:  false,
+							MultipleOfSet: false,
+							MultipleOf:    0,
+							Pattern:       nil,
+						}).Validate(int64(value)); err != nil {
+							return errors.Wrap(err, "int")
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "duration",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Set default value for query: style.
+	{
+		val := BadgeStyle("flat")
+		params.Style.SetTo(val)
+	}
+	// Decode query: style.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "style",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotStyleVal BadgeStyle
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotStyleVal = BadgeStyle(c)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Style.SetTo(paramsDotStyleVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.Style.Get(); ok {
+					if err := func() error {
+						if err := value.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "style",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode path: monitorId.
+	if err := func() error {
+		param := args[0]
+		if argsEscaped {
+			unescaped, err := url.PathUnescape(args[0])
+			if err != nil {
+				return errors.Wrap(err, "unescape path")
+			}
+			param = unescaped
+		}
+		if len(param) > 0 {
+			d := uri.NewPathDecoder(uri.PathDecoderConfig{
+				Param:   "monitorId",
+				Value:   param,
+				Style:   uri.PathStyleSimple,
+				Explode: false,
+			})
+
+			if err := func() error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToUUID(val)
+				if err != nil {
+					return err
+				}
+
+				params.MonitorId = c
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "monitorId",
+			In:   "path",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // GetMaintenanceParams is parameters of getMaintenance operation.
 type GetMaintenanceParams struct {
 	MaintenanceId uuid.UUID
@@ -2234,226 +2454,6 @@ func unpackGetMonitorParams(packed middleware.Parameters) (params GetMonitorPara
 }
 
 func decodeGetMonitorParams(args [1]string, argsEscaped bool, r *http.Request) (params GetMonitorParams, _ error) {
-	// Decode path: monitorId.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "monitorId",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToUUID(val)
-				if err != nil {
-					return err
-				}
-
-				params.MonitorId = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "monitorId",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
-// GetPingBadgeParams is parameters of getPingBadge operation.
-type GetPingBadgeParams struct {
-	Duration OptInt `json:",omitempty,omitzero"`
-	// Visual style of the rendered SVG badge.
-	Style OptBadgeStyle `json:",omitempty,omitzero"`
-	// Unique identifier of the monitor.
-	MonitorId uuid.UUID
-}
-
-func unpackGetPingBadgeParams(packed middleware.Parameters) (params GetPingBadgeParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "duration",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.Duration = v.(OptInt)
-		}
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "style",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.Style = v.(OptBadgeStyle)
-		}
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "monitorId",
-			In:   "path",
-		}
-		params.MonitorId = packed[key].(uuid.UUID)
-	}
-	return params
-}
-
-func decodeGetPingBadgeParams(args [1]string, argsEscaped bool, r *http.Request) (params GetPingBadgeParams, _ error) {
-	q := uri.NewQueryDecoder(r.URL.Query())
-	// Set default value for query: duration.
-	{
-		val := int(24)
-		params.Duration.SetTo(val)
-	}
-	// Decode query: duration.
-	if err := func() error {
-		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "duration",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.HasParam(cfg); err == nil {
-			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotDurationVal int
-				if err := func() error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToInt(val)
-					if err != nil {
-						return err
-					}
-
-					paramsDotDurationVal = c
-					return nil
-				}(); err != nil {
-					return err
-				}
-				params.Duration.SetTo(paramsDotDurationVal)
-				return nil
-			}); err != nil {
-				return err
-			}
-			if err := func() error {
-				if value, ok := params.Duration.Get(); ok {
-					if err := func() error {
-						if err := (validate.Int{
-							MinSet:        true,
-							Min:           1,
-							MaxSet:        true,
-							Max:           8760,
-							MinExclusive:  false,
-							MaxExclusive:  false,
-							MultipleOfSet: false,
-							MultipleOf:    0,
-							Pattern:       nil,
-						}).Validate(int64(value)); err != nil {
-							return errors.Wrap(err, "int")
-						}
-						return nil
-					}(); err != nil {
-						return err
-					}
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "duration",
-			In:   "query",
-			Err:  err,
-		}
-	}
-	// Set default value for query: style.
-	{
-		val := BadgeStyle("flat")
-		params.Style.SetTo(val)
-	}
-	// Decode query: style.
-	if err := func() error {
-		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "style",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.HasParam(cfg); err == nil {
-			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotStyleVal BadgeStyle
-				if err := func() error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToString(val)
-					if err != nil {
-						return err
-					}
-
-					paramsDotStyleVal = BadgeStyle(c)
-					return nil
-				}(); err != nil {
-					return err
-				}
-				params.Style.SetTo(paramsDotStyleVal)
-				return nil
-			}); err != nil {
-				return err
-			}
-			if err := func() error {
-				if value, ok := params.Style.Get(); ok {
-					if err := func() error {
-						if err := value.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						return err
-					}
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "style",
-			In:   "query",
-			Err:  err,
-		}
-	}
 	// Decode path: monitorId.
 	if err := func() error {
 		param := args[0]
@@ -3706,7 +3706,7 @@ func decodePauseMonitorParams(args [1]string, argsEscaped bool, r *http.Request)
 type PushHeartbeatParams struct {
 	Status    OptPushHeartbeatStatus `json:",omitempty,omitzero"`
 	Msg       OptString              `json:",omitempty,omitzero"`
-	Ping      OptFloat64             `json:",omitempty,omitzero"`
+	Latency   OptFloat64             `json:",omitempty,omitzero"`
 	PushToken string
 }
 
@@ -3731,11 +3731,11 @@ func unpackPushHeartbeatParams(packed middleware.Parameters) (params PushHeartbe
 	}
 	{
 		key := middleware.ParameterKey{
-			Name: "ping",
+			Name: "latency",
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.Ping = v.(OptFloat64)
+			params.Latency = v.(OptFloat64)
 		}
 	}
 	{
@@ -3884,17 +3884,17 @@ func decodePushHeartbeatParams(args [1]string, argsEscaped bool, r *http.Request
 			Err:  err,
 		}
 	}
-	// Decode query: ping.
+	// Decode query: latency.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "ping",
+			Name:    "latency",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotPingVal float64
+				var paramsDotLatencyVal float64
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
@@ -3906,18 +3906,18 @@ func decodePushHeartbeatParams(args [1]string, argsEscaped bool, r *http.Request
 						return err
 					}
 
-					paramsDotPingVal = c
+					paramsDotLatencyVal = c
 					return nil
 				}(); err != nil {
 					return err
 				}
-				params.Ping.SetTo(paramsDotPingVal)
+				params.Latency.SetTo(paramsDotLatencyVal)
 				return nil
 			}); err != nil {
 				return err
 			}
 			if err := func() error {
-				if value, ok := params.Ping.Get(); ok {
+				if value, ok := params.Latency.Get(); ok {
 					if err := func() error {
 						if err := (validate.Float{
 							MinSet:        true,
@@ -3945,7 +3945,7 @@ func decodePushHeartbeatParams(args [1]string, argsEscaped bool, r *http.Request
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "ping",
+			Name: "latency",
 			In:   "query",
 			Err:  err,
 		}

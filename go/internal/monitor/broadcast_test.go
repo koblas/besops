@@ -28,7 +28,7 @@ func TestResultRecorderPublishesToHub(t *testing.T) {
 
 	recorder.HandleResult(t.Context(), "m1", CheckResult{
 		Status:  status.Up,
-		Ping:    12,
+		Latency: 12,
 		Message: "ok",
 	}, 0)
 
@@ -39,7 +39,7 @@ func TestResultRecorderPublishesToHub(t *testing.T) {
 		require.True(t, ok, "expected *heartbeat.Heartbeat, got %T", ev.Data)
 		assert.Equal(t, "m1", hb.MonitorID)
 		assert.Equal(t, int(status.Up), hb.Status)
-		assert.Equal(t, int64(12), *hb.Ping)
+		assert.Equal(t, int64(12), *hb.Latency)
 	case <-time.After(time.Second):
 		t.Fatal("timed out waiting for broadcast event")
 	}

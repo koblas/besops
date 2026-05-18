@@ -27,29 +27,29 @@ func (r *sqliteRepo) UpsertMinutely(ctx context.Context, stat *StatMinutely) err
 	if stat.ID == "" {
 		stat.ID = uuid.New().String()
 	}
-	return r.upsertStat(ctx, "stat_minutely", stat.ID, stat.MonitorID, stat.Timestamp, stat.Ping, stat.PingMin, stat.PingMax, stat.Up, stat.Down)
+	return r.upsertStat(ctx, "stat_minutely", stat.ID, stat.MonitorID, stat.Timestamp, stat.Latency, stat.LatencyMin, stat.LatencyMax, stat.Up, stat.Down)
 }
 
 func (r *sqliteRepo) UpsertHourly(ctx context.Context, stat *StatHourly) error {
 	if stat.ID == "" {
 		stat.ID = uuid.New().String()
 	}
-	return r.upsertStat(ctx, "stat_hourly", stat.ID, stat.MonitorID, stat.Timestamp, stat.Ping, stat.PingMin, stat.PingMax, stat.Up, stat.Down)
+	return r.upsertStat(ctx, "stat_hourly", stat.ID, stat.MonitorID, stat.Timestamp, stat.Latency, stat.LatencyMin, stat.LatencyMax, stat.Up, stat.Down)
 }
 
 func (r *sqliteRepo) UpsertDaily(ctx context.Context, stat *StatDaily) error {
 	if stat.ID == "" {
 		stat.ID = uuid.New().String()
 	}
-	return r.upsertStat(ctx, "stat_daily", stat.ID, stat.MonitorID, stat.Timestamp, stat.Ping, stat.PingMin, stat.PingMax, stat.Up, stat.Down)
+	return r.upsertStat(ctx, "stat_daily", stat.ID, stat.MonitorID, stat.Timestamp, stat.Latency, stat.LatencyMin, stat.LatencyMax, stat.Up, stat.Down)
 }
 
-func (r *sqliteRepo) upsertStat(ctx context.Context, table, id, monitorID string, timestamp int64, ping float64, pingMin, pingMax int64, up, down int) error {
+func (r *sqliteRepo) upsertStat(ctx context.Context, table, id, monitorID string, timestamp int64, latency float64, latencyMin, latencyMax int64, up, down int) error {
 	q := sqlite.Insert(
-		im.Into(table, "id", "monitor_id", "timestamp", "ping", "ping_min", "ping_max", "up", "down"),
-		im.Values(sqlite.Arg(id, monitorID, timestamp, ping, pingMin, pingMax, up, down)),
+		im.Into(table, "id", "monitor_id", "timestamp", "latency", "latency_min", "latency_max", "up", "down"),
+		im.Values(sqlite.Arg(id, monitorID, timestamp, latency, latencyMin, latencyMax, up, down)),
 		im.OnConflict("monitor_id", "timestamp").DoUpdate(
-			im.SetExcluded("ping", "ping_min", "ping_max", "up", "down"),
+			im.SetExcluded("latency", "latency_min", "latency_max", "up", "down"),
 		),
 	)
 
@@ -75,9 +75,9 @@ func (r *sqliteRepo) GetMinutely(ctx context.Context, monitorID string, since in
 			ID:        m.ID,
 			MonitorID: m.MonitorID,
 			Timestamp: m.Timestamp,
-			Ping:      m.Ping.GetOrZero(),
-			PingMin:   m.PingMin.GetOrZero(),
-			PingMax:   m.PingMax.GetOrZero(),
+			Latency:    m.Latency.GetOrZero(),
+			LatencyMin: m.LatencyMin.GetOrZero(),
+			LatencyMax: m.LatencyMax.GetOrZero(),
 			Up:        int(m.Up),
 			Down:      int(m.Down),
 		}
@@ -100,9 +100,9 @@ func (r *sqliteRepo) GetHourly(ctx context.Context, monitorID string, since int6
 			ID:        m.ID,
 			MonitorID: m.MonitorID,
 			Timestamp: m.Timestamp,
-			Ping:      m.Ping.GetOrZero(),
-			PingMin:   m.PingMin.GetOrZero(),
-			PingMax:   m.PingMax.GetOrZero(),
+			Latency:    m.Latency.GetOrZero(),
+			LatencyMin: m.LatencyMin.GetOrZero(),
+			LatencyMax: m.LatencyMax.GetOrZero(),
 			Up:        int(m.Up),
 			Down:      int(m.Down),
 		}
@@ -125,9 +125,9 @@ func (r *sqliteRepo) GetDaily(ctx context.Context, monitorID string, since int64
 			ID:        m.ID,
 			MonitorID: m.MonitorID,
 			Timestamp: m.Timestamp,
-			Ping:      m.Ping.GetOrZero(),
-			PingMin:   m.PingMin.GetOrZero(),
-			PingMax:   m.PingMax.GetOrZero(),
+			Latency:    m.Latency.GetOrZero(),
+			LatencyMin: m.LatencyMin.GetOrZero(),
+			LatencyMax: m.LatencyMax.GetOrZero(),
 			Up:        int(m.Up),
 			Down:      int(m.Down),
 		}

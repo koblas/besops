@@ -63,14 +63,14 @@ func (c *PingChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.C
 	if stats.PacketsRecv == 0 {
 		return monitor.CheckResult{
 			Status:  status.Down,
-			Ping:    stats.AvgRtt.Milliseconds(),
+			Latency: stats.AvgRtt.Milliseconds(),
 			Message: fmt.Sprintf("0/%d packets received", stats.PacketsSent),
 		}, nil
 	}
 
 	return monitor.CheckResult{
 		Status:  status.Up,
-		Ping:    stats.AvgRtt.Milliseconds(),
+		Latency: stats.AvgRtt.Milliseconds(),
 		Message: fmt.Sprintf("%d/%d packets, avg %.1fms", stats.PacketsRecv, stats.PacketsSent, float64(stats.AvgRtt.Microseconds())/1000),
 	}, nil
 }

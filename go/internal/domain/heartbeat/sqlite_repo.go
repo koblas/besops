@@ -41,8 +41,8 @@ func (r *sqliteRepo) Insert(ctx context.Context, hb *Heartbeat) error {
 		Duration:  omit.From(hb.Duration),
 		Retries:   omit.From(int64(hb.Retries)),
 	}
-	if hb.Ping != nil {
-		setter.Ping = omitnull.From(*hb.Ping)
+	if hb.Latency != nil {
+		setter.Latency = omitnull.From(*hb.Latency)
 	}
 	if hb.Response != nil {
 		setter.Response = omitnull.From(hb.Response)
@@ -151,14 +151,14 @@ func (r *sqliteRepo) ClearByMonitor(ctx context.Context, monitorID string) error
 	return nil
 }
 
-func (r *sqliteRepo) GetAveragePing(ctx context.Context, monitorID string, hours int) (float64, error) {
+func (r *sqliteRepo) GetAverageLatency(ctx context.Context, monitorID string, hours int) (float64, error) {
 	var avg sql.NullFloat64
 	err := r.db.QueryRowContext(ctx,
-		`SELECT AVG(ping) FROM heartbeat WHERE monitor_id = ? AND time >= datetime('now', ?) AND ping IS NOT NULL`,
+		`SELECT AVG(latency) FROM heartbeat WHERE monitor_id = ? AND time >= datetime('now', ?) AND latency IS NOT NULL`,
 		monitorID, fmt.Sprintf("-%d hours", hours),
 	).Scan(&avg)
 	if err != nil {
-		return 0, fmt.Errorf("querying average ping: %w", err)
+		return 0, fmt.Errorf("querying average latency: %w", err)
 	}
 	return avg.Float64, nil
 }
@@ -201,8 +201,8 @@ func heartbeatFromModel(m *models.Heartbeat) *Heartbeat {
 		Duration:  m.Duration,
 		Retries:   int(m.Retries),
 	}
-	if v, ok := m.Ping.Get(); ok {
-		hb.Ping = &v
+	if v, ok := m.Latency.Get(); ok {
+		hb.Latency = &v
 	}
 	if v, ok := m.Response.Get(); ok {
 		hb.Response = v

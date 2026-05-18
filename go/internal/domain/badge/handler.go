@@ -9,7 +9,7 @@ import (
 )
 
 type HeartbeatQuerier interface {
-	GetAveragePing(ctx context.Context, monitorID string, hours int) (float64, error)
+	GetAverageLatency(ctx context.Context, monitorID string, hours int) (float64, error)
 	GetAverageResponse(ctx context.Context, monitorID string, hours int) (float64, error)
 	GetUptime(ctx context.Context, monitorID string, hours int) (float64, error)
 }
@@ -63,19 +63,19 @@ func (h *Handler) GetUptimeBadge(ctx context.Context, params oas.GetUptimeBadgeP
 	return oas.SVGBadge{Data: strings.NewReader(renderBadge("Uptime", value, color))}, nil
 }
 
-func (h *Handler) GetPingBadge(ctx context.Context, params oas.GetPingBadgeParams) (oas.SVGBadge, error) {
+func (h *Handler) GetLatencyBadge(ctx context.Context, params oas.GetLatencyBadgeParams) (oas.SVGBadge, error) {
 	hours := 24
 	if params.Duration.IsSet() {
 		hours = params.Duration.Value
 	}
 
-	ping, err := h.heartbeats.GetAveragePing(ctx, params.MonitorId.String(), hours)
+	latency, err := h.heartbeats.GetAverageLatency(ctx, params.MonitorId.String(), hours)
 	if err != nil {
-		return oas.SVGBadge{Data: strings.NewReader(renderBadge("Ping", "N/A", "#999"))}, nil //nolint:nilerr
+		return oas.SVGBadge{Data: strings.NewReader(renderBadge("Latency", "N/A", "#999"))}, nil //nolint:nilerr
 	}
 
-	value := fmt.Sprintf("%.0fms", ping)
-	return oas.SVGBadge{Data: strings.NewReader(renderBadge("Ping", value, "#4c1"))}, nil
+	value := fmt.Sprintf("%.0fms", latency)
+	return oas.SVGBadge{Data: strings.NewReader(renderBadge("Latency", value, "#4c1"))}, nil
 }
 
 func (h *Handler) GetResponseBadge(ctx context.Context, params oas.GetResponseBadgeParams) (oas.SVGBadge, error) {

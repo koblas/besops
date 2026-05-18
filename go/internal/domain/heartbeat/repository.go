@@ -11,7 +11,7 @@ type Repository interface {
 	GetByMonitorInRange(ctx context.Context, monitorID string, from, to int64) ([]*Heartbeat, error)
 	DeleteOlderThan(ctx context.Context, monitorID string, hours int) error
 	ClearByMonitor(ctx context.Context, monitorID string) error
-	GetAveragePing(ctx context.Context, monitorID string, hours int) (float64, error)
+	GetAverageLatency(ctx context.Context, monitorID string, hours int) (float64, error)
 	GetAverageResponse(ctx context.Context, monitorID string, hours int) (float64, error)
 	GetUptime(ctx context.Context, monitorID string, hours int) (float64, error)
 }

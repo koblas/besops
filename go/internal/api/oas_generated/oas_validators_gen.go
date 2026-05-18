@@ -287,7 +287,7 @@ func (s *ChartPoint) Validate() error {
 		})
 	}
 	if err := func() error {
-		if value, ok := s.Ping.Get(); ok {
+		if value, ok := s.Latency.Get(); ok {
 			if err := func() error {
 				if err := (validate.Float{
 					MinSet:        true,
@@ -310,12 +310,12 @@ func (s *ChartPoint) Validate() error {
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "ping",
+			Name:  "latency",
 			Error: err,
 		})
 	}
 	if err := func() error {
-		if value, ok := s.PingMin.Get(); ok {
+		if value, ok := s.LatencyMin.Get(); ok {
 			if err := func() error {
 				if err := (validate.Int{
 					MinSet:        true,
@@ -338,12 +338,12 @@ func (s *ChartPoint) Validate() error {
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "pingMin",
+			Name:  "latencyMin",
 			Error: err,
 		})
 	}
 	if err := func() error {
-		if value, ok := s.PingMax.Get(); ok {
+		if value, ok := s.LatencyMax.Get(); ok {
 			if err := func() error {
 				if err := (validate.Int{
 					MinSet:        true,
@@ -366,7 +366,7 @@ func (s *ChartPoint) Validate() error {
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "pingMax",
+			Name:  "latencyMax",
 			Error: err,
 		})
 	}
@@ -824,7 +824,7 @@ func (s *Heartbeat) Validate() error {
 		})
 	}
 	if err := func() error {
-		if value, ok := s.Ping.Get(); ok {
+		if value, ok := s.Latency.Get(); ok {
 			if err := func() error {
 				if err := (validate.Int{
 					MinSet:        true,
@@ -847,7 +847,7 @@ func (s *Heartbeat) Validate() error {
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "ping",
+			Name:  "latency",
 			Error: err,
 		})
 	}

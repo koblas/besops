@@ -19,9 +19,9 @@ export function formatDuration(ms: number): string {
   return `${minutes}m ${seconds}s`;
 }
 
-export function formatPing(ping: number | null | undefined): string {
-  if (ping == null) return '-';
-  return `${Math.round(ping)} ms`;
+export function formatLatency(latency: number | null | undefined): string {
+  if (latency == null) return '-';
+  return `${Math.round(latency)} ms`;
 }
 
 export function formatUptime(percentage: number): string {

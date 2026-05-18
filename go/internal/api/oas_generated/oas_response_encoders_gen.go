@@ -447,6 +447,22 @@ func encodeGetInfoResponse(response *GetInfoOK, w http.ResponseWriter, span trac
 	return nil
 }
 
+func encodeGetLatencyBadgeResponse(response SVGBadge, w http.ResponseWriter, span trace.Span) error {
+	w.Header().Set("Content-Type", "image/svg+xml")
+	w.WriteHeader(200)
+	span.SetStatus(codes.Ok, http.StatusText(200))
+
+	writer := w
+	if closer, ok := response.Data.(io.Closer); ok {
+		defer closer.Close()
+	}
+	if _, err := io.Copy(writer, response); err != nil {
+		return errors.Wrap(err, "write")
+	}
+
+	return nil
+}
+
 func encodeGetMaintenanceResponse(response *Maintenance, w http.ResponseWriter, span trace.Span) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(200)
@@ -538,22 +554,6 @@ func encodeGetMonitorUptimesResponse(response GetMonitorUptimesOK, w http.Respon
 	e := new(jx.Encoder)
 	response.Encode(e)
 	if _, err := e.WriteTo(w); err != nil {
-		return errors.Wrap(err, "write")
-	}
-
-	return nil
-}
-
-func encodeGetPingBadgeResponse(response SVGBadge, w http.ResponseWriter, span trace.Span) error {
-	w.Header().Set("Content-Type", "image/svg+xml")
-	w.WriteHeader(200)
-	span.SetStatus(codes.Ok, http.StatusText(200))
-
-	writer := w
-	if closer, ok := response.Data.(io.Closer); ok {
-		defer closer.Close()
-	}
-	if _, err := io.Copy(writer, response); err != nil {
 		return errors.Wrap(err, "write")
 	}
 

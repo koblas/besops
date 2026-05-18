@@ -45,7 +45,7 @@ func TestTCPCheckerSuccess(t *testing.T) {
 	if result.Status != status.Up {
 		t.Errorf("expected Up, got %v: %s", result.Status, result.Message)
 	}
-	if result.Ping < 0 {
+	if result.Latency < 0 {
 		t.Error("expected non-negative ping")
 	}
 }

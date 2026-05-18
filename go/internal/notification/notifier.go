@@ -23,7 +23,7 @@ type HeartbeatInfo struct {
 	Status   int
 	Time     string
 	Message  string
-	Ping     int64
+	Latency  int64
 	Duration int64
 	Timezone string
 }

@@ -64,7 +64,7 @@ func TestHandleResult_RecordsMetrics_WhenUp(t *testing.T) {
 
 	recorder.HandleResult(t.Context(), "mon-1", CheckResult{
 		Status:  status.Up,
-		Ping:    42,
+		Latency: 42,
 		Message: "200 OK",
 	}, 0)
 
@@ -93,7 +93,7 @@ func TestHandleResult_RecordsMetrics_WhenDown(t *testing.T) {
 
 	recorder.HandleResult(t.Context(), "mon-2", CheckResult{
 		Status:  status.Down,
-		Ping:    0,
+		Latency: 0,
 		Message: "timeout",
 	}, 1)
 
@@ -116,7 +116,7 @@ func TestHandleResult_NoMetrics_WhenObserverNil(t *testing.T) {
 
 	// Should not panic
 	recorder.HandleResult(t.Context(), "mon-1", CheckResult{
-		Status: status.Up, Ping: 10, Message: "ok",
+		Status: status.Up, Latency: 10, Message: "ok",
 	}, 0)
 
 	hbs := hbStore.getAll("mon-1")
@@ -134,7 +134,7 @@ func TestHandleResult_MetricsLatency_ZeroWhenNoPing(t *testing.T) {
 
 	recorder.HandleResult(t.Context(), "mon-1", CheckResult{
 		Status:  status.Up,
-		Ping:    0,
+		Latency: 0,
 		Message: "ok",
 	}, 0)
 
@@ -155,7 +155,7 @@ func TestHandleResult_Maintenance_OverridesStatusToMaintenance(t *testing.T) {
 
 	recorder.HandleResult(t.Context(), "mon-1", CheckResult{
 		Status:  status.Down,
-		Ping:    0,
+		Latency: 0,
 		Message: "connection refused",
 	}, 0)
 
@@ -235,7 +235,7 @@ func TestHandleResult_TagsPassedToMetrics(t *testing.T) {
 	}
 
 	recorder.HandleResult(t.Context(), "mon-1", CheckResult{
-		Status: status.Up, Ping: 15, Message: "ok",
+		Status: status.Up, Latency: 15, Message: "ok",
 	}, 0)
 
 	records := observer.getRecords()
@@ -254,7 +254,7 @@ func TestHandleResult_NilTags_PassesNilToMetrics(t *testing.T) {
 	}
 
 	recorder.HandleResult(t.Context(), "mon-1", CheckResult{
-		Status: status.Up, Ping: 5, Message: "ok",
+		Status: status.Up, Latency: 5, Message: "ok",
 	}, 0)
 
 	records := observer.getRecords()

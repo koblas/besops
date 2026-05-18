@@ -60,8 +60,8 @@ var Heartbeats = Table[
 			Generated: false,
 			AutoIncr:  false,
 		},
-		Ping: column{
-			Name:      "ping",
+		Latency: column{
+			Name:      "latency",
 			DBType:    "INTEGER",
 			Default:   "NULL",
 			Comment:   "",
@@ -237,7 +237,7 @@ type heartbeatColumns struct {
 	Status    column
 	MSG       column
 	Time      column
-	Ping      column
+	Latency   column
 	Important column
 	Duration  column
 	DownCount column
@@ -248,7 +248,7 @@ type heartbeatColumns struct {
 
 func (c heartbeatColumns) AsSlice() []column {
 	return []column{
-		c.ID, c.MonitorID, c.Status, c.MSG, c.Time, c.Ping, c.Important, c.Duration, c.DownCount, c.EndTime, c.Retries, c.Response,
+		c.ID, c.MonitorID, c.Status, c.MSG, c.Time, c.Latency, c.Important, c.Duration, c.DownCount, c.EndTime, c.Retries, c.Response,
 	}
 }
 

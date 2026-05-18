@@ -168,7 +168,7 @@ export function HeartbeatBar({ heartbeats, size = 'normal' }: HeartbeatBarProps)
           <div>{formatDateTime(hoveredBeat.time)}</div>
           <div>
             {hoveredBeat.msg || (hoveredBeat.status === 1 ? 'Up' : 'Down')}
-            {hoveredBeat.ping != null && ` (${hoveredBeat.ping}ms)`}
+            {hoveredBeat.latency != null && ` (${hoveredBeat.latency}ms)`}
           </div>
         </div>
       )}

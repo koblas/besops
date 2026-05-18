@@ -1582,15 +1582,15 @@ paths:
         "200":
           $ref: "#/components/responses/SVGBadge"
 
-  /badges/{monitorId}/ping:
+  /badges/{monitorId}/latency:
     parameters:
       - $ref: "#/components/parameters/MonitorId"
     get:
-      operationId: getPingBadge
+      operationId: getLatencyBadge
       tags: [badges]
       x-ogen-operation-group: Badge
       security: []
-      summary: Get average ping badge SVG
+      summary: Get average latency badge SVG
       parameters:
         - name: duration
           in: query
@@ -1663,7 +1663,7 @@ paths:
             type: string
             maxLength: 500
             default: OK
-        - name: ping
+        - name: latency
           in: query
           schema:
             type: number
@@ -2351,7 +2351,7 @@ components:
           type: string
           maxLength: 1000
           description: Human-readable status message (e.g., error details when DOWN, or response info when UP).
-        ping:
+        latency:
           type: integer
           format: int64
           minimum: 0
@@ -2382,15 +2382,15 @@ components:
           type: integer
           minimum: 0
           description: Number of failed checks in this interval.
-        ping:
+        latency:
           type: number
           minimum: 0
           description: Average response time in milliseconds for this interval.
-        pingMin:
+        latencyMin:
           type: integer
           minimum: 0
           description: Minimum response time in milliseconds for this interval.
-        pingMax:
+        latencyMax:
           type: integer
           minimum: 0
           description: Maximum response time in milliseconds for this interval.

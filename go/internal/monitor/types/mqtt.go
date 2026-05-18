@@ -95,30 +95,30 @@ func (c *MQTTChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.C
 			Message: "check cancelled",
 		}, nil
 	case err := <-errCh:
-		ping := time.Since(start).Milliseconds()
+		latency := time.Since(start).Milliseconds()
 		return monitor.CheckResult{
 			Status:  status.Down,
-			Ping:    ping,
+			Latency: latency,
 			Message: err.Error(),
 		}, nil
 	case msg := <-messageCh:
-		ping := time.Since(start).Milliseconds()
-		return c.evaluateMessage(cfg, msg, ping)
+		latency := time.Since(start).Milliseconds()
+		return c.evaluateMessage(cfg, msg, latency)
 	case <-time.After(timeout):
-		ping := time.Since(start).Milliseconds()
+		latency := time.Since(start).Milliseconds()
 		return monitor.CheckResult{
 			Status:  status.Down,
-			Ping:    ping,
+			Latency: latency,
 			Message: "timeout waiting for MQTT message",
 		}, nil
 	}
 }
 
-func (c *MQTTChecker) evaluateMessage(cfg *monitor.Config, msg mqttMessage, ping int64) (monitor.CheckResult, error) {
+func (c *MQTTChecker) evaluateMessage(cfg *monitor.Config, msg mqttMessage, latency int64) (monitor.CheckResult, error) {
 	if cfg.MQTT.SuccessMessage == "" {
 		return monitor.CheckResult{
 			Status:  status.Up,
-			Ping:    ping,
+			Latency: latency,
 			Message: fmt.Sprintf("Topic: %s; Message: %s", msg.topic, msg.payload),
 		}, nil
 	}
@@ -126,14 +126,14 @@ func (c *MQTTChecker) evaluateMessage(cfg *monitor.Config, msg mqttMessage, ping
 	if strings.Contains(msg.payload, cfg.MQTT.SuccessMessage) {
 		return monitor.CheckResult{
 			Status:  status.Up,
-			Ping:    ping,
+			Latency: latency,
 			Message: fmt.Sprintf("Topic: %s; Message: %s", msg.topic, msg.payload),
 		}, nil
 	}
 
 	return monitor.CheckResult{
 		Status:  status.Down,
-		Ping:    ping,
+		Latency: latency,
 		Message: fmt.Sprintf("message mismatch - Topic: %s; Message: %s", msg.topic, msg.payload),
 	}, nil
 }

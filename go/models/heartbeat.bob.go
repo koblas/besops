@@ -30,7 +30,7 @@ type Heartbeat struct {
 	Status    int64               `db:"status" `
 	MSG       null.Val[string]    `db:"msg" `
 	Time      time.Time           `db:"time" `
-	Ping      null.Val[int64]     `db:"ping" `
+	Latency   null.Val[int64]     `db:"latency" `
 	Important bool                `db:"important" `
 	Duration  int64               `db:"duration" `
 	DownCount int64               `db:"down_count" `
@@ -58,7 +58,7 @@ type heartbeatR struct {
 
 func buildHeartbeatColumns(tableName string) heartbeatColumns {
 	columnsExpr := expr.NewColumnsExpr(
-		"id", "monitor_id", "status", "msg", "time", "ping", "important", "duration", "down_count", "end_time", "retries", "response",
+		"id", "monitor_id", "status", "msg", "time", "latency", "important", "duration", "down_count", "end_time", "retries", "response",
 	)
 	if tableName != "" {
 		columnsExpr = columnsExpr.WithParent(tableName)
@@ -71,7 +71,7 @@ func buildHeartbeatColumns(tableName string) heartbeatColumns {
 		Status:      sqlite.Quote(tableName, "status"),
 		MSG:         sqlite.Quote(tableName, "msg"),
 		Time:        sqlite.Quote(tableName, "time"),
-		Ping:        sqlite.Quote(tableName, "ping"),
+		Latency:     sqlite.Quote(tableName, "latency"),
 		Important:   sqlite.Quote(tableName, "important"),
 		Duration:    sqlite.Quote(tableName, "duration"),
 		DownCount:   sqlite.Quote(tableName, "down_count"),
@@ -89,7 +89,7 @@ type heartbeatColumns struct {
 	Status     sqlite.Expression
 	MSG        sqlite.Expression
 	Time       sqlite.Expression
-	Ping       sqlite.Expression
+	Latency    sqlite.Expression
 	Important  sqlite.Expression
 	Duration   sqlite.Expression
 	DownCount  sqlite.Expression
@@ -119,7 +119,7 @@ type HeartbeatSetter struct {
 	Status    omit.Val[int64]         `db:"status" `
 	MSG       omitnull.Val[string]    `db:"msg" `
 	Time      omit.Val[time.Time]     `db:"time" `
-	Ping      omitnull.Val[int64]     `db:"ping" `
+	Latency   omitnull.Val[int64]     `db:"latency" `
 	Important omit.Val[bool]          `db:"important" `
 	Duration  omit.Val[int64]         `db:"duration" `
 	DownCount omit.Val[int64]         `db:"down_count" `
@@ -145,8 +145,8 @@ func (s HeartbeatSetter) SetColumns() []string {
 	if s.Time.IsValue() {
 		vals = append(vals, "time")
 	}
-	if !s.Ping.IsUnset() {
-		vals = append(vals, "ping")
+	if !s.Latency.IsUnset() {
+		vals = append(vals, "latency")
 	}
 	if s.Important.IsValue() {
 		vals = append(vals, "important")
@@ -185,8 +185,8 @@ func (s HeartbeatSetter) Overwrite(t *Heartbeat) {
 	if s.Time.IsValue() {
 		t.Time = s.Time.MustGet()
 	}
-	if !s.Ping.IsUnset() {
-		t.Ping = s.Ping.MustGetNull()
+	if !s.Latency.IsUnset() {
+		t.Latency = s.Latency.MustGetNull()
 	}
 	if s.Important.IsValue() {
 		t.Important = s.Important.MustGet()
@@ -243,8 +243,8 @@ func (s *HeartbeatSetter) Apply(q *dialect.InsertQuery) {
 			vals = append(vals, sqlite.Arg(s.Time.MustGet()))
 		}
 
-		if !s.Ping.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.Ping.MustGetNull()))
+		if !s.Latency.IsUnset() {
+			vals = append(vals, sqlite.Arg(s.Latency.MustGetNull()))
 		}
 
 		if s.Important.IsValue() {
@@ -321,10 +321,10 @@ func (s HeartbeatSetter) Expressions(prefix ...string) []bob.Expression {
 		}})
 	}
 
-	if !s.Ping.IsUnset() {
+	if !s.Latency.IsUnset() {
 		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "ping")...),
-			sqlite.Arg(s.Ping),
+			sqlite.Quote(append(prefix, "latency")...),
+			sqlite.Arg(s.Latency),
 		}})
 	}
 
@@ -671,7 +671,7 @@ type heartbeatWhere[Q sqlite.Filterable] struct {
 	Status    sqlite.WhereMod[Q, int64]
 	MSG       sqlite.WhereNullMod[Q, string]
 	Time      sqlite.WhereMod[Q, time.Time]
-	Ping      sqlite.WhereNullMod[Q, int64]
+	Latency   sqlite.WhereNullMod[Q, int64]
 	Important sqlite.WhereMod[Q, bool]
 	Duration  sqlite.WhereMod[Q, int64]
 	DownCount sqlite.WhereMod[Q, int64]
@@ -691,7 +691,7 @@ func buildHeartbeatWhere[Q sqlite.Filterable](cols heartbeatColumns) heartbeatWh
 		Status:    sqlite.Where[Q, int64](cols.Status),
 		MSG:       sqlite.WhereNull[Q, string](cols.MSG),
 		Time:      sqlite.Where[Q, time.Time](cols.Time),
-		Ping:      sqlite.WhereNull[Q, int64](cols.Ping),
+		Latency:   sqlite.WhereNull[Q, int64](cols.Latency),
 		Important: sqlite.Where[Q, bool](cols.Important),
 		Duration:  sqlite.Where[Q, int64](cols.Duration),
 		DownCount: sqlite.Where[Q, int64](cols.DownCount),

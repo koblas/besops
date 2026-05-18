@@ -342,9 +342,9 @@ func (a *chartRepoAdapter) GetMinutely(ctx context.Context, monitorID string, si
 			Timestamp: r.Timestamp,
 			Up:        r.Up,
 			Down:      r.Down,
-			Ping:      r.Ping,
-			PingMin:   r.PingMin,
-			PingMax:   r.PingMax,
+			Latency:    r.Latency,
+			LatencyMin: r.LatencyMin,
+			LatencyMax: r.LatencyMax,
 		})
 	}
 	return result, nil
@@ -361,9 +361,9 @@ func (a *chartRepoAdapter) GetHourly(ctx context.Context, monitorID string, sinc
 			Timestamp: r.Timestamp,
 			Up:        r.Up,
 			Down:      r.Down,
-			Ping:      r.Ping,
-			PingMin:   r.PingMin,
-			PingMax:   r.PingMax,
+			Latency:    r.Latency,
+			LatencyMin: r.LatencyMin,
+			LatencyMax: r.LatencyMax,
 		})
 	}
 	return result, nil
@@ -380,9 +380,9 @@ func (a *chartRepoAdapter) GetDaily(ctx context.Context, monitorID string, since
 			Timestamp: r.Timestamp,
 			Up:        r.Up,
 			Down:      r.Down,
-			Ping:      r.Ping,
-			PingMin:   r.PingMin,
-			PingMax:   r.PingMax,
+			Latency:    r.Latency,
+			LatencyMin: r.LatencyMin,
+			LatencyMax: r.LatencyMax,
 		})
 	}
 	return result, nil

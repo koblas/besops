@@ -14,7 +14,7 @@ type Heartbeat struct {
 	Status    int         `db:"status" json:"status"`
 	Time      RFC3339Time `db:"time" json:"time"`
 	Msg       string      `db:"msg" json:"msg,omitempty"`
-	Ping      *int64      `db:"ping" json:"ping,omitempty"`
+	Latency   *int64      `db:"latency" json:"latency,omitempty"`
 	Important bool        `db:"important" json:"important,omitempty"`
 	Duration  int64       `db:"duration" json:"duration,omitempty"`
 	Retries   int         `db:"retries" json:"retries,omitempty"`

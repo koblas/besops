@@ -51,6 +51,18 @@ export function MonitorForm({ mode }: { mode?: 'clone' }) {
       if (values.parentId === null) {
         delete values.parentId;
       }
+
+      // Extract Content-Type from headers into bodyContentType for the form
+      if (typeof values.headers === 'string' && values.headers) {
+        try {
+          const hdrs = JSON.parse(values.headers as string) as Record<string, string>;
+          const ctKey = Object.keys(hdrs).find(k => k.toLowerCase() === 'content-type');
+          if (ctKey) {
+            values.bodyContentType = hdrs[ctKey];
+          }
+        } catch { /* ignore malformed headers */ }
+      }
+
       form.setFieldsValue(values);
 
       const ids = (existing.tags ?? []).map(t => t.tagId).filter((id): id is string => !!id);
@@ -102,7 +114,20 @@ export function MonitorForm({ mode }: { mode?: 'clone' }) {
 
   async function handleSubmit(values: MonitorInput) {
     setSaving(true);
-    const input = { ...values, parentId: values.parentId ?? null } as MonitorInput;
+    const input = { ...values, parentId: values.parentId ?? null } as MonitorInput & { bodyContentType?: string };
+
+    // Merge bodyContentType into headers and remove the virtual field
+    if (input.bodyContentType && input.body) {
+      const hdrs: Record<string, string> = input.headers ? JSON.parse(input.headers) : {};
+      const existingCtKey = Object.keys(hdrs).find(k => k.toLowerCase() === 'content-type');
+      if (existingCtKey) {
+        hdrs[existingCtKey] = input.bodyContentType;
+      } else {
+        hdrs['Content-Type'] = input.bodyContentType;
+      }
+      input.headers = JSON.stringify(hdrs);
+    }
+    delete input.bodyContentType;
 
     try {
       if (isEdit) {

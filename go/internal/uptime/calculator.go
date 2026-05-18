@@ -56,9 +56,9 @@ func (c *Calculator) AggregateMinutely(ctx context.Context) error {
 		return c.stats.UpsertMinutely(ctx, &stats.StatMinutely{
 			MonitorID: monitorID,
 			Timestamp: bucketStart.Unix(),
-			Ping:      s.avgPing(),
-			PingMin:   s.pingMin,
-			PingMax:   s.pingMax,
+			Latency:    s.avgLatency(),
+			LatencyMin: s.latencyMin,
+			LatencyMax: s.latencyMax,
 			Up:        s.up,
 			Down:      s.down,
 		})
@@ -75,9 +75,9 @@ func (c *Calculator) AggregateHourly(ctx context.Context) error {
 		return c.stats.UpsertHourly(ctx, &stats.StatHourly{
 			MonitorID: monitorID,
 			Timestamp: bucketStart.Unix(),
-			Ping:      s.avgPing(),
-			PingMin:   s.pingMin,
-			PingMax:   s.pingMax,
+			Latency:    s.avgLatency(),
+			LatencyMin: s.latencyMin,
+			LatencyMax: s.latencyMax,
 			Up:        s.up,
 			Down:      s.down,
 		})
@@ -94,9 +94,9 @@ func (c *Calculator) AggregateDaily(ctx context.Context) error {
 		return c.stats.UpsertDaily(ctx, &stats.StatDaily{
 			MonitorID: monitorID,
 			Timestamp: bucketStart.Unix(),
-			Ping:      s.avgPing(),
-			PingMin:   s.pingMin,
-			PingMax:   s.pingMax,
+			Latency:    s.avgLatency(),
+			LatencyMin: s.latencyMin,
+			LatencyMax: s.latencyMax,
 			Up:        s.up,
 			Down:      s.down,
 		})
@@ -132,22 +132,22 @@ func (c *Calculator) aggregate(ctx context.Context, from, to time.Time, upsert u
 type statBucket struct {
 	up      int
 	down    int
-	pingSum int64
-	pingMin int64
-	pingMax int64
-	pingN   int
+	latencySum int64
+	latencyMin int64
+	latencyMax int64
+	latencyN   int
 }
 
-func (s *statBucket) avgPing() float64 {
-	if s.pingN == 0 {
+func (s *statBucket) avgLatency() float64 {
+	if s.latencyN == 0 {
 		return 0
 	}
-	return float64(s.pingSum) / float64(s.pingN)
+	return float64(s.latencySum) / float64(s.latencyN)
 }
 
 func computeBucket(beats []*heartbeat.Heartbeat) *statBucket {
 	b := &statBucket{
-		pingMin: int64(^uint64(0) >> 1), // max int64
+		latencyMin: int64(^uint64(0) >> 1), // max int64
 	}
 
 	for _, hb := range beats {
@@ -158,21 +158,21 @@ func computeBucket(beats []*heartbeat.Heartbeat) *statBucket {
 			b.down++
 		}
 
-		if hb.Ping != nil {
-			p := *hb.Ping
-			b.pingSum += p
-			b.pingN++
-			if p < b.pingMin {
-				b.pingMin = p
+		if hb.Latency != nil {
+			p := *hb.Latency
+			b.latencySum += p
+			b.latencyN++
+			if p < b.latencyMin {
+				b.latencyMin = p
 			}
-			if p > b.pingMax {
-				b.pingMax = p
+			if p > b.latencyMax {
+				b.latencyMax = p
 			}
 		}
 	}
 
-	if b.pingN == 0 {
-		b.pingMin = 0
+	if b.latencyN == 0 {
+		b.latencyMin = 0
 	}
 	return b
 }

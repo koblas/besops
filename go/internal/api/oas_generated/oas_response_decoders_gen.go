@@ -1198,6 +1198,31 @@ func decodeGetInfoResponse(resp *http.Response) (res *GetInfoOK, _ error) {
 	return res, validate.UnexpectedStatusCodeWithResponse(resp)
 }
 
+func decodeGetLatencyBadgeResponse(resp *http.Response) (res SVGBadge, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "image/svg+xml":
+			reader := resp.Body
+			b, err := io.ReadAll(reader)
+			if err != nil {
+				return res, err
+			}
+
+			response := SVGBadge{Data: bytes.NewReader(b)}
+			return response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}
+	return res, validate.UnexpectedStatusCodeWithResponse(resp)
+}
+
 func decodeGetMaintenanceResponse(resp *http.Response) (res *Maintenance, _ error) {
 	switch resp.StatusCode {
 	case 200:
@@ -1504,31 +1529,6 @@ func decodeGetMonitorUptimesResponse(resp *http.Response) (res GetMonitorUptimes
 			}(); err != nil {
 				return res, errors.Wrap(err, "validate")
 			}
-			return response, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
-	}
-	return res, validate.UnexpectedStatusCodeWithResponse(resp)
-}
-
-func decodeGetPingBadgeResponse(resp *http.Response) (res SVGBadge, _ error) {
-	switch resp.StatusCode {
-	case 200:
-		// Code 200.
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "image/svg+xml":
-			reader := resp.Body
-			b, err := io.ReadAll(reader)
-			if err != nil {
-				return res, err
-			}
-
-			response := SVGBadge{Data: bytes.NewReader(b)}
 			return response, nil
 		default:
 			return res, validate.InvalidContentType(ct)

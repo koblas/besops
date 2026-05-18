@@ -40,12 +40,12 @@ func (c *TailscalePingChecker) Check(ctx context.Context, cfg *monitor.Config) (
 
 	start := time.Now()
 	result, err := lc.Ping(ctx, addr, tailcfg.PingDisco)
-	ping := time.Since(start).Milliseconds()
+	latency := time.Since(start).Milliseconds()
 
 	if err != nil {
 		return monitor.CheckResult{
 			Status:  status.Down,
-			Ping:    ping,
+			Latency: latency,
 			Message: fmt.Sprintf("tailscale ping failed: %v", err),
 		}, nil
 	}
@@ -53,7 +53,7 @@ func (c *TailscalePingChecker) Check(ctx context.Context, cfg *monitor.Config) (
 	if result.Err != "" {
 		return monitor.CheckResult{
 			Status:  status.Down,
-			Ping:    ping,
+			Latency: latency,
 			Message: fmt.Sprintf("tailscale ping error: %s", result.Err),
 		}, nil
 	}
@@ -62,7 +62,7 @@ func (c *TailscalePingChecker) Check(ctx context.Context, cfg *monitor.Config) (
 
 	return monitor.CheckResult{
 		Status:  status.Up,
-		Ping:    latencyMs,
+		Latency: latencyMs,
 		Message: fmt.Sprintf("pong from %s via %s", result.NodeName, endpoint(result.Endpoint)),
 	}, nil
 }

@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"strconv"
 	"strings"
@@ -74,6 +75,7 @@ func (c *HTTPChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.C
 
 	for k, v := range cfg.HTTP.Headers {
 		req.Header.Set(k, v)
+		slog.DebugContext(ctx, "setting header", slog.String("key", k), slog.String("value", v))
 	}
 	if cfg.HTTP.BasicAuthUser != "" {
 		req.SetBasicAuth(cfg.HTTP.BasicAuthUser, cfg.HTTP.BasicAuthPass)
@@ -81,20 +83,22 @@ func (c *HTTPChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.C
 
 	start := time.Now()
 	resp, err := client.Do(req)
-	ping := time.Since(start).Milliseconds()
+	latency := time.Since(start).Milliseconds()
 
 	if err != nil {
-		return monitor.CheckResult{Status: status.Down, Ping: ping, Message: err.Error()}, nil
+		return monitor.CheckResult{Status: status.Down, Latency: latency, Message: err.Error()}, nil
 	}
 	defer resp.Body.Close()
 
 	body, _ := io.ReadAll(io.LimitReader(resp.Body, 1<<20)) // 1MB max
 
 	result := monitor.CheckResult{
-		Ping:         ping,
+		Latency:      latency,
 		ResponseBody: body,
 		Message:      fmt.Sprintf("%d - %s", resp.StatusCode, http.StatusText(resp.StatusCode)),
 	}
+
+	slog.DebugContext(ctx, "got body", slog.String("body", string(body)[:min(1000, len(body))]))
 
 	// TLS certificate info
 	if resp.TLS != nil && len(resp.TLS.PeerCertificates) > 0 {

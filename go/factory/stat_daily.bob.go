@@ -36,14 +36,14 @@ func (mods StatDailyModSlice) Apply(ctx context.Context, n *StatDailyTemplate) {
 // StatDailyTemplate is an object representing the database table.
 // all columns are optional and should be set by mods
 type StatDailyTemplate struct {
-	ID        func() string
-	MonitorID func() string
-	Timestamp func() int64
-	Ping      func() null.Val[float64]
-	PingMin   func() null.Val[int64]
-	PingMax   func() null.Val[int64]
-	Up        func() int64
-	Down      func() int64
+	ID         func() string
+	MonitorID  func() string
+	Timestamp  func() int64
+	Latency    func() null.Val[float64]
+	LatencyMin func() null.Val[int64]
+	LatencyMax func() null.Val[int64]
+	Up         func() int64
+	Down       func() int64
 
 	r statDailyR
 	f *Factory
@@ -94,17 +94,17 @@ func (o StatDailyTemplate) BuildSetter() *models.StatDailySetter {
 		val := o.Timestamp()
 		m.Timestamp = omit.From(val)
 	}
-	if o.Ping != nil {
-		val := o.Ping()
-		m.Ping = omitnull.FromNull(val)
+	if o.Latency != nil {
+		val := o.Latency()
+		m.Latency = omitnull.FromNull(val)
 	}
-	if o.PingMin != nil {
-		val := o.PingMin()
-		m.PingMin = omitnull.FromNull(val)
+	if o.LatencyMin != nil {
+		val := o.LatencyMin()
+		m.LatencyMin = omitnull.FromNull(val)
 	}
-	if o.PingMax != nil {
-		val := o.PingMax()
-		m.PingMax = omitnull.FromNull(val)
+	if o.LatencyMax != nil {
+		val := o.LatencyMax()
+		m.LatencyMax = omitnull.FromNull(val)
 	}
 	if o.Up != nil {
 		val := o.Up()
@@ -145,14 +145,14 @@ func (o StatDailyTemplate) Build() *models.StatDaily {
 	if o.Timestamp != nil {
 		m.Timestamp = o.Timestamp()
 	}
-	if o.Ping != nil {
-		m.Ping = o.Ping()
+	if o.Latency != nil {
+		m.Latency = o.Latency()
 	}
-	if o.PingMin != nil {
-		m.PingMin = o.PingMin()
+	if o.LatencyMin != nil {
+		m.LatencyMin = o.LatencyMin()
 	}
-	if o.PingMax != nil {
-		m.PingMax = o.PingMax()
+	if o.LatencyMax != nil {
+		m.LatencyMax = o.LatencyMax()
 	}
 	if o.Up != nil {
 		m.Up = o.Up()
@@ -314,9 +314,9 @@ func (m statDailyMods) RandomizeAllColumns(f *faker.Faker) StatDailyMod {
 		StatDailyMods.RandomID(f),
 		StatDailyMods.RandomMonitorID(f),
 		StatDailyMods.RandomTimestamp(f),
-		StatDailyMods.RandomPing(f),
-		StatDailyMods.RandomPingMin(f),
-		StatDailyMods.RandomPingMax(f),
+		StatDailyMods.RandomLatency(f),
+		StatDailyMods.RandomLatencyMin(f),
+		StatDailyMods.RandomLatencyMax(f),
 		StatDailyMods.RandomUp(f),
 		StatDailyMods.RandomDown(f),
 	}
@@ -416,32 +416,32 @@ func (m statDailyMods) RandomTimestamp(f *faker.Faker) StatDailyMod {
 }
 
 // Set the model columns to this value
-func (m statDailyMods) Ping(val null.Val[float64]) StatDailyMod {
+func (m statDailyMods) Latency(val null.Val[float64]) StatDailyMod {
 	return StatDailyModFunc(func(_ context.Context, o *StatDailyTemplate) {
-		o.Ping = func() null.Val[float64] { return val }
+		o.Latency = func() null.Val[float64] { return val }
 	})
 }
 
 // Set the Column from the function
-func (m statDailyMods) PingFunc(f func() null.Val[float64]) StatDailyMod {
+func (m statDailyMods) LatencyFunc(f func() null.Val[float64]) StatDailyMod {
 	return StatDailyModFunc(func(_ context.Context, o *StatDailyTemplate) {
-		o.Ping = f
+		o.Latency = f
 	})
 }
 
 // Clear any values for the column
-func (m statDailyMods) UnsetPing() StatDailyMod {
+func (m statDailyMods) UnsetLatency() StatDailyMod {
 	return StatDailyModFunc(func(_ context.Context, o *StatDailyTemplate) {
-		o.Ping = nil
+		o.Latency = nil
 	})
 }
 
 // Generates a random value for the column using the given faker
 // if faker is nil, a default faker is used
 // The generated value is sometimes null
-func (m statDailyMods) RandomPing(f *faker.Faker) StatDailyMod {
+func (m statDailyMods) RandomLatency(f *faker.Faker) StatDailyMod {
 	return StatDailyModFunc(func(_ context.Context, o *StatDailyTemplate) {
-		o.Ping = func() null.Val[float64] {
+		o.Latency = func() null.Val[float64] {
 			if f == nil {
 				f = &defaultFaker
 			}
@@ -455,9 +455,9 @@ func (m statDailyMods) RandomPing(f *faker.Faker) StatDailyMod {
 // Generates a random value for the column using the given faker
 // if faker is nil, a default faker is used
 // The generated value is never null
-func (m statDailyMods) RandomPingNotNull(f *faker.Faker) StatDailyMod {
+func (m statDailyMods) RandomLatencyNotNull(f *faker.Faker) StatDailyMod {
 	return StatDailyModFunc(func(_ context.Context, o *StatDailyTemplate) {
-		o.Ping = func() null.Val[float64] {
+		o.Latency = func() null.Val[float64] {
 			if f == nil {
 				f = &defaultFaker
 			}
@@ -469,32 +469,32 @@ func (m statDailyMods) RandomPingNotNull(f *faker.Faker) StatDailyMod {
 }
 
 // Set the model columns to this value
-func (m statDailyMods) PingMin(val null.Val[int64]) StatDailyMod {
+func (m statDailyMods) LatencyMin(val null.Val[int64]) StatDailyMod {
 	return StatDailyModFunc(func(_ context.Context, o *StatDailyTemplate) {
-		o.PingMin = func() null.Val[int64] { return val }
+		o.LatencyMin = func() null.Val[int64] { return val }
 	})
 }
 
 // Set the Column from the function
-func (m statDailyMods) PingMinFunc(f func() null.Val[int64]) StatDailyMod {
+func (m statDailyMods) LatencyMinFunc(f func() null.Val[int64]) StatDailyMod {
 	return StatDailyModFunc(func(_ context.Context, o *StatDailyTemplate) {
-		o.PingMin = f
+		o.LatencyMin = f
 	})
 }
 
 // Clear any values for the column
-func (m statDailyMods) UnsetPingMin() StatDailyMod {
+func (m statDailyMods) UnsetLatencyMin() StatDailyMod {
 	return StatDailyModFunc(func(_ context.Context, o *StatDailyTemplate) {
-		o.PingMin = nil
+		o.LatencyMin = nil
 	})
 }
 
 // Generates a random value for the column using the given faker
 // if faker is nil, a default faker is used
 // The generated value is sometimes null
-func (m statDailyMods) RandomPingMin(f *faker.Faker) StatDailyMod {
+func (m statDailyMods) RandomLatencyMin(f *faker.Faker) StatDailyMod {
 	return StatDailyModFunc(func(_ context.Context, o *StatDailyTemplate) {
-		o.PingMin = func() null.Val[int64] {
+		o.LatencyMin = func() null.Val[int64] {
 			if f == nil {
 				f = &defaultFaker
 			}
@@ -508,9 +508,9 @@ func (m statDailyMods) RandomPingMin(f *faker.Faker) StatDailyMod {
 // Generates a random value for the column using the given faker
 // if faker is nil, a default faker is used
 // The generated value is never null
-func (m statDailyMods) RandomPingMinNotNull(f *faker.Faker) StatDailyMod {
+func (m statDailyMods) RandomLatencyMinNotNull(f *faker.Faker) StatDailyMod {
 	return StatDailyModFunc(func(_ context.Context, o *StatDailyTemplate) {
-		o.PingMin = func() null.Val[int64] {
+		o.LatencyMin = func() null.Val[int64] {
 			if f == nil {
 				f = &defaultFaker
 			}
@@ -522,32 +522,32 @@ func (m statDailyMods) RandomPingMinNotNull(f *faker.Faker) StatDailyMod {
 }
 
 // Set the model columns to this value
-func (m statDailyMods) PingMax(val null.Val[int64]) StatDailyMod {
+func (m statDailyMods) LatencyMax(val null.Val[int64]) StatDailyMod {
 	return StatDailyModFunc(func(_ context.Context, o *StatDailyTemplate) {
-		o.PingMax = func() null.Val[int64] { return val }
+		o.LatencyMax = func() null.Val[int64] { return val }
 	})
 }
 
 // Set the Column from the function
-func (m statDailyMods) PingMaxFunc(f func() null.Val[int64]) StatDailyMod {
+func (m statDailyMods) LatencyMaxFunc(f func() null.Val[int64]) StatDailyMod {
 	return StatDailyModFunc(func(_ context.Context, o *StatDailyTemplate) {
-		o.PingMax = f
+		o.LatencyMax = f
 	})
 }
 
 // Clear any values for the column
-func (m statDailyMods) UnsetPingMax() StatDailyMod {
+func (m statDailyMods) UnsetLatencyMax() StatDailyMod {
 	return StatDailyModFunc(func(_ context.Context, o *StatDailyTemplate) {
-		o.PingMax = nil
+		o.LatencyMax = nil
 	})
 }
 
 // Generates a random value for the column using the given faker
 // if faker is nil, a default faker is used
 // The generated value is sometimes null
-func (m statDailyMods) RandomPingMax(f *faker.Faker) StatDailyMod {
+func (m statDailyMods) RandomLatencyMax(f *faker.Faker) StatDailyMod {
 	return StatDailyModFunc(func(_ context.Context, o *StatDailyTemplate) {
-		o.PingMax = func() null.Val[int64] {
+		o.LatencyMax = func() null.Val[int64] {
 			if f == nil {
 				f = &defaultFaker
 			}
@@ -561,9 +561,9 @@ func (m statDailyMods) RandomPingMax(f *faker.Faker) StatDailyMod {
 // Generates a random value for the column using the given faker
 // if faker is nil, a default faker is used
 // The generated value is never null
-func (m statDailyMods) RandomPingMaxNotNull(f *faker.Faker) StatDailyMod {
+func (m statDailyMods) RandomLatencyMaxNotNull(f *faker.Faker) StatDailyMod {
 	return StatDailyModFunc(func(_ context.Context, o *StatDailyTemplate) {
-		o.PingMax = func() null.Val[int64] {
+		o.LatencyMax = func() null.Val[int64] {
 			if f == nil {
 				f = &defaultFaker
 			}

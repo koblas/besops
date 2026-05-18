@@ -9,7 +9,7 @@ import (
 
 type CheckResult struct {
 	Status       status.Status
-	Ping         int64
+	Latency      int64
 	Message      string
 	ResponseBody []byte
 	CertInfo     *CertInfo

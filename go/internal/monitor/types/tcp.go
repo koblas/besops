@@ -24,12 +24,12 @@ func (c *TCPChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.Ch
 
 	start := time.Now()
 	conn, err := (&net.Dialer{Timeout: timeout}).DialContext(ctx, "tcp", addr)
-	ping := time.Since(start).Milliseconds()
+	latency := time.Since(start).Milliseconds()
 
 	if err != nil {
 		return monitor.CheckResult{
 			Status:  status.Down,
-			Ping:    ping,
+			Latency: latency,
 			Message: fmt.Sprintf("connection failed: %v", err),
 		}, nil
 	}
@@ -37,7 +37,7 @@ func (c *TCPChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.Ch
 
 	return monitor.CheckResult{
 		Status:  status.Up,
-		Ping:    ping,
+		Latency: latency,
 		Message: fmt.Sprintf("TCP connection to %s successful", addr),
 	}, nil
 }

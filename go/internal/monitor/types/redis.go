@@ -51,19 +51,19 @@ func (c *RedisChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.
 
 	start := time.Now()
 	result, err := client.Ping(ctx).Result()
-	ping := time.Since(start).Milliseconds()
+	latency := time.Since(start).Milliseconds()
 
 	if err != nil {
 		return monitor.CheckResult{
 			Status:  status.Down,
-			Ping:    ping,
+			Latency: latency,
 			Message: fmt.Sprintf("redis ping failed: %v", err),
 		}, nil
 	}
 
 	return monitor.CheckResult{
 		Status:  status.Up,
-		Ping:    ping,
+		Latency: latency,
 		Message: result,
 	}, nil
 }

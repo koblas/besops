@@ -195,8 +195,8 @@ func hbToOAS(hb *heartbeat.Heartbeat) oas.Heartbeat {
 	if hb.Msg != "" {
 		result.Msg = oas.NewOptString(hb.Msg)
 	}
-	if hb.Ping != nil {
-		result.Ping = oas.NewOptInt64(*hb.Ping)
+	if hb.Latency != nil {
+		result.Latency = oas.NewOptInt64(*hb.Latency)
 	}
 	if hb.Duration > 0 {
 		result.Duration = oas.NewOptInt64(hb.Duration)

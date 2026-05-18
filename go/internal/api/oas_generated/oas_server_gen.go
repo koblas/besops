@@ -139,12 +139,12 @@ type BadgeHandler interface {
 	//
 	// GET /badges/{monitorId}/cert-exp
 	GetCertExpiryBadge(ctx context.Context, params GetCertExpiryBadgeParams) (SVGBadge, error)
-	// GetPingBadge implements getPingBadge operation.
+	// GetLatencyBadge implements getLatencyBadge operation.
 	//
-	// Get average ping badge SVG.
+	// Get average latency badge SVG.
 	//
-	// GET /badges/{monitorId}/ping
-	GetPingBadge(ctx context.Context, params GetPingBadgeParams) (SVGBadge, error)
+	// GET /badges/{monitorId}/latency
+	GetLatencyBadge(ctx context.Context, params GetLatencyBadgeParams) (SVGBadge, error)
 	// GetResponseBadge implements getResponseBadge operation.
 	//
 	// Get last response time badge SVG.

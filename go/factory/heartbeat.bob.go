@@ -42,7 +42,7 @@ type HeartbeatTemplate struct {
 	Status    func() int64
 	MSG       func() null.Val[string]
 	Time      func() time.Time
-	Ping      func() null.Val[int64]
+	Latency   func() null.Val[int64]
 	Important func() bool
 	Duration  func() int64
 	DownCount func() int64
@@ -107,9 +107,9 @@ func (o HeartbeatTemplate) BuildSetter() *models.HeartbeatSetter {
 		val := o.Time()
 		m.Time = omit.From(val)
 	}
-	if o.Ping != nil {
-		val := o.Ping()
-		m.Ping = omitnull.FromNull(val)
+	if o.Latency != nil {
+		val := o.Latency()
+		m.Latency = omitnull.FromNull(val)
 	}
 	if o.Important != nil {
 		val := o.Important()
@@ -172,8 +172,8 @@ func (o HeartbeatTemplate) Build() *models.Heartbeat {
 	if o.Time != nil {
 		m.Time = o.Time()
 	}
-	if o.Ping != nil {
-		m.Ping = o.Ping()
+	if o.Latency != nil {
+		m.Latency = o.Latency()
 	}
 	if o.Important != nil {
 		m.Important = o.Important()
@@ -353,7 +353,7 @@ func (m heartbeatMods) RandomizeAllColumns(f *faker.Faker) HeartbeatMod {
 		HeartbeatMods.RandomStatus(f),
 		HeartbeatMods.RandomMSG(f),
 		HeartbeatMods.RandomTime(f),
-		HeartbeatMods.RandomPing(f),
+		HeartbeatMods.RandomLatency(f),
 		HeartbeatMods.RandomImportant(f),
 		HeartbeatMods.RandomDuration(f),
 		HeartbeatMods.RandomDownCount(f),
@@ -541,32 +541,32 @@ func (m heartbeatMods) RandomTime(f *faker.Faker) HeartbeatMod {
 }
 
 // Set the model columns to this value
-func (m heartbeatMods) Ping(val null.Val[int64]) HeartbeatMod {
+func (m heartbeatMods) Latency(val null.Val[int64]) HeartbeatMod {
 	return HeartbeatModFunc(func(_ context.Context, o *HeartbeatTemplate) {
-		o.Ping = func() null.Val[int64] { return val }
+		o.Latency = func() null.Val[int64] { return val }
 	})
 }
 
 // Set the Column from the function
-func (m heartbeatMods) PingFunc(f func() null.Val[int64]) HeartbeatMod {
+func (m heartbeatMods) LatencyFunc(f func() null.Val[int64]) HeartbeatMod {
 	return HeartbeatModFunc(func(_ context.Context, o *HeartbeatTemplate) {
-		o.Ping = f
+		o.Latency = f
 	})
 }
 
 // Clear any values for the column
-func (m heartbeatMods) UnsetPing() HeartbeatMod {
+func (m heartbeatMods) UnsetLatency() HeartbeatMod {
 	return HeartbeatModFunc(func(_ context.Context, o *HeartbeatTemplate) {
-		o.Ping = nil
+		o.Latency = nil
 	})
 }
 
 // Generates a random value for the column using the given faker
 // if faker is nil, a default faker is used
 // The generated value is sometimes null
-func (m heartbeatMods) RandomPing(f *faker.Faker) HeartbeatMod {
+func (m heartbeatMods) RandomLatency(f *faker.Faker) HeartbeatMod {
 	return HeartbeatModFunc(func(_ context.Context, o *HeartbeatTemplate) {
-		o.Ping = func() null.Val[int64] {
+		o.Latency = func() null.Val[int64] {
 			if f == nil {
 				f = &defaultFaker
 			}
@@ -580,9 +580,9 @@ func (m heartbeatMods) RandomPing(f *faker.Faker) HeartbeatMod {
 // Generates a random value for the column using the given faker
 // if faker is nil, a default faker is used
 // The generated value is never null
-func (m heartbeatMods) RandomPingNotNull(f *faker.Faker) HeartbeatMod {
+func (m heartbeatMods) RandomLatencyNotNull(f *faker.Faker) HeartbeatMod {
 	return HeartbeatModFunc(func(_ context.Context, o *HeartbeatTemplate) {
-		o.Ping = func() null.Val[int64] {
+		o.Latency = func() null.Val[int64] {
 			if f == nil {
 				f = &defaultFaker
 			}

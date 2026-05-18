@@ -545,21 +545,21 @@ func (s *ChartPoint) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Ping.Set {
-			e.FieldStart("ping")
-			s.Ping.Encode(e)
+		if s.Latency.Set {
+			e.FieldStart("latency")
+			s.Latency.Encode(e)
 		}
 	}
 	{
-		if s.PingMin.Set {
-			e.FieldStart("pingMin")
-			s.PingMin.Encode(e)
+		if s.LatencyMin.Set {
+			e.FieldStart("latencyMin")
+			s.LatencyMin.Encode(e)
 		}
 	}
 	{
-		if s.PingMax.Set {
-			e.FieldStart("pingMax")
-			s.PingMax.Encode(e)
+		if s.LatencyMax.Set {
+			e.FieldStart("latencyMax")
+			s.LatencyMax.Encode(e)
 		}
 	}
 }
@@ -568,9 +568,9 @@ var jsonFieldsNameOfChartPoint = [6]string{
 	0: "timestamp",
 	1: "up",
 	2: "down",
-	3: "ping",
-	4: "pingMin",
-	5: "pingMax",
+	3: "latency",
+	4: "latencyMin",
+	5: "latencyMax",
 }
 
 // Decode decodes ChartPoint from json.
@@ -611,35 +611,35 @@ func (s *ChartPoint) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"down\"")
 			}
-		case "ping":
+		case "latency":
 			if err := func() error {
-				s.Ping.Reset()
-				if err := s.Ping.Decode(d); err != nil {
+				s.Latency.Reset()
+				if err := s.Latency.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ping\"")
+				return errors.Wrap(err, "decode field \"latency\"")
 			}
-		case "pingMin":
+		case "latencyMin":
 			if err := func() error {
-				s.PingMin.Reset()
-				if err := s.PingMin.Decode(d); err != nil {
+				s.LatencyMin.Reset()
+				if err := s.LatencyMin.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"pingMin\"")
+				return errors.Wrap(err, "decode field \"latencyMin\"")
 			}
-		case "pingMax":
+		case "latencyMax":
 			if err := func() error {
-				s.PingMax.Reset()
-				if err := s.PingMax.Decode(d); err != nil {
+				s.LatencyMax.Reset()
+				if err := s.LatencyMax.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"pingMax\"")
+				return errors.Wrap(err, "decode field \"latencyMax\"")
 			}
 		default:
 			return d.Skip()
@@ -2669,9 +2669,9 @@ func (s *Heartbeat) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Ping.Set {
-			e.FieldStart("ping")
-			s.Ping.Encode(e)
+		if s.Latency.Set {
+			e.FieldStart("latency")
+			s.Latency.Encode(e)
 		}
 	}
 	{
@@ -2694,7 +2694,7 @@ var jsonFieldsNameOfHeartbeat = [8]string{
 	2: "status",
 	3: "time",
 	4: "msg",
-	5: "ping",
+	5: "latency",
 	6: "important",
 	7: "duration",
 }
@@ -2764,15 +2764,15 @@ func (s *Heartbeat) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"msg\"")
 			}
-		case "ping":
+		case "latency":
 			if err := func() error {
-				s.Ping.Reset()
-				if err := s.Ping.Decode(d); err != nil {
+				s.Latency.Reset()
+				if err := s.Latency.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ping\"")
+				return errors.Wrap(err, "decode field \"latency\"")
 			}
 		case "important":
 			if err := func() error {

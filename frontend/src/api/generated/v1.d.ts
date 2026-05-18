@@ -924,7 +924,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/badges/{monitorId}/ping": {
+    "/badges/{monitorId}/latency": {
         parameters: {
             query?: never;
             header?: never;
@@ -934,8 +934,8 @@ export interface paths {
             };
             cookie?: never;
         };
-        /** Get average ping badge SVG */
-        get: operations["getPingBadge"];
+        /** Get average latency badge SVG */
+        get: operations["getLatencyBadge"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1379,7 +1379,7 @@ export interface components {
              * Format: int64
              * @description Response time in milliseconds. Null if the check did not complete.
              */
-            ping?: number;
+            latency?: number;
             /** @description True if this heartbeat represents a status change (e.g., UP→DOWN transition). */
             important?: boolean;
             /**
@@ -1400,11 +1400,11 @@ export interface components {
             /** @description Number of failed checks in this interval. */
             down?: number;
             /** @description Average response time in milliseconds for this interval. */
-            ping?: number;
+            latency?: number;
             /** @description Minimum response time in milliseconds for this interval. */
-            pingMin?: number;
+            latencyMin?: number;
             /** @description Maximum response time in milliseconds for this interval. */
-            pingMax?: number;
+            latencyMax?: number;
         };
         /** @description A configured notification provider that can receive alerts when monitors change status. */
         Notification: {
@@ -3620,7 +3620,7 @@ export interface operations {
             200: components["responses"]["SVGBadge"];
         };
     };
-    getPingBadge: {
+    getLatencyBadge: {
         parameters: {
             query?: {
                 duration?: number;
@@ -3680,7 +3680,7 @@ export interface operations {
             query?: {
                 status?: "up" | "down";
                 msg?: string;
-                ping?: number;
+                latency?: number;
             };
             header?: never;
             path: {

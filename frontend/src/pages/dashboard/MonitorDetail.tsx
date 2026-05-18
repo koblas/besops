@@ -15,10 +15,10 @@ import {
 } from '../../hooks/useMonitors';
 import { useHeartbeats, useImportantHeartbeats } from '../../hooks/useHeartbeats';
 import { HeartbeatBar } from '../../components/HeartbeatBar';
-import { PingChart } from '../../components/PingChart';
+import { LatencyChart } from '../../components/LatencyChart';
 import { StatusBadge } from '../../components/StatusBadge';
 import { UptimeBadge } from '../../components/UptimeBadge';
-import { formatDateTime, formatPing } from '../../lib/formatters';
+import { formatDateTime, formatLatency } from '../../lib/formatters';
 import type { StatusValue } from '../../lib/constants';
 
 const { Title, Text } = Typography;
@@ -113,11 +113,11 @@ export function MonitorDetail() {
       ellipsis: true,
     },
     {
-      title: 'Ping',
-      dataIndex: 'ping',
-      key: 'ping',
+      title: 'Latency',
+      dataIndex: 'latency',
+      key: 'latency',
       width: 100,
-      render: (ping: number | null) => formatPing(ping),
+      render: (latency: number | null) => formatLatency(latency),
     },
   ];
 
@@ -189,14 +189,14 @@ export function MonitorDetail() {
         <Col span={6}>
           <Card size="small" style={{ textAlign: 'center' }}>
             <Text type="secondary" style={{ fontSize: 12 }}>
-              Avg Ping
+              Avg Latency
             </Text>
             <div>
               <Text strong style={{ fontSize: 16 }}>
-                {formatPing(
+                {formatLatency(
                   heartbeats.length > 0
-                    ? heartbeats.reduce((sum, hb) => sum + (hb.ping ?? 0), 0) /
-                        heartbeats.filter(hb => hb.ping != null).length
+                    ? heartbeats.reduce((sum, hb) => sum + (hb.latency ?? 0), 0) /
+                        heartbeats.filter(hb => hb.latency != null).length
                     : null,
                 )}
               </Text>
@@ -229,9 +229,9 @@ export function MonitorDetail() {
         </Col>
       </Row>
 
-      {/* Ping Chart */}
+      {/* Latency Chart */}
       <Card title="Response Time" size="small" style={{ marginBottom: 16 }}>
-        <PingChart monitorId={id} heartbeats={heartbeats} />
+        <LatencyChart monitorId={id} heartbeats={heartbeats} />
       </Card>
 
       {/* Events Table */}

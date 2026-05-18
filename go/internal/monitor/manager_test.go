@@ -97,7 +97,7 @@ type alwaysUpChecker struct{}
 
 func (c *alwaysUpChecker) Type() string { return "test" }
 func (c *alwaysUpChecker) Check(_ context.Context, _ *Config) (CheckResult, error) {
-	return CheckResult{Status: status.Up, Ping: 5, Message: "ok"}, nil
+	return CheckResult{Status: status.Up, Latency: 5, Message: "ok"}, nil
 }
 
 func TestManagerStartAndStop(t *testing.T) {
