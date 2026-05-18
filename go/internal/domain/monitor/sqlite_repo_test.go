@@ -143,3 +143,63 @@ func TestFindByTagIDs_EmptySliceReturnsNil(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Nil(t, results)
 }
+
+// TestGroupTagIDs_PersistsRoundTrip verifies that GroupTagIDs written during
+// Create is readable via FindByID with the value intact.
+func TestGroupTagIDs_PersistsRoundTrip(t *testing.T) {
+	repo, db := setupRepo(t)
+	ctx := t.Context()
+
+	userID := createUser(t, db)
+	tagID := uuid.New().String()
+
+	m := &monitor.Monitor{
+		Name:        "My Group",
+		Type:        "group",
+		Active:      true,
+		UserID:      userID,
+		Interval:    60,
+		Timeout:     48,
+		GroupTagIDs: `["` + tagID + `"]`,
+	}
+
+	id, err := repo.Create(ctx, m)
+	require.NoError(t, err)
+
+	loaded, err := repo.FindByID(ctx, id)
+	require.NoError(t, err)
+	assert.Equal(t, `["`+tagID+`"]`, loaded.GroupTagIDs)
+}
+
+// TestGroupTagIDs_UpdatePersists verifies that updating GroupTagIDs writes
+// the new value to the database.
+func TestGroupTagIDs_UpdatePersists(t *testing.T) {
+	repo, db := setupRepo(t)
+	ctx := t.Context()
+
+	userID := createUser(t, db)
+
+	m := &monitor.Monitor{
+		Name:     "My Group",
+		Type:     "group",
+		Active:   true,
+		UserID:   userID,
+		Interval: 60,
+		Timeout:  48,
+	}
+
+	id, err := repo.Create(ctx, m)
+	require.NoError(t, err)
+
+	loaded, err := repo.FindByID(ctx, id)
+	require.NoError(t, err)
+	assert.Equal(t, "", loaded.GroupTagIDs)
+
+	tagID := uuid.New().String()
+	loaded.GroupTagIDs = `["` + tagID + `"]`
+	require.NoError(t, repo.Update(ctx, loaded))
+
+	reloaded, err := repo.FindByID(ctx, id)
+	require.NoError(t, err)
+	assert.Equal(t, `["`+tagID+`"]`, reloaded.GroupTagIDs)
+}

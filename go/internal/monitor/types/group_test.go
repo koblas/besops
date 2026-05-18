@@ -42,7 +42,7 @@ func TestGroupChecker_EmptyGroup(t *testing.T) {
 	result, err := checker.Check(t.Context(), &monitor.Config{ID: "group-1", Type: "group", GroupTagIDs: []string{"tag-1"}})
 	require.NoError(t, err)
 	assert.Equal(t, status.Pending, result.Status)
-	assert.Equal(t, "Group empty", result.Message)
+	assert.Equal(t, "No monitors have the selected tags", result.Message)
 }
 
 func TestGroupChecker_NoTagIDs(t *testing.T) {
@@ -58,7 +58,7 @@ func TestGroupChecker_NoTagIDs(t *testing.T) {
 	result, err := checker.Check(t.Context(), &monitor.Config{ID: "group-1", Type: "group"})
 	require.NoError(t, err)
 	assert.Equal(t, status.Pending, result.Status)
-	assert.Equal(t, "Group empty", result.Message)
+	assert.Equal(t, "No member tags configured", result.Message)
 }
 
 func TestGroupChecker_AllChildrenUp(t *testing.T) {

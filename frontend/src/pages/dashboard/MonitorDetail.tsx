@@ -186,23 +186,39 @@ export function MonitorDetail() {
             <UptimeBadge heartbeats={heartbeats} label="Uptime (24h)" />
           </Card>
         </Col>
-        <Col span={6}>
-          <Card size="small" style={{ textAlign: 'center' }}>
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              Avg Latency
-            </Text>
-            <div>
-              <Text strong style={{ fontSize: 16 }}>
-                {formatLatency(
-                  heartbeats.length > 0
-                    ? heartbeats.reduce((sum, hb) => sum + (hb.latency ?? 0), 0) /
-                        heartbeats.filter(hb => hb.latency != null).length
-                    : null,
-                )}
+        {monitor.type !== 'group' && (
+          <Col span={6}>
+            <Card size="small" style={{ textAlign: 'center' }}>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                Avg Latency
               </Text>
-            </div>
-          </Card>
-        </Col>
+              <div>
+                <Text strong style={{ fontSize: 16 }}>
+                  {formatLatency(
+                    heartbeats.length > 0
+                      ? heartbeats.reduce((sum, hb) => sum + (hb.latency ?? 0), 0) /
+                          heartbeats.filter(hb => hb.latency != null).length
+                      : null,
+                  )}
+                </Text>
+              </div>
+            </Card>
+          </Col>
+        )}
+        {monitor.type === 'group' && (
+          <Col span={6}>
+            <Card size="small" style={{ textAlign: 'center' }}>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                Members
+              </Text>
+              <div>
+                <Text strong style={{ fontSize: 16 }}>
+                  {lastBeat?.msg ?? '—'}
+                </Text>
+              </div>
+            </Card>
+          </Col>
+        )}
         <Col span={6}>
           <Card size="small" style={{ textAlign: 'center' }}>
             <Text type="secondary" style={{ fontSize: 12 }}>
@@ -230,9 +246,11 @@ export function MonitorDetail() {
       </Row>
 
       {/* Latency Chart */}
-      <Card title="Response Time" size="small" style={{ marginBottom: 16 }}>
-        <LatencyChart monitorId={id} heartbeats={heartbeats} />
-      </Card>
+      {monitor.type !== 'group' && (
+        <Card title="Response Time" size="small" style={{ marginBottom: 16 }}>
+          <LatencyChart monitorId={id} heartbeats={heartbeats} />
+        </Card>
+      )}
 
       {/* Events Table */}
       <Card title="Events" size="small">

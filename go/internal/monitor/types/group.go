@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"log/slog"
 	"strings"
 
 	"github.com/koblas/besops/internal/domain/heartbeat"
@@ -31,13 +32,21 @@ func (c *GroupChecker) Type() string { return "group" }
 func (c *GroupChecker) IsAggregate()  {}
 
 func (c *GroupChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.CheckResult, error) {
+	slog.DebugContext(ctx, "group check starting", slog.String("monitor", cfg.ID), slog.Int("tag_count", len(cfg.GroupTagIDs)))
+
+	if len(cfg.GroupTagIDs) == 0 {
+		return monitor.CheckResult{Status: status.Pending, Message: "No member tags configured"}, nil
+	}
+
 	members, err := c.resolveMembers(ctx, cfg)
 	if err != nil {
+		slog.WarnContext(ctx, "group member resolution failed", slog.String("monitor", cfg.ID), slog.Any("error", err))
 		return monitor.CheckResult{Status: status.Down, Message: "failed to load members"}, nil
 	}
 
 	if len(members) == 0 {
-		return monitor.CheckResult{Status: status.Pending, Message: "Group empty"}, nil
+		slog.DebugContext(ctx, "group has no members", slog.String("monitor", cfg.ID), slog.Any("tag_ids", cfg.GroupTagIDs))
+		return monitor.CheckResult{Status: status.Pending, Message: "No monitors have the selected tags"}, nil
 	}
 
 	worstStatus := status.Up
@@ -85,8 +94,5 @@ func (c *GroupChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.
 }
 
 func (c *GroupChecker) resolveMembers(ctx context.Context, cfg *monitor.Config) ([]*domainmonitor.Monitor, error) {
-	if len(cfg.GroupTagIDs) > 0 && c.TagFinder != nil {
-		return c.TagFinder.FindByTagIDs(ctx, cfg.GroupTagIDs)
-	}
-	return nil, nil
+	return c.TagFinder.FindByTagIDs(ctx, cfg.GroupTagIDs)
 }
