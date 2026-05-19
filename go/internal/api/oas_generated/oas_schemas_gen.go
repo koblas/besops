@@ -744,7 +744,6 @@ func (*ErrorResponse) changePasswordRes() {}
 func (*ErrorResponse) deleteMonitorRes()  {}
 func (*ErrorResponse) getMonitorRes()     {}
 func (*ErrorResponse) getStatusPageRes()  {}
-func (*ErrorResponse) pushHeartbeatRes()  {}
 func (*ErrorResponse) refreshTokenRes()   {}
 func (*ErrorResponse) updateMonitorRes()  {}
 
@@ -2750,24 +2749,21 @@ func (s *MessageResponse) SetMessage(val string) {
 	s.Message = val
 }
 
-func (*MessageResponse) pushHeartbeatRes() {}
-func (*MessageResponse) setupRes()         {}
+func (*MessageResponse) setupRes() {}
 
 // A monitor represents a single endpoint or service being monitored for uptime.
 // Ref: #/components/schemas/Monitor
 type Monitor struct {
-	ID            uuid.UUID   `json:"id"`
-	Name          string      `json:"name"`
-	Type          MonitorType `json:"type"`
-	Active        bool        `json:"active"`
-	Interval      OptInt      `json:"interval"`
-	Timeout       OptInt      `json:"timeout"`
-	MaxRetries    OptInt      `json:"maxRetries"`
-	RetryInterval OptInt      `json:"retryInterval"`
-	Description   OptString   `json:"description"`
-	UpsideDown    OptBool     `json:"upsideDown"`
-	// Server-generated token for push monitors.
-	PushToken          OptString        `json:"pushToken"`
+	ID                 uuid.UUID        `json:"id"`
+	Name               string           `json:"name"`
+	Type               MonitorType      `json:"type"`
+	Active             bool             `json:"active"`
+	Interval           OptInt           `json:"interval"`
+	Timeout            OptInt           `json:"timeout"`
+	MaxRetries         OptInt           `json:"maxRetries"`
+	RetryInterval      OptInt           `json:"retryInterval"`
+	Description        OptString        `json:"description"`
+	UpsideDown         OptBool          `json:"upsideDown"`
 	Tags               []MonitorTag     `json:"tags"`
 	NotificationIds    []uuid.UUID      `json:"notificationIds"`
 	ResendInterval     OptInt           `json:"resendInterval"`
@@ -2823,11 +2819,6 @@ func (s *Monitor) GetDescription() OptString {
 // GetUpsideDown returns the value of UpsideDown.
 func (s *Monitor) GetUpsideDown() OptBool {
 	return s.UpsideDown
-}
-
-// GetPushToken returns the value of PushToken.
-func (s *Monitor) GetPushToken() OptString {
-	return s.PushToken
 }
 
 // GetTags returns the value of Tags.
@@ -2905,11 +2896,6 @@ func (s *Monitor) SetUpsideDown(val OptBool) {
 	s.UpsideDown = val
 }
 
-// SetPushToken sets the value of PushToken.
-func (s *Monitor) SetPushToken(val OptString) {
-	s.PushToken = val
-}
-
 // SetTags sets the value of Tags.
 func (s *Monitor) SetTags(val []MonitorTag) {
 	s.Tags = val
@@ -2949,7 +2935,6 @@ type MonitorConfig struct {
 	GrpcMonitorConfig          GrpcMonitorConfig
 	MqttMonitorConfig          MqttMonitorConfig
 	RedisMonitorConfig         RedisMonitorConfig
-	PushMonitorConfig          PushMonitorConfig
 	SmtpMonitorConfig          SmtpMonitorConfig
 	TailscalePingMonitorConfig TailscalePingMonitorConfig
 	GroupMonitorConfig         GroupMonitorConfig
@@ -2967,7 +2952,6 @@ const (
 	GrpcMonitorConfigMonitorConfig          MonitorConfigType = "grpc-keyword"
 	MqttMonitorConfigMonitorConfig          MonitorConfigType = "mqtt"
 	RedisMonitorConfigMonitorConfig         MonitorConfigType = "redis"
-	PushMonitorConfigMonitorConfig          MonitorConfigType = "push"
 	SmtpMonitorConfigMonitorConfig          MonitorConfigType = "smtp"
 	TailscalePingMonitorConfigMonitorConfig MonitorConfigType = "tailscale-ping"
 	GroupMonitorConfigMonitorConfig         MonitorConfigType = "group"
@@ -2993,9 +2977,6 @@ func (s MonitorConfig) IsMqttMonitorConfig() bool { return s.Type == MqttMonitor
 
 // IsRedisMonitorConfig reports whether MonitorConfig is RedisMonitorConfig.
 func (s MonitorConfig) IsRedisMonitorConfig() bool { return s.Type == RedisMonitorConfigMonitorConfig }
-
-// IsPushMonitorConfig reports whether MonitorConfig is PushMonitorConfig.
-func (s MonitorConfig) IsPushMonitorConfig() bool { return s.Type == PushMonitorConfigMonitorConfig }
 
 // IsSmtpMonitorConfig reports whether MonitorConfig is SmtpMonitorConfig.
 func (s MonitorConfig) IsSmtpMonitorConfig() bool { return s.Type == SmtpMonitorConfigMonitorConfig }
@@ -3152,27 +3133,6 @@ func (s MonitorConfig) GetRedisMonitorConfig() (v RedisMonitorConfig, ok bool) {
 func NewRedisMonitorConfigMonitorConfig(v RedisMonitorConfig) MonitorConfig {
 	var s MonitorConfig
 	s.SetRedisMonitorConfig(v)
-	return s
-}
-
-// SetPushMonitorConfig sets MonitorConfig to PushMonitorConfig.
-func (s *MonitorConfig) SetPushMonitorConfig(v PushMonitorConfig) {
-	s.Type = PushMonitorConfigMonitorConfig
-	s.PushMonitorConfig = v
-}
-
-// GetPushMonitorConfig returns PushMonitorConfig and true boolean if MonitorConfig is PushMonitorConfig.
-func (s MonitorConfig) GetPushMonitorConfig() (v PushMonitorConfig, ok bool) {
-	if !s.IsPushMonitorConfig() {
-		return v, false
-	}
-	return s.PushMonitorConfig, true
-}
-
-// NewPushMonitorConfigMonitorConfig returns new MonitorConfig from PushMonitorConfig.
-func NewPushMonitorConfigMonitorConfig(v PushMonitorConfig) MonitorConfig {
-	var s MonitorConfig
-	s.SetPushMonitorConfig(v)
 	return s
 }
 
@@ -3450,7 +3410,6 @@ const (
 	MonitorTypeJSONQuery     MonitorType = "json-query"
 	MonitorTypeGrpcKeyword   MonitorType = "grpc-keyword"
 	MonitorTypeDNS           MonitorType = "dns"
-	MonitorTypePush          MonitorType = "push"
 	MonitorTypeSteam         MonitorType = "steam"
 	MonitorTypeGamedig       MonitorType = "gamedig"
 	MonitorTypeMqtt          MonitorType = "mqtt"
@@ -3478,7 +3437,6 @@ func (MonitorType) AllValues() []MonitorType {
 		MonitorTypeJSONQuery,
 		MonitorTypeGrpcKeyword,
 		MonitorTypeDNS,
-		MonitorTypePush,
 		MonitorTypeSteam,
 		MonitorTypeGamedig,
 		MonitorTypeMqtt,
@@ -3513,8 +3471,6 @@ func (s MonitorType) MarshalText() ([]byte, error) {
 	case MonitorTypeGrpcKeyword:
 		return []byte(s), nil
 	case MonitorTypeDNS:
-		return []byte(s), nil
-	case MonitorTypePush:
 		return []byte(s), nil
 	case MonitorTypeSteam:
 		return []byte(s), nil
@@ -3574,9 +3530,6 @@ func (s *MonitorType) UnmarshalText(data []byte) error {
 		return nil
 	case MonitorTypeDNS:
 		*s = MonitorTypeDNS
-		return nil
-	case MonitorTypePush:
-		*s = MonitorTypePush
 		return nil
 	case MonitorTypeSteam:
 		*s = MonitorTypeSteam
@@ -4568,52 +4521,6 @@ func (o OptNotificationConfig) Or(d NotificationConfig) NotificationConfig {
 	return d
 }
 
-// NewOptPushHeartbeatStatus returns new OptPushHeartbeatStatus with value set to v.
-func NewOptPushHeartbeatStatus(v PushHeartbeatStatus) OptPushHeartbeatStatus {
-	return OptPushHeartbeatStatus{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptPushHeartbeatStatus is optional PushHeartbeatStatus.
-type OptPushHeartbeatStatus struct {
-	Value PushHeartbeatStatus
-	Set   bool
-}
-
-// IsSet returns true if OptPushHeartbeatStatus was set.
-func (o OptPushHeartbeatStatus) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptPushHeartbeatStatus) Reset() {
-	var v PushHeartbeatStatus
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptPushHeartbeatStatus) SetTo(v PushHeartbeatStatus) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptPushHeartbeatStatus) Get() (v PushHeartbeatStatus, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptPushHeartbeatStatus) Or(d PushHeartbeatStatus) PushHeartbeatStatus {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptSettingsEntryPage returns new OptSettingsEntryPage with value set to v.
 func NewOptSettingsEntryPage(v SettingsEntryPage) OptSettingsEntryPage {
 	return OptSettingsEntryPage{
@@ -5397,96 +5304,6 @@ func (s *ProxyProtocol) UnmarshalText(data []byte) error {
 		return nil
 	case ProxyProtocolSocks4:
 		*s = ProxyProtocolSocks4
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
-
-type PushHeartbeatStatus string
-
-const (
-	PushHeartbeatStatusUp   PushHeartbeatStatus = "up"
-	PushHeartbeatStatusDown PushHeartbeatStatus = "down"
-)
-
-// AllValues returns all PushHeartbeatStatus values.
-func (PushHeartbeatStatus) AllValues() []PushHeartbeatStatus {
-	return []PushHeartbeatStatus{
-		PushHeartbeatStatusUp,
-		PushHeartbeatStatusDown,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s PushHeartbeatStatus) MarshalText() ([]byte, error) {
-	switch s {
-	case PushHeartbeatStatusUp:
-		return []byte(s), nil
-	case PushHeartbeatStatusDown:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *PushHeartbeatStatus) UnmarshalText(data []byte) error {
-	switch PushHeartbeatStatus(data) {
-	case PushHeartbeatStatusUp:
-		*s = PushHeartbeatStatusUp
-		return nil
-	case PushHeartbeatStatusDown:
-		*s = PushHeartbeatStatusDown
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
-
-// Ref: #/components/schemas/PushMonitorConfig
-type PushMonitorConfig struct {
-	Kind PushMonitorConfigKind `json:"kind"`
-}
-
-// GetKind returns the value of Kind.
-func (s *PushMonitorConfig) GetKind() PushMonitorConfigKind {
-	return s.Kind
-}
-
-// SetKind sets the value of Kind.
-func (s *PushMonitorConfig) SetKind(val PushMonitorConfigKind) {
-	s.Kind = val
-}
-
-type PushMonitorConfigKind string
-
-const (
-	PushMonitorConfigKindPush PushMonitorConfigKind = "push"
-)
-
-// AllValues returns all PushMonitorConfigKind values.
-func (PushMonitorConfigKind) AllValues() []PushMonitorConfigKind {
-	return []PushMonitorConfigKind{
-		PushMonitorConfigKindPush,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s PushMonitorConfigKind) MarshalText() ([]byte, error) {
-	switch s {
-	case PushMonitorConfigKindPush:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *PushMonitorConfigKind) UnmarshalText(data []byte) error {
-	switch PushMonitorConfigKind(data) {
-	case PushMonitorConfigKindPush:
-		*s = PushMonitorConfigKindPush
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)

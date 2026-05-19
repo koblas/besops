@@ -385,7 +385,6 @@ func (f *Factory) FromExistingMonitor(m *models.Monitor) *MonitorTemplate {
 	o.DNSResolveServer = func() null.Val[string] { return m.DNSResolveServer }
 	o.DNSLastResult = func() null.Val[string] { return m.DNSLastResult }
 	o.RetryInterval = func() int64 { return m.RetryInterval }
-	o.PushToken = func() null.Val[string] { return m.PushToken }
 	o.Method = func() string { return m.Method }
 	o.Body = func() null.Val[string] { return m.Body }
 	o.Headers = func() null.Val[string] { return m.Headers }

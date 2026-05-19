@@ -69,7 +69,6 @@ const (
 	PauseMaintenanceOperation          OperationName = "PauseMaintenance"
 	PauseMonitorOperation              OperationName = "PauseMonitor"
 	Prepare2FAOperation                OperationName = "Prepare2FA"
-	PushHeartbeatOperation             OperationName = "PushHeartbeat"
 	RefreshTokenOperation              OperationName = "RefreshToken"
 	ResolveIncidentOperation           OperationName = "ResolveIncident"
 	ResumeMaintenanceOperation         OperationName = "ResumeMaintenance"

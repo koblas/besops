@@ -6,7 +6,6 @@ import {
   DatabaseOutlined,
   MailOutlined,
   CodeOutlined,
-  UploadOutlined,
   GroupOutlined,
 } from '@ant-design/icons';
 
@@ -17,7 +16,6 @@ const iconMap: Record<string, React.ReactNode> = {
   'tailscale-ping': <WifiOutlined />,
   dns: <CloudServerOutlined />,
   smtp: <MailOutlined />,
-  push: <UploadOutlined />,
   mqtt: <MailOutlined />,
   'grpc-keyword': <CodeOutlined />,
   redis: <DatabaseOutlined />,

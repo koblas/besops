@@ -435,7 +435,6 @@ func TestBuildConfigFromDomain_AllTypes(t *testing.T) {
 		{"grpc-keyword", "grpc-keyword", oas.GrpcMonitorConfigMonitorConfig},
 		{"mqtt", "mqtt", oas.MqttMonitorConfigMonitorConfig},
 		{"redis", "redis", oas.RedisMonitorConfigMonitorConfig},
-		{"push", "push", oas.PushMonitorConfigMonitorConfig},
 		{"smtp", "smtp", oas.SmtpMonitorConfigMonitorConfig},
 		{"tailscale-ping", "tailscale-ping", oas.TailscalePingMonitorConfigMonitorConfig},
 		{"group", "group", oas.GroupMonitorConfigMonitorConfig},

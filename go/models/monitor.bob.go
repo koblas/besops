@@ -47,7 +47,6 @@ type Monitor struct {
 	DNSResolveServer                    null.Val[string] `db:"dns_resolve_server" `
 	DNSLastResult                       null.Val[string] `db:"dns_last_result" `
 	RetryInterval                       int64            `db:"retry_interval" `
-	PushToken                           null.Val[string] `db:"push_token" `
 	Method                              string           `db:"method" `
 	Body                                null.Val[string] `db:"body" `
 	Headers                             null.Val[string] `db:"headers" `
@@ -143,7 +142,7 @@ type monitorR struct {
 
 func buildMonitorColumns(tableName string) monitorColumns {
 	columnsExpr := expr.NewColumnsExpr(
-		"id", "name", "active", "user_id", "interval", "url", "type", "weight", "hostname", "port", "created_date", "keyword", "maxretries", "ignore_tls", "upside_down", "maxredirects", "accepted_statuscodes_json", "dns_resolve_type", "dns_resolve_server", "dns_last_result", "retry_interval", "push_token", "method", "body", "headers", "basic_auth_user", "basic_auth_pass", "proxy_id", "expiry_notification", "mqtt_topic", "mqtt_success_message", "mqtt_username", "mqtt_password", "database_connection_string", "database_query", "auth_method", "auth_domain", "auth_workstation", "grpc_url", "grpc_protobuf", "grpc_body", "grpc_metadata", "grpc_method", "grpc_service_name", "grpc_enable_tls", "radius_username", "radius_password", "radius_calling_station_id", "radius_called_station_id", "radius_secret", "resend_interval", "packet_size", "game", "http_body_encoding", "description", "tls_ca", "tls_cert", "tls_key", "invert_keyword", "json_path", "expected_value", "kafka_producer_topic", "kafka_producer_brokers", "kafka_producer_ssl", "kafka_producer_allow_auto_topic_creation", "kafka_producer_sasl_options", "kafka_producer_message", "oauth_client_id", "oauth_client_secret", "oauth_token_url", "oauth_scopes", "oauth_auth_method", "timeout", "gamedig_given_port_only", "save_response", "save_error_response", "response_max_length", "system_service_name", "rabbitmq_nodes", "rabbitmq_username", "rabbitmq_password", "remote_browser", "domain_expiry_notification", "group_tag_ids_json",
+		"id", "name", "active", "user_id", "interval", "url", "type", "weight", "hostname", "port", "created_date", "keyword", "maxretries", "ignore_tls", "upside_down", "maxredirects", "accepted_statuscodes_json", "dns_resolve_type", "dns_resolve_server", "dns_last_result", "retry_interval", "method", "body", "headers", "basic_auth_user", "basic_auth_pass", "proxy_id", "expiry_notification", "mqtt_topic", "mqtt_success_message", "mqtt_username", "mqtt_password", "database_connection_string", "database_query", "auth_method", "auth_domain", "auth_workstation", "grpc_url", "grpc_protobuf", "grpc_body", "grpc_metadata", "grpc_method", "grpc_service_name", "grpc_enable_tls", "radius_username", "radius_password", "radius_calling_station_id", "radius_called_station_id", "radius_secret", "resend_interval", "packet_size", "game", "http_body_encoding", "description", "tls_ca", "tls_cert", "tls_key", "invert_keyword", "json_path", "expected_value", "kafka_producer_topic", "kafka_producer_brokers", "kafka_producer_ssl", "kafka_producer_allow_auto_topic_creation", "kafka_producer_sasl_options", "kafka_producer_message", "oauth_client_id", "oauth_client_secret", "oauth_token_url", "oauth_scopes", "oauth_auth_method", "timeout", "gamedig_given_port_only", "save_response", "save_error_response", "response_max_length", "system_service_name", "rabbitmq_nodes", "rabbitmq_username", "rabbitmq_password", "remote_browser", "domain_expiry_notification", "group_tag_ids_json",
 	)
 	if tableName != "" {
 		columnsExpr = columnsExpr.WithParent(tableName)
@@ -172,7 +171,6 @@ func buildMonitorColumns(tableName string) monitorColumns {
 		DNSResolveServer:                    sqlite.Quote(tableName, "dns_resolve_server"),
 		DNSLastResult:                       sqlite.Quote(tableName, "dns_last_result"),
 		RetryInterval:                       sqlite.Quote(tableName, "retry_interval"),
-		PushToken:                           sqlite.Quote(tableName, "push_token"),
 		Method:                              sqlite.Quote(tableName, "method"),
 		Body:                                sqlite.Quote(tableName, "body"),
 		Headers:                             sqlite.Quote(tableName, "headers"),
@@ -262,7 +260,6 @@ type monitorColumns struct {
 	DNSResolveServer                    sqlite.Expression
 	DNSLastResult                       sqlite.Expression
 	RetryInterval                       sqlite.Expression
-	PushToken                           sqlite.Expression
 	Method                              sqlite.Expression
 	Body                                sqlite.Expression
 	Headers                             sqlite.Expression
@@ -364,7 +361,6 @@ type MonitorSetter struct {
 	DNSResolveServer                    omitnull.Val[string] `db:"dns_resolve_server" `
 	DNSLastResult                       omitnull.Val[string] `db:"dns_last_result" `
 	RetryInterval                       omit.Val[int64]      `db:"retry_interval" `
-	PushToken                           omitnull.Val[string] `db:"push_token" `
 	Method                              omit.Val[string]     `db:"method" `
 	Body                                omitnull.Val[string] `db:"body" `
 	Headers                             omitnull.Val[string] `db:"headers" `
@@ -493,9 +489,6 @@ func (s MonitorSetter) SetColumns() []string {
 	}
 	if s.RetryInterval.IsValue() {
 		vals = append(vals, "retry_interval")
-	}
-	if !s.PushToken.IsUnset() {
-		vals = append(vals, "push_token")
 	}
 	if s.Method.IsValue() {
 		vals = append(vals, "method")
@@ -749,9 +742,6 @@ func (s MonitorSetter) Overwrite(t *Monitor) {
 	}
 	if s.RetryInterval.IsValue() {
 		t.RetryInterval = s.RetryInterval.MustGet()
-	}
-	if !s.PushToken.IsUnset() {
-		t.PushToken = s.PushToken.MustGetNull()
 	}
 	if s.Method.IsValue() {
 		t.Method = s.Method.MustGet()
@@ -1038,10 +1028,6 @@ func (s *MonitorSetter) Apply(q *dialect.InsertQuery) {
 
 		if s.RetryInterval.IsValue() {
 			vals = append(vals, sqlite.Arg(s.RetryInterval.MustGet()))
-		}
-
-		if !s.PushToken.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.PushToken.MustGetNull()))
 		}
 
 		if s.Method.IsValue() {
@@ -1451,13 +1437,6 @@ func (s MonitorSetter) Expressions(prefix ...string) []bob.Expression {
 		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
 			sqlite.Quote(append(prefix, "retry_interval")...),
 			sqlite.Arg(s.RetryInterval),
-		}})
-	}
-
-	if !s.PushToken.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "push_token")...),
-			sqlite.Arg(s.PushToken),
 		}})
 	}
 
@@ -3068,7 +3047,6 @@ type monitorWhere[Q sqlite.Filterable] struct {
 	DNSResolveServer                    sqlite.WhereNullMod[Q, string]
 	DNSLastResult                       sqlite.WhereNullMod[Q, string]
 	RetryInterval                       sqlite.WhereMod[Q, int64]
-	PushToken                           sqlite.WhereNullMod[Q, string]
 	Method                              sqlite.WhereMod[Q, string]
 	Body                                sqlite.WhereNullMod[Q, string]
 	Headers                             sqlite.WhereNullMod[Q, string]
@@ -3160,7 +3138,6 @@ func buildMonitorWhere[Q sqlite.Filterable](cols monitorColumns) monitorWhere[Q]
 		DNSResolveServer:                    sqlite.WhereNull[Q, string](cols.DNSResolveServer),
 		DNSLastResult:                       sqlite.WhereNull[Q, string](cols.DNSLastResult),
 		RetryInterval:                       sqlite.Where[Q, int64](cols.RetryInterval),
-		PushToken:                           sqlite.WhereNull[Q, string](cols.PushToken),
 		Method:                              sqlite.Where[Q, string](cols.Method),
 		Body:                                sqlite.WhereNull[Q, string](cols.Body),
 		Headers:                             sqlite.WhereNull[Q, string](cols.Headers),

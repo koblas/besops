@@ -41,15 +41,6 @@ func (r *repo) FindByUserID(ctx context.Context, userID string) ([]*Monitor, err
 	return monitorsFromModels(ms), nil
 }
 
-func (r *repo) FindByPushToken(ctx context.Context, token string) (*Monitor, error) {
-	m, err := models.Monitors.Query(
-		sm.Where(models.Monitors.Columns.PushToken.EQ(sqlite.Arg(token))),
-	).One(ctx, r.db)
-	if err != nil {
-		return nil, errs.WrapNotFound(err, "finding monitor by push token") //nolint:wrapcheck // WrapNotFound handles wrapping
-	}
-	return monitorFromModel(m), nil
-}
 
 func (r *repo) FindAllActiveIDs(ctx context.Context) ([]string, error) {
 	ms, err := models.Monitors.Query(
@@ -148,7 +139,6 @@ func monitorToSetter(m *Monitor) *models.MonitorSetter {
 		DNSResolveType:          omitnull.From(m.DNSResolveType),
 		DNSResolveServer:        omitnull.From(m.DNSResolveServer),
 		RetryInterval:           omit.From(int64(m.RetryInterval)),
-		PushToken:               omitnull.From(m.PushToken),
 		Method:                  omit.From(m.Method),
 		Body:                    omitnull.From(m.Body),
 		Headers:                 omitnull.From(m.Headers),
@@ -228,7 +218,6 @@ func monitorFromModel(m *models.Monitor) *Monitor {
 		DNSResolveServer:     m.DNSResolveServer.GetOrZero(),
 		DNSLastResult:        m.DNSLastResult.GetOrZero(),
 		RetryInterval:        int(m.RetryInterval),
-		PushToken:            m.PushToken.GetOrZero(),
 		Method:               m.Method,
 		Body:                 m.Body.GetOrZero(),
 		Headers:              m.Headers.GetOrZero(),

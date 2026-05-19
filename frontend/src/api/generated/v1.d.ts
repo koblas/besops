@@ -984,25 +984,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/push/{pushToken}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                pushToken: string;
-            };
-            cookie?: never;
-        };
-        /** Report status for a push monitor */
-        get: operations["pushHeartbeat"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/status-pages/{slug}/events": {
         parameters: {
             query?: never;
@@ -1163,7 +1144,7 @@ export interface components {
             id: string;
             name: string;
             /** @enum {string} */
-            type: "http" | "port" | "ping" | "keyword" | "json-query" | "grpc-keyword" | "dns" | "push" | "steam" | "gamedig" | "mqtt" | "sqlserver" | "postgres" | "mysql" | "mongodb" | "radius" | "redis" | "group" | "snmp" | "rabbitmq" | "tailscale-ping" | "real-browser" | "manual";
+            type: "http" | "port" | "ping" | "keyword" | "json-query" | "grpc-keyword" | "dns" | "steam" | "gamedig" | "mqtt" | "sqlserver" | "postgres" | "mysql" | "mongodb" | "radius" | "redis" | "group" | "snmp" | "rabbitmq" | "tailscale-ping" | "real-browser" | "manual";
             active: boolean;
             /** @default 60 */
             interval: number;
@@ -1175,8 +1156,6 @@ export interface components {
             retryInterval: number;
             description?: string;
             upsideDown?: boolean;
-            /** @description Server-generated token for push monitors. */
-            pushToken?: string;
             tags?: components["schemas"]["MonitorTag"][];
             notificationIds?: string[];
             /** @default 0 */
@@ -1206,7 +1185,7 @@ export interface components {
             expiryNotification?: boolean;
             config: components["schemas"]["MonitorConfig"];
         };
-        MonitorConfig: components["schemas"]["HttpMonitorConfig"] | components["schemas"]["PortMonitorConfig"] | components["schemas"]["PingMonitorConfig"] | components["schemas"]["DnsMonitorConfig"] | components["schemas"]["GrpcMonitorConfig"] | components["schemas"]["MqttMonitorConfig"] | components["schemas"]["RedisMonitorConfig"] | components["schemas"]["PushMonitorConfig"] | components["schemas"]["SmtpMonitorConfig"] | components["schemas"]["TailscalePingMonitorConfig"] | components["schemas"]["GroupMonitorConfig"];
+        MonitorConfig: components["schemas"]["HttpMonitorConfig"] | components["schemas"]["PortMonitorConfig"] | components["schemas"]["PingMonitorConfig"] | components["schemas"]["DnsMonitorConfig"] | components["schemas"]["GrpcMonitorConfig"] | components["schemas"]["MqttMonitorConfig"] | components["schemas"]["RedisMonitorConfig"] | components["schemas"]["SmtpMonitorConfig"] | components["schemas"]["TailscalePingMonitorConfig"] | components["schemas"]["GroupMonitorConfig"];
         HttpMonitorConfig: {
             /**
              * @description discriminator enum property added by openapi-typescript
@@ -1304,13 +1283,6 @@ export interface components {
             hostname?: string;
             port?: number;
             databaseQuery?: string;
-        };
-        PushMonitorConfig: {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            kind: "push";
         };
         SmtpMonitorConfig: {
             /**
@@ -3663,33 +3635,6 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["SVGBadge"];
-        };
-    };
-    pushHeartbeat: {
-        parameters: {
-            query?: {
-                status?: "up" | "down";
-                msg?: string;
-                latency?: number;
-            };
-            header?: never;
-            path: {
-                pushToken: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Heartbeat recorded */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MessageResponse"];
-                };
-            };
-            404: components["responses"]["NotFound"];
         };
     };
     getStatusPageEventStream: {

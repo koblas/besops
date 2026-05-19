@@ -35,12 +35,6 @@ const monitorTypeGroups = [
       { value: 'grpc-keyword', label: 'gRPC' },
     ],
   },
-  {
-    label: 'Other',
-    options: [
-      { value: 'push', label: 'Push (passive)' },
-    ],
-  },
 ];
 
 export function GeneralFields() {

@@ -58,7 +58,6 @@ type MonitorTemplate struct {
 	DNSResolveServer                    func() null.Val[string]
 	DNSLastResult                       func() null.Val[string]
 	RetryInterval                       func() int64
-	PushToken                           func() null.Val[string]
 	Method                              func() string
 	Body                                func() null.Val[string]
 	Headers                             func() null.Val[string]
@@ -416,10 +415,6 @@ func (o MonitorTemplate) BuildSetter() *models.MonitorSetter {
 		val := o.RetryInterval()
 		m.RetryInterval = omit.From(val)
 	}
-	if o.PushToken != nil {
-		val := o.PushToken()
-		m.PushToken = omitnull.FromNull(val)
-	}
 	if o.Method != nil {
 		val := o.Method()
 		m.Method = omit.From(val)
@@ -752,9 +747,6 @@ func (o MonitorTemplate) Build() *models.Monitor {
 	}
 	if o.RetryInterval != nil {
 		m.RetryInterval = o.RetryInterval()
-	}
-	if o.PushToken != nil {
-		m.PushToken = o.PushToken()
 	}
 	if o.Method != nil {
 		m.Method = o.Method()
@@ -1317,7 +1309,6 @@ func (m monitorMods) RandomizeAllColumns(f *faker.Faker) MonitorMod {
 		MonitorMods.RandomDNSResolveServer(f),
 		MonitorMods.RandomDNSLastResult(f),
 		MonitorMods.RandomRetryInterval(f),
-		MonitorMods.RandomPushToken(f),
 		MonitorMods.RandomMethod(f),
 		MonitorMods.RandomBody(f),
 		MonitorMods.RandomHeaders(f),
@@ -2228,59 +2219,6 @@ func (m monitorMods) RandomRetryInterval(f *faker.Faker) MonitorMod {
 	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
 		o.RetryInterval = func() int64 {
 			return random_int64(f)
-		}
-	})
-}
-
-// Set the model columns to this value
-func (m monitorMods) PushToken(val null.Val[string]) MonitorMod {
-	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
-		o.PushToken = func() null.Val[string] { return val }
-	})
-}
-
-// Set the Column from the function
-func (m monitorMods) PushTokenFunc(f func() null.Val[string]) MonitorMod {
-	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
-		o.PushToken = f
-	})
-}
-
-// Clear any values for the column
-func (m monitorMods) UnsetPushToken() MonitorMod {
-	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
-		o.PushToken = nil
-	})
-}
-
-// Generates a random value for the column using the given faker
-// if faker is nil, a default faker is used
-// The generated value is sometimes null
-func (m monitorMods) RandomPushToken(f *faker.Faker) MonitorMod {
-	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
-		o.PushToken = func() null.Val[string] {
-			if f == nil {
-				f = &defaultFaker
-			}
-
-			val := random_string(f)
-			return null.From(val)
-		}
-	})
-}
-
-// Generates a random value for the column using the given faker
-// if faker is nil, a default faker is used
-// The generated value is never null
-func (m monitorMods) RandomPushTokenNotNull(f *faker.Faker) MonitorMod {
-	return MonitorModFunc(func(_ context.Context, o *MonitorTemplate) {
-		o.PushToken = func() null.Val[string] {
-			if f == nil {
-				f = &defaultFaker
-			}
-
-			val := random_string(f)
-			return null.From(val)
 		}
 	})
 }

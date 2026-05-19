@@ -208,7 +208,6 @@ func monitorToOAS(m *Monitor) oas.Monitor {
 		RetryInterval:      oas.NewOptInt(m.RetryInterval),
 		Description:        oasutil.PtrToOptString(m.Description),
 		UpsideDown:         oas.NewOptBool(m.UpsideDown),
-		PushToken:          oasutil.PtrToOptString(m.PushToken),
 		ResendInterval:     oas.NewOptInt(m.ResendInterval),
 		ExpiryNotification: oas.NewOptBool(m.ExpiryNotification),
 	}
@@ -235,11 +234,6 @@ func buildConfigFromDomain(m *Monitor) oas.MonitorConfig {
 		return buildMqttConfig(m)
 	case "redis":
 		return buildRedisConfig(m)
-	case "push":
-		return oas.MonitorConfig{
-			Type:              oas.PushMonitorConfigMonitorConfig,
-			PushMonitorConfig: oas.PushMonitorConfig{Kind: "push"},
-		}
 	case "smtp":
 		return buildSmtpConfig(m)
 	case "tailscale-ping":
@@ -459,7 +453,6 @@ func monitorFromInput(req *oas.MonitorInput, userID string) *Monitor {
 		UpsideDown:         oasutil.OptBoolValue(req.UpsideDown, false),
 		ResendInterval:     oasutil.OptIntValue(req.ResendInterval, 0),
 		ExpiryNotification: oasutil.OptBoolValue(req.ExpiryNotification, false),
-		PushToken:          uuid.New().String(),
 	}
 
 	applyConfig(m, &req.Config)
@@ -532,8 +525,6 @@ func applyConfig(m *Monitor, cfg *oas.MonitorConfig) {
 		applySmtpConfig(m, &cfg.SmtpMonitorConfig)
 	case oas.TailscalePingMonitorConfigMonitorConfig:
 		applyTailscalePingConfig(m, &cfg.TailscalePingMonitorConfig)
-	case oas.PushMonitorConfigMonitorConfig:
-		// no type-specific fields
 	case oas.GroupMonitorConfigMonitorConfig:
 		applyGroupConfig(m, &cfg.GroupMonitorConfig)
 	}

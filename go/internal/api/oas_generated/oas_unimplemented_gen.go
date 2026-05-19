@@ -582,15 +582,6 @@ func (UnimplementedHandler) Prepare2FA(ctx context.Context, req *Prepare2FAReq) 
 	return r, ht.ErrNotImplemented
 }
 
-// PushHeartbeat implements pushHeartbeat operation.
-//
-// Report status for a push monitor.
-//
-// GET /push/{pushToken}
-func (UnimplementedHandler) PushHeartbeat(ctx context.Context, params PushHeartbeatParams) (r PushHeartbeatRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // RefreshToken implements refreshToken operation.
 //
 // Refresh JWT token.

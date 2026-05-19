@@ -196,14 +196,6 @@ describe('buildConfigFromForm', () => {
     });
   });
 
-  it('builds PushMonitorConfig from flat form values', () => {
-    const values = { type: 'push' };
-
-    const config = buildConfigFromForm(values);
-
-    expect(config).toEqual({ kind: 'push' });
-  });
-
   it('group with tagIds produces correct config', () => {
     const values = {
       type: 'group',

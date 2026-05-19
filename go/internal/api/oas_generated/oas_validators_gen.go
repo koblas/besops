@@ -2950,36 +2950,6 @@ func (s *Monitor) Validate() error {
 		})
 	}
 	if err := func() error {
-		if value, ok := s.PushToken.Get(); ok {
-			if err := func() error {
-				if err := (validate.String{
-					MinLength:     0,
-					MinLengthSet:  false,
-					MaxLength:     64,
-					MaxLengthSet:  true,
-					Email:         false,
-					Hostname:      false,
-					Regex:         nil,
-					MinNumeric:    0,
-					MinNumericSet: false,
-					MaxNumeric:    0,
-					MaxNumericSet: false,
-				}).Validate(string(value)); err != nil {
-					return errors.Wrap(err, "string")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "pushToken",
-			Error: err,
-		})
-	}
-	if err := func() error {
 		if s.Tags == nil {
 			return nil // optional
 		}
@@ -3120,11 +3090,6 @@ func (s MonitorConfig) Validate() error {
 		return nil
 	case RedisMonitorConfigMonitorConfig:
 		if err := s.RedisMonitorConfig.Validate(); err != nil {
-			return err
-		}
-		return nil
-	case PushMonitorConfigMonitorConfig:
-		if err := s.PushMonitorConfig.Validate(); err != nil {
 			return err
 		}
 		return nil
@@ -3523,8 +3488,6 @@ func (s MonitorType) Validate() error {
 	case "grpc-keyword":
 		return nil
 	case "dns":
-		return nil
-	case "push":
 		return nil
 	case "steam":
 		return nil
@@ -4470,49 +4433,6 @@ func (s ProxyProtocol) Validate() error {
 	case "socks5h":
 		return nil
 	case "socks4":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
-}
-
-func (s PushHeartbeatStatus) Validate() error {
-	switch s {
-	case "up":
-		return nil
-	case "down":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
-}
-
-func (s *PushMonitorConfig) Validate() error {
-	if s == nil {
-		return validate.ErrNilPointer
-	}
-
-	var failures []validate.FieldError
-	if err := func() error {
-		if err := s.Kind.Validate(); err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "kind",
-			Error: err,
-		})
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s PushMonitorConfigKind) Validate() error {
-	switch s {
-	case "push":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)

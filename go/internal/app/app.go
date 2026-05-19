@@ -150,7 +150,7 @@ func (a *App) Start(ctx context.Context) error {
 	registry.Register(&monitortypes.GRPCChecker{})
 	registry.Register(&monitortypes.MQTTChecker{})
 	registry.Register(&monitortypes.RedisChecker{})
-	registry.Register(&monitortypes.PushChecker{})
+
 	registry.Register(&monitortypes.SMTPMonitorChecker{})
 	registry.Register(&monitortypes.TailscalePingChecker{})
 	registry.Register(&monitortypes.GroupChecker{HbStore: heartbeatRepo, TagFinder: monitorRepo})
@@ -190,8 +190,6 @@ func (a *App) Start(ctx context.Context) error {
 		return fmt.Errorf("starting monitor manager: %w", monErr)
 	}
 
-	// Push token finder adapter (heartbeat handler needs to look up monitor by push token)
-	pushFinder := &pushTokenAdapter{monitorRepo: monitorRepo}
 	statsHandler := stats.NewHandler(stats.NewRepository(db))
 	chartAdapter := &chartRepoAdapter{stats: statsHandler}
 
@@ -200,7 +198,7 @@ func (a *App) Start(ctx context.Context) error {
 		api.WithTags(tag.NewHandler(tagRepo)),
 		api.WithAPIKeys(apikey.NewHandler(apikey.NewRepository(db))),
 		api.WithSettings(settings.NewHandler(settings.NewRepository(db))),
-		api.WithHeartbeats(heartbeat.NewHandler(heartbeatRepo, pushFinder, chartAdapter)),
+		api.WithHeartbeats(heartbeat.NewHandler(heartbeatRepo, chartAdapter)),
 		api.WithNotifications(domainnotification.NewHandler(notifRepo)),
 		api.WithMaintenance(maintenance.NewHandler(maintRepo)),
 		api.WithUsers(user.NewHandler(userRepo, authProvider, a.Config.Bootstrap)),
@@ -313,18 +311,6 @@ func (a *App) shutdown(ctx context.Context) error {
 	return nil
 }
 
-// pushTokenAdapter bridges the monitor repository to the heartbeat.PushTokenFinder interface.
-type pushTokenAdapter struct {
-	monitorRepo domainmonitor.Repository
-}
-
-func (a *pushTokenAdapter) FindByPushToken(ctx context.Context, token string) (string, error) {
-	m, err := a.monitorRepo.FindByPushToken(ctx, token)
-	if err != nil {
-		return "", fmt.Errorf("finding monitor by push token: %w", err)
-	}
-	return m.ID, nil
-}
 
 // chartRepoAdapter bridges stats.Handler to the heartbeat.ChartRepository interface.
 type chartRepoAdapter struct {

@@ -9,14 +9,7 @@ import (
 	"github.com/koblas/besops/internal/api/oasutil"
 )
 
-var (
-	_ oas.HeartbeatHandler = (*Handler)(nil)
-	_ oas.PushHandler      = (*Handler)(nil)
-)
-
-type PushTokenFinder interface {
-	FindByPushToken(ctx context.Context, token string) (monitorID string, err error)
-}
+var _ oas.HeartbeatHandler = (*Handler)(nil)
 
 type ChartPoint struct {
 	Timestamp  int64
@@ -34,13 +27,12 @@ type ChartRepository interface {
 }
 
 type Handler struct {
-	repo       Repository
-	pushFinder PushTokenFinder
-	chartRepo  ChartRepository
+	repo      Repository
+	chartRepo ChartRepository
 }
 
-func NewHandler(repo Repository, pushFinder PushTokenFinder, chartRepo ChartRepository) *Handler {
-	return &Handler{repo: repo, pushFinder: pushFinder, chartRepo: chartRepo}
+func NewHandler(repo Repository, chartRepo ChartRepository) *Handler {
+	return &Handler{repo: repo, chartRepo: chartRepo}
 }
 
 func (h *Handler) GetHeartbeats(ctx context.Context, params oas.GetHeartbeatsParams) ([]oas.Heartbeat, error) {
@@ -145,43 +137,6 @@ func (h *Handler) GetChartData(ctx context.Context, params oas.GetChartDataParam
 	return result, nil
 }
 
-func (h *Handler) PushHeartbeat(ctx context.Context, params oas.PushHeartbeatParams) (oas.PushHeartbeatRes, error) {
-	monitorID, err := h.pushFinder.FindByPushToken(ctx, params.PushToken)
-	if err != nil {
-		return &oas.ErrorResponse{Error: "push token not found"}, nil //nolint:nilerr // returning error response
-	}
-
-	status := 1
-	if params.Status.IsSet() {
-		if params.Status.Value == oas.PushHeartbeatStatusDown {
-			status = 0
-		}
-	}
-	msg := ""
-	if params.Msg.IsSet() {
-		msg = params.Msg.Value
-	}
-	var latency *int64
-	if params.Latency.IsSet() {
-		p := int64(params.Latency.Value)
-		latency = &p
-	}
-
-	hb := &Heartbeat{
-		MonitorID: monitorID,
-		Status:    status,
-		Time:      RFC3339Time(time.Now().UTC()),
-		Msg:       msg,
-		Latency:   latency,
-		Important: true,
-	}
-
-	if err := h.repo.Insert(ctx, hb); err != nil {
-		return nil, fmt.Errorf("inserting heartbeat: %w", err)
-	}
-
-	return &oas.MessageResponse{Message: "ok"}, nil
-}
 
 func heartbeatToOAS(hb *Heartbeat) oas.Heartbeat {
 	result := oas.Heartbeat{

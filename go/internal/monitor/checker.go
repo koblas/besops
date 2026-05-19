@@ -41,9 +41,8 @@ type Config struct {
 	KeywordType   string
 	JsonPath      string
 	ExpectedValue string
-	ProxyID     *string
-	PushToken   string
-	Tags        []string
+	ProxyID *string
+	Tags    []string
 	GroupTagIDs []string
 
 	HTTP  HTTPConfig

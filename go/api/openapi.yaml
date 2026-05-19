@@ -35,8 +35,6 @@ tags:
     description: Proxy configuration
   - name: badges
     description: Status badges (SVG)
-  - name: push
-    description: Push monitor API
   - name: events
     description: Server-Sent Events for real-time updates
   - name: system
@@ -1634,50 +1632,6 @@ paths:
         "200":
           $ref: "#/components/responses/SVGBadge"
 
-  # ─── Push ───────────────────────────────────────────────────────────────
-  /push/{pushToken}:
-    parameters:
-      - name: pushToken
-        in: path
-        required: true
-        schema:
-          type: string
-          minLength: 1
-          maxLength: 64
-    get:
-      operationId: pushHeartbeat
-      tags: [push]
-      x-ogen-operation-group: Push
-      security: []
-      summary: Report status for a push monitor
-      parameters:
-        - name: status
-          in: query
-          schema:
-            type: string
-            enum: [up, down]
-            default: up
-        - name: msg
-          in: query
-          schema:
-            type: string
-            maxLength: 500
-            default: OK
-        - name: latency
-          in: query
-          schema:
-            type: number
-            minimum: 0
-      responses:
-        "200":
-          description: Heartbeat recorded
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponse"
-        "404":
-          $ref: "#/components/responses/NotFound"
-
 
   /status-pages/{slug}/events:
     parameters:
@@ -1970,7 +1924,6 @@ components:
             - json-query
             - grpc-keyword
             - dns
-            - push
             - steam
             - gamedig
             - mqtt
@@ -2013,10 +1966,6 @@ components:
           maxLength: 1000
         upsideDown:
           type: boolean
-        pushToken:
-          type: string
-          maxLength: 64
-          description: Server-generated token for push monitors.
         tags:
           type: array
           maxItems: 50
@@ -2103,7 +2052,6 @@ components:
         - $ref: "#/components/schemas/GrpcMonitorConfig"
         - $ref: "#/components/schemas/MqttMonitorConfig"
         - $ref: "#/components/schemas/RedisMonitorConfig"
-        - $ref: "#/components/schemas/PushMonitorConfig"
         - $ref: "#/components/schemas/SmtpMonitorConfig"
         - $ref: "#/components/schemas/TailscalePingMonitorConfig"
         - $ref: "#/components/schemas/GroupMonitorConfig"
@@ -2117,7 +2065,6 @@ components:
           grpc-keyword: "#/components/schemas/GrpcMonitorConfig"
           mqtt: "#/components/schemas/MqttMonitorConfig"
           redis: "#/components/schemas/RedisMonitorConfig"
-          push: "#/components/schemas/PushMonitorConfig"
           smtp: "#/components/schemas/SmtpMonitorConfig"
           tailscale-ping: "#/components/schemas/TailscalePingMonitorConfig"
           group: "#/components/schemas/GroupMonitorConfig"
@@ -2307,14 +2254,6 @@ components:
         databaseQuery:
           type: string
           maxLength: 2000
-
-    PushMonitorConfig:
-      type: object
-      required: [kind]
-      properties:
-        kind:
-          type: string
-          enum: [push]
 
     SmtpMonitorConfig:
       type: object

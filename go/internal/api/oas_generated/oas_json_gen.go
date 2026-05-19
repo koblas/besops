@@ -5914,12 +5914,6 @@ func (s *Monitor) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.PushToken.Set {
-			e.FieldStart("pushToken")
-			s.PushToken.Encode(e)
-		}
-	}
-	{
 		if s.Tags != nil {
 			e.FieldStart("tags")
 			e.ArrStart()
@@ -5959,7 +5953,7 @@ func (s *Monitor) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfMonitor = [16]string{
+var jsonFieldsNameOfMonitor = [15]string{
 	0:  "id",
 	1:  "name",
 	2:  "type",
@@ -5970,12 +5964,11 @@ var jsonFieldsNameOfMonitor = [16]string{
 	7:  "retryInterval",
 	8:  "description",
 	9:  "upsideDown",
-	10: "pushToken",
-	11: "tags",
-	12: "notificationIds",
-	13: "resendInterval",
-	14: "expiryNotification",
-	15: "config",
+	10: "tags",
+	11: "notificationIds",
+	12: "resendInterval",
+	13: "expiryNotification",
+	14: "config",
 }
 
 // Decode decodes Monitor from json.
@@ -6093,16 +6086,6 @@ func (s *Monitor) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"upsideDown\"")
-			}
-		case "pushToken":
-			if err := func() error {
-				s.PushToken.Reset()
-				if err := s.PushToken.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"pushToken\"")
 			}
 		case "tags":
 			if err := func() error {
@@ -6514,9 +6497,6 @@ func (s MonitorConfig) encodeFields(e *jx.Encoder) {
 				}
 			}
 		}
-	case PushMonitorConfigMonitorConfig:
-		e.FieldStart("kind")
-		e.Str("push")
 	case SmtpMonitorConfigMonitorConfig:
 		e.FieldStart("kind")
 		e.Str("smtp")
@@ -6616,9 +6596,6 @@ func (s *MonitorConfig) Decode(d *jx.Decoder) error {
 				case "redis":
 					s.Type = RedisMonitorConfigMonitorConfig
 					found = true
-				case "push":
-					s.Type = PushMonitorConfigMonitorConfig
-					found = true
 				case "smtp":
 					s.Type = SmtpMonitorConfigMonitorConfig
 					found = true
@@ -6668,10 +6645,6 @@ func (s *MonitorConfig) Decode(d *jx.Decoder) error {
 		}
 	case RedisMonitorConfigMonitorConfig:
 		if err := s.RedisMonitorConfig.Decode(d); err != nil {
-			return err
-		}
-	case PushMonitorConfigMonitorConfig:
-		if err := s.PushMonitorConfig.Decode(d); err != nil {
 			return err
 		}
 	case SmtpMonitorConfigMonitorConfig:
@@ -7162,8 +7135,6 @@ func (s *MonitorType) Decode(d *jx.Decoder) error {
 		*s = MonitorTypeGrpcKeyword
 	case MonitorTypeDNS:
 		*s = MonitorTypeDNS
-	case MonitorTypePush:
-		*s = MonitorTypePush
 	case MonitorTypeSteam:
 		*s = MonitorTypeSteam
 	case MonitorTypeGamedig:
@@ -9719,138 +9690,6 @@ func (s ProxyProtocol) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *ProxyProtocol) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *PushMonitorConfig) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *PushMonitorConfig) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("kind")
-		s.Kind.Encode(e)
-	}
-}
-
-var jsonFieldsNameOfPushMonitorConfig = [1]string{
-	0: "kind",
-}
-
-// Decode decodes PushMonitorConfig from json.
-func (s *PushMonitorConfig) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode PushMonitorConfig to nil")
-	}
-	var requiredBitSet [1]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "kind":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				if err := s.Kind.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"kind\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode PushMonitorConfig")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000001,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfPushMonitorConfig) {
-					name = jsonFieldsNameOfPushMonitorConfig[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *PushMonitorConfig) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *PushMonitorConfig) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes PushMonitorConfigKind as json.
-func (s PushMonitorConfigKind) Encode(e *jx.Encoder) {
-	e.Str(string(s))
-}
-
-// Decode decodes PushMonitorConfigKind from json.
-func (s *PushMonitorConfigKind) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode PushMonitorConfigKind to nil")
-	}
-	v, err := d.StrBytes()
-	if err != nil {
-		return err
-	}
-	// Try to use constant string.
-	switch PushMonitorConfigKind(v) {
-	case PushMonitorConfigKindPush:
-		*s = PushMonitorConfigKindPush
-	default:
-		*s = PushMonitorConfigKind(v)
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s PushMonitorConfigKind) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *PushMonitorConfigKind) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

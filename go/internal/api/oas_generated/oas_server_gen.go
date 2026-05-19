@@ -20,7 +20,6 @@ type Handler interface {
 	MonitorHandler
 	NotificationHandler
 	ProxyHandler
-	PushHandler
 	SettingsHandler
 	StatusPageHandler
 	SystemHandler
@@ -452,18 +451,6 @@ type ProxyHandler interface {
 	//
 	// PUT /proxies/{proxyId}
 	UpdateProxy(ctx context.Context, req *ProxyInput, params UpdateProxyParams) error
-}
-
-// PushHandler handles operations described by OpenAPI v3 specification.
-//
-// x-ogen-operation-group: Push
-type PushHandler interface {
-	// PushHeartbeat implements pushHeartbeat operation.
-	//
-	// Report status for a push monitor.
-	//
-	// GET /push/{pushToken}
-	PushHeartbeat(ctx context.Context, params PushHeartbeatParams) (PushHeartbeatRes, error)
 }
 
 // SettingsHandler handles operations described by OpenAPI v3 specification.

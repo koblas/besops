@@ -147,8 +147,7 @@ func modelToConfig(mon *domainmonitor.Monitor) *Config {
 		Keyword:       mon.Keyword,
 		JsonPath:      mon.JsonPath,
 		ExpectedValue: mon.ExpectedValue,
-		ProxyID:       mon.ProxyID,
-		PushToken:     mon.PushToken,
+		ProxyID: mon.ProxyID,
 		HTTP: HTTPConfig{
 			Method:        mon.Method,
 			Body:          mon.Body,

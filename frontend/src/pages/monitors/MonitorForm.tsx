@@ -13,7 +13,6 @@ import { SmtpFields } from './fields/SmtpFields';
 import { MqttFields } from './fields/MqttFields';
 import { GrpcFields } from './fields/GrpcFields';
 import { DatabaseFields } from './fields/DatabaseFields';
-import { PushFields } from './fields/PushFields';
 import { GroupFields } from './fields/GroupFields';
 import { TimingFields } from './fields/TimingFields';
 import { AlertFields } from './fields/AlertFields';
@@ -242,6 +241,5 @@ function TypeFields({ type }: { type: string }) {
   if (type === 'mqtt') return <MqttFields />;
   if (type === 'grpc-keyword') return <GrpcFields />;
   if (type === 'redis') return <DatabaseFields />;
-  if (type === 'push') return <PushFields />;
   return null;
 }

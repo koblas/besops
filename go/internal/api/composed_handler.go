@@ -152,9 +152,6 @@ func (c *ComposedHandler) ClearEvents(ctx context.Context, params oas.ClearEvent
 	return c.heartbeats.ClearEvents(ctx, params)
 }
 
-func (c *ComposedHandler) PushHeartbeat(ctx context.Context, params oas.PushHeartbeatParams) (oas.PushHeartbeatRes, error) {
-	return c.heartbeats.PushHeartbeat(ctx, params)
-}
 
 // --- Notification methods ---
 

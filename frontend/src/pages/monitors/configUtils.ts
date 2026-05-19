@@ -47,8 +47,6 @@ export function buildConfigFromForm(values: FormValues): MonitorConfig {
       return { kind: 'mqtt', ...pick(values, mqttFields) } as MonitorConfig;
     case 'redis':
       return { kind: 'redis', ...pick(values, redisFields) } as MonitorConfig;
-    case 'push':
-      return { kind: 'push' };
     case 'smtp':
       return { kind: 'smtp', ...pick(values, smtpFields) } as MonitorConfig;
     case 'tailscale-ping':

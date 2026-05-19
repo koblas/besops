@@ -24,7 +24,6 @@ type Monitor struct {
 	DNSResolveServer     string    `db:"dns_resolve_server"`
 	DNSLastResult        string    `db:"dns_last_result"`
 	RetryInterval        int       `db:"retry_interval"`
-	PushToken            string    `db:"push_token"`
 	Method               string    `db:"method"`
 	Body                 string    `db:"body"`
 	Headers              string    `db:"headers"`

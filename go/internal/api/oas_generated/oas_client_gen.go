@@ -39,7 +39,6 @@ type Invoker interface {
 	MonitorInvoker
 	NotificationInvoker
 	ProxyInvoker
-	PushInvoker
 	SettingsInvoker
 	StatusPageInvoker
 	SystemInvoker
@@ -471,18 +470,6 @@ type ProxyInvoker interface {
 	//
 	// PUT /proxies/{proxyId}
 	UpdateProxy(ctx context.Context, request *ProxyInput, params UpdateProxyParams) error
-}
-
-// PushInvoker invokes operations described by OpenAPI v3 specification.
-//
-// x-gen-operation-group: Push
-type PushInvoker interface {
-	// PushHeartbeat invokes pushHeartbeat operation.
-	//
-	// Report status for a push monitor.
-	//
-	// GET /push/{pushToken}
-	PushHeartbeat(ctx context.Context, params PushHeartbeatParams) (PushHeartbeatRes, error)
 }
 
 // SettingsInvoker invokes operations described by OpenAPI v3 specification.
@@ -7981,153 +7968,6 @@ func (c *Client) sendPrepare2FA(ctx context.Context, request *Prepare2FAReq) (re
 
 	stage = "DecodeResponse"
 	result, err := decodePrepare2FAResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// PushHeartbeat invokes pushHeartbeat operation.
-//
-// Report status for a push monitor.
-//
-// GET /push/{pushToken}
-func (c *Client) PushHeartbeat(ctx context.Context, params PushHeartbeatParams) (PushHeartbeatRes, error) {
-	res, err := c.sendPushHeartbeat(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendPushHeartbeat(ctx context.Context, params PushHeartbeatParams) (res PushHeartbeatRes, err error) {
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("pushHeartbeat"),
-		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.URLTemplateKey.String("/push/{pushToken}"),
-	}
-	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, PushHeartbeatOperation,
-		trace.WithAttributes(otelAttrs...),
-		clientSpanKind,
-	)
-	// Track stage for error reporting.
-	var stage string
-	defer func() {
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		span.End()
-	}()
-
-	stage = "BuildURL"
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [2]string
-	pathParts[0] = "/push/"
-	{
-		// Encode "pushToken" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "pushToken",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.PushToken))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	uri.AddPathParts(u, pathParts[:]...)
-
-	stage = "EncodeQueryParams"
-	q := uri.NewQueryEncoder()
-	{
-		// Encode "status" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "status",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Status.Get(); ok {
-				return e.EncodeValue(conv.StringToString(string(val)))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "msg" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "msg",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Msg.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "latency" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "latency",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Latency.Get(); ok {
-				return e.EncodeValue(conv.Float64ToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	u.RawQuery = q.Values().Encode()
-
-	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	stage = "SendRequest"
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	body := resp.Body
-	defer body.Close()
-
-	stage = "DecodeResponse"
-	result, err := decodePushHeartbeatResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

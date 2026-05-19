@@ -21,10 +21,6 @@ type LoginRes interface {
 	loginRes()
 }
 
-type PushHeartbeatRes interface {
-	pushHeartbeatRes()
-}
-
 type RefreshTokenRes interface {
 	refreshTokenRes()
 }
