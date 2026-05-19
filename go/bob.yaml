@@ -14,26 +14,13 @@ sqlite:
         - http
         - port
         - ping
-        - keyword
-        - json-query
         - grpc-keyword
         - dns
-        - push
-        - steam
-        - gamedig
         - mqtt
-        - sqlserver
-        - postgres
-        - mysql
-        - mongodb
-        - radius
         - redis
-        - group
-        - snmp
-        - rabbitmq
+        - smtp
         - tailscale-ping
-        - real-browser
-        - manual
+        - group
     - name: maintenance_strategy
       type: string
       values:

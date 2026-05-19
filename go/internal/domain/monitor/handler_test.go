@@ -1,7 +1,7 @@
 package monitor
 
 import (
-	"sort"
+	"encoding/json"
 	"testing"
 
 	"github.com/google/uuid"
@@ -10,86 +10,6 @@ import (
 
 	oas "github.com/koblas/besops/internal/api/oas_generated"
 )
-
-func TestHeadersToOAS_EmptyString(t *testing.T) {
-	result := headersToOAS("")
-	assert.Nil(t, result)
-}
-
-func TestHeadersToOAS_InvalidJSON(t *testing.T) {
-	result := headersToOAS("not json at all")
-	assert.Nil(t, result)
-}
-
-func TestHeadersToOAS_SingleHeader(t *testing.T) {
-	result := headersToOAS(`{"Content-Type":"application/json"}`)
-	require.Len(t, result, 1)
-	assert.Equal(t, "Content-Type", result[0].Name)
-	assert.Equal(t, "application/json", result[0].Value)
-}
-
-func TestHeadersToOAS_MultipleHeaders(t *testing.T) {
-	result := headersToOAS(`{"Authorization":"Bearer token","X-Custom":"value"}`)
-	require.Len(t, result, 2)
-
-	sort.Slice(result, func(i, j int) bool { return result[i].Name < result[j].Name })
-	assert.Equal(t, "Authorization", result[0].Name)
-	assert.Equal(t, "Bearer token", result[0].Value)
-	assert.Equal(t, "X-Custom", result[1].Name)
-	assert.Equal(t, "value", result[1].Value)
-}
-
-func TestHeadersFromOAS_EmptySlice(t *testing.T) {
-	result := headersFromOAS(nil)
-	assert.Equal(t, "", result)
-
-	result = headersFromOAS([]oas.HttpMonitorConfigHeadersItem{})
-	assert.Equal(t, "", result)
-}
-
-func TestHeadersFromOAS_SingleHeader(t *testing.T) {
-	items := []oas.HttpMonitorConfigHeadersItem{
-		{Name: "Content-Type", Value: "text/plain"},
-	}
-	result := headersFromOAS(items)
-	assert.JSONEq(t, `{"Content-Type":"text/plain"}`, result)
-}
-
-func TestHeadersFromOAS_MultipleHeaders(t *testing.T) {
-	items := []oas.HttpMonitorConfigHeadersItem{
-		{Name: "Authorization", Value: "Bearer abc"},
-		{Name: "Accept", Value: "application/json"},
-	}
-	result := headersFromOAS(items)
-	assert.JSONEq(t, `{"Authorization":"Bearer abc","Accept":"application/json"}`, result)
-}
-
-func TestHeadersFromOAS_LastValueWins(t *testing.T) {
-	items := []oas.HttpMonitorConfigHeadersItem{
-		{Name: "X-Dup", Value: "first"},
-		{Name: "X-Dup", Value: "second"},
-	}
-	result := headersFromOAS(items)
-	assert.JSONEq(t, `{"X-Dup":"second"}`, result)
-}
-
-func TestHeadersRoundTrip(t *testing.T) {
-	input := []oas.HttpMonitorConfigHeadersItem{
-		{Name: "Content-Type", Value: "application/json"},
-		{Name: "Authorization", Value: "Bearer xyz"},
-	}
-
-	dbString := headersFromOAS(input)
-	oasItems := headersToOAS(dbString)
-
-	require.Len(t, oasItems, 2)
-	byName := map[string]string{}
-	for _, item := range oasItems {
-		byName[item.Name] = item.Value
-	}
-	assert.Equal(t, "application/json", byName["Content-Type"])
-	assert.Equal(t, "Bearer xyz", byName["Authorization"])
-}
 
 func TestMonitorFromInput_HttpConfig(t *testing.T) {
 	req := &oas.MonitorInput{
@@ -125,19 +45,22 @@ func TestMonitorFromInput_HttpConfig(t *testing.T) {
 	assert.Equal(t, "http", m.Type)
 	assert.True(t, m.Active)
 	assert.Equal(t, "user-123", m.UserID)
-	assert.Equal(t, "https://example.com", m.URL)
-	assert.Equal(t, "GET", m.Method)
-	assert.JSONEq(t, `{"Authorization":"Bearer token"}`, m.Headers)
-	assert.Equal(t, `{"key":"val"}`, m.Body)
-	assert.Equal(t, "user", m.BasicAuthUser)
-	assert.Equal(t, "pass", m.BasicAuthPass)
-	assert.Equal(t, 5, m.MaxRedirects)
-	assert.JSONEq(t, `["200","201"]`, m.AcceptedStatusCodes)
-	assert.True(t, m.IgnoreTLS)
-	assert.Equal(t, "OK", m.Keyword)
-	assert.True(t, m.InvertKeyword)
-	assert.Equal(t, "$.status", m.JsonPath)
-	assert.Equal(t, "healthy", m.ExpectedValue)
+	assert.NotEmpty(t, m.ConfigJSON)
+
+	var cfg oas.MonitorConfig
+	require.NoError(t, json.Unmarshal([]byte(m.ConfigJSON), &cfg))
+	require.Equal(t, oas.HttpMonitorConfigMonitorConfig, cfg.Type)
+	assert.Equal(t, "https://example.com", cfg.HttpMonitorConfig.URL.Value)
+	assert.Equal(t, oas.HttpMonitorConfigMethod("GET"), cfg.HttpMonitorConfig.Method.Value)
+	assert.Equal(t, "user", cfg.HttpMonitorConfig.BasicAuthUser.Value)
+	assert.Equal(t, "pass", cfg.HttpMonitorConfig.BasicAuthPass.Value)
+	assert.Equal(t, 5, cfg.HttpMonitorConfig.MaxRedirects.Value)
+	assert.Equal(t, []string{"200", "201"}, cfg.HttpMonitorConfig.AcceptedStatusCodes)
+	assert.True(t, cfg.HttpMonitorConfig.IgnoreTls.Value)
+	assert.Equal(t, "OK", cfg.HttpMonitorConfig.Keyword.Value)
+	assert.True(t, cfg.HttpMonitorConfig.InvertKeyword.Value)
+	assert.Equal(t, "$.status", cfg.HttpMonitorConfig.JsonPath.Value)
+	assert.Equal(t, "healthy", cfg.HttpMonitorConfig.ExpectedValue.Value)
 }
 
 func TestMonitorFromInput_PortConfig(t *testing.T) {
@@ -160,10 +83,13 @@ func TestMonitorFromInput_PortConfig(t *testing.T) {
 
 	assert.Equal(t, "Port Test", m.Name)
 	assert.Equal(t, "port", m.Type)
-	assert.Equal(t, "db.example.com", m.Hostname)
-	require.NotNil(t, m.Port)
-	assert.Equal(t, 5432, *m.Port)
-	assert.True(t, m.IgnoreTLS)
+
+	var cfg oas.MonitorConfig
+	require.NoError(t, json.Unmarshal([]byte(m.ConfigJSON), &cfg))
+	require.Equal(t, oas.PortMonitorConfigMonitorConfig, cfg.Type)
+	assert.Equal(t, "db.example.com", cfg.PortMonitorConfig.Hostname.Value)
+	assert.Equal(t, 5432, cfg.PortMonitorConfig.Port.Value)
+	assert.True(t, cfg.PortMonitorConfig.IgnoreTls.Value)
 }
 
 func TestMonitorFromInput_PingConfig(t *testing.T) {
@@ -183,9 +109,11 @@ func TestMonitorFromInput_PingConfig(t *testing.T) {
 
 	m := monitorFromInput(req, "user-123")
 
-	assert.Equal(t, "ping", m.Type)
-	assert.Equal(t, "gateway.local", m.Hostname)
-	assert.Equal(t, 128, m.PacketSize)
+	var cfg oas.MonitorConfig
+	require.NoError(t, json.Unmarshal([]byte(m.ConfigJSON), &cfg))
+	require.Equal(t, oas.PingMonitorConfigMonitorConfig, cfg.Type)
+	assert.Equal(t, "gateway.local", cfg.PingMonitorConfig.Hostname.Value)
+	assert.Equal(t, 128, cfg.PingMonitorConfig.PacketSize.Value)
 }
 
 func TestMonitorFromInput_DnsConfig(t *testing.T) {
@@ -206,12 +134,13 @@ func TestMonitorFromInput_DnsConfig(t *testing.T) {
 
 	m := monitorFromInput(req, "user-123")
 
-	assert.Equal(t, "dns", m.Type)
-	assert.Equal(t, "example.com", m.Hostname)
-	require.NotNil(t, m.Port)
-	assert.Equal(t, 53, *m.Port)
-	assert.Equal(t, "A", m.DNSResolveType)
-	assert.Equal(t, "8.8.8.8", m.DNSResolveServer)
+	var cfg oas.MonitorConfig
+	require.NoError(t, json.Unmarshal([]byte(m.ConfigJSON), &cfg))
+	require.Equal(t, oas.DnsMonitorConfigMonitorConfig, cfg.Type)
+	assert.Equal(t, "example.com", cfg.DnsMonitorConfig.Hostname.Value)
+	assert.Equal(t, 53, cfg.DnsMonitorConfig.Port.Value)
+	assert.Equal(t, oas.DnsMonitorConfigDnsResolveType("A"), cfg.DnsMonitorConfig.DnsResolveType.Value)
+	assert.Equal(t, "8.8.8.8", cfg.DnsMonitorConfig.DnsResolveServer.Value)
 }
 
 func TestMonitorFromInput_MqttConfig(t *testing.T) {
@@ -235,15 +164,15 @@ func TestMonitorFromInput_MqttConfig(t *testing.T) {
 
 	m := monitorFromInput(req, "user-123")
 
-	assert.Equal(t, "mqtt", m.Type)
-	assert.Equal(t, "broker.local", m.Hostname)
-	require.NotNil(t, m.Port)
-	assert.Equal(t, 1883, *m.Port)
-	assert.Equal(t, "health/check", m.MQTTTopic)
-	assert.Equal(t, "alive", m.MQTTSuccessMessage)
-	assert.Equal(t, "mqttuser", m.MQTTUsername)
-	assert.Equal(t, "mqttpass", m.MQTTPassword)
-	assert.False(t, m.IgnoreTLS)
+	var cfg oas.MonitorConfig
+	require.NoError(t, json.Unmarshal([]byte(m.ConfigJSON), &cfg))
+	require.Equal(t, oas.MqttMonitorConfigMonitorConfig, cfg.Type)
+	assert.Equal(t, "broker.local", cfg.MqttMonitorConfig.Hostname.Value)
+	assert.Equal(t, 1883, cfg.MqttMonitorConfig.Port.Value)
+	assert.Equal(t, "health/check", cfg.MqttMonitorConfig.MqttTopic.Value)
+	assert.Equal(t, "alive", cfg.MqttMonitorConfig.MqttSuccessMessage.Value)
+	assert.Equal(t, "mqttuser", cfg.MqttMonitorConfig.MqttUsername.Value)
+	assert.Equal(t, "mqttpass", cfg.MqttMonitorConfig.MqttPassword.Value)
 }
 
 func TestMonitorFromInput_GrpcConfig(t *testing.T) {
@@ -253,24 +182,26 @@ func TestMonitorFromInput_GrpcConfig(t *testing.T) {
 		Config: oas.MonitorConfig{
 			Type: oas.GrpcMonitorConfigMonitorConfig,
 			GrpcMonitorConfig: oas.GrpcMonitorConfig{
-				Kind:           "grpc-keyword",
-				GrpcUrl:        oas.OptString{Value: "grpc.example.com:443", Set: true},
+				Kind:            "grpc-keyword",
+				GrpcUrl:         oas.OptString{Value: "grpc.example.com:443", Set: true},
 				GrpcServiceName: oas.OptString{Value: "health.v1.Health", Set: true},
-				GrpcMethod:     oas.OptString{Value: "Check", Set: true},
-				GrpcEnableTls:  oas.OptBool{Value: true, Set: true},
-				IgnoreTls:      oas.OptBool{Value: false, Set: true},
+				GrpcMethod:      oas.OptString{Value: "Check", Set: true},
+				GrpcEnableTls:   oas.OptBool{Value: true, Set: true},
+				IgnoreTls:       oas.OptBool{Value: false, Set: true},
 			},
 		},
 	}
 
 	m := monitorFromInput(req, "user-123")
 
-	assert.Equal(t, "grpc-keyword", m.Type)
-	assert.Equal(t, "grpc.example.com:443", m.GRPCUrl)
-	assert.Equal(t, "health.v1.Health", m.GRPCServiceName)
-	assert.Equal(t, "Check", m.GRPCMethod)
-	assert.True(t, m.GRPCEnableTLS)
-	assert.False(t, m.IgnoreTLS)
+	var cfg oas.MonitorConfig
+	require.NoError(t, json.Unmarshal([]byte(m.ConfigJSON), &cfg))
+	require.Equal(t, oas.GrpcMonitorConfigMonitorConfig, cfg.Type)
+	assert.Equal(t, "grpc.example.com:443", cfg.GrpcMonitorConfig.GrpcUrl.Value)
+	assert.Equal(t, "health.v1.Health", cfg.GrpcMonitorConfig.GrpcServiceName.Value)
+	assert.Equal(t, "Check", cfg.GrpcMonitorConfig.GrpcMethod.Value)
+	assert.True(t, cfg.GrpcMonitorConfig.GrpcEnableTls.Value)
+	assert.False(t, cfg.GrpcMonitorConfig.IgnoreTls.Value)
 }
 
 func TestMonitorFromInput_RedisConfig(t *testing.T) {
@@ -290,11 +221,12 @@ func TestMonitorFromInput_RedisConfig(t *testing.T) {
 
 	m := monitorFromInput(req, "user-123")
 
-	assert.Equal(t, "redis", m.Type)
-	assert.Equal(t, "redis.local", m.Hostname)
-	require.NotNil(t, m.Port)
-	assert.Equal(t, 6379, *m.Port)
-	assert.Equal(t, "PING", m.DatabaseQuery)
+	var cfg oas.MonitorConfig
+	require.NoError(t, json.Unmarshal([]byte(m.ConfigJSON), &cfg))
+	require.Equal(t, oas.RedisMonitorConfigMonitorConfig, cfg.Type)
+	assert.Equal(t, "redis.local", cfg.RedisMonitorConfig.Hostname.Value)
+	assert.Equal(t, 6379, cfg.RedisMonitorConfig.Port.Value)
+	assert.Equal(t, "PING", cfg.RedisMonitorConfig.DatabaseQuery.Value)
 }
 
 func TestMonitorFromInput_SmtpConfig(t *testing.T) {
@@ -314,40 +246,29 @@ func TestMonitorFromInput_SmtpConfig(t *testing.T) {
 
 	m := monitorFromInput(req, "user-123")
 
-	assert.Equal(t, "smtp", m.Type)
-	assert.Equal(t, "mail.example.com", m.Hostname)
-	require.NotNil(t, m.Port)
-	assert.Equal(t, 587, *m.Port)
-	assert.False(t, m.IgnoreTLS)
+	var cfg oas.MonitorConfig
+	require.NoError(t, json.Unmarshal([]byte(m.ConfigJSON), &cfg))
+	require.Equal(t, oas.SmtpMonitorConfigMonitorConfig, cfg.Type)
+	assert.Equal(t, "mail.example.com", cfg.SmtpMonitorConfig.Hostname.Value)
+	assert.Equal(t, 587, cfg.SmtpMonitorConfig.Port.Value)
+	assert.False(t, cfg.SmtpMonitorConfig.IgnoreTls.Value)
 }
 
 func TestMonitorToOAS_HttpConfig(t *testing.T) {
-	port := 443
+	configJSON := `{"kind":"http","url":"https://example.com","method":"POST","headers":[{"name":"Content-Type","value":"application/json"}],"body":"{\"ping\":true}","basicAuthUser":"admin","basicAuthPass":"secret","maxRedirects":3,"acceptedStatusCodes":["200","204"],"ignoreTls":true,"keyword":"success","invertKeyword":true,"jsonPath":"$.status","expectedValue":"ok"}`
+
 	m := &Monitor{
-		ID:                  "mon-1",
-		Name:                "HTTP Mon",
-		Type:                "http",
-		Active:              true,
-		Interval:            30,
-		URL:                 "https://example.com",
-		Method:              "POST",
-		Headers:             `{"Content-Type":"application/json"}`,
-		Body:                `{"ping":true}`,
-		BasicAuthUser:       "admin",
-		BasicAuthPass:       "secret",
-		MaxRedirects:        3,
-		AcceptedStatusCodes: `["200","204"]`,
-		IgnoreTLS:           true,
-		Keyword:             "success",
-		InvertKeyword:       true,
-		JsonPath:            "$.status",
-		ExpectedValue:       "ok",
-		Port:                &port,
-		Timeout:             30,
-		MaxRetries:          2,
-		RetryInterval:       10,
-		ResendInterval:      60,
-		ExpiryNotification:  true,
+		ID:                 "mon-1",
+		Name:               "HTTP Mon",
+		Type:               "http",
+		Active:             true,
+		Interval:           30,
+		Timeout:            30,
+		MaxRetries:         2,
+		RetryInterval:      10,
+		ResendInterval:     60,
+		ExpiryNotification: true,
+		ConfigJSON:         configJSON,
 	}
 
 	result := monitorToOAS(m)
@@ -378,16 +299,15 @@ func TestMonitorToOAS_HttpConfig(t *testing.T) {
 }
 
 func TestMonitorToOAS_PortConfig(t *testing.T) {
-	port := 5432
+	configJSON := `{"kind":"port","hostname":"db.local","port":5432,"ignoreTls":true}`
+
 	m := &Monitor{
-		ID:        "mon-2",
-		Name:      "Port Mon",
-		Type:      "port",
-		Active:    true,
-		Hostname:  "db.local",
-		Port:      &port,
-		IgnoreTLS: true,
-		Interval:  60,
+		ID:         "mon-2",
+		Name:       "Port Mon",
+		Type:       "port",
+		Active:     true,
+		Interval:   60,
+		ConfigJSON: configJSON,
 	}
 
 	result := monitorToOAS(m)
@@ -402,14 +322,15 @@ func TestMonitorToOAS_PortConfig(t *testing.T) {
 }
 
 func TestMonitorToOAS_PingConfig(t *testing.T) {
+	configJSON := `{"kind":"ping","hostname":"router.local","packetSize":64}`
+
 	m := &Monitor{
 		ID:         "mon-3",
 		Name:       "Ping Mon",
 		Type:       "ping",
 		Active:     true,
-		Hostname:   "router.local",
-		PacketSize: 64,
 		Interval:   30,
+		ConfigJSON: configJSON,
 	}
 
 	result := monitorToOAS(m)
@@ -422,33 +343,50 @@ func TestMonitorToOAS_PingConfig(t *testing.T) {
 	assert.Equal(t, 64, cfg.PacketSize.Value)
 }
 
+func TestMonitorToOAS_EmptyConfig(t *testing.T) {
+	m := &Monitor{
+		ID:         "mon-4",
+		Name:       "Empty",
+		Type:       "http",
+		Active:     true,
+		Interval:   60,
+		ConfigJSON: "{}",
+	}
+
+	result := monitorToOAS(m)
+	assert.False(t, result.Config.Set)
+}
+
 func TestBuildConfigFromDomain_AllTypes(t *testing.T) {
 	tests := []struct {
 		name         string
 		monitorType  string
+		configJSON   string
 		expectedType oas.MonitorConfigType
 	}{
-		{"http", "http", oas.HttpMonitorConfigMonitorConfig},
-		{"port", "port", oas.PortMonitorConfigMonitorConfig},
-		{"ping", "ping", oas.PingMonitorConfigMonitorConfig},
-		{"dns", "dns", oas.DnsMonitorConfigMonitorConfig},
-		{"grpc-keyword", "grpc-keyword", oas.GrpcMonitorConfigMonitorConfig},
-		{"mqtt", "mqtt", oas.MqttMonitorConfigMonitorConfig},
-		{"redis", "redis", oas.RedisMonitorConfigMonitorConfig},
-		{"smtp", "smtp", oas.SmtpMonitorConfigMonitorConfig},
-		{"tailscale-ping", "tailscale-ping", oas.TailscalePingMonitorConfigMonitorConfig},
-		{"group", "group", oas.GroupMonitorConfigMonitorConfig},
+		{"http", "http", `{"kind":"http","url":"https://example.com"}`, oas.HttpMonitorConfigMonitorConfig},
+		{"port", "port", `{"kind":"port","hostname":"x"}`, oas.PortMonitorConfigMonitorConfig},
+		{"ping", "ping", `{"kind":"ping","hostname":"x"}`, oas.PingMonitorConfigMonitorConfig},
+		{"dns", "dns", `{"kind":"dns","hostname":"x"}`, oas.DnsMonitorConfigMonitorConfig},
+		{"grpc-keyword", "grpc-keyword", `{"kind":"grpc-keyword","grpcUrl":"x"}`, oas.GrpcMonitorConfigMonitorConfig},
+		{"mqtt", "mqtt", `{"kind":"mqtt","hostname":"x"}`, oas.MqttMonitorConfigMonitorConfig},
+		{"redis", "redis", `{"kind":"redis","hostname":"x"}`, oas.RedisMonitorConfigMonitorConfig},
+		{"smtp", "smtp", `{"kind":"smtp","hostname":"x"}`, oas.SmtpMonitorConfigMonitorConfig},
+		{"tailscale-ping", "tailscale-ping", `{"kind":"tailscale-ping","hostname":"x"}`, oas.TailscalePingMonitorConfigMonitorConfig},
+		{"group", "group", `{"kind":"group","tagIds":[]}`, oas.GroupMonitorConfigMonitorConfig},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			m := &Monitor{
-				ID:   "mon-x",
-				Name: "Test " + tt.monitorType,
-				Type: tt.monitorType,
+				ID:         "mon-x",
+				Name:       "Test " + tt.monitorType,
+				Type:       tt.monitorType,
+				ConfigJSON: tt.configJSON,
 			}
-			cfg := buildConfigFromDomain(m)
-			assert.Equal(t, tt.expectedType, cfg.Type)
+			result := monitorToOAS(m)
+			require.True(t, result.Config.Set)
+			assert.Equal(t, tt.expectedType, result.Config.Value.Type)
 		})
 	}
 }
@@ -473,7 +411,7 @@ func TestGroupConfig_TagIdsRoundTrip(t *testing.T) {
 	}
 
 	m := monitorFromInput(req, "user-1")
-	assert.JSONEq(t, `["550e8400-e29b-41d4-a716-446655440001","550e8400-e29b-41d4-a716-446655440002"]`, m.GroupTagIDs)
+	assert.NotEmpty(t, m.ConfigJSON)
 
 	oasResult := monitorToOAS(m)
 	require.True(t, oasResult.Config.Set)
@@ -498,9 +436,35 @@ func TestGroupConfig_EmptyTagIds(t *testing.T) {
 	}
 
 	m := monitorFromInput(req, "user-1")
-	assert.Equal(t, "", m.GroupTagIDs)
 
 	oasResult := monitorToOAS(m)
+	require.True(t, oasResult.Config.Set)
 	groupCfg := oasResult.Config.Value.GroupMonitorConfig
 	assert.Empty(t, groupCfg.TagIds)
+}
+
+func TestMonitorRoundTrip_HttpConfig(t *testing.T) {
+	req := &oas.MonitorInput{
+		Name: "Roundtrip HTTP",
+		Type: "http",
+		Config: oas.MonitorConfig{
+			Type: oas.HttpMonitorConfigMonitorConfig,
+			HttpMonitorConfig: oas.HttpMonitorConfig{
+				Kind:                "http",
+				URL:                 oas.OptString{Value: "https://roundtrip.test", Set: true},
+				Method:              oas.OptHttpMonitorConfigMethod{Value: "PUT", Set: true},
+				AcceptedStatusCodes: []string{"200-299"},
+				IgnoreTls:           oas.OptBool{Value: false, Set: true},
+			},
+		},
+	}
+
+	m := monitorFromInput(req, "user-rt")
+	result := monitorToOAS(m)
+
+	require.True(t, result.Config.Set)
+	cfg := result.Config.Value.HttpMonitorConfig
+	assert.Equal(t, "https://roundtrip.test", cfg.URL.Value)
+	assert.Equal(t, oas.HttpMonitorConfigMethod("PUT"), cfg.Method.Value)
+	assert.Equal(t, []string{"200-299"}, cfg.AcceptedStatusCodes)
 }

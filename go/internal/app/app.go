@@ -433,14 +433,10 @@ func (a *monitorNotificationAdapter) Dispatch(ctx context.Context, monitorID str
 	}
 
 	monInfo := &corenotification.MonitorInfo{
-		Name:     mon.Name,
-		URL:      mon.URL,
-		Type:     mon.Type,
-		Hostname: mon.Hostname,
+		Name: mon.Name,
+		Type: mon.Type,
 	}
-	if mon.Port != nil {
-		monInfo.Port = *mon.Port
-	}
+	extractNotificationFields(mon.ConfigJSON, monInfo)
 
 	hbInfo := &corenotification.HeartbeatInfo{
 		Status:  int(current),
@@ -524,4 +520,21 @@ func (a *tagReaderAdapter) GetMonitorTags(ctx context.Context, monitorID string)
 		})
 	}
 	return result, nil
+}
+
+func extractNotificationFields(configJSON string, info *corenotification.MonitorInfo) {
+	if configJSON == "" || configJSON == "{}" {
+		return
+	}
+	var raw struct {
+		URL      string `json:"url"`
+		Hostname string `json:"hostname"`
+		Port     int    `json:"port"`
+	}
+	if err := json.Unmarshal([]byte(configJSON), &raw); err != nil {
+		return
+	}
+	info.URL = raw.URL
+	info.Hostname = raw.Hostname
+	info.Port = raw.Port
 }

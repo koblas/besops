@@ -185,7 +185,7 @@ func TestHTTPCheckerHeaders(t *testing.T) {
 	checker := NewHTTPChecker()
 	cfg := &monitor.Config{
 		URL:     srv.URL,
-		HTTP:    monitor.HTTPConfig{Method: "GET", Headers: map[string]string{"X-Custom": "test-value"}},
+		HTTP:    monitor.HTTPConfig{Method: "GET", Headers: []monitor.HeaderPair{{Name: "X-Custom", Value: "test-value"}}},
 		Timeout: 5 * time.Second,
 	}
 
@@ -361,6 +361,64 @@ func containsSubstring(s, substr string) bool {
 		}
 	}
 	return false
+}
+
+func TestHTTPCheckerDefaultContentTypeWithBody(t *testing.T) {
+	var receivedContentType string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		receivedContentType = r.Header.Get("Content-Type")
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer srv.Close()
+
+	checker := NewHTTPChecker()
+	cfg := &monitor.Config{
+		URL:     srv.URL,
+		HTTP:    monitor.HTTPConfig{Method: "POST", Body: `{"key":"value"}`},
+		Timeout: 5 * time.Second,
+	}
+
+	result, err := checker.Check(t.Context(), cfg)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if result.Status != status.Up {
+		t.Errorf("expected Up, got %v: %s", result.Status, result.Message)
+	}
+	if receivedContentType != "application/json" {
+		t.Errorf("expected Content-Type application/json, got %q", receivedContentType)
+	}
+}
+
+func TestHTTPCheckerExplicitContentTypeNotOverridden(t *testing.T) {
+	var receivedContentType string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		receivedContentType = r.Header.Get("Content-Type")
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer srv.Close()
+
+	checker := NewHTTPChecker()
+	cfg := &monitor.Config{
+		URL: srv.URL,
+		HTTP: monitor.HTTPConfig{
+			Method:  "POST",
+			Body:    "name=value",
+			Headers: []monitor.HeaderPair{{Name: "Content-Type", Value: "application/x-www-form-urlencoded"}},
+		},
+		Timeout: 5 * time.Second,
+	}
+
+	result, err := checker.Check(t.Context(), cfg)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if result.Status != status.Up {
+		t.Errorf("expected Up, got %v: %s", result.Status, result.Message)
+	}
+	if receivedContentType != "application/x-www-form-urlencoded" {
+		t.Errorf("expected Content-Type application/x-www-form-urlencoded, got %q", receivedContentType)
+	}
 }
 
 func TestHTTPCheckerTimeout(t *testing.T) {

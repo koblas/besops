@@ -137,69 +137,122 @@ func modelToConfig(mon *domainmonitor.Monitor) *Config {
 		ID:            mon.ID,
 		Type:          mon.Type,
 		Name:          mon.Name,
-		URL:           mon.URL,
-		Hostname:      mon.Hostname,
 		Interval:      time.Duration(mon.Interval) * time.Second,
 		Timeout:       time.Duration(mon.Timeout) * time.Second,
 		MaxRetries:    mon.MaxRetries,
 		RetryInterval: time.Duration(mon.RetryInterval) * time.Second,
-		IgnoreTLS:     mon.IgnoreTLS,
-		Keyword:       mon.Keyword,
-		JsonPath:      mon.JsonPath,
-		ExpectedValue: mon.ExpectedValue,
-		ProxyID: mon.ProxyID,
-		HTTP: HTTPConfig{
-			Method:        mon.Method,
-			Body:          mon.Body,
-			BasicAuthUser: mon.BasicAuthUser,
-			BasicAuthPass: mon.BasicAuthPass,
-		},
-		DNS: DNSConfig{
-			ResolveType: mon.DNSResolveType,
-		},
-		MQTT: MQTTConfig{
-			Topic:          mon.MQTTTopic,
-			Username:       mon.MQTTUsername,
-			Password:       mon.MQTTPassword,
-			SuccessMessage: mon.MQTTSuccessMessage,
-		},
-		GRPC: GRPCConfig{
-			URL:         mon.GRPCUrl,
-			ServiceName: mon.GRPCServiceName,
-			Method:      mon.GRPCMethod,
-			Body:        mon.GRPCBody,
-			Protobuf:    mon.GRPCProtobuf,
-			EnableTLS:   mon.GRPCEnableTLS,
-		},
-		SMTP: SMTPConfig{},
-		Redis: RedisConfig{
-			ConnectionString: mon.DatabaseQuery,
-		},
 	}
 
-	if mon.Port != nil {
-		cfg.Port = *mon.Port
+	if mon.ConfigJSON == "" || mon.ConfigJSON == "{}" {
+		return cfg
 	}
 
-	if mon.Headers != "" {
-		_ = json.Unmarshal([]byte(mon.Headers), &cfg.HTTP.Headers)
+	var raw map[string]json.RawMessage
+	if err := json.Unmarshal([]byte(mon.ConfigJSON), &raw); err != nil {
+		return cfg
 	}
 
-	if mon.AcceptedStatusCodes != "" {
-		_ = json.Unmarshal([]byte(mon.AcceptedStatusCodes), &cfg.HTTP.AcceptedStatusCodes)
+	cfg.Hostname = jsonString(raw, "hostname")
+	cfg.Port = jsonInt(raw, "port")
+	cfg.IgnoreTLS = jsonBool(raw, "ignoreTls")
+	cfg.Keyword = jsonString(raw, "keyword")
+	cfg.JsonPath = jsonString(raw, "jsonPath")
+	cfg.ExpectedValue = jsonString(raw, "expectedValue")
+
+	if v := jsonString(raw, "proxyId"); v != "" {
+		cfg.ProxyID = &v
 	}
 
-	if mon.InvertKeyword {
-		cfg.KeywordType = "not contain"
-	} else if mon.Keyword != "" {
-		cfg.KeywordType = "contain"
-	}
-
-	if mon.GroupTagIDs != "" {
-		_ = json.Unmarshal([]byte(mon.GroupTagIDs), &cfg.GroupTagIDs)
+	switch mon.Type {
+	case "http":
+		cfg.URL = jsonString(raw, "url")
+		cfg.HTTP.Method = jsonString(raw, "method")
+		cfg.HTTP.Body = jsonString(raw, "body")
+		cfg.HTTP.BasicAuthUser = jsonString(raw, "basicAuthUser")
+		cfg.HTTP.BasicAuthPass = jsonString(raw, "basicAuthPass")
+		if h, ok := raw["headers"]; ok {
+			cfg.HTTP.Headers = jsonHeaderPairs(h)
+		}
+		if sc, ok := raw["acceptedStatusCodes"]; ok {
+			_ = json.Unmarshal(sc, &cfg.HTTP.AcceptedStatusCodes)
+		}
+		if jsonBool(raw, "invertKeyword") {
+			cfg.KeywordType = "not contain"
+		} else if cfg.Keyword != "" {
+			cfg.KeywordType = "contain"
+		}
+	case "dns":
+		cfg.DNS.ResolveType = jsonString(raw, "dnsResolveType")
+	case "mqtt":
+		cfg.MQTT.Topic = jsonString(raw, "mqttTopic")
+		cfg.MQTT.Username = jsonString(raw, "mqttUsername")
+		cfg.MQTT.Password = jsonString(raw, "mqttPassword")
+		cfg.MQTT.SuccessMessage = jsonString(raw, "mqttSuccessMessage")
+	case "grpc-keyword":
+		cfg.GRPC.URL = jsonString(raw, "grpcUrl")
+		cfg.GRPC.ServiceName = jsonString(raw, "grpcServiceName")
+		cfg.GRPC.Method = jsonString(raw, "grpcMethod")
+		cfg.GRPC.EnableTLS = jsonBool(raw, "grpcEnableTls")
+	case "redis":
+		cfg.Redis.ConnectionString = jsonString(raw, "databaseQuery")
+	case "group":
+		if tids, ok := raw["tagIds"]; ok {
+			_ = json.Unmarshal(tids, &cfg.GroupTagIDs)
+		}
 	}
 
 	return cfg
+}
+
+func jsonString(raw map[string]json.RawMessage, key string) string {
+	v, ok := raw[key]
+	if !ok {
+		return ""
+	}
+	var s string
+	if err := json.Unmarshal(v, &s); err != nil {
+		return ""
+	}
+	return s
+}
+
+func jsonInt(raw map[string]json.RawMessage, key string) int {
+	v, ok := raw[key]
+	if !ok {
+		return 0
+	}
+	var n int
+	if err := json.Unmarshal(v, &n); err != nil {
+		return 0
+	}
+	return n
+}
+
+func jsonHeaderPairs(data json.RawMessage) []HeaderPair {
+	var raw []struct {
+		Name  string `json:"name"`
+		Value string `json:"value"`
+	}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return nil
+	}
+	pairs := make([]HeaderPair, len(raw))
+	for i, r := range raw {
+		pairs[i] = HeaderPair{Name: r.Name, Value: r.Value}
+	}
+	return pairs
+}
+
+func jsonBool(raw map[string]json.RawMessage, key string) bool {
+	v, ok := raw[key]
+	if !ok {
+		return false
+	}
+	var b bool
+	if err := json.Unmarshal(v, &b); err != nil {
+		return false
+	}
+	return b
 }
 
 // resultRecorder implements ResultHandler by persisting heartbeats and dispatching notifications.

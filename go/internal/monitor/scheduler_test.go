@@ -100,7 +100,7 @@ func (p *noopPublisher) Publish(_ broadcast.Event) {}
 
 func TestSchedulerImmediateCheck(t *testing.T) {
 	store := &mockStore{monitors: map[string]*domainmonitor.Monitor{
-		"m1": {ID: "m1", Name: "test", Type: "http", URL: "http://example.com", Interval: 3600, Timeout: 5, Active: true, Method: "GET"},
+		"m1": {ID: "m1", Name: "test", Type: "http", Interval: 3600, Timeout: 5, Active: true, ConfigJSON: `{"kind":"http","url":"http://example.com","method":"GET"}`},
 	}}
 	hbStore := &mockHBStore{}
 	checker := &mockCheckerSched{results: []CheckResult{{Status: status.Up, Latency: 42, Message: "ok"}}}
@@ -118,7 +118,7 @@ func TestSchedulerImmediateCheck(t *testing.T) {
 
 func TestSchedulerInterval(t *testing.T) {
 	store := &mockStore{monitors: map[string]*domainmonitor.Monitor{
-		"m1": {ID: "m1", Name: "test", Type: "http", URL: "http://example.com", Interval: 1, Timeout: 5, Active: true, Method: "GET"},
+		"m1": {ID: "m1", Name: "test", Type: "http", Interval: 1, Timeout: 5, Active: true, ConfigJSON: `{"kind":"http","url":"http://example.com","method":"GET"}`},
 	}}
 	hbStore := &mockHBStore{}
 	checker := &mockCheckerSched{results: []CheckResult{{Status: status.Up, Latency: 10, Message: "ok"}}}
@@ -134,7 +134,7 @@ func TestSchedulerInterval(t *testing.T) {
 
 func TestSchedulerRetry(t *testing.T) {
 	store := &mockStore{monitors: map[string]*domainmonitor.Monitor{
-		"m1": {ID: "m1", Name: "retry", Type: "http", URL: "http://example.com", Interval: 3600, Timeout: 5, MaxRetries: 3, RetryInterval: 1, Active: true, Method: "GET"},
+		"m1": {ID: "m1", Name: "retry", Type: "http", Interval: 3600, Timeout: 5, MaxRetries: 3, RetryInterval: 1, Active: true, ConfigJSON: `{"kind":"http","url":"http://example.com","method":"GET"}`},
 	}}
 	hbStore := &mockHBStore{}
 	checker := &mockCheckerSched{results: []CheckResult{
@@ -157,7 +157,7 @@ func TestSchedulerRetry(t *testing.T) {
 
 func TestSchedulerRetryExhausted(t *testing.T) {
 	store := &mockStore{monitors: map[string]*domainmonitor.Monitor{
-		"m1": {ID: "m1", Name: "exhaust", Type: "http", URL: "http://example.com", Interval: 3600, Timeout: 5, MaxRetries: 2, RetryInterval: 1, Active: true, Method: "GET"},
+		"m1": {ID: "m1", Name: "exhaust", Type: "http", Interval: 3600, Timeout: 5, MaxRetries: 2, RetryInterval: 1, Active: true, ConfigJSON: `{"kind":"http","url":"http://example.com","method":"GET"}`},
 	}}
 	hbStore := &mockHBStore{}
 	checker := &mockCheckerSched{results: []CheckResult{{Status: status.Down, Message: "fail"}}}
@@ -175,7 +175,7 @@ func TestSchedulerRetryExhausted(t *testing.T) {
 
 func TestSchedulerRescheduleOnConfigChange(t *testing.T) {
 	store := &mockStore{monitors: map[string]*domainmonitor.Monitor{
-		"m1": {ID: "m1", Name: "slow", Type: "http", URL: "http://example.com", Interval: 3600, Timeout: 5, Active: true, Method: "GET"},
+		"m1": {ID: "m1", Name: "slow", Type: "http", Interval: 3600, Timeout: 5, Active: true, ConfigJSON: `{"kind":"http","url":"http://example.com","method":"GET"}`},
 	}}
 	hbStore := &mockHBStore{}
 	checker := &mockCheckerSched{results: []CheckResult{{Status: status.Up, Latency: 10, Message: "ok"}}}
@@ -206,7 +206,7 @@ func TestSchedulerRescheduleOnConfigChange(t *testing.T) {
 
 func TestSchedulerRemoveMonitor(t *testing.T) {
 	store := &mockStore{monitors: map[string]*domainmonitor.Monitor{
-		"m1": {ID: "m1", Name: "toremove", Type: "http", URL: "http://example.com", Interval: 1, Timeout: 5, Active: true, Method: "GET"},
+		"m1": {ID: "m1", Name: "toremove", Type: "http", Interval: 1, Timeout: 5, Active: true, ConfigJSON: `{"kind":"http","url":"http://example.com","method":"GET"}`},
 	}}
 	hbStore := &mockHBStore{}
 	checker := &mockCheckerSched{results: []CheckResult{{Status: status.Up, Latency: 10, Message: "ok"}}}
@@ -227,7 +227,7 @@ func TestSchedulerRemoveMonitor(t *testing.T) {
 
 func TestSchedulerCheckNow(t *testing.T) {
 	store := &mockStore{monitors: map[string]*domainmonitor.Monitor{
-		"m1": {ID: "m1", Name: "checknow", Type: "http", URL: "http://example.com", Interval: 3600, Timeout: 5, Active: true, Method: "GET"},
+		"m1": {ID: "m1", Name: "checknow", Type: "http", Interval: 3600, Timeout: 5, Active: true, ConfigJSON: `{"kind":"http","url":"http://example.com","method":"GET"}`},
 	}}
 	hbStore := &mockHBStore{}
 	checker := &mockCheckerSched{results: []CheckResult{{Status: status.Up, Latency: 10, Message: "ok"}}}

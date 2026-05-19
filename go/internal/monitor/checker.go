@@ -53,9 +53,14 @@ type Config struct {
 	Redis RedisConfig
 }
 
+type HeaderPair struct {
+	Name  string
+	Value string
+}
+
 type HTTPConfig struct {
 	Method              string
-	Headers             map[string]string
+	Headers             []HeaderPair
 	Body                string
 	AcceptedStatusCodes []string
 	BasicAuthUser       string

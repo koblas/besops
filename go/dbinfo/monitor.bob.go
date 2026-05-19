@@ -60,15 +60,6 @@ var Monitors = Table[
 			Generated: false,
 			AutoIncr:  false,
 		},
-		URL: column{
-			Name:      "url",
-			DBType:    "TEXT",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
 		Type: column{
 			Name:      "type",
 			DBType:    "VARCHAR(30)",
@@ -87,24 +78,6 @@ var Monitors = Table[
 			Generated: false,
 			AutoIncr:  false,
 		},
-		Hostname: column{
-			Name:      "hostname",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		Port: column{
-			Name:      "port",
-			DBType:    "INTEGER",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
 		CreatedDate: column{
 			Name:      "created_date",
 			DBType:    "TIMESTAMP",
@@ -114,27 +87,9 @@ var Monitors = Table[
 			Generated: false,
 			AutoIncr:  false,
 		},
-		Keyword: column{
-			Name:      "keyword",
-			DBType:    "VARCHAR(500)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
 		Maxretries: column{
 			Name:      "maxretries",
 			DBType:    "INTEGER",
-			Default:   "0",
-			Comment:   "",
-			Nullable:  false,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		IgnoreTLS: column{
-			Name:      "ignore_tls",
-			DBType:    "BOOLEAN",
 			Default:   "0",
 			Comment:   "",
 			Nullable:  false,
@@ -150,51 +105,6 @@ var Monitors = Table[
 			Generated: false,
 			AutoIncr:  false,
 		},
-		Maxredirects: column{
-			Name:      "maxredirects",
-			DBType:    "INTEGER",
-			Default:   "10",
-			Comment:   "",
-			Nullable:  false,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		AcceptedStatuscodesJSON: column{
-			Name:      "accepted_statuscodes_json",
-			DBType:    "TEXT",
-			Default:   "'[\"200-299\"]'",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		DNSResolveType: column{
-			Name:      "dns_resolve_type",
-			DBType:    "VARCHAR(10)",
-			Default:   "'A'",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		DNSResolveServer: column{
-			Name:      "dns_resolve_server",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		DNSLastResult: column{
-			Name:      "dns_last_result",
-			DBType:    "TEXT",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
 		RetryInterval: column{
 			Name:      "retry_interval",
 			DBType:    "INTEGER",
@@ -204,261 +114,18 @@ var Monitors = Table[
 			Generated: false,
 			AutoIncr:  false,
 		},
-		PushToken: column{
-			Name:      "push_token",
-			DBType:    "VARCHAR(64)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		Method: column{
-			Name:      "method",
-			DBType:    "VARCHAR(10)",
-			Default:   "'GET'",
+		Timeout: column{
+			Name:      "timeout",
+			DBType:    "INTEGER",
+			Default:   "48",
 			Comment:   "",
 			Nullable:  false,
 			Generated: false,
 			AutoIncr:  false,
 		},
-		Body: column{
-			Name:      "body",
+		Description: column{
+			Name:      "description",
 			DBType:    "TEXT",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		Headers: column{
-			Name:      "headers",
-			DBType:    "TEXT",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		BasicAuthUser: column{
-			Name:      "basic_auth_user",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		BasicAuthPass: column{
-			Name:      "basic_auth_pass",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		ProxyID: column{
-			Name:      "proxy_id",
-			DBType:    "TEXT",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		ExpiryNotification: column{
-			Name:      "expiry_notification",
-			DBType:    "BOOLEAN",
-			Default:   "0",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		MQTTTopic: column{
-			Name:      "mqtt_topic",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		MQTTSuccessMessage: column{
-			Name:      "mqtt_success_message",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		MQTTUsername: column{
-			Name:      "mqtt_username",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		MQTTPassword: column{
-			Name:      "mqtt_password",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		DatabaseConnectionString: column{
-			Name:      "database_connection_string",
-			DBType:    "TEXT",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		DatabaseQuery: column{
-			Name:      "database_query",
-			DBType:    "TEXT",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		AuthMethod: column{
-			Name:      "auth_method",
-			DBType:    "VARCHAR(50)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		AuthDomain: column{
-			Name:      "auth_domain",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		AuthWorkstation: column{
-			Name:      "auth_workstation",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		GRPCURL: column{
-			Name:      "grpc_url",
-			DBType:    "TEXT",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		GRPCProtobuf: column{
-			Name:      "grpc_protobuf",
-			DBType:    "TEXT",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		GRPCBody: column{
-			Name:      "grpc_body",
-			DBType:    "TEXT",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		GRPCMetadata: column{
-			Name:      "grpc_metadata",
-			DBType:    "TEXT",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		GRPCMethod: column{
-			Name:      "grpc_method",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		GRPCServiceName: column{
-			Name:      "grpc_service_name",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		GRPCEnableTLS: column{
-			Name:      "grpc_enable_tls",
-			DBType:    "BOOLEAN",
-			Default:   "0",
-			Comment:   "",
-			Nullable:  false,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		RadiusUsername: column{
-			Name:      "radius_username",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		RadiusPassword: column{
-			Name:      "radius_password",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		RadiusCallingStationID: column{
-			Name:      "radius_calling_station_id",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		RadiusCalledStationID: column{
-			Name:      "radius_called_station_id",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		RadiusSecret: column{
-			Name:      "radius_secret",
-			DBType:    "VARCHAR(255)",
 			Default:   "NULL",
 			Comment:   "",
 			Nullable:  true,
@@ -474,287 +141,8 @@ var Monitors = Table[
 			Generated: false,
 			AutoIncr:  false,
 		},
-		PacketSize: column{
-			Name:      "packet_size",
-			DBType:    "INTEGER",
-			Default:   "56",
-			Comment:   "",
-			Nullable:  false,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		Game: column{
-			Name:      "game",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		HTTPBodyEncoding: column{
-			Name:      "http_body_encoding",
-			DBType:    "VARCHAR(30)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		Description: column{
-			Name:      "description",
-			DBType:    "TEXT",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		TLSCa: column{
-			Name:      "tls_ca",
-			DBType:    "TEXT",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		TLSCert: column{
-			Name:      "tls_cert",
-			DBType:    "TEXT",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		TLSKey: column{
-			Name:      "tls_key",
-			DBType:    "TEXT",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		InvertKeyword: column{
-			Name:      "invert_keyword",
-			DBType:    "BOOLEAN",
-			Default:   "0",
-			Comment:   "",
-			Nullable:  false,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		JSONPath: column{
-			Name:      "json_path",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		ExpectedValue: column{
-			Name:      "expected_value",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		KafkaProducerTopic: column{
-			Name:      "kafka_producer_topic",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		KafkaProducerBrokers: column{
-			Name:      "kafka_producer_brokers",
-			DBType:    "TEXT",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		KafkaProducerSSL: column{
-			Name:      "kafka_producer_ssl",
-			DBType:    "BOOLEAN",
-			Default:   "0",
-			Comment:   "",
-			Nullable:  false,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		KafkaProducerAllowAutoTopicCreation: column{
-			Name:      "kafka_producer_allow_auto_topic_creation",
-			DBType:    "BOOLEAN",
-			Default:   "0",
-			Comment:   "",
-			Nullable:  false,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		KafkaProducerSaslOptions: column{
-			Name:      "kafka_producer_sasl_options",
-			DBType:    "TEXT",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		KafkaProducerMessage: column{
-			Name:      "kafka_producer_message",
-			DBType:    "TEXT",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		OauthClientID: column{
-			Name:      "oauth_client_id",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		OauthClientSecret: column{
-			Name:      "oauth_client_secret",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		OauthTokenURL: column{
-			Name:      "oauth_token_url",
-			DBType:    "TEXT",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		OauthScopes: column{
-			Name:      "oauth_scopes",
-			DBType:    "VARCHAR(500)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		OauthAuthMethod: column{
-			Name:      "oauth_auth_method",
-			DBType:    "VARCHAR(50)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		Timeout: column{
-			Name:      "timeout",
-			DBType:    "INTEGER",
-			Default:   "48",
-			Comment:   "",
-			Nullable:  false,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		GamedigGivenPortOnly: column{
-			Name:      "gamedig_given_port_only",
-			DBType:    "BOOLEAN",
-			Default:   "1",
-			Comment:   "",
-			Nullable:  false,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		SaveResponse: column{
-			Name:      "save_response",
-			DBType:    "BOOLEAN",
-			Default:   "0",
-			Comment:   "",
-			Nullable:  false,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		SaveErrorResponse: column{
-			Name:      "save_error_response",
-			DBType:    "BOOLEAN",
-			Default:   "0",
-			Comment:   "",
-			Nullable:  false,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		ResponseMaxLength: column{
-			Name:      "response_max_length",
-			DBType:    "INTEGER",
-			Default:   "0",
-			Comment:   "",
-			Nullable:  false,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		SystemServiceName: column{
-			Name:      "system_service_name",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		RabbitmqNodes: column{
-			Name:      "rabbitmq_nodes",
-			DBType:    "TEXT",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		RabbitmqUsername: column{
-			Name:      "rabbitmq_username",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		RabbitmqPassword: column{
-			Name:      "rabbitmq_password",
-			DBType:    "VARCHAR(255)",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		RemoteBrowser: column{
-			Name:      "remote_browser",
-			DBType:    "TEXT",
-			Default:   "NULL",
-			Comment:   "",
-			Nullable:  true,
-			Generated: false,
-			AutoIncr:  false,
-		},
-		DomainExpiryNotification: column{
-			Name:      "domain_expiry_notification",
+		ExpiryNotification: column{
+			Name:      "expiry_notification",
 			DBType:    "BOOLEAN",
 			Default:   "0",
 			Comment:   "",
@@ -762,12 +150,12 @@ var Monitors = Table[
 			Generated: false,
 			AutoIncr:  false,
 		},
-		GroupTagIdsJSON: column{
-			Name:      "group_tag_ids_json",
+		ConfigJSON: column{
+			Name:      "config_json",
 			DBType:    "TEXT",
-			Default:   "NULL",
+			Default:   "'{}'",
 			Comment:   "",
-			Nullable:  true,
+			Nullable:  false,
 			Generated: false,
 			AutoIncr:  false,
 		},
@@ -837,95 +225,27 @@ var Monitors = Table[
 }
 
 type monitorColumns struct {
-	ID                                  column
-	Name                                column
-	Active                              column
-	UserID                              column
-	Interval                            column
-	URL                                 column
-	Type                                column
-	Weight                              column
-	Hostname                            column
-	Port                                column
-	CreatedDate                         column
-	Keyword                             column
-	Maxretries                          column
-	IgnoreTLS                           column
-	UpsideDown                          column
-	Maxredirects                        column
-	AcceptedStatuscodesJSON             column
-	DNSResolveType                      column
-	DNSResolveServer                    column
-	DNSLastResult                       column
-	RetryInterval                       column
-	PushToken                           column
-	Method                              column
-	Body                                column
-	Headers                             column
-	BasicAuthUser                       column
-	BasicAuthPass                       column
-	ProxyID                             column
-	ExpiryNotification                  column
-	MQTTTopic                           column
-	MQTTSuccessMessage                  column
-	MQTTUsername                        column
-	MQTTPassword                        column
-	DatabaseConnectionString            column
-	DatabaseQuery                       column
-	AuthMethod                          column
-	AuthDomain                          column
-	AuthWorkstation                     column
-	GRPCURL                             column
-	GRPCProtobuf                        column
-	GRPCBody                            column
-	GRPCMetadata                        column
-	GRPCMethod                          column
-	GRPCServiceName                     column
-	GRPCEnableTLS                       column
-	RadiusUsername                      column
-	RadiusPassword                      column
-	RadiusCallingStationID              column
-	RadiusCalledStationID               column
-	RadiusSecret                        column
-	ResendInterval                      column
-	PacketSize                          column
-	Game                                column
-	HTTPBodyEncoding                    column
-	Description                         column
-	TLSCa                               column
-	TLSCert                             column
-	TLSKey                              column
-	InvertKeyword                       column
-	JSONPath                            column
-	ExpectedValue                       column
-	KafkaProducerTopic                  column
-	KafkaProducerBrokers                column
-	KafkaProducerSSL                    column
-	KafkaProducerAllowAutoTopicCreation column
-	KafkaProducerSaslOptions            column
-	KafkaProducerMessage                column
-	OauthClientID                       column
-	OauthClientSecret                   column
-	OauthTokenURL                       column
-	OauthScopes                         column
-	OauthAuthMethod                     column
-	Timeout                             column
-	GamedigGivenPortOnly                column
-	SaveResponse                        column
-	SaveErrorResponse                   column
-	ResponseMaxLength                   column
-	SystemServiceName                   column
-	RabbitmqNodes                       column
-	RabbitmqUsername                    column
-	RabbitmqPassword                    column
-	RemoteBrowser                       column
-	DomainExpiryNotification            column
-	GroupTagIdsJSON                     column
+	ID                 column
+	Name               column
+	Active             column
+	UserID             column
+	Interval           column
+	Type               column
+	Weight             column
+	CreatedDate        column
+	Maxretries         column
+	UpsideDown         column
+	RetryInterval      column
+	Timeout            column
+	Description        column
+	ResendInterval     column
+	ExpiryNotification column
+	ConfigJSON         column
 }
 
 func (c monitorColumns) AsSlice() []column {
 	return []column{
-		c.ID, c.Name, c.Active, c.UserID, c.Interval, c.URL, c.Type, c.Weight, c.Hostname, c.Port, c.CreatedDate, c.Keyword, c.Maxretries, c.IgnoreTLS, c.UpsideDown, c.Maxredirects, c.AcceptedStatuscodesJSON, c.DNSResolveType, c.DNSResolveServer, c.DNSLastResult, c.RetryInterval, c.PushToken, c.Method, c.Body, c.Headers, c.BasicAuthUser, c.BasicAuthPass, c.ProxyID, c.ExpiryNotification, c.MQTTTopic, c.MQTTSuccessMessage, c.MQTTUsername, c.MQTTPassword, c.DatabaseConnectionString, c.DatabaseQuery, c.AuthMethod, c.AuthDomain, c.AuthWorkstation, c.GRPCURL, c.GRPCProtobuf, c.GRPCBody, c.GRPCMetadata, c.GRPCMethod, c.GRPCServiceName, c.GRPCEnableTLS, c.RadiusUsername, c.RadiusPassword, c.RadiusCallingStationID, c.RadiusCalledStationID, c.RadiusSecret, c.ResendInterval, c.PacketSize, c.Game, c.HTTPBodyEncoding, c.Description, c.TLSCa, c.TLSCert, c.TLSKey, c.InvertKeyword, c.JSONPath, c.ExpectedValue, c.KafkaProducerTopic, c.KafkaProducerBrokers, c.KafkaProducerSSL, c.KafkaProducerAllowAutoTopicCreation, c.KafkaProducerSaslOptions, c.KafkaProducerMessage, c.OauthClientID, c.OauthClientSecret, c.OauthTokenURL, c.OauthScopes, c.OauthAuthMethod, c.Timeout, c.GamedigGivenPortOnly, c.SaveResponse, c.SaveErrorResponse, c.ResponseMaxLength, c.SystemServiceName, c.RabbitmqNodes, c.RabbitmqUsername, c.RabbitmqPassword, c.RemoteBrowser, c.DomainExpiryNotification, c.GroupTagIdsJSON,
+		c.ID, c.Name, c.Active, c.UserID, c.Interval, c.Type, c.Weight, c.CreatedDate, c.Maxretries, c.UpsideDown, c.RetryInterval, c.Timeout, c.Description, c.ResendInterval, c.ExpiryNotification, c.ConfigJSON,
 	}
 }
 

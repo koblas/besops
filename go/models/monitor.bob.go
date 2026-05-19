@@ -26,89 +26,22 @@ import (
 
 // Monitor is an object representing the database table.
 type Monitor struct {
-	ID                                  string           `db:"id,pk" `
-	Name                                string           `db:"name" `
-	Active                              bool             `db:"active" `
-	UserID                              string           `db:"user_id" `
-	Interval                            int64            `db:"interval" `
-	URL                                 null.Val[string] `db:"url" `
-	Type                                string           `db:"type" `
-	Weight                              null.Val[int64]  `db:"weight" `
-	Hostname                            null.Val[string] `db:"hostname" `
-	Port                                null.Val[int64]  `db:"port" `
-	CreatedDate                         time.Time        `db:"created_date" `
-	Keyword                             null.Val[string] `db:"keyword" `
-	Maxretries                          int64            `db:"maxretries" `
-	IgnoreTLS                           bool             `db:"ignore_tls" `
-	UpsideDown                          bool             `db:"upside_down" `
-	Maxredirects                        int64            `db:"maxredirects" `
-	AcceptedStatuscodesJSON             null.Val[string] `db:"accepted_statuscodes_json" `
-	DNSResolveType                      null.Val[string] `db:"dns_resolve_type" `
-	DNSResolveServer                    null.Val[string] `db:"dns_resolve_server" `
-	DNSLastResult                       null.Val[string] `db:"dns_last_result" `
-	RetryInterval                       int64            `db:"retry_interval" `
-	Method                              string           `db:"method" `
-	Body                                null.Val[string] `db:"body" `
-	Headers                             null.Val[string] `db:"headers" `
-	BasicAuthUser                       null.Val[string] `db:"basic_auth_user" `
-	BasicAuthPass                       null.Val[string] `db:"basic_auth_pass" `
-	ProxyID                             null.Val[string] `db:"proxy_id" `
-	ExpiryNotification                  null.Val[bool]   `db:"expiry_notification" `
-	MQTTTopic                           null.Val[string] `db:"mqtt_topic" `
-	MQTTSuccessMessage                  null.Val[string] `db:"mqtt_success_message" `
-	MQTTUsername                        null.Val[string] `db:"mqtt_username" `
-	MQTTPassword                        null.Val[string] `db:"mqtt_password" `
-	DatabaseConnectionString            null.Val[string] `db:"database_connection_string" `
-	DatabaseQuery                       null.Val[string] `db:"database_query" `
-	AuthMethod                          null.Val[string] `db:"auth_method" `
-	AuthDomain                          null.Val[string] `db:"auth_domain" `
-	AuthWorkstation                     null.Val[string] `db:"auth_workstation" `
-	GRPCURL                             null.Val[string] `db:"grpc_url" `
-	GRPCProtobuf                        null.Val[string] `db:"grpc_protobuf" `
-	GRPCBody                            null.Val[string] `db:"grpc_body" `
-	GRPCMetadata                        null.Val[string] `db:"grpc_metadata" `
-	GRPCMethod                          null.Val[string] `db:"grpc_method" `
-	GRPCServiceName                     null.Val[string] `db:"grpc_service_name" `
-	GRPCEnableTLS                       bool             `db:"grpc_enable_tls" `
-	RadiusUsername                      null.Val[string] `db:"radius_username" `
-	RadiusPassword                      null.Val[string] `db:"radius_password" `
-	RadiusCallingStationID              null.Val[string] `db:"radius_calling_station_id" `
-	RadiusCalledStationID               null.Val[string] `db:"radius_called_station_id" `
-	RadiusSecret                        null.Val[string] `db:"radius_secret" `
-	ResendInterval                      int64            `db:"resend_interval" `
-	PacketSize                          int64            `db:"packet_size" `
-	Game                                null.Val[string] `db:"game" `
-	HTTPBodyEncoding                    null.Val[string] `db:"http_body_encoding" `
-	Description                         null.Val[string] `db:"description" `
-	TLSCa                               null.Val[string] `db:"tls_ca" `
-	TLSCert                             null.Val[string] `db:"tls_cert" `
-	TLSKey                              null.Val[string] `db:"tls_key" `
-	InvertKeyword                       bool             `db:"invert_keyword" `
-	JSONPath                            null.Val[string] `db:"json_path" `
-	ExpectedValue                       null.Val[string] `db:"expected_value" `
-	KafkaProducerTopic                  null.Val[string] `db:"kafka_producer_topic" `
-	KafkaProducerBrokers                null.Val[string] `db:"kafka_producer_brokers" `
-	KafkaProducerSSL                    bool             `db:"kafka_producer_ssl" `
-	KafkaProducerAllowAutoTopicCreation bool             `db:"kafka_producer_allow_auto_topic_creation" `
-	KafkaProducerSaslOptions            null.Val[string] `db:"kafka_producer_sasl_options" `
-	KafkaProducerMessage                null.Val[string] `db:"kafka_producer_message" `
-	OauthClientID                       null.Val[string] `db:"oauth_client_id" `
-	OauthClientSecret                   null.Val[string] `db:"oauth_client_secret" `
-	OauthTokenURL                       null.Val[string] `db:"oauth_token_url" `
-	OauthScopes                         null.Val[string] `db:"oauth_scopes" `
-	OauthAuthMethod                     null.Val[string] `db:"oauth_auth_method" `
-	Timeout                             int64            `db:"timeout" `
-	GamedigGivenPortOnly                bool             `db:"gamedig_given_port_only" `
-	SaveResponse                        bool             `db:"save_response" `
-	SaveErrorResponse                   bool             `db:"save_error_response" `
-	ResponseMaxLength                   int64            `db:"response_max_length" `
-	SystemServiceName                   null.Val[string] `db:"system_service_name" `
-	RabbitmqNodes                       null.Val[string] `db:"rabbitmq_nodes" `
-	RabbitmqUsername                    null.Val[string] `db:"rabbitmq_username" `
-	RabbitmqPassword                    null.Val[string] `db:"rabbitmq_password" `
-	RemoteBrowser                       null.Val[string] `db:"remote_browser" `
-	DomainExpiryNotification            null.Val[bool]   `db:"domain_expiry_notification" `
-	GroupTagIdsJSON                     null.Val[string] `db:"group_tag_ids_json" `
+	ID                 string           `db:"id,pk" `
+	Name               string           `db:"name" `
+	Active             bool             `db:"active" `
+	UserID             string           `db:"user_id" `
+	Interval           int64            `db:"interval" `
+	Type               string           `db:"type" `
+	Weight             null.Val[int64]  `db:"weight" `
+	CreatedDate        time.Time        `db:"created_date" `
+	Maxretries         int64            `db:"maxretries" `
+	UpsideDown         bool             `db:"upside_down" `
+	RetryInterval      int64            `db:"retry_interval" `
+	Timeout            int64            `db:"timeout" `
+	Description        null.Val[string] `db:"description" `
+	ResendInterval     int64            `db:"resend_interval" `
+	ExpiryNotification null.Val[bool]   `db:"expiry_notification" `
+	ConfigJSON         string           `db:"config_json" `
 
 	R monitorR `db:"-" `
 
@@ -142,186 +75,52 @@ type monitorR struct {
 
 func buildMonitorColumns(tableName string) monitorColumns {
 	columnsExpr := expr.NewColumnsExpr(
-		"id", "name", "active", "user_id", "interval", "url", "type", "weight", "hostname", "port", "created_date", "keyword", "maxretries", "ignore_tls", "upside_down", "maxredirects", "accepted_statuscodes_json", "dns_resolve_type", "dns_resolve_server", "dns_last_result", "retry_interval", "method", "body", "headers", "basic_auth_user", "basic_auth_pass", "proxy_id", "expiry_notification", "mqtt_topic", "mqtt_success_message", "mqtt_username", "mqtt_password", "database_connection_string", "database_query", "auth_method", "auth_domain", "auth_workstation", "grpc_url", "grpc_protobuf", "grpc_body", "grpc_metadata", "grpc_method", "grpc_service_name", "grpc_enable_tls", "radius_username", "radius_password", "radius_calling_station_id", "radius_called_station_id", "radius_secret", "resend_interval", "packet_size", "game", "http_body_encoding", "description", "tls_ca", "tls_cert", "tls_key", "invert_keyword", "json_path", "expected_value", "kafka_producer_topic", "kafka_producer_brokers", "kafka_producer_ssl", "kafka_producer_allow_auto_topic_creation", "kafka_producer_sasl_options", "kafka_producer_message", "oauth_client_id", "oauth_client_secret", "oauth_token_url", "oauth_scopes", "oauth_auth_method", "timeout", "gamedig_given_port_only", "save_response", "save_error_response", "response_max_length", "system_service_name", "rabbitmq_nodes", "rabbitmq_username", "rabbitmq_password", "remote_browser", "domain_expiry_notification", "group_tag_ids_json",
+		"id", "name", "active", "user_id", "interval", "type", "weight", "created_date", "maxretries", "upside_down", "retry_interval", "timeout", "description", "resend_interval", "expiry_notification", "config_json",
 	)
 	if tableName != "" {
 		columnsExpr = columnsExpr.WithParent(tableName)
 	}
 	return monitorColumns{
-		ColumnsExpr:                         columnsExpr,
-		tableAlias:                          tableName,
-		ID:                                  sqlite.Quote(tableName, "id"),
-		Name:                                sqlite.Quote(tableName, "name"),
-		Active:                              sqlite.Quote(tableName, "active"),
-		UserID:                              sqlite.Quote(tableName, "user_id"),
-		Interval:                            sqlite.Quote(tableName, "interval"),
-		URL:                                 sqlite.Quote(tableName, "url"),
-		Type:                                sqlite.Quote(tableName, "type"),
-		Weight:                              sqlite.Quote(tableName, "weight"),
-		Hostname:                            sqlite.Quote(tableName, "hostname"),
-		Port:                                sqlite.Quote(tableName, "port"),
-		CreatedDate:                         sqlite.Quote(tableName, "created_date"),
-		Keyword:                             sqlite.Quote(tableName, "keyword"),
-		Maxretries:                          sqlite.Quote(tableName, "maxretries"),
-		IgnoreTLS:                           sqlite.Quote(tableName, "ignore_tls"),
-		UpsideDown:                          sqlite.Quote(tableName, "upside_down"),
-		Maxredirects:                        sqlite.Quote(tableName, "maxredirects"),
-		AcceptedStatuscodesJSON:             sqlite.Quote(tableName, "accepted_statuscodes_json"),
-		DNSResolveType:                      sqlite.Quote(tableName, "dns_resolve_type"),
-		DNSResolveServer:                    sqlite.Quote(tableName, "dns_resolve_server"),
-		DNSLastResult:                       sqlite.Quote(tableName, "dns_last_result"),
-		RetryInterval:                       sqlite.Quote(tableName, "retry_interval"),
-		Method:                              sqlite.Quote(tableName, "method"),
-		Body:                                sqlite.Quote(tableName, "body"),
-		Headers:                             sqlite.Quote(tableName, "headers"),
-		BasicAuthUser:                       sqlite.Quote(tableName, "basic_auth_user"),
-		BasicAuthPass:                       sqlite.Quote(tableName, "basic_auth_pass"),
-		ProxyID:                             sqlite.Quote(tableName, "proxy_id"),
-		ExpiryNotification:                  sqlite.Quote(tableName, "expiry_notification"),
-		MQTTTopic:                           sqlite.Quote(tableName, "mqtt_topic"),
-		MQTTSuccessMessage:                  sqlite.Quote(tableName, "mqtt_success_message"),
-		MQTTUsername:                        sqlite.Quote(tableName, "mqtt_username"),
-		MQTTPassword:                        sqlite.Quote(tableName, "mqtt_password"),
-		DatabaseConnectionString:            sqlite.Quote(tableName, "database_connection_string"),
-		DatabaseQuery:                       sqlite.Quote(tableName, "database_query"),
-		AuthMethod:                          sqlite.Quote(tableName, "auth_method"),
-		AuthDomain:                          sqlite.Quote(tableName, "auth_domain"),
-		AuthWorkstation:                     sqlite.Quote(tableName, "auth_workstation"),
-		GRPCURL:                             sqlite.Quote(tableName, "grpc_url"),
-		GRPCProtobuf:                        sqlite.Quote(tableName, "grpc_protobuf"),
-		GRPCBody:                            sqlite.Quote(tableName, "grpc_body"),
-		GRPCMetadata:                        sqlite.Quote(tableName, "grpc_metadata"),
-		GRPCMethod:                          sqlite.Quote(tableName, "grpc_method"),
-		GRPCServiceName:                     sqlite.Quote(tableName, "grpc_service_name"),
-		GRPCEnableTLS:                       sqlite.Quote(tableName, "grpc_enable_tls"),
-		RadiusUsername:                      sqlite.Quote(tableName, "radius_username"),
-		RadiusPassword:                      sqlite.Quote(tableName, "radius_password"),
-		RadiusCallingStationID:              sqlite.Quote(tableName, "radius_calling_station_id"),
-		RadiusCalledStationID:               sqlite.Quote(tableName, "radius_called_station_id"),
-		RadiusSecret:                        sqlite.Quote(tableName, "radius_secret"),
-		ResendInterval:                      sqlite.Quote(tableName, "resend_interval"),
-		PacketSize:                          sqlite.Quote(tableName, "packet_size"),
-		Game:                                sqlite.Quote(tableName, "game"),
-		HTTPBodyEncoding:                    sqlite.Quote(tableName, "http_body_encoding"),
-		Description:                         sqlite.Quote(tableName, "description"),
-		TLSCa:                               sqlite.Quote(tableName, "tls_ca"),
-		TLSCert:                             sqlite.Quote(tableName, "tls_cert"),
-		TLSKey:                              sqlite.Quote(tableName, "tls_key"),
-		InvertKeyword:                       sqlite.Quote(tableName, "invert_keyword"),
-		JSONPath:                            sqlite.Quote(tableName, "json_path"),
-		ExpectedValue:                       sqlite.Quote(tableName, "expected_value"),
-		KafkaProducerTopic:                  sqlite.Quote(tableName, "kafka_producer_topic"),
-		KafkaProducerBrokers:                sqlite.Quote(tableName, "kafka_producer_brokers"),
-		KafkaProducerSSL:                    sqlite.Quote(tableName, "kafka_producer_ssl"),
-		KafkaProducerAllowAutoTopicCreation: sqlite.Quote(tableName, "kafka_producer_allow_auto_topic_creation"),
-		KafkaProducerSaslOptions:            sqlite.Quote(tableName, "kafka_producer_sasl_options"),
-		KafkaProducerMessage:                sqlite.Quote(tableName, "kafka_producer_message"),
-		OauthClientID:                       sqlite.Quote(tableName, "oauth_client_id"),
-		OauthClientSecret:                   sqlite.Quote(tableName, "oauth_client_secret"),
-		OauthTokenURL:                       sqlite.Quote(tableName, "oauth_token_url"),
-		OauthScopes:                         sqlite.Quote(tableName, "oauth_scopes"),
-		OauthAuthMethod:                     sqlite.Quote(tableName, "oauth_auth_method"),
-		Timeout:                             sqlite.Quote(tableName, "timeout"),
-		GamedigGivenPortOnly:                sqlite.Quote(tableName, "gamedig_given_port_only"),
-		SaveResponse:                        sqlite.Quote(tableName, "save_response"),
-		SaveErrorResponse:                   sqlite.Quote(tableName, "save_error_response"),
-		ResponseMaxLength:                   sqlite.Quote(tableName, "response_max_length"),
-		SystemServiceName:                   sqlite.Quote(tableName, "system_service_name"),
-		RabbitmqNodes:                       sqlite.Quote(tableName, "rabbitmq_nodes"),
-		RabbitmqUsername:                    sqlite.Quote(tableName, "rabbitmq_username"),
-		RabbitmqPassword:                    sqlite.Quote(tableName, "rabbitmq_password"),
-		RemoteBrowser:                       sqlite.Quote(tableName, "remote_browser"),
-		DomainExpiryNotification:            sqlite.Quote(tableName, "domain_expiry_notification"),
-		GroupTagIdsJSON:                     sqlite.Quote(tableName, "group_tag_ids_json"),
+		ColumnsExpr:        columnsExpr,
+		tableAlias:         tableName,
+		ID:                 sqlite.Quote(tableName, "id"),
+		Name:               sqlite.Quote(tableName, "name"),
+		Active:             sqlite.Quote(tableName, "active"),
+		UserID:             sqlite.Quote(tableName, "user_id"),
+		Interval:           sqlite.Quote(tableName, "interval"),
+		Type:               sqlite.Quote(tableName, "type"),
+		Weight:             sqlite.Quote(tableName, "weight"),
+		CreatedDate:        sqlite.Quote(tableName, "created_date"),
+		Maxretries:         sqlite.Quote(tableName, "maxretries"),
+		UpsideDown:         sqlite.Quote(tableName, "upside_down"),
+		RetryInterval:      sqlite.Quote(tableName, "retry_interval"),
+		Timeout:            sqlite.Quote(tableName, "timeout"),
+		Description:        sqlite.Quote(tableName, "description"),
+		ResendInterval:     sqlite.Quote(tableName, "resend_interval"),
+		ExpiryNotification: sqlite.Quote(tableName, "expiry_notification"),
+		ConfigJSON:         sqlite.Quote(tableName, "config_json"),
 	}
 }
 
 type monitorColumns struct {
 	expr.ColumnsExpr
-	tableAlias                          string
-	ID                                  sqlite.Expression
-	Name                                sqlite.Expression
-	Active                              sqlite.Expression
-	UserID                              sqlite.Expression
-	Interval                            sqlite.Expression
-	URL                                 sqlite.Expression
-	Type                                sqlite.Expression
-	Weight                              sqlite.Expression
-	Hostname                            sqlite.Expression
-	Port                                sqlite.Expression
-	CreatedDate                         sqlite.Expression
-	Keyword                             sqlite.Expression
-	Maxretries                          sqlite.Expression
-	IgnoreTLS                           sqlite.Expression
-	UpsideDown                          sqlite.Expression
-	Maxredirects                        sqlite.Expression
-	AcceptedStatuscodesJSON             sqlite.Expression
-	DNSResolveType                      sqlite.Expression
-	DNSResolveServer                    sqlite.Expression
-	DNSLastResult                       sqlite.Expression
-	RetryInterval                       sqlite.Expression
-	Method                              sqlite.Expression
-	Body                                sqlite.Expression
-	Headers                             sqlite.Expression
-	BasicAuthUser                       sqlite.Expression
-	BasicAuthPass                       sqlite.Expression
-	ProxyID                             sqlite.Expression
-	ExpiryNotification                  sqlite.Expression
-	MQTTTopic                           sqlite.Expression
-	MQTTSuccessMessage                  sqlite.Expression
-	MQTTUsername                        sqlite.Expression
-	MQTTPassword                        sqlite.Expression
-	DatabaseConnectionString            sqlite.Expression
-	DatabaseQuery                       sqlite.Expression
-	AuthMethod                          sqlite.Expression
-	AuthDomain                          sqlite.Expression
-	AuthWorkstation                     sqlite.Expression
-	GRPCURL                             sqlite.Expression
-	GRPCProtobuf                        sqlite.Expression
-	GRPCBody                            sqlite.Expression
-	GRPCMetadata                        sqlite.Expression
-	GRPCMethod                          sqlite.Expression
-	GRPCServiceName                     sqlite.Expression
-	GRPCEnableTLS                       sqlite.Expression
-	RadiusUsername                      sqlite.Expression
-	RadiusPassword                      sqlite.Expression
-	RadiusCallingStationID              sqlite.Expression
-	RadiusCalledStationID               sqlite.Expression
-	RadiusSecret                        sqlite.Expression
-	ResendInterval                      sqlite.Expression
-	PacketSize                          sqlite.Expression
-	Game                                sqlite.Expression
-	HTTPBodyEncoding                    sqlite.Expression
-	Description                         sqlite.Expression
-	TLSCa                               sqlite.Expression
-	TLSCert                             sqlite.Expression
-	TLSKey                              sqlite.Expression
-	InvertKeyword                       sqlite.Expression
-	JSONPath                            sqlite.Expression
-	ExpectedValue                       sqlite.Expression
-	KafkaProducerTopic                  sqlite.Expression
-	KafkaProducerBrokers                sqlite.Expression
-	KafkaProducerSSL                    sqlite.Expression
-	KafkaProducerAllowAutoTopicCreation sqlite.Expression
-	KafkaProducerSaslOptions            sqlite.Expression
-	KafkaProducerMessage                sqlite.Expression
-	OauthClientID                       sqlite.Expression
-	OauthClientSecret                   sqlite.Expression
-	OauthTokenURL                       sqlite.Expression
-	OauthScopes                         sqlite.Expression
-	OauthAuthMethod                     sqlite.Expression
-	Timeout                             sqlite.Expression
-	GamedigGivenPortOnly                sqlite.Expression
-	SaveResponse                        sqlite.Expression
-	SaveErrorResponse                   sqlite.Expression
-	ResponseMaxLength                   sqlite.Expression
-	SystemServiceName                   sqlite.Expression
-	RabbitmqNodes                       sqlite.Expression
-	RabbitmqUsername                    sqlite.Expression
-	RabbitmqPassword                    sqlite.Expression
-	RemoteBrowser                       sqlite.Expression
-	DomainExpiryNotification            sqlite.Expression
-	GroupTagIdsJSON                     sqlite.Expression
+	tableAlias         string
+	ID                 sqlite.Expression
+	Name               sqlite.Expression
+	Active             sqlite.Expression
+	UserID             sqlite.Expression
+	Interval           sqlite.Expression
+	Type               sqlite.Expression
+	Weight             sqlite.Expression
+	CreatedDate        sqlite.Expression
+	Maxretries         sqlite.Expression
+	UpsideDown         sqlite.Expression
+	RetryInterval      sqlite.Expression
+	Timeout            sqlite.Expression
+	Description        sqlite.Expression
+	ResendInterval     sqlite.Expression
+	ExpiryNotification sqlite.Expression
+	ConfigJSON         sqlite.Expression
 }
 
 func (c monitorColumns) Alias() string {
@@ -340,93 +139,26 @@ func (c monitorColumns) Unqualified() monitorColumns {
 // All values are optional, and do not have to be set
 // Generated columns are not included
 type MonitorSetter struct {
-	ID                                  omit.Val[string]     `db:"id,pk" `
-	Name                                omit.Val[string]     `db:"name" `
-	Active                              omit.Val[bool]       `db:"active" `
-	UserID                              omit.Val[string]     `db:"user_id" `
-	Interval                            omit.Val[int64]      `db:"interval" `
-	URL                                 omitnull.Val[string] `db:"url" `
-	Type                                omit.Val[string]     `db:"type" `
-	Weight                              omitnull.Val[int64]  `db:"weight" `
-	Hostname                            omitnull.Val[string] `db:"hostname" `
-	Port                                omitnull.Val[int64]  `db:"port" `
-	CreatedDate                         omit.Val[time.Time]  `db:"created_date" `
-	Keyword                             omitnull.Val[string] `db:"keyword" `
-	Maxretries                          omit.Val[int64]      `db:"maxretries" `
-	IgnoreTLS                           omit.Val[bool]       `db:"ignore_tls" `
-	UpsideDown                          omit.Val[bool]       `db:"upside_down" `
-	Maxredirects                        omit.Val[int64]      `db:"maxredirects" `
-	AcceptedStatuscodesJSON             omitnull.Val[string] `db:"accepted_statuscodes_json" `
-	DNSResolveType                      omitnull.Val[string] `db:"dns_resolve_type" `
-	DNSResolveServer                    omitnull.Val[string] `db:"dns_resolve_server" `
-	DNSLastResult                       omitnull.Val[string] `db:"dns_last_result" `
-	RetryInterval                       omit.Val[int64]      `db:"retry_interval" `
-	Method                              omit.Val[string]     `db:"method" `
-	Body                                omitnull.Val[string] `db:"body" `
-	Headers                             omitnull.Val[string] `db:"headers" `
-	BasicAuthUser                       omitnull.Val[string] `db:"basic_auth_user" `
-	BasicAuthPass                       omitnull.Val[string] `db:"basic_auth_pass" `
-	ProxyID                             omitnull.Val[string] `db:"proxy_id" `
-	ExpiryNotification                  omitnull.Val[bool]   `db:"expiry_notification" `
-	MQTTTopic                           omitnull.Val[string] `db:"mqtt_topic" `
-	MQTTSuccessMessage                  omitnull.Val[string] `db:"mqtt_success_message" `
-	MQTTUsername                        omitnull.Val[string] `db:"mqtt_username" `
-	MQTTPassword                        omitnull.Val[string] `db:"mqtt_password" `
-	DatabaseConnectionString            omitnull.Val[string] `db:"database_connection_string" `
-	DatabaseQuery                       omitnull.Val[string] `db:"database_query" `
-	AuthMethod                          omitnull.Val[string] `db:"auth_method" `
-	AuthDomain                          omitnull.Val[string] `db:"auth_domain" `
-	AuthWorkstation                     omitnull.Val[string] `db:"auth_workstation" `
-	GRPCURL                             omitnull.Val[string] `db:"grpc_url" `
-	GRPCProtobuf                        omitnull.Val[string] `db:"grpc_protobuf" `
-	GRPCBody                            omitnull.Val[string] `db:"grpc_body" `
-	GRPCMetadata                        omitnull.Val[string] `db:"grpc_metadata" `
-	GRPCMethod                          omitnull.Val[string] `db:"grpc_method" `
-	GRPCServiceName                     omitnull.Val[string] `db:"grpc_service_name" `
-	GRPCEnableTLS                       omit.Val[bool]       `db:"grpc_enable_tls" `
-	RadiusUsername                      omitnull.Val[string] `db:"radius_username" `
-	RadiusPassword                      omitnull.Val[string] `db:"radius_password" `
-	RadiusCallingStationID              omitnull.Val[string] `db:"radius_calling_station_id" `
-	RadiusCalledStationID               omitnull.Val[string] `db:"radius_called_station_id" `
-	RadiusSecret                        omitnull.Val[string] `db:"radius_secret" `
-	ResendInterval                      omit.Val[int64]      `db:"resend_interval" `
-	PacketSize                          omit.Val[int64]      `db:"packet_size" `
-	Game                                omitnull.Val[string] `db:"game" `
-	HTTPBodyEncoding                    omitnull.Val[string] `db:"http_body_encoding" `
-	Description                         omitnull.Val[string] `db:"description" `
-	TLSCa                               omitnull.Val[string] `db:"tls_ca" `
-	TLSCert                             omitnull.Val[string] `db:"tls_cert" `
-	TLSKey                              omitnull.Val[string] `db:"tls_key" `
-	InvertKeyword                       omit.Val[bool]       `db:"invert_keyword" `
-	JSONPath                            omitnull.Val[string] `db:"json_path" `
-	ExpectedValue                       omitnull.Val[string] `db:"expected_value" `
-	KafkaProducerTopic                  omitnull.Val[string] `db:"kafka_producer_topic" `
-	KafkaProducerBrokers                omitnull.Val[string] `db:"kafka_producer_brokers" `
-	KafkaProducerSSL                    omit.Val[bool]       `db:"kafka_producer_ssl" `
-	KafkaProducerAllowAutoTopicCreation omit.Val[bool]       `db:"kafka_producer_allow_auto_topic_creation" `
-	KafkaProducerSaslOptions            omitnull.Val[string] `db:"kafka_producer_sasl_options" `
-	KafkaProducerMessage                omitnull.Val[string] `db:"kafka_producer_message" `
-	OauthClientID                       omitnull.Val[string] `db:"oauth_client_id" `
-	OauthClientSecret                   omitnull.Val[string] `db:"oauth_client_secret" `
-	OauthTokenURL                       omitnull.Val[string] `db:"oauth_token_url" `
-	OauthScopes                         omitnull.Val[string] `db:"oauth_scopes" `
-	OauthAuthMethod                     omitnull.Val[string] `db:"oauth_auth_method" `
-	Timeout                             omit.Val[int64]      `db:"timeout" `
-	GamedigGivenPortOnly                omit.Val[bool]       `db:"gamedig_given_port_only" `
-	SaveResponse                        omit.Val[bool]       `db:"save_response" `
-	SaveErrorResponse                   omit.Val[bool]       `db:"save_error_response" `
-	ResponseMaxLength                   omit.Val[int64]      `db:"response_max_length" `
-	SystemServiceName                   omitnull.Val[string] `db:"system_service_name" `
-	RabbitmqNodes                       omitnull.Val[string] `db:"rabbitmq_nodes" `
-	RabbitmqUsername                    omitnull.Val[string] `db:"rabbitmq_username" `
-	RabbitmqPassword                    omitnull.Val[string] `db:"rabbitmq_password" `
-	RemoteBrowser                       omitnull.Val[string] `db:"remote_browser" `
-	DomainExpiryNotification            omitnull.Val[bool]   `db:"domain_expiry_notification" `
-	GroupTagIdsJSON                     omitnull.Val[string] `db:"group_tag_ids_json" `
+	ID                 omit.Val[string]     `db:"id,pk" `
+	Name               omit.Val[string]     `db:"name" `
+	Active             omit.Val[bool]       `db:"active" `
+	UserID             omit.Val[string]     `db:"user_id" `
+	Interval           omit.Val[int64]      `db:"interval" `
+	Type               omit.Val[string]     `db:"type" `
+	Weight             omitnull.Val[int64]  `db:"weight" `
+	CreatedDate        omit.Val[time.Time]  `db:"created_date" `
+	Maxretries         omit.Val[int64]      `db:"maxretries" `
+	UpsideDown         omit.Val[bool]       `db:"upside_down" `
+	RetryInterval      omit.Val[int64]      `db:"retry_interval" `
+	Timeout            omit.Val[int64]      `db:"timeout" `
+	Description        omitnull.Val[string] `db:"description" `
+	ResendInterval     omit.Val[int64]      `db:"resend_interval" `
+	ExpiryNotification omitnull.Val[bool]   `db:"expiry_notification" `
+	ConfigJSON         omit.Val[string]     `db:"config_json" `
 }
 
 func (s MonitorSetter) SetColumns() []string {
-	vals := make([]string, 0, 84)
+	vals := make([]string, 0, 16)
 	if s.ID.IsValue() {
 		vals = append(vals, "id")
 	}
@@ -442,239 +174,38 @@ func (s MonitorSetter) SetColumns() []string {
 	if s.Interval.IsValue() {
 		vals = append(vals, "interval")
 	}
-	if !s.URL.IsUnset() {
-		vals = append(vals, "url")
-	}
 	if s.Type.IsValue() {
 		vals = append(vals, "type")
 	}
 	if !s.Weight.IsUnset() {
 		vals = append(vals, "weight")
 	}
-	if !s.Hostname.IsUnset() {
-		vals = append(vals, "hostname")
-	}
-	if !s.Port.IsUnset() {
-		vals = append(vals, "port")
-	}
 	if s.CreatedDate.IsValue() {
 		vals = append(vals, "created_date")
-	}
-	if !s.Keyword.IsUnset() {
-		vals = append(vals, "keyword")
 	}
 	if s.Maxretries.IsValue() {
 		vals = append(vals, "maxretries")
 	}
-	if s.IgnoreTLS.IsValue() {
-		vals = append(vals, "ignore_tls")
-	}
 	if s.UpsideDown.IsValue() {
 		vals = append(vals, "upside_down")
-	}
-	if s.Maxredirects.IsValue() {
-		vals = append(vals, "maxredirects")
-	}
-	if !s.AcceptedStatuscodesJSON.IsUnset() {
-		vals = append(vals, "accepted_statuscodes_json")
-	}
-	if !s.DNSResolveType.IsUnset() {
-		vals = append(vals, "dns_resolve_type")
-	}
-	if !s.DNSResolveServer.IsUnset() {
-		vals = append(vals, "dns_resolve_server")
-	}
-	if !s.DNSLastResult.IsUnset() {
-		vals = append(vals, "dns_last_result")
 	}
 	if s.RetryInterval.IsValue() {
 		vals = append(vals, "retry_interval")
 	}
-	if s.Method.IsValue() {
-		vals = append(vals, "method")
-	}
-	if !s.Body.IsUnset() {
-		vals = append(vals, "body")
-	}
-	if !s.Headers.IsUnset() {
-		vals = append(vals, "headers")
-	}
-	if !s.BasicAuthUser.IsUnset() {
-		vals = append(vals, "basic_auth_user")
-	}
-	if !s.BasicAuthPass.IsUnset() {
-		vals = append(vals, "basic_auth_pass")
-	}
-	if !s.ProxyID.IsUnset() {
-		vals = append(vals, "proxy_id")
-	}
-	if !s.ExpiryNotification.IsUnset() {
-		vals = append(vals, "expiry_notification")
-	}
-	if !s.MQTTTopic.IsUnset() {
-		vals = append(vals, "mqtt_topic")
-	}
-	if !s.MQTTSuccessMessage.IsUnset() {
-		vals = append(vals, "mqtt_success_message")
-	}
-	if !s.MQTTUsername.IsUnset() {
-		vals = append(vals, "mqtt_username")
-	}
-	if !s.MQTTPassword.IsUnset() {
-		vals = append(vals, "mqtt_password")
-	}
-	if !s.DatabaseConnectionString.IsUnset() {
-		vals = append(vals, "database_connection_string")
-	}
-	if !s.DatabaseQuery.IsUnset() {
-		vals = append(vals, "database_query")
-	}
-	if !s.AuthMethod.IsUnset() {
-		vals = append(vals, "auth_method")
-	}
-	if !s.AuthDomain.IsUnset() {
-		vals = append(vals, "auth_domain")
-	}
-	if !s.AuthWorkstation.IsUnset() {
-		vals = append(vals, "auth_workstation")
-	}
-	if !s.GRPCURL.IsUnset() {
-		vals = append(vals, "grpc_url")
-	}
-	if !s.GRPCProtobuf.IsUnset() {
-		vals = append(vals, "grpc_protobuf")
-	}
-	if !s.GRPCBody.IsUnset() {
-		vals = append(vals, "grpc_body")
-	}
-	if !s.GRPCMetadata.IsUnset() {
-		vals = append(vals, "grpc_metadata")
-	}
-	if !s.GRPCMethod.IsUnset() {
-		vals = append(vals, "grpc_method")
-	}
-	if !s.GRPCServiceName.IsUnset() {
-		vals = append(vals, "grpc_service_name")
-	}
-	if s.GRPCEnableTLS.IsValue() {
-		vals = append(vals, "grpc_enable_tls")
-	}
-	if !s.RadiusUsername.IsUnset() {
-		vals = append(vals, "radius_username")
-	}
-	if !s.RadiusPassword.IsUnset() {
-		vals = append(vals, "radius_password")
-	}
-	if !s.RadiusCallingStationID.IsUnset() {
-		vals = append(vals, "radius_calling_station_id")
-	}
-	if !s.RadiusCalledStationID.IsUnset() {
-		vals = append(vals, "radius_called_station_id")
-	}
-	if !s.RadiusSecret.IsUnset() {
-		vals = append(vals, "radius_secret")
-	}
-	if s.ResendInterval.IsValue() {
-		vals = append(vals, "resend_interval")
-	}
-	if s.PacketSize.IsValue() {
-		vals = append(vals, "packet_size")
-	}
-	if !s.Game.IsUnset() {
-		vals = append(vals, "game")
-	}
-	if !s.HTTPBodyEncoding.IsUnset() {
-		vals = append(vals, "http_body_encoding")
+	if s.Timeout.IsValue() {
+		vals = append(vals, "timeout")
 	}
 	if !s.Description.IsUnset() {
 		vals = append(vals, "description")
 	}
-	if !s.TLSCa.IsUnset() {
-		vals = append(vals, "tls_ca")
+	if s.ResendInterval.IsValue() {
+		vals = append(vals, "resend_interval")
 	}
-	if !s.TLSCert.IsUnset() {
-		vals = append(vals, "tls_cert")
+	if !s.ExpiryNotification.IsUnset() {
+		vals = append(vals, "expiry_notification")
 	}
-	if !s.TLSKey.IsUnset() {
-		vals = append(vals, "tls_key")
-	}
-	if s.InvertKeyword.IsValue() {
-		vals = append(vals, "invert_keyword")
-	}
-	if !s.JSONPath.IsUnset() {
-		vals = append(vals, "json_path")
-	}
-	if !s.ExpectedValue.IsUnset() {
-		vals = append(vals, "expected_value")
-	}
-	if !s.KafkaProducerTopic.IsUnset() {
-		vals = append(vals, "kafka_producer_topic")
-	}
-	if !s.KafkaProducerBrokers.IsUnset() {
-		vals = append(vals, "kafka_producer_brokers")
-	}
-	if s.KafkaProducerSSL.IsValue() {
-		vals = append(vals, "kafka_producer_ssl")
-	}
-	if s.KafkaProducerAllowAutoTopicCreation.IsValue() {
-		vals = append(vals, "kafka_producer_allow_auto_topic_creation")
-	}
-	if !s.KafkaProducerSaslOptions.IsUnset() {
-		vals = append(vals, "kafka_producer_sasl_options")
-	}
-	if !s.KafkaProducerMessage.IsUnset() {
-		vals = append(vals, "kafka_producer_message")
-	}
-	if !s.OauthClientID.IsUnset() {
-		vals = append(vals, "oauth_client_id")
-	}
-	if !s.OauthClientSecret.IsUnset() {
-		vals = append(vals, "oauth_client_secret")
-	}
-	if !s.OauthTokenURL.IsUnset() {
-		vals = append(vals, "oauth_token_url")
-	}
-	if !s.OauthScopes.IsUnset() {
-		vals = append(vals, "oauth_scopes")
-	}
-	if !s.OauthAuthMethod.IsUnset() {
-		vals = append(vals, "oauth_auth_method")
-	}
-	if s.Timeout.IsValue() {
-		vals = append(vals, "timeout")
-	}
-	if s.GamedigGivenPortOnly.IsValue() {
-		vals = append(vals, "gamedig_given_port_only")
-	}
-	if s.SaveResponse.IsValue() {
-		vals = append(vals, "save_response")
-	}
-	if s.SaveErrorResponse.IsValue() {
-		vals = append(vals, "save_error_response")
-	}
-	if s.ResponseMaxLength.IsValue() {
-		vals = append(vals, "response_max_length")
-	}
-	if !s.SystemServiceName.IsUnset() {
-		vals = append(vals, "system_service_name")
-	}
-	if !s.RabbitmqNodes.IsUnset() {
-		vals = append(vals, "rabbitmq_nodes")
-	}
-	if !s.RabbitmqUsername.IsUnset() {
-		vals = append(vals, "rabbitmq_username")
-	}
-	if !s.RabbitmqPassword.IsUnset() {
-		vals = append(vals, "rabbitmq_password")
-	}
-	if !s.RemoteBrowser.IsUnset() {
-		vals = append(vals, "remote_browser")
-	}
-	if !s.DomainExpiryNotification.IsUnset() {
-		vals = append(vals, "domain_expiry_notification")
-	}
-	if !s.GroupTagIdsJSON.IsUnset() {
-		vals = append(vals, "group_tag_ids_json")
+	if s.ConfigJSON.IsValue() {
+		vals = append(vals, "config_json")
 	}
 	return vals
 }
@@ -695,239 +226,38 @@ func (s MonitorSetter) Overwrite(t *Monitor) {
 	if s.Interval.IsValue() {
 		t.Interval = s.Interval.MustGet()
 	}
-	if !s.URL.IsUnset() {
-		t.URL = s.URL.MustGetNull()
-	}
 	if s.Type.IsValue() {
 		t.Type = s.Type.MustGet()
 	}
 	if !s.Weight.IsUnset() {
 		t.Weight = s.Weight.MustGetNull()
 	}
-	if !s.Hostname.IsUnset() {
-		t.Hostname = s.Hostname.MustGetNull()
-	}
-	if !s.Port.IsUnset() {
-		t.Port = s.Port.MustGetNull()
-	}
 	if s.CreatedDate.IsValue() {
 		t.CreatedDate = s.CreatedDate.MustGet()
-	}
-	if !s.Keyword.IsUnset() {
-		t.Keyword = s.Keyword.MustGetNull()
 	}
 	if s.Maxretries.IsValue() {
 		t.Maxretries = s.Maxretries.MustGet()
 	}
-	if s.IgnoreTLS.IsValue() {
-		t.IgnoreTLS = s.IgnoreTLS.MustGet()
-	}
 	if s.UpsideDown.IsValue() {
 		t.UpsideDown = s.UpsideDown.MustGet()
-	}
-	if s.Maxredirects.IsValue() {
-		t.Maxredirects = s.Maxredirects.MustGet()
-	}
-	if !s.AcceptedStatuscodesJSON.IsUnset() {
-		t.AcceptedStatuscodesJSON = s.AcceptedStatuscodesJSON.MustGetNull()
-	}
-	if !s.DNSResolveType.IsUnset() {
-		t.DNSResolveType = s.DNSResolveType.MustGetNull()
-	}
-	if !s.DNSResolveServer.IsUnset() {
-		t.DNSResolveServer = s.DNSResolveServer.MustGetNull()
-	}
-	if !s.DNSLastResult.IsUnset() {
-		t.DNSLastResult = s.DNSLastResult.MustGetNull()
 	}
 	if s.RetryInterval.IsValue() {
 		t.RetryInterval = s.RetryInterval.MustGet()
 	}
-	if s.Method.IsValue() {
-		t.Method = s.Method.MustGet()
-	}
-	if !s.Body.IsUnset() {
-		t.Body = s.Body.MustGetNull()
-	}
-	if !s.Headers.IsUnset() {
-		t.Headers = s.Headers.MustGetNull()
-	}
-	if !s.BasicAuthUser.IsUnset() {
-		t.BasicAuthUser = s.BasicAuthUser.MustGetNull()
-	}
-	if !s.BasicAuthPass.IsUnset() {
-		t.BasicAuthPass = s.BasicAuthPass.MustGetNull()
-	}
-	if !s.ProxyID.IsUnset() {
-		t.ProxyID = s.ProxyID.MustGetNull()
-	}
-	if !s.ExpiryNotification.IsUnset() {
-		t.ExpiryNotification = s.ExpiryNotification.MustGetNull()
-	}
-	if !s.MQTTTopic.IsUnset() {
-		t.MQTTTopic = s.MQTTTopic.MustGetNull()
-	}
-	if !s.MQTTSuccessMessage.IsUnset() {
-		t.MQTTSuccessMessage = s.MQTTSuccessMessage.MustGetNull()
-	}
-	if !s.MQTTUsername.IsUnset() {
-		t.MQTTUsername = s.MQTTUsername.MustGetNull()
-	}
-	if !s.MQTTPassword.IsUnset() {
-		t.MQTTPassword = s.MQTTPassword.MustGetNull()
-	}
-	if !s.DatabaseConnectionString.IsUnset() {
-		t.DatabaseConnectionString = s.DatabaseConnectionString.MustGetNull()
-	}
-	if !s.DatabaseQuery.IsUnset() {
-		t.DatabaseQuery = s.DatabaseQuery.MustGetNull()
-	}
-	if !s.AuthMethod.IsUnset() {
-		t.AuthMethod = s.AuthMethod.MustGetNull()
-	}
-	if !s.AuthDomain.IsUnset() {
-		t.AuthDomain = s.AuthDomain.MustGetNull()
-	}
-	if !s.AuthWorkstation.IsUnset() {
-		t.AuthWorkstation = s.AuthWorkstation.MustGetNull()
-	}
-	if !s.GRPCURL.IsUnset() {
-		t.GRPCURL = s.GRPCURL.MustGetNull()
-	}
-	if !s.GRPCProtobuf.IsUnset() {
-		t.GRPCProtobuf = s.GRPCProtobuf.MustGetNull()
-	}
-	if !s.GRPCBody.IsUnset() {
-		t.GRPCBody = s.GRPCBody.MustGetNull()
-	}
-	if !s.GRPCMetadata.IsUnset() {
-		t.GRPCMetadata = s.GRPCMetadata.MustGetNull()
-	}
-	if !s.GRPCMethod.IsUnset() {
-		t.GRPCMethod = s.GRPCMethod.MustGetNull()
-	}
-	if !s.GRPCServiceName.IsUnset() {
-		t.GRPCServiceName = s.GRPCServiceName.MustGetNull()
-	}
-	if s.GRPCEnableTLS.IsValue() {
-		t.GRPCEnableTLS = s.GRPCEnableTLS.MustGet()
-	}
-	if !s.RadiusUsername.IsUnset() {
-		t.RadiusUsername = s.RadiusUsername.MustGetNull()
-	}
-	if !s.RadiusPassword.IsUnset() {
-		t.RadiusPassword = s.RadiusPassword.MustGetNull()
-	}
-	if !s.RadiusCallingStationID.IsUnset() {
-		t.RadiusCallingStationID = s.RadiusCallingStationID.MustGetNull()
-	}
-	if !s.RadiusCalledStationID.IsUnset() {
-		t.RadiusCalledStationID = s.RadiusCalledStationID.MustGetNull()
-	}
-	if !s.RadiusSecret.IsUnset() {
-		t.RadiusSecret = s.RadiusSecret.MustGetNull()
-	}
-	if s.ResendInterval.IsValue() {
-		t.ResendInterval = s.ResendInterval.MustGet()
-	}
-	if s.PacketSize.IsValue() {
-		t.PacketSize = s.PacketSize.MustGet()
-	}
-	if !s.Game.IsUnset() {
-		t.Game = s.Game.MustGetNull()
-	}
-	if !s.HTTPBodyEncoding.IsUnset() {
-		t.HTTPBodyEncoding = s.HTTPBodyEncoding.MustGetNull()
+	if s.Timeout.IsValue() {
+		t.Timeout = s.Timeout.MustGet()
 	}
 	if !s.Description.IsUnset() {
 		t.Description = s.Description.MustGetNull()
 	}
-	if !s.TLSCa.IsUnset() {
-		t.TLSCa = s.TLSCa.MustGetNull()
+	if s.ResendInterval.IsValue() {
+		t.ResendInterval = s.ResendInterval.MustGet()
 	}
-	if !s.TLSCert.IsUnset() {
-		t.TLSCert = s.TLSCert.MustGetNull()
+	if !s.ExpiryNotification.IsUnset() {
+		t.ExpiryNotification = s.ExpiryNotification.MustGetNull()
 	}
-	if !s.TLSKey.IsUnset() {
-		t.TLSKey = s.TLSKey.MustGetNull()
-	}
-	if s.InvertKeyword.IsValue() {
-		t.InvertKeyword = s.InvertKeyword.MustGet()
-	}
-	if !s.JSONPath.IsUnset() {
-		t.JSONPath = s.JSONPath.MustGetNull()
-	}
-	if !s.ExpectedValue.IsUnset() {
-		t.ExpectedValue = s.ExpectedValue.MustGetNull()
-	}
-	if !s.KafkaProducerTopic.IsUnset() {
-		t.KafkaProducerTopic = s.KafkaProducerTopic.MustGetNull()
-	}
-	if !s.KafkaProducerBrokers.IsUnset() {
-		t.KafkaProducerBrokers = s.KafkaProducerBrokers.MustGetNull()
-	}
-	if s.KafkaProducerSSL.IsValue() {
-		t.KafkaProducerSSL = s.KafkaProducerSSL.MustGet()
-	}
-	if s.KafkaProducerAllowAutoTopicCreation.IsValue() {
-		t.KafkaProducerAllowAutoTopicCreation = s.KafkaProducerAllowAutoTopicCreation.MustGet()
-	}
-	if !s.KafkaProducerSaslOptions.IsUnset() {
-		t.KafkaProducerSaslOptions = s.KafkaProducerSaslOptions.MustGetNull()
-	}
-	if !s.KafkaProducerMessage.IsUnset() {
-		t.KafkaProducerMessage = s.KafkaProducerMessage.MustGetNull()
-	}
-	if !s.OauthClientID.IsUnset() {
-		t.OauthClientID = s.OauthClientID.MustGetNull()
-	}
-	if !s.OauthClientSecret.IsUnset() {
-		t.OauthClientSecret = s.OauthClientSecret.MustGetNull()
-	}
-	if !s.OauthTokenURL.IsUnset() {
-		t.OauthTokenURL = s.OauthTokenURL.MustGetNull()
-	}
-	if !s.OauthScopes.IsUnset() {
-		t.OauthScopes = s.OauthScopes.MustGetNull()
-	}
-	if !s.OauthAuthMethod.IsUnset() {
-		t.OauthAuthMethod = s.OauthAuthMethod.MustGetNull()
-	}
-	if s.Timeout.IsValue() {
-		t.Timeout = s.Timeout.MustGet()
-	}
-	if s.GamedigGivenPortOnly.IsValue() {
-		t.GamedigGivenPortOnly = s.GamedigGivenPortOnly.MustGet()
-	}
-	if s.SaveResponse.IsValue() {
-		t.SaveResponse = s.SaveResponse.MustGet()
-	}
-	if s.SaveErrorResponse.IsValue() {
-		t.SaveErrorResponse = s.SaveErrorResponse.MustGet()
-	}
-	if s.ResponseMaxLength.IsValue() {
-		t.ResponseMaxLength = s.ResponseMaxLength.MustGet()
-	}
-	if !s.SystemServiceName.IsUnset() {
-		t.SystemServiceName = s.SystemServiceName.MustGetNull()
-	}
-	if !s.RabbitmqNodes.IsUnset() {
-		t.RabbitmqNodes = s.RabbitmqNodes.MustGetNull()
-	}
-	if !s.RabbitmqUsername.IsUnset() {
-		t.RabbitmqUsername = s.RabbitmqUsername.MustGetNull()
-	}
-	if !s.RabbitmqPassword.IsUnset() {
-		t.RabbitmqPassword = s.RabbitmqPassword.MustGetNull()
-	}
-	if !s.RemoteBrowser.IsUnset() {
-		t.RemoteBrowser = s.RemoteBrowser.MustGetNull()
-	}
-	if !s.DomainExpiryNotification.IsUnset() {
-		t.DomainExpiryNotification = s.DomainExpiryNotification.MustGetNull()
-	}
-	if !s.GroupTagIdsJSON.IsUnset() {
-		t.GroupTagIdsJSON = s.GroupTagIdsJSON.MustGetNull()
+	if s.ConfigJSON.IsValue() {
+		t.ConfigJSON = s.ConfigJSON.MustGet()
 	}
 }
 
@@ -945,7 +275,7 @@ func (s *MonitorSetter) Apply(q *dialect.InsertQuery) {
 	}
 
 	q.AppendValues(bob.ExpressionFunc(func(ctx context.Context, w io.StringWriter, d bob.Dialect, start int) ([]any, error) {
-		vals := make([]bob.Expression, 0, 84)
+		vals := make([]bob.Expression, 0, 16)
 		if s.ID.IsValue() {
 			vals = append(vals, sqlite.Arg(s.ID.MustGet()))
 		}
@@ -966,10 +296,6 @@ func (s *MonitorSetter) Apply(q *dialect.InsertQuery) {
 			vals = append(vals, sqlite.Arg(s.Interval.MustGet()))
 		}
 
-		if !s.URL.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.URL.MustGetNull()))
-		}
-
 		if s.Type.IsValue() {
 			vals = append(vals, sqlite.Arg(s.Type.MustGet()))
 		}
@@ -978,304 +304,40 @@ func (s *MonitorSetter) Apply(q *dialect.InsertQuery) {
 			vals = append(vals, sqlite.Arg(s.Weight.MustGetNull()))
 		}
 
-		if !s.Hostname.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.Hostname.MustGetNull()))
-		}
-
-		if !s.Port.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.Port.MustGetNull()))
-		}
-
 		if s.CreatedDate.IsValue() {
 			vals = append(vals, sqlite.Arg(s.CreatedDate.MustGet()))
-		}
-
-		if !s.Keyword.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.Keyword.MustGetNull()))
 		}
 
 		if s.Maxretries.IsValue() {
 			vals = append(vals, sqlite.Arg(s.Maxretries.MustGet()))
 		}
 
-		if s.IgnoreTLS.IsValue() {
-			vals = append(vals, sqlite.Arg(s.IgnoreTLS.MustGet()))
-		}
-
 		if s.UpsideDown.IsValue() {
 			vals = append(vals, sqlite.Arg(s.UpsideDown.MustGet()))
-		}
-
-		if s.Maxredirects.IsValue() {
-			vals = append(vals, sqlite.Arg(s.Maxredirects.MustGet()))
-		}
-
-		if !s.AcceptedStatuscodesJSON.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.AcceptedStatuscodesJSON.MustGetNull()))
-		}
-
-		if !s.DNSResolveType.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.DNSResolveType.MustGetNull()))
-		}
-
-		if !s.DNSResolveServer.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.DNSResolveServer.MustGetNull()))
-		}
-
-		if !s.DNSLastResult.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.DNSLastResult.MustGetNull()))
 		}
 
 		if s.RetryInterval.IsValue() {
 			vals = append(vals, sqlite.Arg(s.RetryInterval.MustGet()))
 		}
 
-		if s.Method.IsValue() {
-			vals = append(vals, sqlite.Arg(s.Method.MustGet()))
-		}
-
-		if !s.Body.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.Body.MustGetNull()))
-		}
-
-		if !s.Headers.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.Headers.MustGetNull()))
-		}
-
-		if !s.BasicAuthUser.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.BasicAuthUser.MustGetNull()))
-		}
-
-		if !s.BasicAuthPass.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.BasicAuthPass.MustGetNull()))
-		}
-
-		if !s.ProxyID.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.ProxyID.MustGetNull()))
-		}
-
-		if !s.ExpiryNotification.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.ExpiryNotification.MustGetNull()))
-		}
-
-		if !s.MQTTTopic.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.MQTTTopic.MustGetNull()))
-		}
-
-		if !s.MQTTSuccessMessage.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.MQTTSuccessMessage.MustGetNull()))
-		}
-
-		if !s.MQTTUsername.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.MQTTUsername.MustGetNull()))
-		}
-
-		if !s.MQTTPassword.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.MQTTPassword.MustGetNull()))
-		}
-
-		if !s.DatabaseConnectionString.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.DatabaseConnectionString.MustGetNull()))
-		}
-
-		if !s.DatabaseQuery.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.DatabaseQuery.MustGetNull()))
-		}
-
-		if !s.AuthMethod.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.AuthMethod.MustGetNull()))
-		}
-
-		if !s.AuthDomain.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.AuthDomain.MustGetNull()))
-		}
-
-		if !s.AuthWorkstation.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.AuthWorkstation.MustGetNull()))
-		}
-
-		if !s.GRPCURL.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.GRPCURL.MustGetNull()))
-		}
-
-		if !s.GRPCProtobuf.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.GRPCProtobuf.MustGetNull()))
-		}
-
-		if !s.GRPCBody.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.GRPCBody.MustGetNull()))
-		}
-
-		if !s.GRPCMetadata.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.GRPCMetadata.MustGetNull()))
-		}
-
-		if !s.GRPCMethod.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.GRPCMethod.MustGetNull()))
-		}
-
-		if !s.GRPCServiceName.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.GRPCServiceName.MustGetNull()))
-		}
-
-		if s.GRPCEnableTLS.IsValue() {
-			vals = append(vals, sqlite.Arg(s.GRPCEnableTLS.MustGet()))
-		}
-
-		if !s.RadiusUsername.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.RadiusUsername.MustGetNull()))
-		}
-
-		if !s.RadiusPassword.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.RadiusPassword.MustGetNull()))
-		}
-
-		if !s.RadiusCallingStationID.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.RadiusCallingStationID.MustGetNull()))
-		}
-
-		if !s.RadiusCalledStationID.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.RadiusCalledStationID.MustGetNull()))
-		}
-
-		if !s.RadiusSecret.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.RadiusSecret.MustGetNull()))
-		}
-
-		if s.ResendInterval.IsValue() {
-			vals = append(vals, sqlite.Arg(s.ResendInterval.MustGet()))
-		}
-
-		if s.PacketSize.IsValue() {
-			vals = append(vals, sqlite.Arg(s.PacketSize.MustGet()))
-		}
-
-		if !s.Game.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.Game.MustGetNull()))
-		}
-
-		if !s.HTTPBodyEncoding.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.HTTPBodyEncoding.MustGetNull()))
+		if s.Timeout.IsValue() {
+			vals = append(vals, sqlite.Arg(s.Timeout.MustGet()))
 		}
 
 		if !s.Description.IsUnset() {
 			vals = append(vals, sqlite.Arg(s.Description.MustGetNull()))
 		}
 
-		if !s.TLSCa.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.TLSCa.MustGetNull()))
+		if s.ResendInterval.IsValue() {
+			vals = append(vals, sqlite.Arg(s.ResendInterval.MustGet()))
 		}
 
-		if !s.TLSCert.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.TLSCert.MustGetNull()))
+		if !s.ExpiryNotification.IsUnset() {
+			vals = append(vals, sqlite.Arg(s.ExpiryNotification.MustGetNull()))
 		}
 
-		if !s.TLSKey.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.TLSKey.MustGetNull()))
-		}
-
-		if s.InvertKeyword.IsValue() {
-			vals = append(vals, sqlite.Arg(s.InvertKeyword.MustGet()))
-		}
-
-		if !s.JSONPath.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.JSONPath.MustGetNull()))
-		}
-
-		if !s.ExpectedValue.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.ExpectedValue.MustGetNull()))
-		}
-
-		if !s.KafkaProducerTopic.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.KafkaProducerTopic.MustGetNull()))
-		}
-
-		if !s.KafkaProducerBrokers.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.KafkaProducerBrokers.MustGetNull()))
-		}
-
-		if s.KafkaProducerSSL.IsValue() {
-			vals = append(vals, sqlite.Arg(s.KafkaProducerSSL.MustGet()))
-		}
-
-		if s.KafkaProducerAllowAutoTopicCreation.IsValue() {
-			vals = append(vals, sqlite.Arg(s.KafkaProducerAllowAutoTopicCreation.MustGet()))
-		}
-
-		if !s.KafkaProducerSaslOptions.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.KafkaProducerSaslOptions.MustGetNull()))
-		}
-
-		if !s.KafkaProducerMessage.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.KafkaProducerMessage.MustGetNull()))
-		}
-
-		if !s.OauthClientID.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.OauthClientID.MustGetNull()))
-		}
-
-		if !s.OauthClientSecret.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.OauthClientSecret.MustGetNull()))
-		}
-
-		if !s.OauthTokenURL.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.OauthTokenURL.MustGetNull()))
-		}
-
-		if !s.OauthScopes.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.OauthScopes.MustGetNull()))
-		}
-
-		if !s.OauthAuthMethod.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.OauthAuthMethod.MustGetNull()))
-		}
-
-		if s.Timeout.IsValue() {
-			vals = append(vals, sqlite.Arg(s.Timeout.MustGet()))
-		}
-
-		if s.GamedigGivenPortOnly.IsValue() {
-			vals = append(vals, sqlite.Arg(s.GamedigGivenPortOnly.MustGet()))
-		}
-
-		if s.SaveResponse.IsValue() {
-			vals = append(vals, sqlite.Arg(s.SaveResponse.MustGet()))
-		}
-
-		if s.SaveErrorResponse.IsValue() {
-			vals = append(vals, sqlite.Arg(s.SaveErrorResponse.MustGet()))
-		}
-
-		if s.ResponseMaxLength.IsValue() {
-			vals = append(vals, sqlite.Arg(s.ResponseMaxLength.MustGet()))
-		}
-
-		if !s.SystemServiceName.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.SystemServiceName.MustGetNull()))
-		}
-
-		if !s.RabbitmqNodes.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.RabbitmqNodes.MustGetNull()))
-		}
-
-		if !s.RabbitmqUsername.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.RabbitmqUsername.MustGetNull()))
-		}
-
-		if !s.RabbitmqPassword.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.RabbitmqPassword.MustGetNull()))
-		}
-
-		if !s.RemoteBrowser.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.RemoteBrowser.MustGetNull()))
-		}
-
-		if !s.DomainExpiryNotification.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.DomainExpiryNotification.MustGetNull()))
-		}
-
-		if !s.GroupTagIdsJSON.IsUnset() {
-			vals = append(vals, sqlite.Arg(s.GroupTagIdsJSON.MustGetNull()))
+		if s.ConfigJSON.IsValue() {
+			vals = append(vals, sqlite.Arg(s.ConfigJSON.MustGet()))
 		}
 
 		if len(vals) == 0 {
@@ -1291,7 +353,7 @@ func (s MonitorSetter) UpdateMod() bob.Mod[*dialect.UpdateQuery] {
 }
 
 func (s MonitorSetter) Expressions(prefix ...string) []bob.Expression {
-	exprs := make([]bob.Expression, 0, 84)
+	exprs := make([]bob.Expression, 0, 16)
 
 	if s.ID.IsValue() {
 		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
@@ -1328,13 +390,6 @@ func (s MonitorSetter) Expressions(prefix ...string) []bob.Expression {
 		}})
 	}
 
-	if !s.URL.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "url")...),
-			sqlite.Arg(s.URL),
-		}})
-	}
-
 	if s.Type.IsValue() {
 		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
 			sqlite.Quote(append(prefix, "type")...),
@@ -1349,31 +404,10 @@ func (s MonitorSetter) Expressions(prefix ...string) []bob.Expression {
 		}})
 	}
 
-	if !s.Hostname.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "hostname")...),
-			sqlite.Arg(s.Hostname),
-		}})
-	}
-
-	if !s.Port.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "port")...),
-			sqlite.Arg(s.Port),
-		}})
-	}
-
 	if s.CreatedDate.IsValue() {
 		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
 			sqlite.Quote(append(prefix, "created_date")...),
 			sqlite.Arg(s.CreatedDate),
-		}})
-	}
-
-	if !s.Keyword.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "keyword")...),
-			sqlite.Arg(s.Keyword),
 		}})
 	}
 
@@ -1384,52 +418,10 @@ func (s MonitorSetter) Expressions(prefix ...string) []bob.Expression {
 		}})
 	}
 
-	if s.IgnoreTLS.IsValue() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "ignore_tls")...),
-			sqlite.Arg(s.IgnoreTLS),
-		}})
-	}
-
 	if s.UpsideDown.IsValue() {
 		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
 			sqlite.Quote(append(prefix, "upside_down")...),
 			sqlite.Arg(s.UpsideDown),
-		}})
-	}
-
-	if s.Maxredirects.IsValue() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "maxredirects")...),
-			sqlite.Arg(s.Maxredirects),
-		}})
-	}
-
-	if !s.AcceptedStatuscodesJSON.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "accepted_statuscodes_json")...),
-			sqlite.Arg(s.AcceptedStatuscodesJSON),
-		}})
-	}
-
-	if !s.DNSResolveType.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "dns_resolve_type")...),
-			sqlite.Arg(s.DNSResolveType),
-		}})
-	}
-
-	if !s.DNSResolveServer.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "dns_resolve_server")...),
-			sqlite.Arg(s.DNSResolveServer),
-		}})
-	}
-
-	if !s.DNSLastResult.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "dns_last_result")...),
-			sqlite.Arg(s.DNSLastResult),
 		}})
 	}
 
@@ -1440,227 +432,10 @@ func (s MonitorSetter) Expressions(prefix ...string) []bob.Expression {
 		}})
 	}
 
-	if s.Method.IsValue() {
+	if s.Timeout.IsValue() {
 		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "method")...),
-			sqlite.Arg(s.Method),
-		}})
-	}
-
-	if !s.Body.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "body")...),
-			sqlite.Arg(s.Body),
-		}})
-	}
-
-	if !s.Headers.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "headers")...),
-			sqlite.Arg(s.Headers),
-		}})
-	}
-
-	if !s.BasicAuthUser.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "basic_auth_user")...),
-			sqlite.Arg(s.BasicAuthUser),
-		}})
-	}
-
-	if !s.BasicAuthPass.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "basic_auth_pass")...),
-			sqlite.Arg(s.BasicAuthPass),
-		}})
-	}
-
-	if !s.ProxyID.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "proxy_id")...),
-			sqlite.Arg(s.ProxyID),
-		}})
-	}
-
-	if !s.ExpiryNotification.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "expiry_notification")...),
-			sqlite.Arg(s.ExpiryNotification),
-		}})
-	}
-
-	if !s.MQTTTopic.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "mqtt_topic")...),
-			sqlite.Arg(s.MQTTTopic),
-		}})
-	}
-
-	if !s.MQTTSuccessMessage.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "mqtt_success_message")...),
-			sqlite.Arg(s.MQTTSuccessMessage),
-		}})
-	}
-
-	if !s.MQTTUsername.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "mqtt_username")...),
-			sqlite.Arg(s.MQTTUsername),
-		}})
-	}
-
-	if !s.MQTTPassword.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "mqtt_password")...),
-			sqlite.Arg(s.MQTTPassword),
-		}})
-	}
-
-	if !s.DatabaseConnectionString.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "database_connection_string")...),
-			sqlite.Arg(s.DatabaseConnectionString),
-		}})
-	}
-
-	if !s.DatabaseQuery.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "database_query")...),
-			sqlite.Arg(s.DatabaseQuery),
-		}})
-	}
-
-	if !s.AuthMethod.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "auth_method")...),
-			sqlite.Arg(s.AuthMethod),
-		}})
-	}
-
-	if !s.AuthDomain.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "auth_domain")...),
-			sqlite.Arg(s.AuthDomain),
-		}})
-	}
-
-	if !s.AuthWorkstation.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "auth_workstation")...),
-			sqlite.Arg(s.AuthWorkstation),
-		}})
-	}
-
-	if !s.GRPCURL.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "grpc_url")...),
-			sqlite.Arg(s.GRPCURL),
-		}})
-	}
-
-	if !s.GRPCProtobuf.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "grpc_protobuf")...),
-			sqlite.Arg(s.GRPCProtobuf),
-		}})
-	}
-
-	if !s.GRPCBody.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "grpc_body")...),
-			sqlite.Arg(s.GRPCBody),
-		}})
-	}
-
-	if !s.GRPCMetadata.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "grpc_metadata")...),
-			sqlite.Arg(s.GRPCMetadata),
-		}})
-	}
-
-	if !s.GRPCMethod.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "grpc_method")...),
-			sqlite.Arg(s.GRPCMethod),
-		}})
-	}
-
-	if !s.GRPCServiceName.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "grpc_service_name")...),
-			sqlite.Arg(s.GRPCServiceName),
-		}})
-	}
-
-	if s.GRPCEnableTLS.IsValue() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "grpc_enable_tls")...),
-			sqlite.Arg(s.GRPCEnableTLS),
-		}})
-	}
-
-	if !s.RadiusUsername.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "radius_username")...),
-			sqlite.Arg(s.RadiusUsername),
-		}})
-	}
-
-	if !s.RadiusPassword.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "radius_password")...),
-			sqlite.Arg(s.RadiusPassword),
-		}})
-	}
-
-	if !s.RadiusCallingStationID.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "radius_calling_station_id")...),
-			sqlite.Arg(s.RadiusCallingStationID),
-		}})
-	}
-
-	if !s.RadiusCalledStationID.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "radius_called_station_id")...),
-			sqlite.Arg(s.RadiusCalledStationID),
-		}})
-	}
-
-	if !s.RadiusSecret.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "radius_secret")...),
-			sqlite.Arg(s.RadiusSecret),
-		}})
-	}
-
-	if s.ResendInterval.IsValue() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "resend_interval")...),
-			sqlite.Arg(s.ResendInterval),
-		}})
-	}
-
-	if s.PacketSize.IsValue() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "packet_size")...),
-			sqlite.Arg(s.PacketSize),
-		}})
-	}
-
-	if !s.Game.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "game")...),
-			sqlite.Arg(s.Game),
-		}})
-	}
-
-	if !s.HTTPBodyEncoding.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "http_body_encoding")...),
-			sqlite.Arg(s.HTTPBodyEncoding),
+			sqlite.Quote(append(prefix, "timeout")...),
+			sqlite.Arg(s.Timeout),
 		}})
 	}
 
@@ -1671,206 +446,24 @@ func (s MonitorSetter) Expressions(prefix ...string) []bob.Expression {
 		}})
 	}
 
-	if !s.TLSCa.IsUnset() {
+	if s.ResendInterval.IsValue() {
 		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "tls_ca")...),
-			sqlite.Arg(s.TLSCa),
+			sqlite.Quote(append(prefix, "resend_interval")...),
+			sqlite.Arg(s.ResendInterval),
 		}})
 	}
 
-	if !s.TLSCert.IsUnset() {
+	if !s.ExpiryNotification.IsUnset() {
 		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "tls_cert")...),
-			sqlite.Arg(s.TLSCert),
+			sqlite.Quote(append(prefix, "expiry_notification")...),
+			sqlite.Arg(s.ExpiryNotification),
 		}})
 	}
 
-	if !s.TLSKey.IsUnset() {
+	if s.ConfigJSON.IsValue() {
 		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "tls_key")...),
-			sqlite.Arg(s.TLSKey),
-		}})
-	}
-
-	if s.InvertKeyword.IsValue() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "invert_keyword")...),
-			sqlite.Arg(s.InvertKeyword),
-		}})
-	}
-
-	if !s.JSONPath.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "json_path")...),
-			sqlite.Arg(s.JSONPath),
-		}})
-	}
-
-	if !s.ExpectedValue.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "expected_value")...),
-			sqlite.Arg(s.ExpectedValue),
-		}})
-	}
-
-	if !s.KafkaProducerTopic.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "kafka_producer_topic")...),
-			sqlite.Arg(s.KafkaProducerTopic),
-		}})
-	}
-
-	if !s.KafkaProducerBrokers.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "kafka_producer_brokers")...),
-			sqlite.Arg(s.KafkaProducerBrokers),
-		}})
-	}
-
-	if s.KafkaProducerSSL.IsValue() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "kafka_producer_ssl")...),
-			sqlite.Arg(s.KafkaProducerSSL),
-		}})
-	}
-
-	if s.KafkaProducerAllowAutoTopicCreation.IsValue() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "kafka_producer_allow_auto_topic_creation")...),
-			sqlite.Arg(s.KafkaProducerAllowAutoTopicCreation),
-		}})
-	}
-
-	if !s.KafkaProducerSaslOptions.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "kafka_producer_sasl_options")...),
-			sqlite.Arg(s.KafkaProducerSaslOptions),
-		}})
-	}
-
-	if !s.KafkaProducerMessage.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "kafka_producer_message")...),
-			sqlite.Arg(s.KafkaProducerMessage),
-		}})
-	}
-
-	if !s.OauthClientID.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "oauth_client_id")...),
-			sqlite.Arg(s.OauthClientID),
-		}})
-	}
-
-	if !s.OauthClientSecret.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "oauth_client_secret")...),
-			sqlite.Arg(s.OauthClientSecret),
-		}})
-	}
-
-	if !s.OauthTokenURL.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "oauth_token_url")...),
-			sqlite.Arg(s.OauthTokenURL),
-		}})
-	}
-
-	if !s.OauthScopes.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "oauth_scopes")...),
-			sqlite.Arg(s.OauthScopes),
-		}})
-	}
-
-	if !s.OauthAuthMethod.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "oauth_auth_method")...),
-			sqlite.Arg(s.OauthAuthMethod),
-		}})
-	}
-
-	if s.Timeout.IsValue() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "timeout")...),
-			sqlite.Arg(s.Timeout),
-		}})
-	}
-
-	if s.GamedigGivenPortOnly.IsValue() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "gamedig_given_port_only")...),
-			sqlite.Arg(s.GamedigGivenPortOnly),
-		}})
-	}
-
-	if s.SaveResponse.IsValue() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "save_response")...),
-			sqlite.Arg(s.SaveResponse),
-		}})
-	}
-
-	if s.SaveErrorResponse.IsValue() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "save_error_response")...),
-			sqlite.Arg(s.SaveErrorResponse),
-		}})
-	}
-
-	if s.ResponseMaxLength.IsValue() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "response_max_length")...),
-			sqlite.Arg(s.ResponseMaxLength),
-		}})
-	}
-
-	if !s.SystemServiceName.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "system_service_name")...),
-			sqlite.Arg(s.SystemServiceName),
-		}})
-	}
-
-	if !s.RabbitmqNodes.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "rabbitmq_nodes")...),
-			sqlite.Arg(s.RabbitmqNodes),
-		}})
-	}
-
-	if !s.RabbitmqUsername.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "rabbitmq_username")...),
-			sqlite.Arg(s.RabbitmqUsername),
-		}})
-	}
-
-	if !s.RabbitmqPassword.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "rabbitmq_password")...),
-			sqlite.Arg(s.RabbitmqPassword),
-		}})
-	}
-
-	if !s.RemoteBrowser.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "remote_browser")...),
-			sqlite.Arg(s.RemoteBrowser),
-		}})
-	}
-
-	if !s.DomainExpiryNotification.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "domain_expiry_notification")...),
-			sqlite.Arg(s.DomainExpiryNotification),
-		}})
-	}
-
-	if !s.GroupTagIdsJSON.IsUnset() {
-		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
-			sqlite.Quote(append(prefix, "group_tag_ids_json")...),
-			sqlite.Arg(s.GroupTagIdsJSON),
+			sqlite.Quote(append(prefix, "config_json")...),
+			sqlite.Arg(s.ConfigJSON),
 		}})
 	}
 
@@ -3026,89 +1619,22 @@ func (monitor0 *Monitor) AttachStatMinutelies(ctx context.Context, exec bob.Exec
 }
 
 type monitorWhere[Q sqlite.Filterable] struct {
-	ID                                  sqlite.WhereMod[Q, string]
-	Name                                sqlite.WhereMod[Q, string]
-	Active                              sqlite.WhereMod[Q, bool]
-	UserID                              sqlite.WhereMod[Q, string]
-	Interval                            sqlite.WhereMod[Q, int64]
-	URL                                 sqlite.WhereNullMod[Q, string]
-	Type                                sqlite.WhereMod[Q, string]
-	Weight                              sqlite.WhereNullMod[Q, int64]
-	Hostname                            sqlite.WhereNullMod[Q, string]
-	Port                                sqlite.WhereNullMod[Q, int64]
-	CreatedDate                         sqlite.WhereMod[Q, time.Time]
-	Keyword                             sqlite.WhereNullMod[Q, string]
-	Maxretries                          sqlite.WhereMod[Q, int64]
-	IgnoreTLS                           sqlite.WhereMod[Q, bool]
-	UpsideDown                          sqlite.WhereMod[Q, bool]
-	Maxredirects                        sqlite.WhereMod[Q, int64]
-	AcceptedStatuscodesJSON             sqlite.WhereNullMod[Q, string]
-	DNSResolveType                      sqlite.WhereNullMod[Q, string]
-	DNSResolveServer                    sqlite.WhereNullMod[Q, string]
-	DNSLastResult                       sqlite.WhereNullMod[Q, string]
-	RetryInterval                       sqlite.WhereMod[Q, int64]
-	Method                              sqlite.WhereMod[Q, string]
-	Body                                sqlite.WhereNullMod[Q, string]
-	Headers                             sqlite.WhereNullMod[Q, string]
-	BasicAuthUser                       sqlite.WhereNullMod[Q, string]
-	BasicAuthPass                       sqlite.WhereNullMod[Q, string]
-	ProxyID                             sqlite.WhereNullMod[Q, string]
-	ExpiryNotification                  sqlite.WhereNullMod[Q, bool]
-	MQTTTopic                           sqlite.WhereNullMod[Q, string]
-	MQTTSuccessMessage                  sqlite.WhereNullMod[Q, string]
-	MQTTUsername                        sqlite.WhereNullMod[Q, string]
-	MQTTPassword                        sqlite.WhereNullMod[Q, string]
-	DatabaseConnectionString            sqlite.WhereNullMod[Q, string]
-	DatabaseQuery                       sqlite.WhereNullMod[Q, string]
-	AuthMethod                          sqlite.WhereNullMod[Q, string]
-	AuthDomain                          sqlite.WhereNullMod[Q, string]
-	AuthWorkstation                     sqlite.WhereNullMod[Q, string]
-	GRPCURL                             sqlite.WhereNullMod[Q, string]
-	GRPCProtobuf                        sqlite.WhereNullMod[Q, string]
-	GRPCBody                            sqlite.WhereNullMod[Q, string]
-	GRPCMetadata                        sqlite.WhereNullMod[Q, string]
-	GRPCMethod                          sqlite.WhereNullMod[Q, string]
-	GRPCServiceName                     sqlite.WhereNullMod[Q, string]
-	GRPCEnableTLS                       sqlite.WhereMod[Q, bool]
-	RadiusUsername                      sqlite.WhereNullMod[Q, string]
-	RadiusPassword                      sqlite.WhereNullMod[Q, string]
-	RadiusCallingStationID              sqlite.WhereNullMod[Q, string]
-	RadiusCalledStationID               sqlite.WhereNullMod[Q, string]
-	RadiusSecret                        sqlite.WhereNullMod[Q, string]
-	ResendInterval                      sqlite.WhereMod[Q, int64]
-	PacketSize                          sqlite.WhereMod[Q, int64]
-	Game                                sqlite.WhereNullMod[Q, string]
-	HTTPBodyEncoding                    sqlite.WhereNullMod[Q, string]
-	Description                         sqlite.WhereNullMod[Q, string]
-	TLSCa                               sqlite.WhereNullMod[Q, string]
-	TLSCert                             sqlite.WhereNullMod[Q, string]
-	TLSKey                              sqlite.WhereNullMod[Q, string]
-	InvertKeyword                       sqlite.WhereMod[Q, bool]
-	JSONPath                            sqlite.WhereNullMod[Q, string]
-	ExpectedValue                       sqlite.WhereNullMod[Q, string]
-	KafkaProducerTopic                  sqlite.WhereNullMod[Q, string]
-	KafkaProducerBrokers                sqlite.WhereNullMod[Q, string]
-	KafkaProducerSSL                    sqlite.WhereMod[Q, bool]
-	KafkaProducerAllowAutoTopicCreation sqlite.WhereMod[Q, bool]
-	KafkaProducerSaslOptions            sqlite.WhereNullMod[Q, string]
-	KafkaProducerMessage                sqlite.WhereNullMod[Q, string]
-	OauthClientID                       sqlite.WhereNullMod[Q, string]
-	OauthClientSecret                   sqlite.WhereNullMod[Q, string]
-	OauthTokenURL                       sqlite.WhereNullMod[Q, string]
-	OauthScopes                         sqlite.WhereNullMod[Q, string]
-	OauthAuthMethod                     sqlite.WhereNullMod[Q, string]
-	Timeout                             sqlite.WhereMod[Q, int64]
-	GamedigGivenPortOnly                sqlite.WhereMod[Q, bool]
-	SaveResponse                        sqlite.WhereMod[Q, bool]
-	SaveErrorResponse                   sqlite.WhereMod[Q, bool]
-	ResponseMaxLength                   sqlite.WhereMod[Q, int64]
-	SystemServiceName                   sqlite.WhereNullMod[Q, string]
-	RabbitmqNodes                       sqlite.WhereNullMod[Q, string]
-	RabbitmqUsername                    sqlite.WhereNullMod[Q, string]
-	RabbitmqPassword                    sqlite.WhereNullMod[Q, string]
-	RemoteBrowser                       sqlite.WhereNullMod[Q, string]
-	DomainExpiryNotification            sqlite.WhereNullMod[Q, bool]
-	GroupTagIdsJSON                     sqlite.WhereNullMod[Q, string]
+	ID                 sqlite.WhereMod[Q, string]
+	Name               sqlite.WhereMod[Q, string]
+	Active             sqlite.WhereMod[Q, bool]
+	UserID             sqlite.WhereMod[Q, string]
+	Interval           sqlite.WhereMod[Q, int64]
+	Type               sqlite.WhereMod[Q, string]
+	Weight             sqlite.WhereNullMod[Q, int64]
+	CreatedDate        sqlite.WhereMod[Q, time.Time]
+	Maxretries         sqlite.WhereMod[Q, int64]
+	UpsideDown         sqlite.WhereMod[Q, bool]
+	RetryInterval      sqlite.WhereMod[Q, int64]
+	Timeout            sqlite.WhereMod[Q, int64]
+	Description        sqlite.WhereNullMod[Q, string]
+	ResendInterval     sqlite.WhereMod[Q, int64]
+	ExpiryNotification sqlite.WhereNullMod[Q, bool]
+	ConfigJSON         sqlite.WhereMod[Q, string]
 }
 
 func (monitorWhere[Q]) AliasedAs(alias string) monitorWhere[Q] {
@@ -3117,89 +1643,22 @@ func (monitorWhere[Q]) AliasedAs(alias string) monitorWhere[Q] {
 
 func buildMonitorWhere[Q sqlite.Filterable](cols monitorColumns) monitorWhere[Q] {
 	return monitorWhere[Q]{
-		ID:                                  sqlite.Where[Q, string](cols.ID),
-		Name:                                sqlite.Where[Q, string](cols.Name),
-		Active:                              sqlite.Where[Q, bool](cols.Active),
-		UserID:                              sqlite.Where[Q, string](cols.UserID),
-		Interval:                            sqlite.Where[Q, int64](cols.Interval),
-		URL:                                 sqlite.WhereNull[Q, string](cols.URL),
-		Type:                                sqlite.Where[Q, string](cols.Type),
-		Weight:                              sqlite.WhereNull[Q, int64](cols.Weight),
-		Hostname:                            sqlite.WhereNull[Q, string](cols.Hostname),
-		Port:                                sqlite.WhereNull[Q, int64](cols.Port),
-		CreatedDate:                         sqlite.Where[Q, time.Time](cols.CreatedDate),
-		Keyword:                             sqlite.WhereNull[Q, string](cols.Keyword),
-		Maxretries:                          sqlite.Where[Q, int64](cols.Maxretries),
-		IgnoreTLS:                           sqlite.Where[Q, bool](cols.IgnoreTLS),
-		UpsideDown:                          sqlite.Where[Q, bool](cols.UpsideDown),
-		Maxredirects:                        sqlite.Where[Q, int64](cols.Maxredirects),
-		AcceptedStatuscodesJSON:             sqlite.WhereNull[Q, string](cols.AcceptedStatuscodesJSON),
-		DNSResolveType:                      sqlite.WhereNull[Q, string](cols.DNSResolveType),
-		DNSResolveServer:                    sqlite.WhereNull[Q, string](cols.DNSResolveServer),
-		DNSLastResult:                       sqlite.WhereNull[Q, string](cols.DNSLastResult),
-		RetryInterval:                       sqlite.Where[Q, int64](cols.RetryInterval),
-		Method:                              sqlite.Where[Q, string](cols.Method),
-		Body:                                sqlite.WhereNull[Q, string](cols.Body),
-		Headers:                             sqlite.WhereNull[Q, string](cols.Headers),
-		BasicAuthUser:                       sqlite.WhereNull[Q, string](cols.BasicAuthUser),
-		BasicAuthPass:                       sqlite.WhereNull[Q, string](cols.BasicAuthPass),
-		ProxyID:                             sqlite.WhereNull[Q, string](cols.ProxyID),
-		ExpiryNotification:                  sqlite.WhereNull[Q, bool](cols.ExpiryNotification),
-		MQTTTopic:                           sqlite.WhereNull[Q, string](cols.MQTTTopic),
-		MQTTSuccessMessage:                  sqlite.WhereNull[Q, string](cols.MQTTSuccessMessage),
-		MQTTUsername:                        sqlite.WhereNull[Q, string](cols.MQTTUsername),
-		MQTTPassword:                        sqlite.WhereNull[Q, string](cols.MQTTPassword),
-		DatabaseConnectionString:            sqlite.WhereNull[Q, string](cols.DatabaseConnectionString),
-		DatabaseQuery:                       sqlite.WhereNull[Q, string](cols.DatabaseQuery),
-		AuthMethod:                          sqlite.WhereNull[Q, string](cols.AuthMethod),
-		AuthDomain:                          sqlite.WhereNull[Q, string](cols.AuthDomain),
-		AuthWorkstation:                     sqlite.WhereNull[Q, string](cols.AuthWorkstation),
-		GRPCURL:                             sqlite.WhereNull[Q, string](cols.GRPCURL),
-		GRPCProtobuf:                        sqlite.WhereNull[Q, string](cols.GRPCProtobuf),
-		GRPCBody:                            sqlite.WhereNull[Q, string](cols.GRPCBody),
-		GRPCMetadata:                        sqlite.WhereNull[Q, string](cols.GRPCMetadata),
-		GRPCMethod:                          sqlite.WhereNull[Q, string](cols.GRPCMethod),
-		GRPCServiceName:                     sqlite.WhereNull[Q, string](cols.GRPCServiceName),
-		GRPCEnableTLS:                       sqlite.Where[Q, bool](cols.GRPCEnableTLS),
-		RadiusUsername:                      sqlite.WhereNull[Q, string](cols.RadiusUsername),
-		RadiusPassword:                      sqlite.WhereNull[Q, string](cols.RadiusPassword),
-		RadiusCallingStationID:              sqlite.WhereNull[Q, string](cols.RadiusCallingStationID),
-		RadiusCalledStationID:               sqlite.WhereNull[Q, string](cols.RadiusCalledStationID),
-		RadiusSecret:                        sqlite.WhereNull[Q, string](cols.RadiusSecret),
-		ResendInterval:                      sqlite.Where[Q, int64](cols.ResendInterval),
-		PacketSize:                          sqlite.Where[Q, int64](cols.PacketSize),
-		Game:                                sqlite.WhereNull[Q, string](cols.Game),
-		HTTPBodyEncoding:                    sqlite.WhereNull[Q, string](cols.HTTPBodyEncoding),
-		Description:                         sqlite.WhereNull[Q, string](cols.Description),
-		TLSCa:                               sqlite.WhereNull[Q, string](cols.TLSCa),
-		TLSCert:                             sqlite.WhereNull[Q, string](cols.TLSCert),
-		TLSKey:                              sqlite.WhereNull[Q, string](cols.TLSKey),
-		InvertKeyword:                       sqlite.Where[Q, bool](cols.InvertKeyword),
-		JSONPath:                            sqlite.WhereNull[Q, string](cols.JSONPath),
-		ExpectedValue:                       sqlite.WhereNull[Q, string](cols.ExpectedValue),
-		KafkaProducerTopic:                  sqlite.WhereNull[Q, string](cols.KafkaProducerTopic),
-		KafkaProducerBrokers:                sqlite.WhereNull[Q, string](cols.KafkaProducerBrokers),
-		KafkaProducerSSL:                    sqlite.Where[Q, bool](cols.KafkaProducerSSL),
-		KafkaProducerAllowAutoTopicCreation: sqlite.Where[Q, bool](cols.KafkaProducerAllowAutoTopicCreation),
-		KafkaProducerSaslOptions:            sqlite.WhereNull[Q, string](cols.KafkaProducerSaslOptions),
-		KafkaProducerMessage:                sqlite.WhereNull[Q, string](cols.KafkaProducerMessage),
-		OauthClientID:                       sqlite.WhereNull[Q, string](cols.OauthClientID),
-		OauthClientSecret:                   sqlite.WhereNull[Q, string](cols.OauthClientSecret),
-		OauthTokenURL:                       sqlite.WhereNull[Q, string](cols.OauthTokenURL),
-		OauthScopes:                         sqlite.WhereNull[Q, string](cols.OauthScopes),
-		OauthAuthMethod:                     sqlite.WhereNull[Q, string](cols.OauthAuthMethod),
-		Timeout:                             sqlite.Where[Q, int64](cols.Timeout),
-		GamedigGivenPortOnly:                sqlite.Where[Q, bool](cols.GamedigGivenPortOnly),
-		SaveResponse:                        sqlite.Where[Q, bool](cols.SaveResponse),
-		SaveErrorResponse:                   sqlite.Where[Q, bool](cols.SaveErrorResponse),
-		ResponseMaxLength:                   sqlite.Where[Q, int64](cols.ResponseMaxLength),
-		SystemServiceName:                   sqlite.WhereNull[Q, string](cols.SystemServiceName),
-		RabbitmqNodes:                       sqlite.WhereNull[Q, string](cols.RabbitmqNodes),
-		RabbitmqUsername:                    sqlite.WhereNull[Q, string](cols.RabbitmqUsername),
-		RabbitmqPassword:                    sqlite.WhereNull[Q, string](cols.RabbitmqPassword),
-		RemoteBrowser:                       sqlite.WhereNull[Q, string](cols.RemoteBrowser),
-		DomainExpiryNotification:            sqlite.WhereNull[Q, bool](cols.DomainExpiryNotification),
-		GroupTagIdsJSON:                     sqlite.WhereNull[Q, string](cols.GroupTagIdsJSON),
+		ID:                 sqlite.Where[Q, string](cols.ID),
+		Name:               sqlite.Where[Q, string](cols.Name),
+		Active:             sqlite.Where[Q, bool](cols.Active),
+		UserID:             sqlite.Where[Q, string](cols.UserID),
+		Interval:           sqlite.Where[Q, int64](cols.Interval),
+		Type:               sqlite.Where[Q, string](cols.Type),
+		Weight:             sqlite.WhereNull[Q, int64](cols.Weight),
+		CreatedDate:        sqlite.Where[Q, time.Time](cols.CreatedDate),
+		Maxretries:         sqlite.Where[Q, int64](cols.Maxretries),
+		UpsideDown:         sqlite.Where[Q, bool](cols.UpsideDown),
+		RetryInterval:      sqlite.Where[Q, int64](cols.RetryInterval),
+		Timeout:            sqlite.Where[Q, int64](cols.Timeout),
+		Description:        sqlite.WhereNull[Q, string](cols.Description),
+		ResendInterval:     sqlite.Where[Q, int64](cols.ResendInterval),
+		ExpiryNotification: sqlite.WhereNull[Q, bool](cols.ExpiryNotification),
+		ConfigJSON:         sqlite.Where[Q, string](cols.ConfigJSON),
 	}
 }
 

@@ -144,23 +144,24 @@ func TestFindByTagIDs_EmptySliceReturnsNil(t *testing.T) {
 	assert.Nil(t, results)
 }
 
-// TestGroupTagIDs_PersistsRoundTrip verifies that GroupTagIDs written during
+// TestConfigJSON_PersistsRoundTrip verifies that ConfigJSON written during
 // Create is readable via FindByID with the value intact.
-func TestGroupTagIDs_PersistsRoundTrip(t *testing.T) {
+func TestConfigJSON_PersistsRoundTrip(t *testing.T) {
 	repo, db := setupRepo(t)
 	ctx := t.Context()
 
 	userID := createUser(t, db)
 	tagID := uuid.New().String()
 
+	configJSON := `{"kind":"group","tagIds":["` + tagID + `"]}`
 	m := &monitor.Monitor{
-		Name:        "My Group",
-		Type:        "group",
-		Active:      true,
-		UserID:      userID,
-		Interval:    60,
-		Timeout:     48,
-		GroupTagIDs: `["` + tagID + `"]`,
+		Name:       "My Group",
+		Type:       "group",
+		Active:     true,
+		UserID:     userID,
+		Interval:   60,
+		Timeout:    48,
+		ConfigJSON: configJSON,
 	}
 
 	id, err := repo.Create(ctx, m)
@@ -168,24 +169,25 @@ func TestGroupTagIDs_PersistsRoundTrip(t *testing.T) {
 
 	loaded, err := repo.FindByID(ctx, id)
 	require.NoError(t, err)
-	assert.Equal(t, `["`+tagID+`"]`, loaded.GroupTagIDs)
+	assert.JSONEq(t, configJSON, loaded.ConfigJSON)
 }
 
-// TestGroupTagIDs_UpdatePersists verifies that updating GroupTagIDs writes
+// TestConfigJSON_UpdatePersists verifies that updating ConfigJSON writes
 // the new value to the database.
-func TestGroupTagIDs_UpdatePersists(t *testing.T) {
+func TestConfigJSON_UpdatePersists(t *testing.T) {
 	repo, db := setupRepo(t)
 	ctx := t.Context()
 
 	userID := createUser(t, db)
 
 	m := &monitor.Monitor{
-		Name:     "My Group",
-		Type:     "group",
-		Active:   true,
-		UserID:   userID,
-		Interval: 60,
-		Timeout:  48,
+		Name:       "My Group",
+		Type:       "group",
+		Active:     true,
+		UserID:     userID,
+		Interval:   60,
+		Timeout:    48,
+		ConfigJSON: "{}",
 	}
 
 	id, err := repo.Create(ctx, m)
@@ -193,13 +195,13 @@ func TestGroupTagIDs_UpdatePersists(t *testing.T) {
 
 	loaded, err := repo.FindByID(ctx, id)
 	require.NoError(t, err)
-	assert.Equal(t, "", loaded.GroupTagIDs)
+	assert.Equal(t, "{}", loaded.ConfigJSON)
 
 	tagID := uuid.New().String()
-	loaded.GroupTagIDs = `["` + tagID + `"]`
+	loaded.ConfigJSON = `{"kind":"group","tagIds":["` + tagID + `"]}`
 	require.NoError(t, repo.Update(ctx, loaded))
 
 	reloaded, err := repo.FindByID(ctx, id)
 	require.NoError(t, err)
-	assert.Equal(t, `["`+tagID+`"]`, reloaded.GroupTagIDs)
+	assert.JSONEq(t, `{"kind":"group","tagIds":["`+tagID+`"]}`, reloaded.ConfigJSON)
 }

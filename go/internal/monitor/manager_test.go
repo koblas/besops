@@ -237,6 +237,29 @@ func TestManagerNotifiesOnStatusChange(t *testing.T) {
 	}
 }
 
+func TestModelToConfigParsesHeaders(t *testing.T) {
+	mon := &domainmonitor.Monitor{
+		ID:         "m1",
+		Name:       "HTTP Test",
+		Type:       "http",
+		Interval:   60,
+		Timeout:    10,
+		ConfigJSON: `{"url":"https://example.com","method":"POST","headers":[{"name":"Content-Type","value":"application/json"},{"name":"Authorization","value":"Bearer tok"}],"body":"{\"ping\":true}"}`,
+	}
+
+	cfg := modelToConfig(mon)
+
+	if len(cfg.HTTP.Headers) != 2 {
+		t.Fatalf("expected 2 headers, got %d", len(cfg.HTTP.Headers))
+	}
+	if cfg.HTTP.Headers[0].Name != "Content-Type" || cfg.HTTP.Headers[0].Value != "application/json" {
+		t.Errorf("expected first header Content-Type=application/json, got %s=%s", cfg.HTTP.Headers[0].Name, cfg.HTTP.Headers[0].Value)
+	}
+	if cfg.HTTP.Headers[1].Name != "Authorization" || cfg.HTTP.Headers[1].Value != "Bearer tok" {
+		t.Errorf("expected second header Authorization=Bearer tok, got %s=%s", cfg.HTTP.Headers[1].Name, cfg.HTTP.Headers[1].Value)
+	}
+}
+
 func TestManagerUnknownType(t *testing.T) {
 	store := &memMonitorStore{monitors: map[string]*domainmonitor.Monitor{
 		"m1": {ID: "m1", Name: "Bad", Type: "nonexistent", Interval: 60, Timeout: 5, Active: true},

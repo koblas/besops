@@ -73,9 +73,9 @@ func (c *HTTPChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.C
 		return monitor.CheckResult{Status: status.Down, Message: fmt.Sprintf("invalid request: %v", err)}, nil
 	}
 
-	for k, v := range cfg.HTTP.Headers {
-		req.Header.Set(k, v)
-		slog.DebugContext(ctx, "setting header", slog.String("key", k), slog.String("value", v))
+	for _, h := range cfg.HTTP.Headers {
+		req.Header.Add(h.Name, h.Value)
+		slog.DebugContext(ctx, "setting header", slog.String("key", h.Name), slog.String("value", h.Value))
 	}
 	if cfg.HTTP.BasicAuthUser != "" {
 		req.SetBasicAuth(cfg.HTTP.BasicAuthUser, cfg.HTTP.BasicAuthPass)
@@ -95,7 +95,7 @@ func (c *HTTPChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.C
 	result := monitor.CheckResult{
 		Latency:      latency,
 		ResponseBody: body,
-		Message:      fmt.Sprintf("%d - %s", resp.StatusCode, http.StatusText(resp.StatusCode)),
+		Message:      fmt.Sprintf("%d - %s", resp.StatusCode, string(body)[:min(len(body), 80)]),
 	}
 
 	// TLS certificate info
