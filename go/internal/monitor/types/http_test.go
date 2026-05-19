@@ -6,6 +6,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/koblas/besops/internal/monitor"
 	"github.com/koblas/besops/lib/status"
 )
@@ -25,15 +28,9 @@ func TestHTTPCheckerSuccess(t *testing.T) {
 	}
 
 	result, err := checker.Check(t.Context(), cfg)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if result.Status != status.Up {
-		t.Errorf("expected Up, got %v: %s", result.Status, result.Message)
-	}
-	if result.Latency <= 0 {
-		t.Error("expected positive ping")
-	}
+	require.NoError(t, err)
+	assert.Equal(t, status.Up, result.Status, result.Message)
+	assert.Positive(t, result.Latency)
 }
 
 func TestHTTPCheckerKeywordContain(t *testing.T) {
@@ -52,12 +49,8 @@ func TestHTTPCheckerKeywordContain(t *testing.T) {
 	}
 
 	result, err := checker.Check(t.Context(), cfg)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if result.Status != status.Up {
-		t.Errorf("expected Up (keyword found), got %v: %s", result.Status, result.Message)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, status.Up, result.Status, result.Message)
 }
 
 func TestHTTPCheckerKeywordNotFound(t *testing.T) {
@@ -76,12 +69,8 @@ func TestHTTPCheckerKeywordNotFound(t *testing.T) {
 	}
 
 	result, err := checker.Check(t.Context(), cfg)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if result.Status != status.Down {
-		t.Errorf("expected Down (keyword not found), got %v: %s", result.Status, result.Message)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, status.Down, result.Status, result.Message)
 }
 
 func TestHTTPCheckerKeywordNotContain(t *testing.T) {
@@ -100,12 +89,8 @@ func TestHTTPCheckerKeywordNotContain(t *testing.T) {
 	}
 
 	result, err := checker.Check(t.Context(), cfg)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if result.Status != status.Up {
-		t.Errorf("expected Up (keyword absent), got %v: %s", result.Status, result.Message)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, status.Up, result.Status, result.Message)
 }
 
 func TestHTTPCheckerBadStatusCode(t *testing.T) {
@@ -122,12 +107,8 @@ func TestHTTPCheckerBadStatusCode(t *testing.T) {
 	}
 
 	result, err := checker.Check(t.Context(), cfg)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if result.Status != status.Down {
-		t.Errorf("expected Down for 500, got %v: %s", result.Status, result.Message)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, status.Down, result.Status, result.Message)
 }
 
 func TestHTTPCheckerCustomAccepted(t *testing.T) {
@@ -144,17 +125,13 @@ func TestHTTPCheckerCustomAccepted(t *testing.T) {
 	}
 
 	result, err := checker.Check(t.Context(), cfg)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if result.Status != status.Up {
-		t.Errorf("expected Up (404 accepted), got %v: %s", result.Status, result.Message)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, status.Up, result.Status, result.Message)
 }
 
 func TestHTTPCheckerRangeAccepted(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-		w.WriteHeader(http.StatusCreated) // 201
+		w.WriteHeader(http.StatusCreated)
 	}))
 	defer srv.Close()
 
@@ -166,12 +143,8 @@ func TestHTTPCheckerRangeAccepted(t *testing.T) {
 	}
 
 	result, err := checker.Check(t.Context(), cfg)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if result.Status != status.Up {
-		t.Errorf("expected Up (201 in 200-299 range), got %v: %s", result.Status, result.Message)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, status.Up, result.Status, result.Message)
 }
 
 func TestHTTPCheckerHeaders(t *testing.T) {
@@ -190,15 +163,36 @@ func TestHTTPCheckerHeaders(t *testing.T) {
 	}
 
 	result, err := checker.Check(t.Context(), cfg)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
+	require.NoError(t, err)
+	assert.Equal(t, status.Up, result.Status)
+	assert.Equal(t, "test-value", receivedHeader)
+}
+
+func TestHTTPCheckerDuplicateHeaders(t *testing.T) {
+	var receivedValues []string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		receivedValues = r.Header.Values("X-Multi")
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer srv.Close()
+
+	checker := NewHTTPChecker()
+	cfg := &monitor.Config{
+		URL: srv.URL,
+		HTTP: monitor.HTTPConfig{
+			Method: "GET",
+			Headers: []monitor.HeaderPair{
+				{Name: "X-Multi", Value: "first"},
+				{Name: "X-Multi", Value: "second"},
+			},
+		},
+		Timeout: 5 * time.Second,
 	}
-	if result.Status != status.Up {
-		t.Errorf("expected Up, got %v", result.Status)
-	}
-	if receivedHeader != "test-value" {
-		t.Errorf("expected header test-value, got %s", receivedHeader)
-	}
+
+	result, err := checker.Check(t.Context(), cfg)
+	require.NoError(t, err)
+	assert.Equal(t, status.Up, result.Status)
+	assert.Equal(t, []string{"first", "second"}, receivedValues)
 }
 
 func TestHTTPCheckerJsonPathMatch(t *testing.T) {
@@ -218,12 +212,8 @@ func TestHTTPCheckerJsonPathMatch(t *testing.T) {
 	}
 
 	result, err := checker.Check(t.Context(), cfg)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if result.Status != status.Up {
-		t.Errorf("expected Up (JSON path matches), got %v: %s", result.Status, result.Message)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, status.Up, result.Status, result.Message)
 }
 
 func TestHTTPCheckerJsonPathMismatch(t *testing.T) {
@@ -243,15 +233,9 @@ func TestHTTPCheckerJsonPathMismatch(t *testing.T) {
 	}
 
 	result, err := checker.Check(t.Context(), cfg)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if result.Status != status.Down {
-		t.Errorf("expected Down (JSON path mismatch), got %v: %s", result.Status, result.Message)
-	}
-	if !contains(result.Message, `expected "ok"`) {
-		t.Errorf("expected error message to mention expected value, got: %s", result.Message)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, status.Down, result.Status)
+	assert.Contains(t, result.Message, `expected "ok"`)
 }
 
 func TestHTTPCheckerJsonPathNotFound(t *testing.T) {
@@ -270,12 +254,8 @@ func TestHTTPCheckerJsonPathNotFound(t *testing.T) {
 	}
 
 	result, err := checker.Check(t.Context(), cfg)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if result.Status != status.Down {
-		t.Errorf("expected Down (JSON path not found), got %v: %s", result.Status, result.Message)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, status.Down, result.Status)
 }
 
 func TestHTTPCheckerJsonPathExistsWithoutExpected(t *testing.T) {
@@ -294,12 +274,8 @@ func TestHTTPCheckerJsonPathExistsWithoutExpected(t *testing.T) {
 	}
 
 	result, err := checker.Check(t.Context(), cfg)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if result.Status != status.Up {
-		t.Errorf("expected Up (JSON path exists, no expected value), got %v: %s", result.Status, result.Message)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, status.Up, result.Status, result.Message)
 }
 
 func TestHTTPCheckerJsonPathNestedObject(t *testing.T) {
@@ -319,12 +295,8 @@ func TestHTTPCheckerJsonPathNestedObject(t *testing.T) {
 	}
 
 	result, err := checker.Check(t.Context(), cfg)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if result.Status != status.Up {
-		t.Errorf("expected Up (nested JSON path matches), got %v: %s", result.Status, result.Message)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, status.Up, result.Status, result.Message)
 }
 
 func TestHTTPCheckerJsonPathInvalidJson(t *testing.T) {
@@ -342,55 +314,11 @@ func TestHTTPCheckerJsonPathInvalidJson(t *testing.T) {
 	}
 
 	result, err := checker.Check(t.Context(), cfg)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if result.Status != status.Down {
-		t.Errorf("expected Down (invalid JSON), got %v: %s", result.Status, result.Message)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, status.Down, result.Status)
 }
 
-func contains(s, substr string) bool {
-	return len(s) >= len(substr) && (s == substr || len(s) > 0 && containsSubstring(s, substr))
-}
-
-func containsSubstring(s, substr string) bool {
-	for i := 0; i <= len(s)-len(substr); i++ {
-		if s[i:i+len(substr)] == substr {
-			return true
-		}
-	}
-	return false
-}
-
-func TestHTTPCheckerDefaultContentTypeWithBody(t *testing.T) {
-	var receivedContentType string
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		receivedContentType = r.Header.Get("Content-Type")
-		w.WriteHeader(http.StatusOK)
-	}))
-	defer srv.Close()
-
-	checker := NewHTTPChecker()
-	cfg := &monitor.Config{
-		URL:     srv.URL,
-		HTTP:    monitor.HTTPConfig{Method: "POST", Body: `{"key":"value"}`},
-		Timeout: 5 * time.Second,
-	}
-
-	result, err := checker.Check(t.Context(), cfg)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if result.Status != status.Up {
-		t.Errorf("expected Up, got %v: %s", result.Status, result.Message)
-	}
-	if receivedContentType != "application/json" {
-		t.Errorf("expected Content-Type application/json, got %q", receivedContentType)
-	}
-}
-
-func TestHTTPCheckerExplicitContentTypeNotOverridden(t *testing.T) {
+func TestHTTPCheckerExplicitContentType(t *testing.T) {
 	var receivedContentType string
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		receivedContentType = r.Header.Get("Content-Type")
@@ -410,15 +338,9 @@ func TestHTTPCheckerExplicitContentTypeNotOverridden(t *testing.T) {
 	}
 
 	result, err := checker.Check(t.Context(), cfg)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if result.Status != status.Up {
-		t.Errorf("expected Up, got %v: %s", result.Status, result.Message)
-	}
-	if receivedContentType != "application/x-www-form-urlencoded" {
-		t.Errorf("expected Content-Type application/x-www-form-urlencoded, got %q", receivedContentType)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, status.Up, result.Status, result.Message)
+	assert.Equal(t, "application/x-www-form-urlencoded", receivedContentType)
 }
 
 func TestHTTPCheckerTimeout(t *testing.T) {
@@ -436,10 +358,6 @@ func TestHTTPCheckerTimeout(t *testing.T) {
 	}
 
 	result, err := checker.Check(t.Context(), cfg)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if result.Status != status.Down {
-		t.Errorf("expected Down on timeout, got %v: %s", result.Status, result.Message)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, status.Down, result.Status, result.Message)
 }

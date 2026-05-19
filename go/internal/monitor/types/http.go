@@ -95,8 +95,9 @@ func (c *HTTPChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.C
 	result := monitor.CheckResult{
 		Latency:      latency,
 		ResponseBody: body,
-		Message:      fmt.Sprintf("%d - %s", resp.StatusCode, string(body)[:min(len(body), 80)]),
+		Message:      fmt.Sprintf("code=%d", resp.StatusCode),
 	}
+	slog.DebugContext(ctx, "http body", slog.String("body", string(body)[:min(len(body), 80)]))
 
 	// TLS certificate info
 	if resp.TLS != nil && len(resp.TLS.PeerCertificates) > 0 {

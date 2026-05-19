@@ -4,6 +4,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/koblas/besops/internal/monitor"
 	"github.com/koblas/besops/lib/status"
 )
@@ -17,15 +20,9 @@ func TestDNSCheckerA(t *testing.T) {
 	}
 
 	result, err := checker.Check(t.Context(), cfg)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if result.Status != status.Up {
-		t.Errorf("expected Up, got %v: %s", result.Status, result.Message)
-	}
-	if result.Message == "" {
-		t.Error("expected non-empty message with IP addresses")
-	}
+	require.NoError(t, err)
+	assert.Equal(t, status.Up, result.Status, result.Message)
+	assert.NotEmpty(t, result.Message, "expected non-empty message with IP addresses")
 }
 
 func TestDNSCheckerMX(t *testing.T) {
@@ -37,12 +34,8 @@ func TestDNSCheckerMX(t *testing.T) {
 	}
 
 	result, err := checker.Check(t.Context(), cfg)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if result.Status != status.Up {
-		t.Errorf("expected Up, got %v: %s", result.Status, result.Message)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, status.Up, result.Status, result.Message)
 }
 
 func TestDNSCheckerNonexistent(t *testing.T) {
@@ -54,12 +47,8 @@ func TestDNSCheckerNonexistent(t *testing.T) {
 	}
 
 	result, err := checker.Check(t.Context(), cfg)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if result.Status != status.Down {
-		t.Errorf("expected Down for nonexistent domain, got %v", result.Status)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, status.Down, result.Status)
 }
 
 func TestDNSCheckerUnsupportedType(t *testing.T) {
@@ -71,10 +60,6 @@ func TestDNSCheckerUnsupportedType(t *testing.T) {
 	}
 
 	result, err := checker.Check(t.Context(), cfg)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if result.Status != status.Down {
-		t.Errorf("expected Down for unsupported type, got %v", result.Status)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, status.Down, result.Status)
 }

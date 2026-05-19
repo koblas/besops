@@ -7,6 +7,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/koblas/besops/internal/domain/heartbeat"
 	domainmonitor "github.com/koblas/besops/internal/domain/monitor"
 	"github.com/koblas/besops/lib/status"
@@ -113,32 +116,18 @@ func TestManagerStartAndStop(t *testing.T) {
 
 	mgr := NewManager(store, hbStore, registry, notify, nil, nil)
 
-	ctx := t.Context()
-	if err := mgr.Start(ctx); err != nil {
-		t.Fatalf("start: %v", err)
-	}
-
-	// Wait for immediate checks to fire
+	require.NoError(t, mgr.Start(t.Context()))
 	time.Sleep(50 * time.Millisecond)
 
-	if mgr.RunningCount() != 2 {
-		t.Errorf("expected 2 running, got %d", mgr.RunningCount())
-	}
-
-	if !mgr.IsRunning("m1") || !mgr.IsRunning("m2") {
-		t.Error("expected both monitors running")
-	}
+	assert.Equal(t, 2, mgr.RunningCount())
+	assert.True(t, mgr.IsRunning("m1"))
+	assert.True(t, mgr.IsRunning("m2"))
 
 	mgr.Stop()
 
-	// Verify heartbeats were stored
 	hbs := hbStore.getAll("m1")
-	if len(hbs) == 0 {
-		t.Error("expected heartbeats for m1")
-	}
-	if hbs[0].Status != int(status.Up) {
-		t.Errorf("expected Up heartbeat, got %d", hbs[0].Status)
-	}
+	require.NotEmpty(t, hbs)
+	assert.Equal(t, int(status.Up), hbs[0].Status)
 }
 
 func TestManagerStopMonitor(t *testing.T) {
@@ -150,19 +139,13 @@ func TestManagerStopMonitor(t *testing.T) {
 	registry.Register(&alwaysUpChecker{})
 
 	mgr := NewManager(store, hbStore, registry, nil, nil, nil)
-	if err := mgr.Start(t.Context()); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, mgr.Start(t.Context()))
 	time.Sleep(30 * time.Millisecond)
 
 	mgr.StopMonitor(t.Context(), "m1")
 
-	if mgr.IsRunning("m1") {
-		t.Error("m1 should be stopped")
-	}
-	if mgr.RunningCount() != 0 {
-		t.Errorf("expected 0 running, got %d", mgr.RunningCount())
-	}
+	assert.False(t, mgr.IsRunning("m1"))
+	assert.Equal(t, 0, mgr.RunningCount())
 
 	mgr.Stop()
 }
@@ -176,19 +159,13 @@ func TestManagerRestartMonitor(t *testing.T) {
 	registry.Register(&alwaysUpChecker{})
 
 	mgr := NewManager(store, hbStore, registry, nil, nil, nil)
-	if err := mgr.Start(t.Context()); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, mgr.Start(t.Context()))
 	time.Sleep(30 * time.Millisecond)
 
-	if err := mgr.RestartMonitor(t.Context(), "m1"); err != nil {
-		t.Fatalf("restart: %v", err)
-	}
-
+	require.NoError(t, mgr.RestartMonitor(t.Context(), "m1"))
 	time.Sleep(30 * time.Millisecond)
-	if !mgr.IsRunning("m1") {
-		t.Error("m1 should be running after restart")
-	}
+
+	assert.True(t, mgr.IsRunning("m1"))
 
 	mgr.Stop()
 }
@@ -203,14 +180,9 @@ func TestManagerNotifiesOnStatusChange(t *testing.T) {
 	registry.Register(&alwaysUpChecker{})
 
 	mgr := NewManager(store, hbStore, registry, notify, nil, nil)
-	if err := mgr.Start(t.Context()); err != nil {
-		t.Fatal(err)
-	}
-
-	// Wait for the first check to complete
+	require.NoError(t, mgr.Start(t.Context()))
 	time.Sleep(30 * time.Millisecond)
 
-	// Replace heartbeats with a single "down" so the next check (Up) triggers a notification
 	hbStore.mu.Lock()
 	hbStore.heartbeats["m1"] = []*heartbeat.Heartbeat{{
 		MonitorID: "m1",
@@ -220,21 +192,14 @@ func TestManagerNotifiesOnStatusChange(t *testing.T) {
 	}}
 	hbStore.mu.Unlock()
 
-	// Restart to trigger a new immediate check
-	if err := mgr.RestartMonitor(t.Context(), "m1"); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, mgr.RestartMonitor(t.Context(), "m1"))
 	time.Sleep(50 * time.Millisecond)
 	mgr.Stop()
 
 	events := notify.getEvents()
-	if len(events) == 0 {
-		t.Error("expected notification on status change from Down to Up")
-	} else {
-		if events[0].current != status.Up || events[0].previous != status.Down {
-			t.Errorf("unexpected transition: %v -> %v", events[0].previous, events[0].current)
-		}
-	}
+	require.NotEmpty(t, events, "expected notification on status change from Down to Up")
+	assert.Equal(t, status.Up, events[0].current)
+	assert.Equal(t, status.Down, events[0].previous)
 }
 
 func TestModelToConfigParsesHeaders(t *testing.T) {
@@ -249,15 +214,11 @@ func TestModelToConfigParsesHeaders(t *testing.T) {
 
 	cfg := modelToConfig(mon)
 
-	if len(cfg.HTTP.Headers) != 2 {
-		t.Fatalf("expected 2 headers, got %d", len(cfg.HTTP.Headers))
-	}
-	if cfg.HTTP.Headers[0].Name != "Content-Type" || cfg.HTTP.Headers[0].Value != "application/json" {
-		t.Errorf("expected first header Content-Type=application/json, got %s=%s", cfg.HTTP.Headers[0].Name, cfg.HTTP.Headers[0].Value)
-	}
-	if cfg.HTTP.Headers[1].Name != "Authorization" || cfg.HTTP.Headers[1].Value != "Bearer tok" {
-		t.Errorf("expected second header Authorization=Bearer tok, got %s=%s", cfg.HTTP.Headers[1].Name, cfg.HTTP.Headers[1].Value)
-	}
+	require.Len(t, cfg.HTTP.Headers, 2)
+	assert.Equal(t, "Content-Type", cfg.HTTP.Headers[0].Name)
+	assert.Equal(t, "application/json", cfg.HTTP.Headers[0].Value)
+	assert.Equal(t, "Authorization", cfg.HTTP.Headers[1].Name)
+	assert.Equal(t, "Bearer tok", cfg.HTTP.Headers[1].Value)
 }
 
 func TestManagerUnknownType(t *testing.T) {
@@ -268,16 +229,10 @@ func TestManagerUnknownType(t *testing.T) {
 	registry := NewRegistry()
 
 	mgr := NewManager(store, hbStore, registry, nil, nil, nil)
-	err := mgr.Start(t.Context())
-	if err != nil {
-		t.Fatal("Start should not fail for individual monitor errors")
-	}
+	require.NoError(t, mgr.Start(t.Context()), "Start should not fail for individual monitor errors")
 
-	// Monitor with unknown type should not be running
 	time.Sleep(30 * time.Millisecond)
-	if mgr.IsRunning("m1") {
-		t.Error("monitor with unknown type should not be running")
-	}
+	assert.False(t, mgr.IsRunning("m1"), "monitor with unknown type should not be running")
 
 	mgr.Stop()
 }

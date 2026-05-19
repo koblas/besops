@@ -6,16 +6,16 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/koblas/besops/internal/monitor"
 	"github.com/koblas/besops/lib/status"
 )
 
 func TestTCPCheckerSuccess(t *testing.T) {
-	// Start a local TCP listener
 	ln, err := net.Listen("tcp", "127.0.0.1:0")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer ln.Close()
 
 	go func() {
@@ -39,30 +39,20 @@ func TestTCPCheckerSuccess(t *testing.T) {
 	}
 
 	result, err := checker.Check(t.Context(), cfg)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if result.Status != status.Up {
-		t.Errorf("expected Up, got %v: %s", result.Status, result.Message)
-	}
-	if result.Latency < 0 {
-		t.Error("expected non-negative ping")
-	}
+	require.NoError(t, err)
+	assert.Equal(t, status.Up, result.Status, result.Message)
+	assert.GreaterOrEqual(t, result.Latency, int64(0))
 }
 
 func TestTCPCheckerRefused(t *testing.T) {
 	checker := &TCPChecker{}
 	cfg := &monitor.Config{
 		Hostname: "127.0.0.1",
-		Port:     1, // port 1 should be refused on localhost
+		Port:     1,
 		Timeout:  1 * time.Second,
 	}
 
 	result, err := checker.Check(t.Context(), cfg)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if result.Status != status.Down {
-		t.Errorf("expected Down, got %v: %s", result.Status, result.Message)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, status.Down, result.Status, result.Message)
 }
