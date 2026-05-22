@@ -27,7 +27,8 @@ export function MonitorDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: monitor, isLoading, isError } = useMonitor(id);
-  const { data: heartbeats = [] } = useHeartbeats(id);
+  const { data: heartbeats = [] } = useHeartbeats(id, { hours: 1 });
+  const { data: recentBeats = [] } = useHeartbeats(id, { count: 100 });
   const { data: eventsResp } = useImportantHeartbeats(id);
   const events = eventsResp?.data ?? [];
   const pauseMutation = usePauseMonitor();
@@ -248,7 +249,7 @@ export function MonitorDetail() {
       {/* Latency Chart */}
       {monitor.type !== 'group' && (
         <Card title="Response Time" size="small" style={{ marginBottom: 16 }}>
-          <LatencyChart monitorId={id} heartbeats={heartbeats} />
+          <LatencyChart monitorId={id} heartbeats={recentBeats} />
         </Card>
       )}
 
