@@ -8,6 +8,7 @@ import (
 
 	oas "github.com/koblas/besops/internal/api/oas_generated"
 	"github.com/koblas/besops/internal/api/oasutil"
+	"github.com/koblas/besops/lib/errs"
 )
 
 var _ oas.MonitorHandler = (*Handler)(nil)
@@ -48,7 +49,7 @@ func NewHandler(repo Repository, scheduler Scheduler, uptimes UptimeProvider, ta
 	return &Handler{repo: repo, scheduler: scheduler, uptimes: uptimes, tags: tags}
 }
 
-func (h *Handler) ListMonitors(ctx context.Context) (oas.ListMonitorsRes, error) {
+func (h *Handler) ListMonitors(ctx context.Context) ([]oas.Monitor, error) {
 	userID, err := oasutil.UserIDFromCtx(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("getting user from context: %w", err)
@@ -59,7 +60,7 @@ func (h *Handler) ListMonitors(ctx context.Context) (oas.ListMonitorsRes, error)
 		return nil, fmt.Errorf("listing monitors: %w", err)
 	}
 
-	result := make(oas.ListMonitorsOKApplicationJSON, 0, len(monitors))
+	result := make([]oas.Monitor, 0, len(monitors))
 	for _, m := range monitors {
 		om := monitorToOAS(m)
 		if h.tags != nil {
@@ -67,14 +68,14 @@ func (h *Handler) ListMonitors(ctx context.Context) (oas.ListMonitorsRes, error)
 		}
 		result = append(result, om)
 	}
-	return &result, nil
+	return result, nil
 }
 
-func (h *Handler) GetMonitor(ctx context.Context, params oas.GetMonitorParams) (oas.GetMonitorRes, error) {
+func (h *Handler) GetMonitor(ctx context.Context, params oas.GetMonitorParams) (*oas.Monitor, error) {
 	m, err := h.repo.FindByID(ctx, params.MonitorId.String())
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return &oas.GetMonitorNotFound{Error: "monitor not found"}, nil
+			return nil, errs.NewNotFound(err, "monitor not found")
 		}
 		return nil, fmt.Errorf("finding monitor: %w", err)
 	}
@@ -85,7 +86,7 @@ func (h *Handler) GetMonitor(ctx context.Context, params oas.GetMonitorParams) (
 	return &result, nil
 }
 
-func (h *Handler) CreateMonitor(ctx context.Context, req *oas.MonitorInput) (oas.CreateMonitorRes, error) {
+func (h *Handler) CreateMonitor(ctx context.Context, req *oas.MonitorInput) (*oas.CreateMonitorCreated, error) {
 	userID, err := oasutil.UserIDFromCtx(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("getting user from context: %w", err)
@@ -104,11 +105,11 @@ func (h *Handler) CreateMonitor(ctx context.Context, req *oas.MonitorInput) (oas
 	return &oas.CreateMonitorCreated{ID: oasutil.MustParseUUID(id)}, nil
 }
 
-func (h *Handler) UpdateMonitor(ctx context.Context, req *oas.MonitorInput, params oas.UpdateMonitorParams) (oas.UpdateMonitorRes, error) {
+func (h *Handler) UpdateMonitor(ctx context.Context, req *oas.MonitorInput, params oas.UpdateMonitorParams) (*oas.Monitor, error) {
 	existing, err := h.repo.FindByID(ctx, params.MonitorId.String())
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return &oas.UpdateMonitorNotFound{Error: "monitor not found"}, nil
+			return nil, errs.NewNotFound(err, "monitor not found")
 		}
 		return nil, fmt.Errorf("finding monitor: %w", err)
 	}
@@ -130,18 +131,18 @@ func (h *Handler) UpdateMonitor(ctx context.Context, req *oas.MonitorInput, para
 	return &result, nil
 }
 
-func (h *Handler) DeleteMonitor(ctx context.Context, params oas.DeleteMonitorParams) (oas.DeleteMonitorRes, error) {
+func (h *Handler) DeleteMonitor(ctx context.Context, params oas.DeleteMonitorParams) error {
 	id := params.MonitorId.String()
 	if h.scheduler != nil {
 		h.scheduler.StopMonitor(ctx, id)
 	}
 	if err := h.repo.Delete(ctx, id); err != nil {
-		return nil, fmt.Errorf("deleting monitor: %w", err)
+		return fmt.Errorf("deleting monitor: %w", err)
 	}
-	return &oas.DeleteMonitorNoContent{}, nil
+	return nil
 }
 
-func (h *Handler) PauseMonitor(ctx context.Context, params oas.PauseMonitorParams) (oas.PauseMonitorRes, error) {
+func (h *Handler) PauseMonitor(ctx context.Context, params oas.PauseMonitorParams) (*oas.MessageResponse, error) {
 	m, err := h.repo.FindByID(ctx, params.MonitorId.String())
 	if err != nil {
 		return nil, fmt.Errorf("finding monitor: %w", err)
@@ -156,7 +157,7 @@ func (h *Handler) PauseMonitor(ctx context.Context, params oas.PauseMonitorParam
 	return &oas.MessageResponse{Message: "paused"}, nil
 }
 
-func (h *Handler) ResumeMonitor(ctx context.Context, params oas.ResumeMonitorParams) (oas.ResumeMonitorRes, error) {
+func (h *Handler) ResumeMonitor(ctx context.Context, params oas.ResumeMonitorParams) (*oas.MessageResponse, error) {
 	m, err := h.repo.FindByID(ctx, params.MonitorId.String())
 	if err != nil {
 		return nil, fmt.Errorf("finding monitor: %w", err)
@@ -171,7 +172,7 @@ func (h *Handler) ResumeMonitor(ctx context.Context, params oas.ResumeMonitorPar
 	return &oas.MessageResponse{Message: "resumed"}, nil
 }
 
-func (h *Handler) CheckDomain(ctx context.Context, params oas.CheckDomainParams) (oas.CheckDomainRes, error) {
+func (h *Handler) CheckDomain(ctx context.Context, params oas.CheckDomainParams) (*oas.CheckDomainOK, error) {
 	// TODO: implement domain/TLS check
 	_ = params.MonitorId
 	return &oas.CheckDomainOK{}, nil
@@ -293,13 +294,13 @@ func marshalConfig(cfg *oas.MonitorConfig) string {
 	return string(b)
 }
 
-func (h *Handler) GetMonitorUptimes(ctx context.Context) (oas.GetMonitorUptimesRes, error) {
+func (h *Handler) GetMonitorUptimes(ctx context.Context) ([]oas.GetMonitorUptimesOKItem, error) {
 	ids, err := h.repo.FindAllActiveIDs(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("loading active monitor IDs: %w", err)
 	}
 
-	result := make(oas.GetMonitorUptimesOKApplicationJSON, 0, len(ids))
+	result := make([]oas.GetMonitorUptimesOKItem, 0, len(ids))
 	for _, id := range ids {
 		up, upErr := h.uptimes.GetUptime(ctx, id, 24)
 		if upErr == nil {
@@ -309,5 +310,5 @@ func (h *Handler) GetMonitorUptimes(ctx context.Context) (oas.GetMonitorUptimesR
 			})
 		}
 	}
-	return &result, nil
+	return result, nil
 }

@@ -18,19 +18,19 @@ func NewHandler(repo Repository) *Handler {
 	return &Handler{repo: repo}
 }
 
-func (h *Handler) ListTags(ctx context.Context) (oas.ListTagsRes, error) {
+func (h *Handler) ListTags(ctx context.Context) ([]oas.Tag, error) {
 	tags, err := h.repo.FindAll(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("listing tags: %w", err)
 	}
-	result := make(oas.ListTagsOKApplicationJSON, 0, len(tags))
+	result := make([]oas.Tag, 0, len(tags))
 	for _, t := range tags {
 		result = append(result, toOAS(t))
 	}
-	return &result, nil
+	return result, nil
 }
 
-func (h *Handler) CreateTag(ctx context.Context, req *oas.TagInput) (oas.CreateTagRes, error) {
+func (h *Handler) CreateTag(ctx context.Context, req *oas.TagInput) (*oas.Tag, error) {
 	t := &Tag{
 		Name:  req.Name,
 		Color: req.Color,
@@ -46,7 +46,7 @@ func (h *Handler) CreateTag(ctx context.Context, req *oas.TagInput) (oas.CreateT
 	}, nil
 }
 
-func (h *Handler) UpdateTag(ctx context.Context, req *oas.TagInput, params oas.UpdateTagParams) (oas.UpdateTagRes, error) {
+func (h *Handler) UpdateTag(ctx context.Context, req *oas.TagInput, params oas.UpdateTagParams) (*oas.Tag, error) {
 	t := &Tag{
 		ID:    params.TagId.String(),
 		Name:  req.Name,
@@ -62,43 +62,43 @@ func (h *Handler) UpdateTag(ctx context.Context, req *oas.TagInput, params oas.U
 	}, nil
 }
 
-func (h *Handler) DeleteTag(ctx context.Context, params oas.DeleteTagParams) (oas.DeleteTagRes, error) {
+func (h *Handler) DeleteTag(ctx context.Context, params oas.DeleteTagParams) error {
 	if err := h.repo.Delete(ctx, params.TagId.String()); err != nil {
-		return nil, fmt.Errorf("deleting tag: %w", err)
+		return fmt.Errorf("deleting tag: %w", err)
 	}
-	return &oas.DeleteTagNoContent{}, nil
+	return nil
 }
 
-func (h *Handler) AddMonitorTag(ctx context.Context, req *oas.AddMonitorTagReq, params oas.AddMonitorTagParams) (oas.AddMonitorTagRes, error) {
+func (h *Handler) AddMonitorTag(ctx context.Context, req *oas.AddMonitorTagReq, params oas.AddMonitorTagParams) error {
 	value := ""
 	if req.Value.IsSet() {
 		value = req.Value.Value
 	}
 	if err := h.repo.AddToMonitor(ctx, params.MonitorId.String(), req.TagId.String(), value); err != nil {
-		return nil, fmt.Errorf("adding tag to monitor: %w", err)
+		return fmt.Errorf("adding tag to monitor: %w", err)
 	}
-	return &oas.AddMonitorTagCreated{}, nil
+	return nil
 }
 
-func (h *Handler) DeleteMonitorTag(ctx context.Context, params oas.DeleteMonitorTagParams) (oas.DeleteMonitorTagRes, error) {
+func (h *Handler) DeleteMonitorTag(ctx context.Context, params oas.DeleteMonitorTagParams) error {
 	if err := h.repo.RemoveFromMonitor(ctx, params.MonitorId.String(), params.TagId.String()); err != nil {
-		return nil, fmt.Errorf("removing tag from monitor: %w", err)
+		return fmt.Errorf("removing tag from monitor: %w", err)
 	}
-	return &oas.DeleteMonitorTagNoContent{}, nil
+	return nil
 }
 
-func (h *Handler) UpdateMonitorTag(ctx context.Context, req *oas.UpdateMonitorTagReq, params oas.UpdateMonitorTagParams) (oas.UpdateMonitorTagRes, error) {
+func (h *Handler) UpdateMonitorTag(ctx context.Context, req *oas.UpdateMonitorTagReq, params oas.UpdateMonitorTagParams) error {
 	value := ""
 	if req.Value.IsSet() {
 		value = req.Value.Value
 	}
 	if err := h.repo.RemoveFromMonitor(ctx, params.MonitorId.String(), params.TagId.String()); err != nil {
-		return nil, fmt.Errorf("removing existing tag: %w", err)
+		return fmt.Errorf("removing existing tag: %w", err)
 	}
 	if err := h.repo.AddToMonitor(ctx, params.MonitorId.String(), params.TagId.String(), value); err != nil {
-		return nil, fmt.Errorf("adding updated tag: %w", err)
+		return fmt.Errorf("adding updated tag: %w", err)
 	}
-	return &oas.UpdateMonitorTagOK{}, nil
+	return nil
 }
 
 func toOAS(t *Tag) oas.Tag {

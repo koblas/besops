@@ -1430,11 +1430,10 @@ export interface components {
              */
             monitorId: string;
             /**
-             * Format: int32
-             * @description Monitor status at this point in time: 0=DOWN, 1=UP, 2=PENDING, 3=MAINTENANCE.
-             * @enum {integer}
+             * @description Monitor status at this point in time.
+             * @enum {string}
              */
-            status: 0 | 1 | 2 | 3;
+            status: "down" | "up" | "pending" | "maintenance" | "degraded";
             /**
              * Format: date-time
              * @description UTC timestamp when this check was performed.
@@ -1935,26 +1934,8 @@ export interface components {
         };
     };
     responses: {
-        /** @description Authentication required */
-        Unauthorized: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponse"];
-            };
-        };
-        /** @description Resource not found */
-        NotFound: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponse"];
-            };
-        };
-        /** @description Too many requests */
-        RateLimited: {
+        /** @description Error response */
+        DefaultError: {
             headers: {
                 [name: string]: unknown;
             };
@@ -2006,8 +1987,7 @@ export interface operations {
                     "application/json": components["schemas"]["LoginResponse"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
-            429: components["responses"]["RateLimited"];
+            default: components["responses"]["DefaultError"];
         };
     };
     logout: {
@@ -2026,7 +2006,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     refreshToken: {
@@ -2051,7 +2031,7 @@ export interface operations {
                     "application/json": components["schemas"]["TokenResponse"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     needSetup: {
@@ -2074,7 +2054,7 @@ export interface operations {
                     };
                 };
             };
-            400: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     setup: {
@@ -2110,6 +2090,7 @@ export interface operations {
                 };
                 content?: never;
             };
+            default: components["responses"]["DefaultError"];
         };
     };
     changePassword: {
@@ -2139,7 +2120,7 @@ export interface operations {
                     "application/json": components["schemas"]["TokenResponse"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     get2FAStatus: {
@@ -2162,7 +2143,7 @@ export interface operations {
                     };
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     prepare2FA: {
@@ -2193,7 +2174,7 @@ export interface operations {
                     };
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     enable2FA: {
@@ -2222,7 +2203,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     disable2FA: {
@@ -2250,7 +2231,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     getMonitorUptimes: {
@@ -2276,7 +2257,7 @@ export interface operations {
                     }[];
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     listMonitors: {
@@ -2297,7 +2278,7 @@ export interface operations {
                     "application/json": components["schemas"]["Monitor"][];
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     createMonitor: {
@@ -2325,7 +2306,7 @@ export interface operations {
                     };
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     getMonitor: {
@@ -2349,7 +2330,7 @@ export interface operations {
                     "application/json": components["schemas"]["Monitor"];
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     updateMonitor: {
@@ -2377,7 +2358,7 @@ export interface operations {
                     "application/json": components["schemas"]["Monitor"];
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     deleteMonitor: {
@@ -2402,7 +2383,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     pauseMonitor: {
@@ -2426,7 +2407,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     resumeMonitor: {
@@ -2450,7 +2431,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     checkDomain: {
@@ -2478,7 +2459,7 @@ export interface operations {
                     };
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     getHeartbeats: {
@@ -2507,7 +2488,7 @@ export interface operations {
                     "application/json": components["schemas"]["Heartbeat"][];
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     clearHeartbeats: {
@@ -2529,7 +2510,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     getChartData: {
@@ -2556,7 +2537,7 @@ export interface operations {
                     "application/json": components["schemas"]["ChartPoint"][];
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     getImportantHeartbeats: {
@@ -2589,7 +2570,7 @@ export interface operations {
                     };
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     clearEvents: {
@@ -2611,7 +2592,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     listRecentEvents: {
@@ -2639,7 +2620,7 @@ export interface operations {
                     };
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     listNotifications: {
@@ -2660,7 +2641,7 @@ export interface operations {
                     "application/json": components["schemas"]["Notification"][];
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     createNotification: {
@@ -2688,7 +2669,7 @@ export interface operations {
                     };
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     updateNotification: {
@@ -2716,7 +2697,7 @@ export interface operations {
                     "application/json": components["schemas"]["Notification"];
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     deleteNotification: {
@@ -2738,7 +2719,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     testNotification: {
@@ -2762,7 +2743,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     listTags: {
@@ -2783,7 +2764,7 @@ export interface operations {
                     "application/json": components["schemas"]["Tag"][];
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     createTag: {
@@ -2808,7 +2789,7 @@ export interface operations {
                     "application/json": components["schemas"]["Tag"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     updateTag: {
@@ -2836,7 +2817,7 @@ export interface operations {
                     "application/json": components["schemas"]["Tag"];
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     deleteTag: {
@@ -2858,7 +2839,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     addMonitorTag: {
@@ -2888,7 +2869,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     updateMonitorTag: {
@@ -2918,7 +2899,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     deleteMonitorTag: {
@@ -2942,7 +2923,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     listMaintenance: {
@@ -2963,7 +2944,7 @@ export interface operations {
                     "application/json": components["schemas"]["Maintenance"][];
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     createMaintenance: {
@@ -2991,7 +2972,7 @@ export interface operations {
                     };
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     getMaintenance: {
@@ -3015,7 +2996,7 @@ export interface operations {
                     "application/json": components["schemas"]["Maintenance"];
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     updateMaintenance: {
@@ -3043,7 +3024,7 @@ export interface operations {
                     "application/json": components["schemas"]["Maintenance"];
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     deleteMaintenance: {
@@ -3065,7 +3046,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     pauseMaintenance: {
@@ -3089,7 +3070,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     resumeMaintenance: {
@@ -3113,7 +3094,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     getMaintenanceMonitors: {
@@ -3137,7 +3118,7 @@ export interface operations {
                     "application/json": string[];
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     setMaintenanceMonitors: {
@@ -3165,7 +3146,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     getMaintenanceStatusPages: {
@@ -3189,7 +3170,7 @@ export interface operations {
                     "application/json": string[];
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     setMaintenanceStatusPages: {
@@ -3217,7 +3198,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     listStatusPages: {
@@ -3238,7 +3219,7 @@ export interface operations {
                     "application/json": components["schemas"]["StatusPage"][];
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     createStatusPage: {
@@ -3265,7 +3246,7 @@ export interface operations {
                     };
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     getStatusPage: {
@@ -3289,7 +3270,7 @@ export interface operations {
                     "application/json": components["schemas"]["StatusPage"];
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     updateStatusPage: {
@@ -3317,7 +3298,7 @@ export interface operations {
                     "application/json": components["schemas"]["StatusPage"];
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     deleteStatusPage: {
@@ -3339,7 +3320,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     getStatusPageHeartbeats: {
@@ -3380,7 +3361,7 @@ export interface operations {
                     };
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     getStatusPageBadge: {
@@ -3407,7 +3388,7 @@ export interface operations {
                     "image/svg+xml": string;
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     listIncidents: {
@@ -3437,7 +3418,7 @@ export interface operations {
                     };
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     createIncident: {
@@ -3465,7 +3446,7 @@ export interface operations {
                     "application/json": components["schemas"]["Incident"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     updateIncident: {
@@ -3495,7 +3476,7 @@ export interface operations {
                     "application/json": components["schemas"]["Incident"];
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     deleteIncident: {
@@ -3519,7 +3500,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     resolveIncident: {
@@ -3545,7 +3526,7 @@ export interface operations {
                     "application/json": components["schemas"]["Incident"];
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     unpinIncident: {
@@ -3571,7 +3552,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     getSettings: {
@@ -3592,7 +3573,7 @@ export interface operations {
                     "application/json": components["schemas"]["Settings"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     updateSettings: {
@@ -3617,7 +3598,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     listAPIKeys: {
@@ -3638,7 +3619,7 @@ export interface operations {
                     "application/json": components["schemas"]["APIKey"][];
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     createAPIKey: {
@@ -3667,7 +3648,7 @@ export interface operations {
                     };
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     deleteAPIKey: {
@@ -3689,7 +3670,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     enableAPIKey: {
@@ -3713,7 +3694,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     disableAPIKey: {
@@ -3737,7 +3718,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     listProxies: {
@@ -3758,7 +3739,7 @@ export interface operations {
                     "application/json": components["schemas"]["Proxy"][];
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     createProxy: {
@@ -3786,7 +3767,7 @@ export interface operations {
                     };
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     updateProxy: {
@@ -3812,7 +3793,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     deleteProxy: {
@@ -3834,7 +3815,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     getStatusBadge: {
@@ -3853,7 +3834,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["SVGBadge"];
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     getUptimeBadge: {
@@ -3874,7 +3855,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["SVGBadge"];
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     getLatencyBadge: {
@@ -3895,7 +3876,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["SVGBadge"];
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     getResponseBadge: {
@@ -3914,7 +3895,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["SVGBadge"];
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     getCertExpiryBadge: {
@@ -3933,7 +3914,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["SVGBadge"];
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     getStatusPageEventStream: {
@@ -3957,7 +3938,7 @@ export interface operations {
                     "text/event-stream": string;
                 };
             };
-            404: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     healthCheck: {
@@ -3981,7 +3962,7 @@ export interface operations {
                     };
                 };
             };
-            400: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     getInfo: {
@@ -4009,7 +3990,7 @@ export interface operations {
                     };
                 };
             };
-            400: components["responses"]["NotFound"];
+            default: components["responses"]["DefaultError"];
         };
     };
     getDatabaseSize: {
@@ -4036,7 +4017,7 @@ export interface operations {
                     };
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     shrinkDatabase: {
@@ -4057,7 +4038,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
     clearStatistics: {
@@ -4076,7 +4057,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            401: components["responses"]["Unauthorized"];
+            default: components["responses"]["DefaultError"];
         };
     };
 }

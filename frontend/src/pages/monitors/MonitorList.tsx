@@ -6,7 +6,7 @@ import { useMonitors, usePauseMonitor, useResumeMonitor, useDeleteMonitor } from
 import type { Monitor } from '../../hooks/useMonitors';
 import { StatusBadge } from '../../components/StatusBadge';
 import { MonitorTypeIcon } from '../../components/MonitorTypeIcon';
-import type { StatusValue } from '../../lib/constants';
+import { STATUS } from '../../lib/constants';
 
 const { Title } = Typography;
 const { Search } = Input;
@@ -54,7 +54,7 @@ export function MonitorList() {
       dataIndex: 'active',
       key: 'status',
       width: 70,
-      render: (active: boolean) => <StatusBadge status={(active ? 1 : 2) as StatusValue} />,
+      render: (active: boolean) => <StatusBadge status={active ? STATUS.UP : STATUS.PENDING} />,
     },
     {
       title: 'Name',

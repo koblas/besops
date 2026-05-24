@@ -11,6 +11,7 @@ import (
 	oas "github.com/koblas/besops/internal/api/oas_generated"
 	"github.com/koblas/besops/internal/api/oasutil"
 	"github.com/koblas/besops/internal/domain/heartbeat"
+	"github.com/koblas/besops/lib/status"
 )
 
 var (
@@ -58,13 +59,13 @@ func WithMonitorResolver(r MonitorResolver) HandlerOption {
 	return func(h *Handler) { h.monitorResolver = r }
 }
 
-func (h *Handler) ListStatusPages(ctx context.Context) (oas.ListStatusPagesRes, error) {
+func (h *Handler) ListStatusPages(ctx context.Context) ([]oas.StatusPage, error) {
 	pages, err := h.repo.FindAll(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("listing status pages: %w", err)
 	}
 
-	result := make(oas.ListStatusPagesOKApplicationJSON, len(pages))
+	result := make([]oas.StatusPage, len(pages))
 	for i, sp := range pages {
 		groups, groupErr := h.loadGroups(ctx, sp.ID)
 		if groupErr != nil {
@@ -72,13 +73,13 @@ func (h *Handler) ListStatusPages(ctx context.Context) (oas.ListStatusPagesRes, 
 		}
 		result[i] = statusPageToOAS(sp, groups)
 	}
-	return &result, nil
+	return result, nil
 }
 
-func (h *Handler) GetStatusPage(ctx context.Context, params oas.GetStatusPageParams) (oas.GetStatusPageRes, error) {
+func (h *Handler) GetStatusPage(ctx context.Context, params oas.GetStatusPageParams) (*oas.StatusPage, error) {
 	sp, err := h.repo.FindBySlug(ctx, params.Slug)
 	if err != nil {
-		return &oas.GetStatusPageNotFound{Error: "status page not found"}, nil //nolint:nilerr
+		return nil, fmt.Errorf("status page not found: %w", err)
 	}
 
 	groups, groupErr := h.loadGroups(ctx, sp.ID)
@@ -90,7 +91,7 @@ func (h *Handler) GetStatusPage(ctx context.Context, params oas.GetStatusPagePar
 	return &result, nil
 }
 
-func (h *Handler) CreateStatusPage(ctx context.Context, req *oas.StatusPageInput) (oas.CreateStatusPageRes, error) {
+func (h *Handler) CreateStatusPage(ctx context.Context, req *oas.StatusPageInput) (*oas.CreateStatusPageCreated, error) {
 	sp := statusPageFromInput(req)
 
 	id, err := h.repo.Create(ctx, sp)
@@ -105,7 +106,7 @@ func (h *Handler) CreateStatusPage(ctx context.Context, req *oas.StatusPageInput
 	return &oas.CreateStatusPageCreated{Slug: req.Slug}, nil
 }
 
-func (h *Handler) UpdateStatusPage(ctx context.Context, req *oas.StatusPageInput, params oas.UpdateStatusPageParams) (oas.UpdateStatusPageRes, error) {
+func (h *Handler) UpdateStatusPage(ctx context.Context, req *oas.StatusPageInput, params oas.UpdateStatusPageParams) (*oas.StatusPage, error) {
 	existing, err := h.repo.FindBySlug(ctx, params.Slug)
 	if err != nil {
 		return nil, fmt.Errorf("finding status page: %w", err)
@@ -131,19 +132,19 @@ func (h *Handler) UpdateStatusPage(ctx context.Context, req *oas.StatusPageInput
 	return &result, nil
 }
 
-func (h *Handler) DeleteStatusPage(ctx context.Context, params oas.DeleteStatusPageParams) (oas.DeleteStatusPageRes, error) {
+func (h *Handler) DeleteStatusPage(ctx context.Context, params oas.DeleteStatusPageParams) error {
 	sp, err := h.repo.FindBySlug(ctx, params.Slug)
 	if err != nil {
-		return nil, fmt.Errorf("finding status page for delete: %w", err)
+		return fmt.Errorf("finding status page for delete: %w", err)
 	}
 
 	if deleteErr := h.repo.Delete(ctx, sp.ID); deleteErr != nil {
-		return nil, fmt.Errorf("deleting status page: %w", deleteErr)
+		return fmt.Errorf("deleting status page: %w", deleteErr)
 	}
-	return &oas.DeleteStatusPageNoContent{}, nil
+	return nil
 }
 
-func (h *Handler) GetStatusPageHeartbeats(ctx context.Context, params oas.GetStatusPageHeartbeatsParams) (oas.GetStatusPageHeartbeatsRes, error) {
+func (h *Handler) GetStatusPageHeartbeats(ctx context.Context, params oas.GetStatusPageHeartbeatsParams) (*oas.GetStatusPageHeartbeatsOK, error) {
 	sp, err := h.repo.FindBySlug(ctx, params.Slug)
 	if err != nil {
 		return nil, fmt.Errorf("finding status page: %w", err)
@@ -240,7 +241,7 @@ func hbToOAS(hb *heartbeat.Heartbeat) oas.Heartbeat {
 	result := oas.Heartbeat{
 		ID:        oasutil.MustParseUUID(hb.ID),
 		MonitorId: oasutil.MustParseUUID(hb.MonitorID),
-		Status:    oas.HeartbeatStatus(hb.Status), //nolint:gosec // status is a small enum value
+		Status:    oas.HeartbeatStatus(status.Status(hb.Status).String()),
 		Time:      time.Time(hb.Time),
 		Important: oas.NewOptBool(hb.Important),
 	}
@@ -256,17 +257,17 @@ func hbToOAS(hb *heartbeat.Heartbeat) oas.Heartbeat {
 	return result
 }
 
-func (h *Handler) GetStatusPageBadge(_ context.Context, _ oas.GetStatusPageBadgeParams) (oas.GetStatusPageBadgeRes, error) {
-	return &oas.GetStatusPageBadgeOK{Data: strings.NewReader("")}, nil
+func (h *Handler) GetStatusPageBadge(_ context.Context, _ oas.GetStatusPageBadgeParams) (oas.GetStatusPageBadgeOK, error) {
+	return oas.GetStatusPageBadgeOK{Data: strings.NewReader("")}, nil
 }
 
-func (h *Handler) GetStatusPageEventStream(_ context.Context, _ oas.GetStatusPageEventStreamParams) (oas.GetStatusPageEventStreamRes, error) {
-	return &oas.GetStatusPageEventStreamOK{Data: strings.NewReader("")}, nil
+func (h *Handler) GetStatusPageEventStream(_ context.Context, _ oas.GetStatusPageEventStreamParams) (oas.GetStatusPageEventStreamOK, error) {
+	return oas.GetStatusPageEventStreamOK{Data: strings.NewReader("")}, nil
 }
 
 // --- Incidents ---
 
-func (h *Handler) ListIncidents(ctx context.Context, params oas.ListIncidentsParams) (oas.ListIncidentsRes, error) {
+func (h *Handler) ListIncidents(ctx context.Context, params oas.ListIncidentsParams) (*oas.ListIncidentsOK, error) {
 	sp, err := h.repo.FindBySlug(ctx, params.Slug)
 	if err != nil {
 		return nil, fmt.Errorf("finding status page: %w", err)
@@ -285,7 +286,7 @@ func (h *Handler) ListIncidents(ctx context.Context, params oas.ListIncidentsPar
 	return &oas.ListIncidentsOK{Incidents: oasIncidents}, nil
 }
 
-func (h *Handler) CreateIncident(ctx context.Context, req *oas.IncidentInput, params oas.CreateIncidentParams) (oas.CreateIncidentRes, error) {
+func (h *Handler) CreateIncident(ctx context.Context, req *oas.IncidentInput, params oas.CreateIncidentParams) (*oas.Incident, error) {
 	sp, err := h.repo.FindBySlug(ctx, params.Slug)
 	if err != nil {
 		return nil, fmt.Errorf("finding status page: %w", err)
@@ -308,7 +309,7 @@ func (h *Handler) CreateIncident(ctx context.Context, req *oas.IncidentInput, pa
 	return &result, nil
 }
 
-func (h *Handler) UpdateIncident(ctx context.Context, req *oas.IncidentInput, params oas.UpdateIncidentParams) (oas.UpdateIncidentRes, error) {
+func (h *Handler) UpdateIncident(ctx context.Context, req *oas.IncidentInput, params oas.UpdateIncidentParams) (*oas.Incident, error) {
 	existing, err := h.repo.FindIncidentByID(ctx, params.IncidentId.String())
 	if err != nil {
 		return nil, fmt.Errorf("finding incident: %w", err)
@@ -329,14 +330,14 @@ func (h *Handler) UpdateIncident(ctx context.Context, req *oas.IncidentInput, pa
 	return &result, nil
 }
 
-func (h *Handler) DeleteIncident(ctx context.Context, params oas.DeleteIncidentParams) (oas.DeleteIncidentRes, error) {
+func (h *Handler) DeleteIncident(ctx context.Context, params oas.DeleteIncidentParams) error {
 	if err := h.repo.DeleteIncident(ctx, params.IncidentId.String()); err != nil {
-		return nil, fmt.Errorf("deleting incident: %w", err)
+		return fmt.Errorf("deleting incident: %w", err)
 	}
-	return &oas.DeleteIncidentNoContent{}, nil
+	return nil
 }
 
-func (h *Handler) ResolveIncident(ctx context.Context, params oas.ResolveIncidentParams) (oas.ResolveIncidentRes, error) {
+func (h *Handler) ResolveIncident(ctx context.Context, params oas.ResolveIncidentParams) (*oas.Incident, error) {
 	inc, err := h.repo.FindIncidentByID(ctx, params.IncidentId.String())
 	if err != nil {
 		return nil, fmt.Errorf("finding incident: %w", err)
@@ -354,7 +355,7 @@ func (h *Handler) ResolveIncident(ctx context.Context, params oas.ResolveInciden
 	return &result, nil
 }
 
-func (h *Handler) UnpinIncident(ctx context.Context, params oas.UnpinIncidentParams) (oas.UnpinIncidentRes, error) {
+func (h *Handler) UnpinIncident(ctx context.Context, params oas.UnpinIncidentParams) (*oas.MessageResponse, error) {
 	inc, err := h.repo.FindIncidentByID(ctx, params.IncidentId.String())
 	if err != nil {
 		return nil, fmt.Errorf("finding incident: %w", err)

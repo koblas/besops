@@ -6,7 +6,7 @@ import { useIncidents } from '../../hooks/useIncidents';
 import { useAuth } from '../../hooks/useAuth';
 import { HeartbeatBar } from '../../components/HeartbeatBar';
 import { StatusBadge } from '../../components/StatusBadge';
-import type { StatusValue } from '../../lib/constants';
+import { STATUS, STATUS_LABELS, type StatusValue } from '../../lib/constants';
 import type { components } from '../../api/generated/v1';
 
 const { Title, Text, Paragraph } = Typography;
@@ -77,7 +77,7 @@ export function StatusPagePublic() {
         <Space>
           <StatusBadge status={overallStatus} />
           <Text strong style={{ fontSize: 16 }}>
-            {overallStatus === 1 ? 'All Systems Operational' : overallStatus === 0 ? 'System Outage Detected' : 'Checking Status...'}
+            {overallStatus === STATUS.UP ? 'All Systems Operational' : overallStatus === STATUS.DOWN ? 'System Outage Detected' : 'Checking Status...'}
           </Text>
         </Space>
       </Card>
@@ -107,12 +107,12 @@ export function StatusPagePublic() {
               {group.monitorIds.map(monitorId => {
                 const beats = (heartbeatMap[monitorId] ?? []) as Heartbeat[];
                 const lastBeat = beats.length > 0 ? beats[beats.length - 1] : null;
-                const status = lastBeat?.status ?? 2;
+                const monitorStatus: StatusValue = lastBeat?.status ?? STATUS.PENDING;
                 const name = monitorNames[monitorId] ?? 'Service';
                 const uptimeKey = `${monitorId}_24`;
                 const uptime = uptimeMap[uptimeKey];
                 return (
-                  <MonitorRow key={monitorId} name={name} status={status} beats={beats} uptime={uptime} />
+                  <MonitorRow key={monitorId} name={name} status={monitorStatus} beats={beats} uptime={uptime} />
                 );
               })}
             </div>
@@ -159,10 +159,10 @@ export function StatusPagePublic() {
   );
 }
 
-function MonitorRow({ name, status, beats, uptime }: { name: string; status: number; beats: Heartbeat[]; uptime?: number }) {
+function MonitorRow({ name, status, beats, uptime }: { name: string; status: StatusValue; beats: Heartbeat[]; uptime?: number }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-      <StatusBadge status={status as StatusValue} />
+      <StatusBadge status={status} />
       <Text strong style={{ minWidth: 140, flex: '0 0 auto' }}>{name}</Text>
       <div style={{ flex: 1, minWidth: 0 }}>
         <HeartbeatBar heartbeats={beats} size="small" />
@@ -174,8 +174,8 @@ function MonitorRow({ name, status, beats, uptime }: { name: string; status: num
           </Text>
         </Tooltip>
       )}
-      <Tag color={status === 1 ? 'green' : status === 0 ? 'red' : 'default'} style={{ margin: 0 }}>
-        {status === 1 ? 'Up' : status === 0 ? 'Down' : 'Pending'}
+      <Tag color={status === STATUS.UP ? 'green' : status === STATUS.DOWN ? 'red' : 'default'} style={{ margin: 0 }}>
+        {STATUS_LABELS[status]}
       </Tag>
     </div>
   );
@@ -185,7 +185,7 @@ function computeOverallStatus(
   groups: components['schemas']['StatusPage']['groups'],
   heartbeatMap: Record<string, Heartbeat[]>,
 ): StatusValue {
-  if (!groups || groups.length === 0) return 2 as StatusValue;
+  if (!groups || groups.length === 0) return STATUS.PENDING;
 
   let hasDown = false;
   let hasUp = false;
@@ -195,12 +195,12 @@ function computeOverallStatus(
       const beats = heartbeatMap[mid] ?? [];
       if (beats.length === 0) continue;
       const last = beats[beats.length - 1];
-      if (last.status === 1) hasUp = true;
-      if (last.status === 0) hasDown = true;
+      if (last.status === STATUS.UP) hasUp = true;
+      if (last.status === STATUS.DOWN) hasDown = true;
     }
   }
 
-  if (hasDown) return 0 as StatusValue;
-  if (hasUp) return 1 as StatusValue;
-  return 2 as StatusValue;
+  if (hasDown) return STATUS.DOWN;
+  if (hasUp) return STATUS.UP;
+  return STATUS.PENDING;
 }

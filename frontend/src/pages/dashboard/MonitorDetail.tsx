@@ -19,7 +19,7 @@ import { LatencyChart } from '../../components/LatencyChart';
 import { StatusBadge } from '../../components/StatusBadge';
 import { UptimeBadge } from '../../components/UptimeBadge';
 import { formatDateTime, formatLatency } from '../../lib/formatters';
-import type { StatusValue } from '../../lib/constants';
+import { STATUS, type StatusValue } from '../../lib/constants';
 
 const { Title, Text } = Typography;
 
@@ -91,7 +91,7 @@ export function MonitorDetail() {
   };
 
   const lastBeat = heartbeats.length > 0 ? heartbeats[heartbeats.length - 1] : null;
-  const currentStatus = lastBeat?.status ?? (monitor.active ? 1 : 2);
+  const currentStatus: StatusValue = lastBeat?.status ?? (monitor.active ? STATUS.UP : STATUS.PENDING);
 
   const eventColumns = [
     {
@@ -134,7 +134,7 @@ export function MonitorDetail() {
         }}
       >
         <Space align="center">
-          <StatusBadge status={currentStatus as StatusValue} />
+          <StatusBadge status={currentStatus} />
           <Title level={4} style={{ margin: 0 }}>
             {monitor.name}
           </Title>

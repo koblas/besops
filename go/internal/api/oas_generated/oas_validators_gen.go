@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/go-faster/errors"
-	"github.com/google/uuid"
 	"github.com/ogen-go/ogen/validate"
 )
 
@@ -80,14 +79,6 @@ func (s *APIKeyInput) Validate() error {
 	return nil
 }
 
-func (s *AddMonitorTagNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (s *AddMonitorTagReq) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -126,22 +117,6 @@ func (s *AddMonitorTagReq) Validate() error {
 	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *AddMonitorTagTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *AddMonitorTagUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
 	}
 	return nil
 }
@@ -217,22 +192,6 @@ func (s *ChangePasswordReq) Validate() error {
 	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *ChangePasswordTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ChangePasswordUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
 	}
 	return nil
 }
@@ -417,14 +376,6 @@ func (s *ChartPoint) Validate() error {
 	return nil
 }
 
-func (s *CheckDomainNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (s *CheckDomainOK) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -497,86 +448,6 @@ func (s *CheckDomainOK) Validate() error {
 	return nil
 }
 
-func (s *CheckDomainTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *CheckDomainUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ClearEventsNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ClearEventsTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ClearEventsUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ClearHeartbeatsNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ClearHeartbeatsTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ClearHeartbeatsUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ClearStatisticsTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ClearStatisticsUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (s *CreateAPIKeyCreated) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -608,102 +479,6 @@ func (s *CreateAPIKeyCreated) Validate() error {
 	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *CreateAPIKeyTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *CreateAPIKeyUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *CreateIncidentTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *CreateIncidentUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *CreateMaintenanceTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *CreateMaintenanceUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *CreateMonitorTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *CreateMonitorUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *CreateNotificationTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *CreateNotificationUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *CreateProxyTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *CreateProxyUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
 	}
 	return nil
 }
@@ -743,250 +518,25 @@ func (s *CreateStatusPageCreated) Validate() error {
 	return nil
 }
 
-func (s *CreateStatusPageTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
+func (s *DefaultErrorStatusCode) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
 	}
-	return nil
-}
 
-func (s *CreateStatusPageUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := s.Response.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "Response",
+			Error: err,
+		})
 	}
-	return nil
-}
-
-func (s *CreateTagTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *CreateTagUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteAPIKeyNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteAPIKeyTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteAPIKeyUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteIncidentNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteIncidentTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteIncidentUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteMaintenanceNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteMaintenanceTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteMaintenanceUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteMonitorNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteMonitorTagNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteMonitorTagTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteMonitorTagUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteMonitorTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteMonitorUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteNotificationNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteNotificationTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteNotificationUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteProxyNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteProxyTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteProxyUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteStatusPageNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteStatusPageTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteStatusPageUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteTagNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteTagTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DeleteTagUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 	return nil
 }
@@ -1022,46 +572,6 @@ func (s *Disable2FAReq) Validate() error {
 	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *Disable2FATooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *Disable2FAUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DisableAPIKeyNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DisableAPIKeyTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *DisableAPIKeyUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
 	}
 	return nil
 }
@@ -1289,46 +799,6 @@ func (s *Enable2FAReq) Validate() error {
 	return nil
 }
 
-func (s *Enable2FATooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *Enable2FAUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *EnableAPIKeyNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *EnableAPIKeyTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *EnableAPIKeyUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (s *ErrorResponse) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -1416,103 +886,6 @@ func (s ErrorResponseCode) Validate() error {
 	}
 }
 
-func (s *Get2FAStatusTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *Get2FAStatusUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetCertExpiryBadgeNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetCertExpiryBadgeTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetCertExpiryBadgeUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetChartDataNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s GetChartDataOKApplicationJSON) Validate() error {
-	alias := ([]ChartPoint)(s)
-	if alias == nil {
-		return errors.New("nil is invalid value")
-	}
-	if err := (validate.Array{
-		MinLength:    0,
-		MinLengthSet: false,
-		MaxLength:    500,
-		MaxLengthSet: true,
-	}).ValidateLength(len(alias)); err != nil {
-		return errors.Wrap(err, "array")
-	}
-	var failures []validate.FieldError
-	for i, elem := range alias {
-		if err := func() error {
-			if err := elem.Validate(); err != nil {
-				return err
-			}
-			return nil
-		}(); err != nil {
-			failures = append(failures, validate.FieldError{
-				Name:  fmt.Sprintf("[%d]", i),
-				Error: err,
-			})
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *GetChartDataTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetChartDataUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (s *GetDatabaseSizeOK) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -1542,87 +915,6 @@ func (s *GetDatabaseSizeOK) Validate() error {
 	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *GetDatabaseSizeTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetDatabaseSizeUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetHeartbeatsNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s GetHeartbeatsOKApplicationJSON) Validate() error {
-	alias := ([]Heartbeat)(s)
-	if alias == nil {
-		return errors.New("nil is invalid value")
-	}
-	if err := (validate.Array{
-		MinLength:    0,
-		MinLengthSet: false,
-		MaxLength:    500,
-		MaxLengthSet: true,
-	}).ValidateLength(len(alias)); err != nil {
-		return errors.Wrap(err, "array")
-	}
-	var failures []validate.FieldError
-	for i, elem := range alias {
-		if err := func() error {
-			if err := elem.Validate(); err != nil {
-				return err
-			}
-			return nil
-		}(); err != nil {
-			failures = append(failures, validate.FieldError{
-				Name:  fmt.Sprintf("[%d]", i),
-				Error: err,
-			})
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *GetHeartbeatsTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetHeartbeatsUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetImportantHeartbeatsNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
 	}
 	return nil
 }
@@ -1692,30 +984,6 @@ func (s *GetImportantHeartbeatsOK) Validate() error {
 	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *GetImportantHeartbeatsTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetImportantHeartbeatsUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetInfoBadRequest) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
 	}
 	return nil
 }
@@ -1852,207 +1120,6 @@ func (s *GetInfoOK) Validate() error {
 	return nil
 }
 
-func (s *GetInfoTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetInfoUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetLatencyBadgeNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetLatencyBadgeTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetLatencyBadgeUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetMaintenanceMonitorsNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s GetMaintenanceMonitorsOKApplicationJSON) Validate() error {
-	alias := ([]uuid.UUID)(s)
-	if alias == nil {
-		return errors.New("nil is invalid value")
-	}
-	if err := (validate.Array{
-		MinLength:    0,
-		MinLengthSet: false,
-		MaxLength:    500,
-		MaxLengthSet: true,
-	}).ValidateLength(len(alias)); err != nil {
-		return errors.Wrap(err, "array")
-	}
-	return nil
-}
-
-func (s *GetMaintenanceMonitorsTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetMaintenanceMonitorsUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetMaintenanceNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetMaintenanceStatusPagesNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s GetMaintenanceStatusPagesOKApplicationJSON) Validate() error {
-	alias := ([]uuid.UUID)(s)
-	if alias == nil {
-		return errors.New("nil is invalid value")
-	}
-	if err := (validate.Array{
-		MinLength:    0,
-		MinLengthSet: false,
-		MaxLength:    100,
-		MaxLengthSet: true,
-	}).ValidateLength(len(alias)); err != nil {
-		return errors.Wrap(err, "array")
-	}
-	return nil
-}
-
-func (s *GetMaintenanceStatusPagesTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetMaintenanceStatusPagesUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetMaintenanceTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetMaintenanceUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetMonitorNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetMonitorTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetMonitorUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s GetMonitorUptimesOKApplicationJSON) Validate() error {
-	alias := ([]GetMonitorUptimesOKItem)(s)
-	if alias == nil {
-		return errors.New("nil is invalid value")
-	}
-	if err := (validate.Array{
-		MinLength:    0,
-		MinLengthSet: false,
-		MaxLength:    10000,
-		MaxLengthSet: true,
-	}).ValidateLength(len(alias)); err != nil {
-		return errors.Wrap(err, "array")
-	}
-	var failures []validate.FieldError
-	for i, elem := range alias {
-		if err := func() error {
-			if err := elem.Validate(); err != nil {
-				return err
-			}
-			return nil
-		}(); err != nil {
-			failures = append(failures, validate.FieldError{
-				Name:  fmt.Sprintf("[%d]", i),
-				Error: err,
-			})
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
 func (s *GetMonitorUptimesOKItem) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -2076,94 +1143,6 @@ func (s *GetMonitorUptimesOKItem) Validate() error {
 	return nil
 }
 
-func (s *GetMonitorUptimesTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetMonitorUptimesUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetResponseBadgeNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetResponseBadgeTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetResponseBadgeUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetSettingsTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetSettingsUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetStatusBadgeNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetStatusBadgeTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetStatusBadgeUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetStatusPageBadgeNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (s GetStatusPageBadgeStyle) Validate() error {
 	switch s {
 	case "flat":
@@ -2179,54 +1158,6 @@ func (s GetStatusPageBadgeStyle) Validate() error {
 	default:
 		return errors.Errorf("invalid value: %v", s)
 	}
-}
-
-func (s *GetStatusPageBadgeTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetStatusPageBadgeUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetStatusPageEventStreamNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetStatusPageEventStreamTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetStatusPageEventStreamUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetStatusPageHeartbeatsNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
 }
 
 func (s *GetStatusPageHeartbeatsOK) Validate() error {
@@ -2455,70 +1386,6 @@ func (s *GetStatusPageHeartbeatsOKUptimeListItem) Validate() error {
 	return nil
 }
 
-func (s *GetStatusPageHeartbeatsTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetStatusPageHeartbeatsUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetStatusPageNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetStatusPageTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetStatusPageUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetUptimeBadgeNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetUptimeBadgeTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *GetUptimeBadgeUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (s *GroupMonitorConfig) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -2662,14 +1529,6 @@ func (s GrpcMonitorConfigKind) Validate() error {
 	}
 }
 
-func (s *HealthCheckBadRequest) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (s *HealthCheckOK) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -2700,22 +1559,6 @@ func (s HealthCheckOKStatus) Validate() error {
 	default:
 		return errors.Errorf("invalid value: %v", s)
 	}
-}
-
-func (s *HealthCheckTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *HealthCheckUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
 }
 
 func (s *Heartbeat) Validate() error {
@@ -2829,13 +1672,15 @@ func (s *Heartbeat) Validate() error {
 
 func (s HeartbeatStatus) Validate() error {
 	switch s {
-	case 0:
+	case "down":
 		return nil
-	case 1:
+	case "up":
 		return nil
-	case 2:
+	case "pending":
 		return nil
-	case 3:
+	case "maintenance":
+		return nil
+	case "degraded":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
@@ -3439,63 +2284,6 @@ func (s IncidentStyle) Validate() error {
 	}
 }
 
-func (s ListAPIKeysOKApplicationJSON) Validate() error {
-	alias := ([]APIKey)(s)
-	if alias == nil {
-		return errors.New("nil is invalid value")
-	}
-	if err := (validate.Array{
-		MinLength:    0,
-		MinLengthSet: false,
-		MaxLength:    100,
-		MaxLengthSet: true,
-	}).ValidateLength(len(alias)); err != nil {
-		return errors.Wrap(err, "array")
-	}
-	var failures []validate.FieldError
-	for i, elem := range alias {
-		if err := func() error {
-			if err := elem.Validate(); err != nil {
-				return err
-			}
-			return nil
-		}(); err != nil {
-			failures = append(failures, validate.FieldError{
-				Name:  fmt.Sprintf("[%d]", i),
-				Error: err,
-			})
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *ListAPIKeysTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ListAPIKeysUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ListIncidentsNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (s *ListIncidentsOK) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -3574,218 +2362,6 @@ func (s *ListIncidentsOK) Validate() error {
 	return nil
 }
 
-func (s *ListIncidentsTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ListIncidentsUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s ListMaintenanceOKApplicationJSON) Validate() error {
-	alias := ([]Maintenance)(s)
-	if alias == nil {
-		return errors.New("nil is invalid value")
-	}
-	if err := (validate.Array{
-		MinLength:    0,
-		MinLengthSet: false,
-		MaxLength:    100,
-		MaxLengthSet: true,
-	}).ValidateLength(len(alias)); err != nil {
-		return errors.Wrap(err, "array")
-	}
-	var failures []validate.FieldError
-	for i, elem := range alias {
-		if err := func() error {
-			if err := elem.Validate(); err != nil {
-				return err
-			}
-			return nil
-		}(); err != nil {
-			failures = append(failures, validate.FieldError{
-				Name:  fmt.Sprintf("[%d]", i),
-				Error: err,
-			})
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *ListMaintenanceTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ListMaintenanceUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s ListMonitorsOKApplicationJSON) Validate() error {
-	alias := ([]Monitor)(s)
-	if alias == nil {
-		return errors.New("nil is invalid value")
-	}
-	if err := (validate.Array{
-		MinLength:    0,
-		MinLengthSet: false,
-		MaxLength:    500,
-		MaxLengthSet: true,
-	}).ValidateLength(len(alias)); err != nil {
-		return errors.Wrap(err, "array")
-	}
-	var failures []validate.FieldError
-	for i, elem := range alias {
-		if err := func() error {
-			if err := elem.Validate(); err != nil {
-				return err
-			}
-			return nil
-		}(); err != nil {
-			failures = append(failures, validate.FieldError{
-				Name:  fmt.Sprintf("[%d]", i),
-				Error: err,
-			})
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *ListMonitorsTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ListMonitorsUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s ListNotificationsOKApplicationJSON) Validate() error {
-	alias := ([]Notification)(s)
-	if alias == nil {
-		return errors.New("nil is invalid value")
-	}
-	if err := (validate.Array{
-		MinLength:    0,
-		MinLengthSet: false,
-		MaxLength:    100,
-		MaxLengthSet: true,
-	}).ValidateLength(len(alias)); err != nil {
-		return errors.Wrap(err, "array")
-	}
-	var failures []validate.FieldError
-	for i, elem := range alias {
-		if err := func() error {
-			if err := elem.Validate(); err != nil {
-				return err
-			}
-			return nil
-		}(); err != nil {
-			failures = append(failures, validate.FieldError{
-				Name:  fmt.Sprintf("[%d]", i),
-				Error: err,
-			})
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *ListNotificationsTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ListNotificationsUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s ListProxiesOKApplicationJSON) Validate() error {
-	alias := ([]Proxy)(s)
-	if alias == nil {
-		return errors.New("nil is invalid value")
-	}
-	if err := (validate.Array{
-		MinLength:    0,
-		MinLengthSet: false,
-		MaxLength:    100,
-		MaxLengthSet: true,
-	}).ValidateLength(len(alias)); err != nil {
-		return errors.Wrap(err, "array")
-	}
-	var failures []validate.FieldError
-	for i, elem := range alias {
-		if err := func() error {
-			if err := elem.Validate(); err != nil {
-				return err
-			}
-			return nil
-		}(); err != nil {
-			failures = append(failures, validate.FieldError{
-				Name:  fmt.Sprintf("[%d]", i),
-				Error: err,
-			})
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *ListProxiesTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ListProxiesUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (s *ListRecentEventsOK) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -3851,120 +2427,6 @@ func (s *ListRecentEventsOK) Validate() error {
 	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *ListRecentEventsTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ListRecentEventsUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s ListStatusPagesOKApplicationJSON) Validate() error {
-	alias := ([]StatusPage)(s)
-	if alias == nil {
-		return errors.New("nil is invalid value")
-	}
-	if err := (validate.Array{
-		MinLength:    0,
-		MinLengthSet: false,
-		MaxLength:    100,
-		MaxLengthSet: true,
-	}).ValidateLength(len(alias)); err != nil {
-		return errors.Wrap(err, "array")
-	}
-	var failures []validate.FieldError
-	for i, elem := range alias {
-		if err := func() error {
-			if err := elem.Validate(); err != nil {
-				return err
-			}
-			return nil
-		}(); err != nil {
-			failures = append(failures, validate.FieldError{
-				Name:  fmt.Sprintf("[%d]", i),
-				Error: err,
-			})
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *ListStatusPagesTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ListStatusPagesUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s ListTagsOKApplicationJSON) Validate() error {
-	alias := ([]Tag)(s)
-	if alias == nil {
-		return errors.New("nil is invalid value")
-	}
-	if err := (validate.Array{
-		MinLength:    0,
-		MinLengthSet: false,
-		MaxLength:    100,
-		MaxLengthSet: true,
-	}).ValidateLength(len(alias)); err != nil {
-		return errors.Wrap(err, "array")
-	}
-	var failures []validate.FieldError
-	for i, elem := range alias {
-		if err := func() error {
-			if err := elem.Validate(); err != nil {
-				return err
-			}
-			return nil
-		}(); err != nil {
-			failures = append(failures, validate.FieldError{
-				Name:  fmt.Sprintf("[%d]", i),
-				Error: err,
-			})
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *ListTagsTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ListTagsUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
 	}
 	return nil
 }
@@ -4118,38 +2580,6 @@ func (s *LoginResponse) Validate() error {
 	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *LoginTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *LoginUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *LogoutTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *LogoutUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
 	}
 	return nil
 }
@@ -5928,30 +4358,6 @@ func (s MqttMonitorConfigKind) Validate() error {
 	}
 }
 
-func (s *NeedSetupBadRequest) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *NeedSetupTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *NeedSetupUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (s *Notification) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -6064,54 +4470,6 @@ func (s *NotificationInput) Validate() error {
 	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *PauseMaintenanceNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *PauseMaintenanceTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *PauseMaintenanceUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *PauseMonitorNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *PauseMonitorTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *PauseMonitorUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
 	}
 	return nil
 }
@@ -6327,22 +4685,6 @@ func (s *Prepare2FAReq) Validate() error {
 	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *Prepare2FATooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *Prepare2FAUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
 	}
 	return nil
 }
@@ -6794,102 +5136,6 @@ func (s *RefreshTokenRequest) Validate() error {
 	return nil
 }
 
-func (s *RefreshTokenTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *RefreshTokenUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ResolveIncidentNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ResolveIncidentTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ResolveIncidentUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ResumeMaintenanceNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ResumeMaintenanceTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ResumeMaintenanceUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ResumeMonitorNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ResumeMonitorTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ResumeMonitorUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *SetMaintenanceMonitorsNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (s *SetMaintenanceMonitorsReq) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -6921,30 +5167,6 @@ func (s *SetMaintenanceMonitorsReq) Validate() error {
 	return nil
 }
 
-func (s *SetMaintenanceMonitorsTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *SetMaintenanceMonitorsUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *SetMaintenanceStatusPagesNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (s *SetMaintenanceStatusPagesReq) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -6972,22 +5194,6 @@ func (s *SetMaintenanceStatusPagesReq) Validate() error {
 	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *SetMaintenanceStatusPagesTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *SetMaintenanceStatusPagesUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
 	}
 	return nil
 }
@@ -7175,38 +5381,6 @@ func (s *SetupReq) Validate() error {
 	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *SetupTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *SetupUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ShrinkDatabaseTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *ShrinkDatabaseUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
 	}
 	return nil
 }
@@ -8130,30 +6304,6 @@ func (s TailscalePingMonitorConfigKind) Validate() error {
 	}
 }
 
-func (s *TestNotificationNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *TestNotificationTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *TestNotificationUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (s *TokenResponse) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -8185,94 +6335,6 @@ func (s *TokenResponse) Validate() error {
 	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *UnpinIncidentNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UnpinIncidentTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UnpinIncidentUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateIncidentNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateIncidentTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateIncidentUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateMaintenanceNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateMaintenanceTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateMaintenanceUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateMonitorNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateMonitorTagNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
 	}
 	return nil
 }
@@ -8315,150 +6377,6 @@ func (s *UpdateMonitorTagReq) Validate() error {
 	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *UpdateMonitorTagTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateMonitorTagUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateMonitorTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateMonitorUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateNotificationNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateNotificationTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateNotificationUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateProxyNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateProxyTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateProxyUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateSettingsTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateSettingsUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateStatusPageNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateStatusPageTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateStatusPageUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateTagNotFound) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateTagTooManyRequests) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *UpdateTagUnauthorized) Validate() error {
-	alias := (*ErrorResponse)(s)
-	if err := alias.Validate(); err != nil {
-		return err
 	}
 	return nil
 }

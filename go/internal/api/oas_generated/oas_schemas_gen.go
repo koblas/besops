@@ -3,6 +3,7 @@
 package oas
 
 import (
+	"fmt"
 	"io"
 	"net/url"
 	"time"
@@ -11,6 +12,10 @@ import (
 	"github.com/go-faster/jx"
 	"github.com/google/uuid"
 )
+
+func (s *DefaultErrorStatusCode) Error() string {
+	return fmt.Sprintf("code %d: %+v", s.StatusCode, s.Response)
+}
 
 // An API key for programmatic access to the API. The key value itself is only returned once at
 // creation time.
@@ -110,12 +115,6 @@ func (s *APIKeyInput) SetExpires(val OptDateTime) {
 // AddMonitorTagCreated is response for AddMonitorTag operation.
 type AddMonitorTagCreated struct{}
 
-func (*AddMonitorTagCreated) addMonitorTagRes() {}
-
-type AddMonitorTagNotFound ErrorResponse
-
-func (*AddMonitorTagNotFound) addMonitorTagRes() {}
-
 type AddMonitorTagReq struct {
 	TagId uuid.UUID `json:"tagId"`
 	Value OptString `json:"value"`
@@ -140,14 +139,6 @@ func (s *AddMonitorTagReq) SetTagId(val uuid.UUID) {
 func (s *AddMonitorTagReq) SetValue(val OptString) {
 	s.Value = val
 }
-
-type AddMonitorTagTooManyRequests ErrorResponse
-
-func (*AddMonitorTagTooManyRequests) addMonitorTagRes() {}
-
-type AddMonitorTagUnauthorized ErrorResponse
-
-func (*AddMonitorTagUnauthorized) addMonitorTagRes() {}
 
 type BadgeStyle string
 
@@ -261,14 +252,6 @@ func (s *ChangePasswordReq) SetNewPassword(val string) {
 	s.NewPassword = val
 }
 
-type ChangePasswordTooManyRequests ErrorResponse
-
-func (*ChangePasswordTooManyRequests) changePasswordRes() {}
-
-type ChangePasswordUnauthorized ErrorResponse
-
-func (*ChangePasswordUnauthorized) changePasswordRes() {}
-
 // Aggregated monitoring data for a single time interval, used for rendering charts.
 // Ref: #/components/schemas/ChartPoint
 type ChartPoint struct {
@@ -346,10 +329,6 @@ func (s *ChartPoint) SetLatencyMax(val OptInt32) {
 	s.LatencyMax = val
 }
 
-type CheckDomainNotFound ErrorResponse
-
-func (*CheckDomainNotFound) checkDomainRes() {}
-
 type CheckDomainOK struct {
 	Domain OptString `json:"domain"`
 	Tld    OptString `json:"tld"`
@@ -375,62 +354,14 @@ func (s *CheckDomainOK) SetTld(val OptString) {
 	s.Tld = val
 }
 
-func (*CheckDomainOK) checkDomainRes() {}
-
-type CheckDomainTooManyRequests ErrorResponse
-
-func (*CheckDomainTooManyRequests) checkDomainRes() {}
-
-type CheckDomainUnauthorized ErrorResponse
-
-func (*CheckDomainUnauthorized) checkDomainRes() {}
-
 // ClearEventsNoContent is response for ClearEvents operation.
 type ClearEventsNoContent struct{}
-
-func (*ClearEventsNoContent) clearEventsRes() {}
-
-type ClearEventsNotFound ErrorResponse
-
-func (*ClearEventsNotFound) clearEventsRes() {}
-
-type ClearEventsTooManyRequests ErrorResponse
-
-func (*ClearEventsTooManyRequests) clearEventsRes() {}
-
-type ClearEventsUnauthorized ErrorResponse
-
-func (*ClearEventsUnauthorized) clearEventsRes() {}
 
 // ClearHeartbeatsNoContent is response for ClearHeartbeats operation.
 type ClearHeartbeatsNoContent struct{}
 
-func (*ClearHeartbeatsNoContent) clearHeartbeatsRes() {}
-
-type ClearHeartbeatsNotFound ErrorResponse
-
-func (*ClearHeartbeatsNotFound) clearHeartbeatsRes() {}
-
-type ClearHeartbeatsTooManyRequests ErrorResponse
-
-func (*ClearHeartbeatsTooManyRequests) clearHeartbeatsRes() {}
-
-type ClearHeartbeatsUnauthorized ErrorResponse
-
-func (*ClearHeartbeatsUnauthorized) clearHeartbeatsRes() {}
-
 // ClearStatisticsNoContent is response for ClearStatistics operation.
 type ClearStatisticsNoContent struct{}
-
-func (*ClearStatisticsNoContent) clearStatisticsRes() {}
-
-type ClearStatisticsTooManyRequests ErrorResponse
-
-func (*ClearStatisticsTooManyRequests) clearStatisticsRes() {}
-
-type ClearStatisticsUnauthorized ErrorResponse
-
-func (*ClearStatisticsUnauthorized) clearStatisticsRes() {}
 
 type CreateAPIKeyCreated struct {
 	ID  uuid.UUID `json:"id"`
@@ -457,24 +388,6 @@ func (s *CreateAPIKeyCreated) SetKey(val string) {
 	s.Key = val
 }
 
-func (*CreateAPIKeyCreated) createAPIKeyRes() {}
-
-type CreateAPIKeyTooManyRequests ErrorResponse
-
-func (*CreateAPIKeyTooManyRequests) createAPIKeyRes() {}
-
-type CreateAPIKeyUnauthorized ErrorResponse
-
-func (*CreateAPIKeyUnauthorized) createAPIKeyRes() {}
-
-type CreateIncidentTooManyRequests ErrorResponse
-
-func (*CreateIncidentTooManyRequests) createIncidentRes() {}
-
-type CreateIncidentUnauthorized ErrorResponse
-
-func (*CreateIncidentUnauthorized) createIncidentRes() {}
-
 type CreateMaintenanceCreated struct {
 	ID uuid.UUID `json:"id"`
 }
@@ -488,16 +401,6 @@ func (s *CreateMaintenanceCreated) GetID() uuid.UUID {
 func (s *CreateMaintenanceCreated) SetID(val uuid.UUID) {
 	s.ID = val
 }
-
-func (*CreateMaintenanceCreated) createMaintenanceRes() {}
-
-type CreateMaintenanceTooManyRequests ErrorResponse
-
-func (*CreateMaintenanceTooManyRequests) createMaintenanceRes() {}
-
-type CreateMaintenanceUnauthorized ErrorResponse
-
-func (*CreateMaintenanceUnauthorized) createMaintenanceRes() {}
 
 type CreateMonitorCreated struct {
 	ID uuid.UUID `json:"id"`
@@ -513,16 +416,6 @@ func (s *CreateMonitorCreated) SetID(val uuid.UUID) {
 	s.ID = val
 }
 
-func (*CreateMonitorCreated) createMonitorRes() {}
-
-type CreateMonitorTooManyRequests ErrorResponse
-
-func (*CreateMonitorTooManyRequests) createMonitorRes() {}
-
-type CreateMonitorUnauthorized ErrorResponse
-
-func (*CreateMonitorUnauthorized) createMonitorRes() {}
-
 type CreateNotificationCreated struct {
 	ID uuid.UUID `json:"id"`
 }
@@ -536,16 +429,6 @@ func (s *CreateNotificationCreated) GetID() uuid.UUID {
 func (s *CreateNotificationCreated) SetID(val uuid.UUID) {
 	s.ID = val
 }
-
-func (*CreateNotificationCreated) createNotificationRes() {}
-
-type CreateNotificationTooManyRequests ErrorResponse
-
-func (*CreateNotificationTooManyRequests) createNotificationRes() {}
-
-type CreateNotificationUnauthorized ErrorResponse
-
-func (*CreateNotificationUnauthorized) createNotificationRes() {}
 
 type CreateProxyCreated struct {
 	ID uuid.UUID `json:"id"`
@@ -561,16 +444,6 @@ func (s *CreateProxyCreated) SetID(val uuid.UUID) {
 	s.ID = val
 }
 
-func (*CreateProxyCreated) createProxyRes() {}
-
-type CreateProxyTooManyRequests ErrorResponse
-
-func (*CreateProxyTooManyRequests) createProxyRes() {}
-
-type CreateProxyUnauthorized ErrorResponse
-
-func (*CreateProxyUnauthorized) createProxyRes() {}
-
 type CreateStatusPageCreated struct {
 	Slug string `json:"slug"`
 }
@@ -585,176 +458,58 @@ func (s *CreateStatusPageCreated) SetSlug(val string) {
 	s.Slug = val
 }
 
-func (*CreateStatusPageCreated) createStatusPageRes() {}
+// DefaultErrorStatusCode wraps ErrorResponse with StatusCode.
+type DefaultErrorStatusCode struct {
+	StatusCode int
+	Response   ErrorResponse
+}
 
-type CreateStatusPageTooManyRequests ErrorResponse
+// GetStatusCode returns the value of StatusCode.
+func (s *DefaultErrorStatusCode) GetStatusCode() int {
+	return s.StatusCode
+}
 
-func (*CreateStatusPageTooManyRequests) createStatusPageRes() {}
+// GetResponse returns the value of Response.
+func (s *DefaultErrorStatusCode) GetResponse() ErrorResponse {
+	return s.Response
+}
 
-type CreateStatusPageUnauthorized ErrorResponse
+// SetStatusCode sets the value of StatusCode.
+func (s *DefaultErrorStatusCode) SetStatusCode(val int) {
+	s.StatusCode = val
+}
 
-func (*CreateStatusPageUnauthorized) createStatusPageRes() {}
-
-type CreateTagTooManyRequests ErrorResponse
-
-func (*CreateTagTooManyRequests) createTagRes() {}
-
-type CreateTagUnauthorized ErrorResponse
-
-func (*CreateTagUnauthorized) createTagRes() {}
+// SetResponse sets the value of Response.
+func (s *DefaultErrorStatusCode) SetResponse(val ErrorResponse) {
+	s.Response = val
+}
 
 // DeleteAPIKeyNoContent is response for DeleteAPIKey operation.
 type DeleteAPIKeyNoContent struct{}
 
-func (*DeleteAPIKeyNoContent) deleteAPIKeyRes() {}
-
-type DeleteAPIKeyNotFound ErrorResponse
-
-func (*DeleteAPIKeyNotFound) deleteAPIKeyRes() {}
-
-type DeleteAPIKeyTooManyRequests ErrorResponse
-
-func (*DeleteAPIKeyTooManyRequests) deleteAPIKeyRes() {}
-
-type DeleteAPIKeyUnauthorized ErrorResponse
-
-func (*DeleteAPIKeyUnauthorized) deleteAPIKeyRes() {}
-
 // DeleteIncidentNoContent is response for DeleteIncident operation.
 type DeleteIncidentNoContent struct{}
-
-func (*DeleteIncidentNoContent) deleteIncidentRes() {}
-
-type DeleteIncidentNotFound ErrorResponse
-
-func (*DeleteIncidentNotFound) deleteIncidentRes() {}
-
-type DeleteIncidentTooManyRequests ErrorResponse
-
-func (*DeleteIncidentTooManyRequests) deleteIncidentRes() {}
-
-type DeleteIncidentUnauthorized ErrorResponse
-
-func (*DeleteIncidentUnauthorized) deleteIncidentRes() {}
 
 // DeleteMaintenanceNoContent is response for DeleteMaintenance operation.
 type DeleteMaintenanceNoContent struct{}
 
-func (*DeleteMaintenanceNoContent) deleteMaintenanceRes() {}
-
-type DeleteMaintenanceNotFound ErrorResponse
-
-func (*DeleteMaintenanceNotFound) deleteMaintenanceRes() {}
-
-type DeleteMaintenanceTooManyRequests ErrorResponse
-
-func (*DeleteMaintenanceTooManyRequests) deleteMaintenanceRes() {}
-
-type DeleteMaintenanceUnauthorized ErrorResponse
-
-func (*DeleteMaintenanceUnauthorized) deleteMaintenanceRes() {}
-
 // DeleteMonitorNoContent is response for DeleteMonitor operation.
 type DeleteMonitorNoContent struct{}
-
-func (*DeleteMonitorNoContent) deleteMonitorRes() {}
-
-type DeleteMonitorNotFound ErrorResponse
-
-func (*DeleteMonitorNotFound) deleteMonitorRes() {}
 
 // DeleteMonitorTagNoContent is response for DeleteMonitorTag operation.
 type DeleteMonitorTagNoContent struct{}
 
-func (*DeleteMonitorTagNoContent) deleteMonitorTagRes() {}
-
-type DeleteMonitorTagNotFound ErrorResponse
-
-func (*DeleteMonitorTagNotFound) deleteMonitorTagRes() {}
-
-type DeleteMonitorTagTooManyRequests ErrorResponse
-
-func (*DeleteMonitorTagTooManyRequests) deleteMonitorTagRes() {}
-
-type DeleteMonitorTagUnauthorized ErrorResponse
-
-func (*DeleteMonitorTagUnauthorized) deleteMonitorTagRes() {}
-
-type DeleteMonitorTooManyRequests ErrorResponse
-
-func (*DeleteMonitorTooManyRequests) deleteMonitorRes() {}
-
-type DeleteMonitorUnauthorized ErrorResponse
-
-func (*DeleteMonitorUnauthorized) deleteMonitorRes() {}
-
 // DeleteNotificationNoContent is response for DeleteNotification operation.
 type DeleteNotificationNoContent struct{}
-
-func (*DeleteNotificationNoContent) deleteNotificationRes() {}
-
-type DeleteNotificationNotFound ErrorResponse
-
-func (*DeleteNotificationNotFound) deleteNotificationRes() {}
-
-type DeleteNotificationTooManyRequests ErrorResponse
-
-func (*DeleteNotificationTooManyRequests) deleteNotificationRes() {}
-
-type DeleteNotificationUnauthorized ErrorResponse
-
-func (*DeleteNotificationUnauthorized) deleteNotificationRes() {}
 
 // DeleteProxyNoContent is response for DeleteProxy operation.
 type DeleteProxyNoContent struct{}
 
-func (*DeleteProxyNoContent) deleteProxyRes() {}
-
-type DeleteProxyNotFound ErrorResponse
-
-func (*DeleteProxyNotFound) deleteProxyRes() {}
-
-type DeleteProxyTooManyRequests ErrorResponse
-
-func (*DeleteProxyTooManyRequests) deleteProxyRes() {}
-
-type DeleteProxyUnauthorized ErrorResponse
-
-func (*DeleteProxyUnauthorized) deleteProxyRes() {}
-
 // DeleteStatusPageNoContent is response for DeleteStatusPage operation.
 type DeleteStatusPageNoContent struct{}
 
-func (*DeleteStatusPageNoContent) deleteStatusPageRes() {}
-
-type DeleteStatusPageNotFound ErrorResponse
-
-func (*DeleteStatusPageNotFound) deleteStatusPageRes() {}
-
-type DeleteStatusPageTooManyRequests ErrorResponse
-
-func (*DeleteStatusPageTooManyRequests) deleteStatusPageRes() {}
-
-type DeleteStatusPageUnauthorized ErrorResponse
-
-func (*DeleteStatusPageUnauthorized) deleteStatusPageRes() {}
-
 // DeleteTagNoContent is response for DeleteTag operation.
 type DeleteTagNoContent struct{}
-
-func (*DeleteTagNoContent) deleteTagRes() {}
-
-type DeleteTagNotFound ErrorResponse
-
-func (*DeleteTagNotFound) deleteTagRes() {}
-
-type DeleteTagTooManyRequests ErrorResponse
-
-func (*DeleteTagTooManyRequests) deleteTagRes() {}
-
-type DeleteTagUnauthorized ErrorResponse
-
-func (*DeleteTagUnauthorized) deleteTagRes() {}
 
 type Disable2FAReq struct {
 	CurrentPassword string `json:"currentPassword"`
@@ -769,26 +524,6 @@ func (s *Disable2FAReq) GetCurrentPassword() string {
 func (s *Disable2FAReq) SetCurrentPassword(val string) {
 	s.CurrentPassword = val
 }
-
-type Disable2FATooManyRequests ErrorResponse
-
-func (*Disable2FATooManyRequests) disable2FARes() {}
-
-type Disable2FAUnauthorized ErrorResponse
-
-func (*Disable2FAUnauthorized) disable2FARes() {}
-
-type DisableAPIKeyNotFound ErrorResponse
-
-func (*DisableAPIKeyNotFound) disableAPIKeyRes() {}
-
-type DisableAPIKeyTooManyRequests ErrorResponse
-
-func (*DisableAPIKeyTooManyRequests) disableAPIKeyRes() {}
-
-type DisableAPIKeyUnauthorized ErrorResponse
-
-func (*DisableAPIKeyUnauthorized) disableAPIKeyRes() {}
 
 // Configuration for DNS resolution checks.
 // Ref: #/components/schemas/DnsMonitorConfig
@@ -1006,26 +741,6 @@ func (s *Enable2FAReq) SetToken(val string) {
 	s.Token = val
 }
 
-type Enable2FATooManyRequests ErrorResponse
-
-func (*Enable2FATooManyRequests) enable2FARes() {}
-
-type Enable2FAUnauthorized ErrorResponse
-
-func (*Enable2FAUnauthorized) enable2FARes() {}
-
-type EnableAPIKeyNotFound ErrorResponse
-
-func (*EnableAPIKeyNotFound) enableAPIKeyRes() {}
-
-type EnableAPIKeyTooManyRequests ErrorResponse
-
-func (*EnableAPIKeyTooManyRequests) enableAPIKeyRes() {}
-
-type EnableAPIKeyUnauthorized ErrorResponse
-
-func (*EnableAPIKeyUnauthorized) enableAPIKeyRes() {}
-
 // Standard error response returned for all 4xx and 5xx responses.
 // Ref: #/components/schemas/ErrorResponse
 type ErrorResponse struct {
@@ -1218,44 +933,6 @@ func (s *Get2FAStatusOK) SetEnabled(val bool) {
 	s.Enabled = val
 }
 
-func (*Get2FAStatusOK) get2FAStatusRes() {}
-
-type Get2FAStatusTooManyRequests ErrorResponse
-
-func (*Get2FAStatusTooManyRequests) get2FAStatusRes() {}
-
-type Get2FAStatusUnauthorized ErrorResponse
-
-func (*Get2FAStatusUnauthorized) get2FAStatusRes() {}
-
-type GetCertExpiryBadgeNotFound ErrorResponse
-
-func (*GetCertExpiryBadgeNotFound) getCertExpiryBadgeRes() {}
-
-type GetCertExpiryBadgeTooManyRequests ErrorResponse
-
-func (*GetCertExpiryBadgeTooManyRequests) getCertExpiryBadgeRes() {}
-
-type GetCertExpiryBadgeUnauthorized ErrorResponse
-
-func (*GetCertExpiryBadgeUnauthorized) getCertExpiryBadgeRes() {}
-
-type GetChartDataNotFound ErrorResponse
-
-func (*GetChartDataNotFound) getChartDataRes() {}
-
-type GetChartDataOKApplicationJSON []ChartPoint
-
-func (*GetChartDataOKApplicationJSON) getChartDataRes() {}
-
-type GetChartDataTooManyRequests ErrorResponse
-
-func (*GetChartDataTooManyRequests) getChartDataRes() {}
-
-type GetChartDataUnauthorized ErrorResponse
-
-func (*GetChartDataUnauthorized) getChartDataRes() {}
-
 type GetDatabaseSizeOK struct {
 	// Size in bytes.
 	Size int64 `json:"size"`
@@ -1270,36 +947,6 @@ func (s *GetDatabaseSizeOK) GetSize() int64 {
 func (s *GetDatabaseSizeOK) SetSize(val int64) {
 	s.Size = val
 }
-
-func (*GetDatabaseSizeOK) getDatabaseSizeRes() {}
-
-type GetDatabaseSizeTooManyRequests ErrorResponse
-
-func (*GetDatabaseSizeTooManyRequests) getDatabaseSizeRes() {}
-
-type GetDatabaseSizeUnauthorized ErrorResponse
-
-func (*GetDatabaseSizeUnauthorized) getDatabaseSizeRes() {}
-
-type GetHeartbeatsNotFound ErrorResponse
-
-func (*GetHeartbeatsNotFound) getHeartbeatsRes() {}
-
-type GetHeartbeatsOKApplicationJSON []Heartbeat
-
-func (*GetHeartbeatsOKApplicationJSON) getHeartbeatsRes() {}
-
-type GetHeartbeatsTooManyRequests ErrorResponse
-
-func (*GetHeartbeatsTooManyRequests) getHeartbeatsRes() {}
-
-type GetHeartbeatsUnauthorized ErrorResponse
-
-func (*GetHeartbeatsUnauthorized) getHeartbeatsRes() {}
-
-type GetImportantHeartbeatsNotFound ErrorResponse
-
-func (*GetImportantHeartbeatsNotFound) getImportantHeartbeatsRes() {}
 
 type GetImportantHeartbeatsOK struct {
 	Data  []Heartbeat `json:"data"`
@@ -1325,20 +972,6 @@ func (s *GetImportantHeartbeatsOK) SetData(val []Heartbeat) {
 func (s *GetImportantHeartbeatsOK) SetTotal(val int64) {
 	s.Total = val
 }
-
-func (*GetImportantHeartbeatsOK) getImportantHeartbeatsRes() {}
-
-type GetImportantHeartbeatsTooManyRequests ErrorResponse
-
-func (*GetImportantHeartbeatsTooManyRequests) getImportantHeartbeatsRes() {}
-
-type GetImportantHeartbeatsUnauthorized ErrorResponse
-
-func (*GetImportantHeartbeatsUnauthorized) getImportantHeartbeatsRes() {}
-
-type GetInfoBadRequest ErrorResponse
-
-func (*GetInfoBadRequest) getInfoRes() {}
 
 type GetInfoOK struct {
 	Version              OptString `json:"version"`
@@ -1398,88 +1031,6 @@ func (s *GetInfoOK) SetServerTimezoneOffset(val OptString) {
 	s.ServerTimezoneOffset = val
 }
 
-func (*GetInfoOK) getInfoRes() {}
-
-type GetInfoTooManyRequests ErrorResponse
-
-func (*GetInfoTooManyRequests) getInfoRes() {}
-
-type GetInfoUnauthorized ErrorResponse
-
-func (*GetInfoUnauthorized) getInfoRes() {}
-
-type GetLatencyBadgeNotFound ErrorResponse
-
-func (*GetLatencyBadgeNotFound) getLatencyBadgeRes() {}
-
-type GetLatencyBadgeTooManyRequests ErrorResponse
-
-func (*GetLatencyBadgeTooManyRequests) getLatencyBadgeRes() {}
-
-type GetLatencyBadgeUnauthorized ErrorResponse
-
-func (*GetLatencyBadgeUnauthorized) getLatencyBadgeRes() {}
-
-type GetMaintenanceMonitorsNotFound ErrorResponse
-
-func (*GetMaintenanceMonitorsNotFound) getMaintenanceMonitorsRes() {}
-
-type GetMaintenanceMonitorsOKApplicationJSON []uuid.UUID
-
-func (*GetMaintenanceMonitorsOKApplicationJSON) getMaintenanceMonitorsRes() {}
-
-type GetMaintenanceMonitorsTooManyRequests ErrorResponse
-
-func (*GetMaintenanceMonitorsTooManyRequests) getMaintenanceMonitorsRes() {}
-
-type GetMaintenanceMonitorsUnauthorized ErrorResponse
-
-func (*GetMaintenanceMonitorsUnauthorized) getMaintenanceMonitorsRes() {}
-
-type GetMaintenanceNotFound ErrorResponse
-
-func (*GetMaintenanceNotFound) getMaintenanceRes() {}
-
-type GetMaintenanceStatusPagesNotFound ErrorResponse
-
-func (*GetMaintenanceStatusPagesNotFound) getMaintenanceStatusPagesRes() {}
-
-type GetMaintenanceStatusPagesOKApplicationJSON []uuid.UUID
-
-func (*GetMaintenanceStatusPagesOKApplicationJSON) getMaintenanceStatusPagesRes() {}
-
-type GetMaintenanceStatusPagesTooManyRequests ErrorResponse
-
-func (*GetMaintenanceStatusPagesTooManyRequests) getMaintenanceStatusPagesRes() {}
-
-type GetMaintenanceStatusPagesUnauthorized ErrorResponse
-
-func (*GetMaintenanceStatusPagesUnauthorized) getMaintenanceStatusPagesRes() {}
-
-type GetMaintenanceTooManyRequests ErrorResponse
-
-func (*GetMaintenanceTooManyRequests) getMaintenanceRes() {}
-
-type GetMaintenanceUnauthorized ErrorResponse
-
-func (*GetMaintenanceUnauthorized) getMaintenanceRes() {}
-
-type GetMonitorNotFound ErrorResponse
-
-func (*GetMonitorNotFound) getMonitorRes() {}
-
-type GetMonitorTooManyRequests ErrorResponse
-
-func (*GetMonitorTooManyRequests) getMonitorRes() {}
-
-type GetMonitorUnauthorized ErrorResponse
-
-func (*GetMonitorUnauthorized) getMonitorRes() {}
-
-type GetMonitorUptimesOKApplicationJSON []GetMonitorUptimesOKItem
-
-func (*GetMonitorUptimesOKApplicationJSON) getMonitorUptimesRes() {}
-
 type GetMonitorUptimesOKItem struct {
 	MonitorId uuid.UUID `json:"monitorId"`
 	Uptime    float64   `json:"uptime"`
@@ -1505,50 +1056,6 @@ func (s *GetMonitorUptimesOKItem) SetUptime(val float64) {
 	s.Uptime = val
 }
 
-type GetMonitorUptimesTooManyRequests ErrorResponse
-
-func (*GetMonitorUptimesTooManyRequests) getMonitorUptimesRes() {}
-
-type GetMonitorUptimesUnauthorized ErrorResponse
-
-func (*GetMonitorUptimesUnauthorized) getMonitorUptimesRes() {}
-
-type GetResponseBadgeNotFound ErrorResponse
-
-func (*GetResponseBadgeNotFound) getResponseBadgeRes() {}
-
-type GetResponseBadgeTooManyRequests ErrorResponse
-
-func (*GetResponseBadgeTooManyRequests) getResponseBadgeRes() {}
-
-type GetResponseBadgeUnauthorized ErrorResponse
-
-func (*GetResponseBadgeUnauthorized) getResponseBadgeRes() {}
-
-type GetSettingsTooManyRequests ErrorResponse
-
-func (*GetSettingsTooManyRequests) getSettingsRes() {}
-
-type GetSettingsUnauthorized ErrorResponse
-
-func (*GetSettingsUnauthorized) getSettingsRes() {}
-
-type GetStatusBadgeNotFound ErrorResponse
-
-func (*GetStatusBadgeNotFound) getStatusBadgeRes() {}
-
-type GetStatusBadgeTooManyRequests ErrorResponse
-
-func (*GetStatusBadgeTooManyRequests) getStatusBadgeRes() {}
-
-type GetStatusBadgeUnauthorized ErrorResponse
-
-func (*GetStatusBadgeUnauthorized) getStatusBadgeRes() {}
-
-type GetStatusPageBadgeNotFound ErrorResponse
-
-func (*GetStatusPageBadgeNotFound) getStatusPageBadgeRes() {}
-
 type GetStatusPageBadgeOK struct {
 	Data io.Reader
 }
@@ -1562,8 +1069,6 @@ func (s GetStatusPageBadgeOK) Read(p []byte) (n int, err error) {
 	}
 	return s.Data.Read(p)
 }
-
-func (*GetStatusPageBadgeOK) getStatusPageBadgeRes() {}
 
 type GetStatusPageBadgeStyle string
 
@@ -1627,18 +1132,6 @@ func (s *GetStatusPageBadgeStyle) UnmarshalText(data []byte) error {
 	}
 }
 
-type GetStatusPageBadgeTooManyRequests ErrorResponse
-
-func (*GetStatusPageBadgeTooManyRequests) getStatusPageBadgeRes() {}
-
-type GetStatusPageBadgeUnauthorized ErrorResponse
-
-func (*GetStatusPageBadgeUnauthorized) getStatusPageBadgeRes() {}
-
-type GetStatusPageEventStreamNotFound ErrorResponse
-
-func (*GetStatusPageEventStreamNotFound) getStatusPageEventStreamRes() {}
-
 type GetStatusPageEventStreamOK struct {
 	Data io.Reader
 }
@@ -1652,20 +1145,6 @@ func (s GetStatusPageEventStreamOK) Read(p []byte) (n int, err error) {
 	}
 	return s.Data.Read(p)
 }
-
-func (*GetStatusPageEventStreamOK) getStatusPageEventStreamRes() {}
-
-type GetStatusPageEventStreamTooManyRequests ErrorResponse
-
-func (*GetStatusPageEventStreamTooManyRequests) getStatusPageEventStreamRes() {}
-
-type GetStatusPageEventStreamUnauthorized ErrorResponse
-
-func (*GetStatusPageEventStreamUnauthorized) getStatusPageEventStreamRes() {}
-
-type GetStatusPageHeartbeatsNotFound ErrorResponse
-
-func (*GetStatusPageHeartbeatsNotFound) getStatusPageHeartbeatsRes() {}
 
 type GetStatusPageHeartbeatsOK struct {
 	HeartbeatList []GetStatusPageHeartbeatsOKHeartbeatListItem `json:"heartbeatList"`
@@ -1703,8 +1182,6 @@ func (s *GetStatusPageHeartbeatsOK) SetUptimeList(val []GetStatusPageHeartbeatsO
 func (s *GetStatusPageHeartbeatsOK) SetMonitorNames(val []GetStatusPageHeartbeatsOKMonitorNamesItem) {
 	s.MonitorNames = val
 }
-
-func (*GetStatusPageHeartbeatsOK) getStatusPageHeartbeatsRes() {}
 
 type GetStatusPageHeartbeatsOKHeartbeatListItem struct {
 	MonitorId  uuid.UUID   `json:"monitorId"`
@@ -1780,38 +1257,6 @@ func (s *GetStatusPageHeartbeatsOKUptimeListItem) SetMonitorId(val uuid.UUID) {
 func (s *GetStatusPageHeartbeatsOKUptimeListItem) SetUptime(val float64) {
 	s.Uptime = val
 }
-
-type GetStatusPageHeartbeatsTooManyRequests ErrorResponse
-
-func (*GetStatusPageHeartbeatsTooManyRequests) getStatusPageHeartbeatsRes() {}
-
-type GetStatusPageHeartbeatsUnauthorized ErrorResponse
-
-func (*GetStatusPageHeartbeatsUnauthorized) getStatusPageHeartbeatsRes() {}
-
-type GetStatusPageNotFound ErrorResponse
-
-func (*GetStatusPageNotFound) getStatusPageRes() {}
-
-type GetStatusPageTooManyRequests ErrorResponse
-
-func (*GetStatusPageTooManyRequests) getStatusPageRes() {}
-
-type GetStatusPageUnauthorized ErrorResponse
-
-func (*GetStatusPageUnauthorized) getStatusPageRes() {}
-
-type GetUptimeBadgeNotFound ErrorResponse
-
-func (*GetUptimeBadgeNotFound) getUptimeBadgeRes() {}
-
-type GetUptimeBadgeTooManyRequests ErrorResponse
-
-func (*GetUptimeBadgeTooManyRequests) getUptimeBadgeRes() {}
-
-type GetUptimeBadgeUnauthorized ErrorResponse
-
-func (*GetUptimeBadgeUnauthorized) getUptimeBadgeRes() {}
 
 // Configuration for a group monitor that aggregates the status of member monitors.
 // Ref: #/components/schemas/GroupMonitorConfig
@@ -1980,10 +1425,6 @@ func (s *GrpcMonitorConfigKind) UnmarshalText(data []byte) error {
 	}
 }
 
-type HealthCheckBadRequest ErrorResponse
-
-func (*HealthCheckBadRequest) healthCheckRes() {}
-
 type HealthCheckOK struct {
 	Status HealthCheckOKStatus `json:"status"`
 }
@@ -1997,8 +1438,6 @@ func (s *HealthCheckOK) GetStatus() HealthCheckOKStatus {
 func (s *HealthCheckOK) SetStatus(val HealthCheckOKStatus) {
 	s.Status = val
 }
-
-func (*HealthCheckOK) healthCheckRes() {}
 
 type HealthCheckOKStatus string
 
@@ -2034,14 +1473,6 @@ func (s *HealthCheckOKStatus) UnmarshalText(data []byte) error {
 	}
 }
 
-type HealthCheckTooManyRequests ErrorResponse
-
-func (*HealthCheckTooManyRequests) healthCheckRes() {}
-
-type HealthCheckUnauthorized ErrorResponse
-
-func (*HealthCheckUnauthorized) healthCheckRes() {}
-
 // A single check result recording the status and response time of a monitor at a point in time.
 // Ref: #/components/schemas/Heartbeat
 type Heartbeat struct {
@@ -2049,7 +1480,7 @@ type Heartbeat struct {
 	ID uuid.UUID `json:"id"`
 	// The monitor that produced this heartbeat.
 	MonitorId uuid.UUID `json:"monitorId"`
-	// Monitor status at this point in time: 0=DOWN, 1=UP, 2=PENDING, 3=MAINTENANCE.
+	// Monitor status at this point in time.
 	Status HeartbeatStatus `json:"status"`
 	// UTC timestamp when this check was performed.
 	Time time.Time `json:"time"`
@@ -2143,23 +1574,66 @@ func (s *Heartbeat) SetDuration(val OptInt64) {
 	s.Duration = val
 }
 
-// Monitor status at this point in time: 0=DOWN, 1=UP, 2=PENDING, 3=MAINTENANCE.
-type HeartbeatStatus int32
+// Monitor status at this point in time.
+type HeartbeatStatus string
 
 const (
-	HeartbeatStatus0 HeartbeatStatus = 0
-	HeartbeatStatus1 HeartbeatStatus = 1
-	HeartbeatStatus2 HeartbeatStatus = 2
-	HeartbeatStatus3 HeartbeatStatus = 3
+	HeartbeatStatusDown        HeartbeatStatus = "down"
+	HeartbeatStatusUp          HeartbeatStatus = "up"
+	HeartbeatStatusPending     HeartbeatStatus = "pending"
+	HeartbeatStatusMaintenance HeartbeatStatus = "maintenance"
+	HeartbeatStatusDegraded    HeartbeatStatus = "degraded"
 )
 
 // AllValues returns all HeartbeatStatus values.
 func (HeartbeatStatus) AllValues() []HeartbeatStatus {
 	return []HeartbeatStatus{
-		HeartbeatStatus0,
-		HeartbeatStatus1,
-		HeartbeatStatus2,
-		HeartbeatStatus3,
+		HeartbeatStatusDown,
+		HeartbeatStatusUp,
+		HeartbeatStatusPending,
+		HeartbeatStatusMaintenance,
+		HeartbeatStatusDegraded,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s HeartbeatStatus) MarshalText() ([]byte, error) {
+	switch s {
+	case HeartbeatStatusDown:
+		return []byte(s), nil
+	case HeartbeatStatusUp:
+		return []byte(s), nil
+	case HeartbeatStatusPending:
+		return []byte(s), nil
+	case HeartbeatStatusMaintenance:
+		return []byte(s), nil
+	case HeartbeatStatusDegraded:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *HeartbeatStatus) UnmarshalText(data []byte) error {
+	switch HeartbeatStatus(data) {
+	case HeartbeatStatusDown:
+		*s = HeartbeatStatusDown
+		return nil
+	case HeartbeatStatusUp:
+		*s = HeartbeatStatusUp
+		return nil
+	case HeartbeatStatusPending:
+		*s = HeartbeatStatusPending
+		return nil
+	case HeartbeatStatusMaintenance:
+		*s = HeartbeatStatusMaintenance
+		return nil
+	case HeartbeatStatusDegraded:
+		*s = HeartbeatStatusDegraded
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
 	}
 }
 
@@ -2569,10 +2043,6 @@ func (s *Incident) SetResolved(val OptBool) {
 	s.Resolved = val
 }
 
-func (*Incident) createIncidentRes()  {}
-func (*Incident) resolveIncidentRes() {}
-func (*Incident) updateIncidentRes()  {}
-
 // Input for creating or updating an incident on a status page.
 // Ref: #/components/schemas/IncidentInput
 type IncidentInput struct {
@@ -2766,22 +2236,6 @@ func (s *IncidentStyle) UnmarshalText(data []byte) error {
 	}
 }
 
-type ListAPIKeysOKApplicationJSON []APIKey
-
-func (*ListAPIKeysOKApplicationJSON) listAPIKeysRes() {}
-
-type ListAPIKeysTooManyRequests ErrorResponse
-
-func (*ListAPIKeysTooManyRequests) listAPIKeysRes() {}
-
-type ListAPIKeysUnauthorized ErrorResponse
-
-func (*ListAPIKeysUnauthorized) listAPIKeysRes() {}
-
-type ListIncidentsNotFound ErrorResponse
-
-func (*ListIncidentsNotFound) listIncidentsRes() {}
-
 type ListIncidentsOK struct {
 	Incidents  []Incident `json:"incidents"`
 	NextCursor OptString  `json:"nextCursor"`
@@ -2807,64 +2261,6 @@ func (s *ListIncidentsOK) SetNextCursor(val OptString) {
 	s.NextCursor = val
 }
 
-func (*ListIncidentsOK) listIncidentsRes() {}
-
-type ListIncidentsTooManyRequests ErrorResponse
-
-func (*ListIncidentsTooManyRequests) listIncidentsRes() {}
-
-type ListIncidentsUnauthorized ErrorResponse
-
-func (*ListIncidentsUnauthorized) listIncidentsRes() {}
-
-type ListMaintenanceOKApplicationJSON []Maintenance
-
-func (*ListMaintenanceOKApplicationJSON) listMaintenanceRes() {}
-
-type ListMaintenanceTooManyRequests ErrorResponse
-
-func (*ListMaintenanceTooManyRequests) listMaintenanceRes() {}
-
-type ListMaintenanceUnauthorized ErrorResponse
-
-func (*ListMaintenanceUnauthorized) listMaintenanceRes() {}
-
-type ListMonitorsOKApplicationJSON []Monitor
-
-func (*ListMonitorsOKApplicationJSON) listMonitorsRes() {}
-
-type ListMonitorsTooManyRequests ErrorResponse
-
-func (*ListMonitorsTooManyRequests) listMonitorsRes() {}
-
-type ListMonitorsUnauthorized ErrorResponse
-
-func (*ListMonitorsUnauthorized) listMonitorsRes() {}
-
-type ListNotificationsOKApplicationJSON []Notification
-
-func (*ListNotificationsOKApplicationJSON) listNotificationsRes() {}
-
-type ListNotificationsTooManyRequests ErrorResponse
-
-func (*ListNotificationsTooManyRequests) listNotificationsRes() {}
-
-type ListNotificationsUnauthorized ErrorResponse
-
-func (*ListNotificationsUnauthorized) listNotificationsRes() {}
-
-type ListProxiesOKApplicationJSON []Proxy
-
-func (*ListProxiesOKApplicationJSON) listProxiesRes() {}
-
-type ListProxiesTooManyRequests ErrorResponse
-
-func (*ListProxiesTooManyRequests) listProxiesRes() {}
-
-type ListProxiesUnauthorized ErrorResponse
-
-func (*ListProxiesUnauthorized) listProxiesRes() {}
-
 type ListRecentEventsOK struct {
 	Data  []Heartbeat `json:"data"`
 	Total int64       `json:"total"`
@@ -2889,40 +2285,6 @@ func (s *ListRecentEventsOK) SetData(val []Heartbeat) {
 func (s *ListRecentEventsOK) SetTotal(val int64) {
 	s.Total = val
 }
-
-func (*ListRecentEventsOK) listRecentEventsRes() {}
-
-type ListRecentEventsTooManyRequests ErrorResponse
-
-func (*ListRecentEventsTooManyRequests) listRecentEventsRes() {}
-
-type ListRecentEventsUnauthorized ErrorResponse
-
-func (*ListRecentEventsUnauthorized) listRecentEventsRes() {}
-
-type ListStatusPagesOKApplicationJSON []StatusPage
-
-func (*ListStatusPagesOKApplicationJSON) listStatusPagesRes() {}
-
-type ListStatusPagesTooManyRequests ErrorResponse
-
-func (*ListStatusPagesTooManyRequests) listStatusPagesRes() {}
-
-type ListStatusPagesUnauthorized ErrorResponse
-
-func (*ListStatusPagesUnauthorized) listStatusPagesRes() {}
-
-type ListTagsOKApplicationJSON []Tag
-
-func (*ListTagsOKApplicationJSON) listTagsRes() {}
-
-type ListTagsTooManyRequests ErrorResponse
-
-func (*ListTagsTooManyRequests) listTagsRes() {}
-
-type ListTagsUnauthorized ErrorResponse
-
-func (*ListTagsUnauthorized) listTagsRes() {}
 
 // Credentials for authenticating a user session.
 // Ref: #/components/schemas/LoginRequest
@@ -3006,28 +2368,8 @@ func (s *LoginResponse) SetTokenRequired(val OptBool) {
 	s.TokenRequired = val
 }
 
-func (*LoginResponse) loginRes() {}
-
-type LoginTooManyRequests ErrorResponse
-
-func (*LoginTooManyRequests) loginRes() {}
-
-type LoginUnauthorized ErrorResponse
-
-func (*LoginUnauthorized) loginRes() {}
-
 // LogoutNoContent is response for Logout operation.
 type LogoutNoContent struct{}
-
-func (*LogoutNoContent) logoutRes() {}
-
-type LogoutTooManyRequests ErrorResponse
-
-func (*LogoutTooManyRequests) logoutRes() {}
-
-type LogoutUnauthorized ErrorResponse
-
-func (*LogoutUnauthorized) logoutRes() {}
 
 // A scheduled maintenance window during which monitors are expected to be offline. Notifications are
 // suppressed and uptime is not affected during maintenance.
@@ -3215,9 +2557,6 @@ func (s *Maintenance) SetDurationMinutes(val OptInt32) {
 func (s *Maintenance) SetTimezoneOption(val OptString) {
 	s.TimezoneOption = val
 }
-
-func (*Maintenance) getMaintenanceRes()    {}
-func (*Maintenance) updateMaintenanceRes() {}
 
 // Input for creating or updating a maintenance window.
 // Ref: #/components/schemas/MaintenanceInput
@@ -3550,19 +2889,7 @@ func (s *MessageResponse) SetMessage(val string) {
 	s.Message = val
 }
 
-func (*MessageResponse) disable2FARes()        {}
-func (*MessageResponse) disableAPIKeyRes()     {}
-func (*MessageResponse) enable2FARes()         {}
-func (*MessageResponse) enableAPIKeyRes()      {}
-func (*MessageResponse) pauseMaintenanceRes()  {}
-func (*MessageResponse) pauseMonitorRes()      {}
-func (*MessageResponse) resumeMaintenanceRes() {}
-func (*MessageResponse) resumeMonitorRes()     {}
-func (*MessageResponse) setupRes()             {}
-func (*MessageResponse) shrinkDatabaseRes()    {}
-func (*MessageResponse) testNotificationRes()  {}
-func (*MessageResponse) unpinIncidentRes()     {}
-func (*MessageResponse) updateSettingsRes()    {}
+func (*MessageResponse) setupRes() {}
 
 // A monitor represents a single endpoint or service being monitored for uptime.
 // Ref: #/components/schemas/Monitor
@@ -3733,9 +3060,6 @@ func (s *Monitor) SetExpiryNotification(val OptBool) {
 func (s *Monitor) SetConfig(val OptMonitorConfig) {
 	s.Config = val
 }
-
-func (*Monitor) getMonitorRes()    {}
-func (*Monitor) updateMonitorRes() {}
 
 // Type-specific configuration for a monitor, discriminated by the kind field.
 // Ref: #/components/schemas/MonitorConfig
@@ -4566,10 +3890,6 @@ func (s *MqttMonitorConfigKind) UnmarshalText(data []byte) error {
 	}
 }
 
-type NeedSetupBadRequest ErrorResponse
-
-func (*NeedSetupBadRequest) needSetupRes() {}
-
 type NeedSetupOK struct {
 	NeedSetup bool `json:"needSetup"`
 }
@@ -4583,16 +3903,6 @@ func (s *NeedSetupOK) GetNeedSetup() bool {
 func (s *NeedSetupOK) SetNeedSetup(val bool) {
 	s.NeedSetup = val
 }
-
-func (*NeedSetupOK) needSetupRes() {}
-
-type NeedSetupTooManyRequests ErrorResponse
-
-func (*NeedSetupTooManyRequests) needSetupRes() {}
-
-type NeedSetupUnauthorized ErrorResponse
-
-func (*NeedSetupUnauthorized) needSetupRes() {}
 
 // A configured notification provider that can receive alerts when monitors change status.
 // Ref: #/components/schemas/Notification
@@ -4659,8 +3969,6 @@ func (s *Notification) SetActive(val bool) {
 func (s *Notification) SetConfig(val jx.Raw) {
 	s.Config = val
 }
-
-func (*Notification) updateNotificationRes() {}
 
 // Input for creating or updating a notification provider configuration.
 // Ref: #/components/schemas/NotificationInput
@@ -5463,30 +4771,6 @@ func (o OptUUID) Or(d uuid.UUID) uuid.UUID {
 	return d
 }
 
-type PauseMaintenanceNotFound ErrorResponse
-
-func (*PauseMaintenanceNotFound) pauseMaintenanceRes() {}
-
-type PauseMaintenanceTooManyRequests ErrorResponse
-
-func (*PauseMaintenanceTooManyRequests) pauseMaintenanceRes() {}
-
-type PauseMaintenanceUnauthorized ErrorResponse
-
-func (*PauseMaintenanceUnauthorized) pauseMaintenanceRes() {}
-
-type PauseMonitorNotFound ErrorResponse
-
-func (*PauseMonitorNotFound) pauseMonitorRes() {}
-
-type PauseMonitorTooManyRequests ErrorResponse
-
-func (*PauseMonitorTooManyRequests) pauseMonitorRes() {}
-
-type PauseMonitorUnauthorized ErrorResponse
-
-func (*PauseMonitorUnauthorized) pauseMonitorRes() {}
-
 // Configuration for ICMP ping checks.
 // Ref: #/components/schemas/PingMonitorConfig
 type PingMonitorConfig struct {
@@ -5656,8 +4940,6 @@ func (s *Prepare2FAOK) SetURI(val url.URL) {
 	s.URI = val
 }
 
-func (*Prepare2FAOK) prepare2FARes() {}
-
 type Prepare2FAReq struct {
 	CurrentPassword string `json:"currentPassword"`
 }
@@ -5671,14 +4953,6 @@ func (s *Prepare2FAReq) GetCurrentPassword() string {
 func (s *Prepare2FAReq) SetCurrentPassword(val string) {
 	s.CurrentPassword = val
 }
-
-type Prepare2FATooManyRequests ErrorResponse
-
-func (*Prepare2FATooManyRequests) prepare2FARes() {}
-
-type Prepare2FAUnauthorized ErrorResponse
-
-func (*Prepare2FAUnauthorized) prepare2FARes() {}
 
 // An HTTP or SOCKS proxy used by monitors for outbound connections to their targets.
 // Ref: #/components/schemas/Proxy
@@ -6158,50 +5432,6 @@ func (s *RefreshTokenRequest) SetRefreshToken(val string) {
 	s.RefreshToken = val
 }
 
-type RefreshTokenTooManyRequests ErrorResponse
-
-func (*RefreshTokenTooManyRequests) refreshTokenRes() {}
-
-type RefreshTokenUnauthorized ErrorResponse
-
-func (*RefreshTokenUnauthorized) refreshTokenRes() {}
-
-type ResolveIncidentNotFound ErrorResponse
-
-func (*ResolveIncidentNotFound) resolveIncidentRes() {}
-
-type ResolveIncidentTooManyRequests ErrorResponse
-
-func (*ResolveIncidentTooManyRequests) resolveIncidentRes() {}
-
-type ResolveIncidentUnauthorized ErrorResponse
-
-func (*ResolveIncidentUnauthorized) resolveIncidentRes() {}
-
-type ResumeMaintenanceNotFound ErrorResponse
-
-func (*ResumeMaintenanceNotFound) resumeMaintenanceRes() {}
-
-type ResumeMaintenanceTooManyRequests ErrorResponse
-
-func (*ResumeMaintenanceTooManyRequests) resumeMaintenanceRes() {}
-
-type ResumeMaintenanceUnauthorized ErrorResponse
-
-func (*ResumeMaintenanceUnauthorized) resumeMaintenanceRes() {}
-
-type ResumeMonitorNotFound ErrorResponse
-
-func (*ResumeMonitorNotFound) resumeMonitorRes() {}
-
-type ResumeMonitorTooManyRequests ErrorResponse
-
-func (*ResumeMonitorTooManyRequests) resumeMonitorRes() {}
-
-type ResumeMonitorUnauthorized ErrorResponse
-
-func (*ResumeMonitorUnauthorized) resumeMonitorRes() {}
-
 type SVGBadge struct {
 	Data io.Reader
 }
@@ -6216,20 +5446,8 @@ func (s SVGBadge) Read(p []byte) (n int, err error) {
 	return s.Data.Read(p)
 }
 
-func (*SVGBadge) getCertExpiryBadgeRes() {}
-func (*SVGBadge) getLatencyBadgeRes()    {}
-func (*SVGBadge) getResponseBadgeRes()   {}
-func (*SVGBadge) getStatusBadgeRes()     {}
-func (*SVGBadge) getUptimeBadgeRes()     {}
-
-type SetMaintenanceMonitorsNotFound ErrorResponse
-
-func (*SetMaintenanceMonitorsNotFound) setMaintenanceMonitorsRes() {}
-
 // SetMaintenanceMonitorsOK is response for SetMaintenanceMonitors operation.
 type SetMaintenanceMonitorsOK struct{}
-
-func (*SetMaintenanceMonitorsOK) setMaintenanceMonitorsRes() {}
 
 type SetMaintenanceMonitorsReq struct {
 	MonitorIds []uuid.UUID `json:"monitorIds"`
@@ -6245,22 +5463,8 @@ func (s *SetMaintenanceMonitorsReq) SetMonitorIds(val []uuid.UUID) {
 	s.MonitorIds = val
 }
 
-type SetMaintenanceMonitorsTooManyRequests ErrorResponse
-
-func (*SetMaintenanceMonitorsTooManyRequests) setMaintenanceMonitorsRes() {}
-
-type SetMaintenanceMonitorsUnauthorized ErrorResponse
-
-func (*SetMaintenanceMonitorsUnauthorized) setMaintenanceMonitorsRes() {}
-
-type SetMaintenanceStatusPagesNotFound ErrorResponse
-
-func (*SetMaintenanceStatusPagesNotFound) setMaintenanceStatusPagesRes() {}
-
 // SetMaintenanceStatusPagesOK is response for SetMaintenanceStatusPages operation.
 type SetMaintenanceStatusPagesOK struct{}
-
-func (*SetMaintenanceStatusPagesOK) setMaintenanceStatusPagesRes() {}
 
 type SetMaintenanceStatusPagesReq struct {
 	StatusPageIds []uuid.UUID `json:"statusPageIds"`
@@ -6275,14 +5479,6 @@ func (s *SetMaintenanceStatusPagesReq) GetStatusPageIds() []uuid.UUID {
 func (s *SetMaintenanceStatusPagesReq) SetStatusPageIds(val []uuid.UUID) {
 	s.StatusPageIds = val
 }
-
-type SetMaintenanceStatusPagesTooManyRequests ErrorResponse
-
-func (*SetMaintenanceStatusPagesTooManyRequests) setMaintenanceStatusPagesRes() {}
-
-type SetMaintenanceStatusPagesUnauthorized ErrorResponse
-
-func (*SetMaintenanceStatusPagesUnauthorized) setMaintenanceStatusPagesRes() {}
 
 // Application-wide configuration settings. All fields are optional on update (PATCH semantics).
 // Ref: #/components/schemas/Settings
@@ -6385,8 +5581,6 @@ func (s *Settings) SetStatusPageSlug(val OptString) {
 	s.StatusPageSlug = val
 }
 
-func (*Settings) getSettingsRes() {}
-
 // Default page shown when users navigate to the root URL.
 type SettingsEntryPage string
 
@@ -6458,22 +5652,6 @@ func (s *SetupReq) SetUsername(val string) {
 func (s *SetupReq) SetPassword(val string) {
 	s.Password = val
 }
-
-type SetupTooManyRequests ErrorResponse
-
-func (*SetupTooManyRequests) setupRes() {}
-
-type SetupUnauthorized ErrorResponse
-
-func (*SetupUnauthorized) setupRes() {}
-
-type ShrinkDatabaseTooManyRequests ErrorResponse
-
-func (*ShrinkDatabaseTooManyRequests) shrinkDatabaseRes() {}
-
-type ShrinkDatabaseUnauthorized ErrorResponse
-
-func (*ShrinkDatabaseUnauthorized) shrinkDatabaseRes() {}
 
 // Configuration for SMTP server connectivity checks.
 // Ref: #/components/schemas/SmtpMonitorConfig
@@ -6719,9 +5897,6 @@ func (s *StatusPage) SetGoogleAnalyticsId(val OptString) {
 func (s *StatusPage) SetGroups(val []StatusPageGroup) {
 	s.Groups = val
 }
-
-func (*StatusPage) getStatusPageRes()    {}
-func (*StatusPage) updateStatusPageRes() {}
 
 // A named group of monitors displayed together on a status page.
 // Ref: #/components/schemas/StatusPageGroup
@@ -7088,9 +6263,6 @@ func (s *Tag) SetColor(val string) {
 	s.Color = val
 }
 
-func (*Tag) createTagRes() {}
-func (*Tag) updateTagRes() {}
-
 // Input for creating or updating a tag.
 // Ref: #/components/schemas/TagInput
 type TagInput struct {
@@ -7181,18 +6353,6 @@ func (s *TailscalePingMonitorConfigKind) UnmarshalText(data []byte) error {
 	}
 }
 
-type TestNotificationNotFound ErrorResponse
-
-func (*TestNotificationNotFound) testNotificationRes() {}
-
-type TestNotificationTooManyRequests ErrorResponse
-
-func (*TestNotificationTooManyRequests) testNotificationRes() {}
-
-type TestNotificationUnauthorized ErrorResponse
-
-func (*TestNotificationUnauthorized) testNotificationRes() {}
-
 // Response containing a fresh JWT token.
 // Ref: #/components/schemas/TokenResponse
 type TokenResponse struct {
@@ -7210,57 +6370,8 @@ func (s *TokenResponse) SetToken(val string) {
 	s.Token = val
 }
 
-func (*TokenResponse) changePasswordRes() {}
-func (*TokenResponse) refreshTokenRes()   {}
-
-type UnpinIncidentNotFound ErrorResponse
-
-func (*UnpinIncidentNotFound) unpinIncidentRes() {}
-
-type UnpinIncidentTooManyRequests ErrorResponse
-
-func (*UnpinIncidentTooManyRequests) unpinIncidentRes() {}
-
-type UnpinIncidentUnauthorized ErrorResponse
-
-func (*UnpinIncidentUnauthorized) unpinIncidentRes() {}
-
-type UpdateIncidentNotFound ErrorResponse
-
-func (*UpdateIncidentNotFound) updateIncidentRes() {}
-
-type UpdateIncidentTooManyRequests ErrorResponse
-
-func (*UpdateIncidentTooManyRequests) updateIncidentRes() {}
-
-type UpdateIncidentUnauthorized ErrorResponse
-
-func (*UpdateIncidentUnauthorized) updateIncidentRes() {}
-
-type UpdateMaintenanceNotFound ErrorResponse
-
-func (*UpdateMaintenanceNotFound) updateMaintenanceRes() {}
-
-type UpdateMaintenanceTooManyRequests ErrorResponse
-
-func (*UpdateMaintenanceTooManyRequests) updateMaintenanceRes() {}
-
-type UpdateMaintenanceUnauthorized ErrorResponse
-
-func (*UpdateMaintenanceUnauthorized) updateMaintenanceRes() {}
-
-type UpdateMonitorNotFound ErrorResponse
-
-func (*UpdateMonitorNotFound) updateMonitorRes() {}
-
-type UpdateMonitorTagNotFound ErrorResponse
-
-func (*UpdateMonitorTagNotFound) updateMonitorTagRes() {}
-
 // UpdateMonitorTagOK is response for UpdateMonitorTag operation.
 type UpdateMonitorTagOK struct{}
-
-func (*UpdateMonitorTagOK) updateMonitorTagRes() {}
 
 type UpdateMonitorTagReq struct {
 	Value OptString `json:"value"`
@@ -7276,79 +6387,5 @@ func (s *UpdateMonitorTagReq) SetValue(val OptString) {
 	s.Value = val
 }
 
-type UpdateMonitorTagTooManyRequests ErrorResponse
-
-func (*UpdateMonitorTagTooManyRequests) updateMonitorTagRes() {}
-
-type UpdateMonitorTagUnauthorized ErrorResponse
-
-func (*UpdateMonitorTagUnauthorized) updateMonitorTagRes() {}
-
-type UpdateMonitorTooManyRequests ErrorResponse
-
-func (*UpdateMonitorTooManyRequests) updateMonitorRes() {}
-
-type UpdateMonitorUnauthorized ErrorResponse
-
-func (*UpdateMonitorUnauthorized) updateMonitorRes() {}
-
-type UpdateNotificationNotFound ErrorResponse
-
-func (*UpdateNotificationNotFound) updateNotificationRes() {}
-
-type UpdateNotificationTooManyRequests ErrorResponse
-
-func (*UpdateNotificationTooManyRequests) updateNotificationRes() {}
-
-type UpdateNotificationUnauthorized ErrorResponse
-
-func (*UpdateNotificationUnauthorized) updateNotificationRes() {}
-
-type UpdateProxyNotFound ErrorResponse
-
-func (*UpdateProxyNotFound) updateProxyRes() {}
-
 // UpdateProxyOK is response for UpdateProxy operation.
 type UpdateProxyOK struct{}
-
-func (*UpdateProxyOK) updateProxyRes() {}
-
-type UpdateProxyTooManyRequests ErrorResponse
-
-func (*UpdateProxyTooManyRequests) updateProxyRes() {}
-
-type UpdateProxyUnauthorized ErrorResponse
-
-func (*UpdateProxyUnauthorized) updateProxyRes() {}
-
-type UpdateSettingsTooManyRequests ErrorResponse
-
-func (*UpdateSettingsTooManyRequests) updateSettingsRes() {}
-
-type UpdateSettingsUnauthorized ErrorResponse
-
-func (*UpdateSettingsUnauthorized) updateSettingsRes() {}
-
-type UpdateStatusPageNotFound ErrorResponse
-
-func (*UpdateStatusPageNotFound) updateStatusPageRes() {}
-
-type UpdateStatusPageTooManyRequests ErrorResponse
-
-func (*UpdateStatusPageTooManyRequests) updateStatusPageRes() {}
-
-type UpdateStatusPageUnauthorized ErrorResponse
-
-func (*UpdateStatusPageUnauthorized) updateStatusPageRes() {}
-
-type UpdateTagNotFound ErrorResponse
-
-func (*UpdateTagNotFound) updateTagRes() {}
-
-type UpdateTagTooManyRequests ErrorResponse
-
-func (*UpdateTagTooManyRequests) updateTagRes() {}
-
-type UpdateTagUnauthorized ErrorResponse
-
-func (*UpdateTagUnauthorized) updateTagRes() {}

@@ -1,9 +1,9 @@
 export const STATUS = {
-  DOWN: 0,
-  UP: 1,
-  PENDING: 2,
-  MAINTENANCE: 3,
-  DEGRADED: 4,
+  DOWN: 'down',
+  UP: 'up',
+  PENDING: 'pending',
+  MAINTENANCE: 'maintenance',
+  DEGRADED: 'degraded',
 } as const;
 
 export type StatusValue = (typeof STATUS)[keyof typeof STATUS];

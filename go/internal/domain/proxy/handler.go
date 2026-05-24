@@ -19,7 +19,7 @@ func NewHandler(repo Repository) *Handler {
 	return &Handler{repo: repo}
 }
 
-func (h *Handler) ListProxies(ctx context.Context) (oas.ListProxiesRes, error) {
+func (h *Handler) ListProxies(ctx context.Context) ([]oas.Proxy, error) {
 	userID, err := oasutil.UserIDFromCtx(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("getting user from context: %w", err)
@@ -30,14 +30,14 @@ func (h *Handler) ListProxies(ctx context.Context) (oas.ListProxiesRes, error) {
 		return nil, fmt.Errorf("listing proxies: %w", err)
 	}
 
-	result := make(oas.ListProxiesOKApplicationJSON, len(proxies))
+	result := make([]oas.Proxy, len(proxies))
 	for i, p := range proxies {
 		result[i] = proxyToOAS(p)
 	}
-	return &result, nil
+	return result, nil
 }
 
-func (h *Handler) CreateProxy(ctx context.Context, req *oas.ProxyInput) (oas.CreateProxyRes, error) {
+func (h *Handler) CreateProxy(ctx context.Context, req *oas.ProxyInput) (*oas.CreateProxyCreated, error) {
 	userID, err := oasutil.UserIDFromCtx(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("getting user from context: %w", err)
@@ -63,10 +63,10 @@ func (h *Handler) CreateProxy(ctx context.Context, req *oas.ProxyInput) (oas.Cre
 	return &oas.CreateProxyCreated{ID: uuid.MustParse(id)}, nil
 }
 
-func (h *Handler) UpdateProxy(ctx context.Context, req *oas.ProxyInput, params oas.UpdateProxyParams) (oas.UpdateProxyRes, error) {
+func (h *Handler) UpdateProxy(ctx context.Context, req *oas.ProxyInput, params oas.UpdateProxyParams) error {
 	userID, err := oasutil.UserIDFromCtx(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("getting user from context: %w", err)
+		return fmt.Errorf("getting user from context: %w", err)
 	}
 
 	p := &Proxy{
@@ -83,16 +83,16 @@ func (h *Handler) UpdateProxy(ctx context.Context, req *oas.ProxyInput, params o
 	}
 
 	if updateErr := h.repo.Update(ctx, p); updateErr != nil {
-		return nil, fmt.Errorf("updating proxy: %w", updateErr)
+		return fmt.Errorf("updating proxy: %w", updateErr)
 	}
-	return &oas.UpdateProxyOK{}, nil
+	return nil
 }
 
-func (h *Handler) DeleteProxy(ctx context.Context, params oas.DeleteProxyParams) (oas.DeleteProxyRes, error) {
+func (h *Handler) DeleteProxy(ctx context.Context, params oas.DeleteProxyParams) error {
 	if err := h.repo.Delete(ctx, params.ProxyId.String()); err != nil {
-		return nil, fmt.Errorf("deleting proxy: %w", err)
+		return fmt.Errorf("deleting proxy: %w", err)
 	}
-	return &oas.DeleteProxyNoContent{}, nil
+	return nil
 }
 
 func proxyToOAS(p *Proxy) oas.Proxy {

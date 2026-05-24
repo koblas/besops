@@ -13,16 +13,33 @@ const (
 func (s Status) String() string {
 	switch s {
 	case Down:
-		return "DOWN"
+		return "down"
 	case Up:
-		return "UP"
+		return "up"
 	case Pending:
-		return "PENDING"
+		return "pending"
 	case Maintenance:
-		return "MAINTENANCE"
+		return "maintenance"
 	case Degraded:
-		return "DEGRADED"
+		return "degraded"
 	default:
-		return "UNKNOWN"
+		return "down"
+	}
+}
+
+func FromString(s string) Status {
+	switch s {
+	case "down":
+		return Down
+	case "up":
+		return Up
+	case "pending":
+		return Pending
+	case "maintenance":
+		return Maintenance
+	case "degraded":
+		return Degraded
+	default:
+		return Down
 	}
 }

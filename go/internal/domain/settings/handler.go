@@ -19,8 +19,7 @@ func NewHandler(repo Repository) *Handler {
 	return &Handler{repo: repo}
 }
 
-// GetSettings returns all application settings.
-func (h *Handler) GetSettings(ctx context.Context) (oas.GetSettingsRes, error) {
+func (h *Handler) GetSettings(ctx context.Context) (*oas.Settings, error) {
 	all, err := h.repo.GetAll(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("getting settings: %w", err)
@@ -58,8 +57,7 @@ func (h *Handler) GetSettings(ctx context.Context) (oas.GetSettingsRes, error) {
 	return result, nil
 }
 
-// UpdateSettings persists the provided settings values.
-func (h *Handler) UpdateSettings(ctx context.Context, req *oas.Settings) (oas.UpdateSettingsRes, error) {
+func (h *Handler) UpdateSettings(ctx context.Context, req *oas.Settings) (*oas.MessageResponse, error) {
 	if req.PrimaryBaseURL.IsSet() {
 		if err := h.repo.Set(ctx, "primaryBaseURL", req.PrimaryBaseURL.Value.String()); err != nil {
 			return nil, fmt.Errorf("setting primaryBaseURL: %w", err)

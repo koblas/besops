@@ -58,10 +58,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/LoginResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /auth/logout:
     post:
       operationId: logout
@@ -71,10 +69,8 @@ paths:
       responses:
         "204":
           description: Logged out
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /auth/token/refresh:
     post:
       operationId: refreshToken
@@ -95,10 +91,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TokenResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /auth/setup:
     get:
       operationId: needSetup
@@ -117,12 +111,8 @@ paths:
                 properties:
                   needSetup:
                     type: boolean
-        "400":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     post:
       operationId: setup
       tags: [auth]
@@ -156,10 +146,8 @@ paths:
                 $ref: "#/components/schemas/MessageResponse"
         "409":
           description: Setup already completed
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /auth/password:
     put:
       operationId: changePassword
@@ -191,10 +179,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TokenResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /auth/2fa:
     get:
       operationId: get2FAStatus
@@ -212,10 +198,8 @@ paths:
                 properties:
                   enabled:
                     type: boolean
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /auth/2fa/prepare:
     post:
       operationId: prepare2FA
@@ -248,10 +232,8 @@ paths:
                     type: string
                     format: uri
                     maxLength: 500
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /auth/2fa/enable:
     post:
       operationId: enable2FA
@@ -283,10 +265,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /auth/2fa/disable:
     post:
       operationId: disable2FA
@@ -313,10 +293,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   # ─── Monitors ───────────────────────────────────────────────────────────
   /monitors/uptimes:
     get:
@@ -344,10 +322,8 @@ paths:
                     uptime:
                       type: number
                       format: double
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /monitors:
     get:
       operationId: listMonitors
@@ -364,10 +340,8 @@ paths:
                 maxItems: 500
                 items:
                   $ref: "#/components/schemas/Monitor"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     post:
       operationId: createMonitor
       tags: [monitors]
@@ -392,10 +366,8 @@ paths:
                     type: string
                     format: uuid
                     maxLength: 36
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /monitors/{monitorId}:
     parameters:
       - $ref: '#/components/parameters/MonitorId'
@@ -411,12 +383,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Monitor"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     put:
       operationId: updateMonitor
       tags: [monitors]
@@ -435,12 +403,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Monitor"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     delete:
       operationId: deleteMonitor
       tags: [monitors]
@@ -456,12 +420,8 @@ paths:
       responses:
         "204":
           description: Monitor deleted
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /monitors/{monitorId}/pause:
     parameters:
       - $ref: '#/components/parameters/MonitorId'
@@ -477,12 +437,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /monitors/{monitorId}/resume:
     parameters:
       - $ref: '#/components/parameters/MonitorId'
@@ -498,12 +454,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /monitors/{monitorId}/domain:
     parameters:
       - $ref: '#/components/parameters/MonitorId'
@@ -528,12 +480,8 @@ paths:
                     type: string
                     maxLength: 63
                     pattern: "^[a-zA-Z][a-zA-Z0-9-]*$"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   # ─── Heartbeats ─────────────────────────────────────────────────────────
   /monitors/{monitorId}/heartbeats:
     parameters:
@@ -573,12 +521,8 @@ paths:
                 maxItems: 500
                 items:
                   $ref: "#/components/schemas/Heartbeat"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     delete:
       operationId: clearHeartbeats
       tags: [heartbeats]
@@ -587,12 +531,8 @@ paths:
       responses:
         "204":
           description: Heartbeats cleared
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /monitors/{monitorId}/heartbeats/chart:
     parameters:
       - $ref: '#/components/parameters/MonitorId'
@@ -621,12 +561,8 @@ paths:
                 maxItems: 500
                 items:
                   $ref: "#/components/schemas/ChartPoint"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /monitors/{monitorId}/events:
     parameters:
       - $ref: '#/components/parameters/MonitorId'
@@ -673,12 +609,8 @@ paths:
                     format: int64
                     minimum: 0
                     maximum: 9007199254740991
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     delete:
       operationId: clearEvents
       tags: [heartbeats]
@@ -687,12 +619,8 @@ paths:
       responses:
         "204":
           description: Events cleared
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /events:
     get:
       operationId: listRecentEvents
@@ -728,10 +656,8 @@ paths:
                     format: int64
                     minimum: 0
                     maximum: 9007199254740991
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   # ─── Notifications ──────────────────────────────────────────────────────
   /notifications:
     get:
@@ -749,10 +675,8 @@ paths:
                 maxItems: 100
                 items:
                   $ref: "#/components/schemas/Notification"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     post:
       operationId: createNotification
       tags: [notifications]
@@ -777,10 +701,8 @@ paths:
                     type: string
                     format: uuid
                     maxLength: 36
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /notifications/{notificationId}:
     parameters:
       - name: notificationId
@@ -809,12 +731,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Notification"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     delete:
       operationId: deleteNotification
       tags: [notifications]
@@ -823,12 +741,8 @@ paths:
       responses:
         "204":
           description: Notification deleted
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /notifications/{notificationId}/test:
     parameters:
       - name: notificationId
@@ -851,12 +765,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   # ─── Tags ───────────────────────────────────────────────────────────────
   /tags:
     get:
@@ -874,10 +784,8 @@ paths:
                 maxItems: 100
                 items:
                   $ref: "#/components/schemas/Tag"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     post:
       operationId: createTag
       tags: [tags]
@@ -896,10 +804,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Tag"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /tags/{tagId}:
     parameters:
       - name: tagId
@@ -928,12 +834,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Tag"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     delete:
       operationId: deleteTag
       tags: [tags]
@@ -942,12 +844,8 @@ paths:
       responses:
         "204":
           description: Tag deleted
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /monitors/{monitorId}/tags:
     parameters:
       - $ref: '#/components/parameters/MonitorId'
@@ -975,12 +873,8 @@ paths:
       responses:
         "201":
           description: Tag added
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /monitors/{monitorId}/tags/{tagId}:
     parameters:
       - $ref: '#/components/parameters/MonitorId'
@@ -1011,12 +905,8 @@ paths:
       responses:
         "200":
           description: Tag updated
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     delete:
       operationId: deleteMonitorTag
       tags: [tags]
@@ -1025,12 +915,8 @@ paths:
       responses:
         "204":
           description: Tag removed
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   # ─── Maintenance ────────────────────────────────────────────────────────
   /maintenance:
     get:
@@ -1048,10 +934,8 @@ paths:
                 maxItems: 100
                 items:
                   $ref: "#/components/schemas/Maintenance"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     post:
       operationId: createMaintenance
       tags: [maintenance]
@@ -1076,10 +960,8 @@ paths:
                     type: string
                     format: uuid
                     maxLength: 36
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /maintenance/{maintenanceId}:
     parameters:
       - name: maintenanceId
@@ -1102,12 +984,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Maintenance"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     put:
       operationId: updateMaintenance
       tags: [maintenance]
@@ -1126,12 +1004,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Maintenance"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     delete:
       operationId: deleteMaintenance
       tags: [maintenance]
@@ -1140,12 +1014,8 @@ paths:
       responses:
         "204":
           description: Maintenance deleted
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /maintenance/{maintenanceId}/pause:
     parameters:
       - name: maintenanceId
@@ -1168,12 +1038,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /maintenance/{maintenanceId}/resume:
     parameters:
       - name: maintenanceId
@@ -1196,12 +1062,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /maintenance/{maintenanceId}/monitors:
     parameters:
       - name: maintenanceId
@@ -1229,12 +1091,8 @@ paths:
                   type: string
                   format: uuid
                   maxLength: 36
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     put:
       operationId: setMaintenanceMonitors
       tags: [maintenance]
@@ -1258,12 +1116,8 @@ paths:
       responses:
         "200":
           description: Monitors updated
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /maintenance/{maintenanceId}/status-pages:
     parameters:
       - name: maintenanceId
@@ -1291,12 +1145,8 @@ paths:
                   type: string
                   format: uuid
                   maxLength: 36
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     put:
       operationId: setMaintenanceStatusPages
       tags: [maintenance]
@@ -1320,12 +1170,8 @@ paths:
       responses:
         "200":
           description: Status pages updated
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   # ─── Status Pages ──────────────────────────────────────────────────────
   /status-pages:
     get:
@@ -1343,10 +1189,8 @@ paths:
                 maxItems: 100
                 items:
                   $ref: "#/components/schemas/StatusPage"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     post:
       operationId: createStatusPage
       tags: [status-pages]
@@ -1371,10 +1215,8 @@ paths:
                     type: string
                     maxLength: 128
                     pattern: "^[a-z0-9]([a-z0-9-]*[a-z0-9])?$"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /status-pages/{slug}:
     parameters:
       - name: slug
@@ -1399,12 +1241,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/StatusPage"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     put:
       operationId: updateStatusPage
       tags: [status-pages]
@@ -1423,12 +1261,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/StatusPage"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     delete:
       operationId: deleteStatusPage
       tags: [status-pages]
@@ -1437,12 +1271,8 @@ paths:
       responses:
         "204":
           description: Status page deleted
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /status-pages/{slug}/heartbeats:
     parameters:
       - name: slug
@@ -1516,12 +1346,8 @@ paths:
                           type: string
                           maxLength: 150
                           pattern: "^[\\s\\S]*$"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /status-pages/{slug}/badge:
     parameters:
       - name: slug
@@ -1555,12 +1381,8 @@ paths:
                 type: string
                 maxLength: 10000
                 pattern: "^<svg[\\s\\S]*<\\/svg>$"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   # ─── Incidents ──────────────────────────────────────────────────────────
   /status-pages/{slug}/incidents:
     parameters:
@@ -1604,12 +1426,8 @@ paths:
                     type: string
                     maxLength: 100
                     pattern: "^[\\s\\S]*$"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     post:
       operationId: createIncident
       tags: [incidents]
@@ -1628,10 +1446,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Incident"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /status-pages/{slug}/incidents/{incidentId}:
     parameters:
       - name: slug
@@ -1669,12 +1485,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Incident"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     delete:
       operationId: deleteIncident
       tags: [incidents]
@@ -1683,12 +1495,8 @@ paths:
       responses:
         "204":
           description: Incident deleted
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /status-pages/{slug}/incidents/{incidentId}/resolve:
     parameters:
       - name: slug
@@ -1720,12 +1528,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Incident"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /status-pages/{slug}/incidents/{incidentId}/unpin:
     parameters:
       - name: slug
@@ -1757,12 +1561,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   # ─── Settings ───────────────────────────────────────────────────────────
   /settings:
     get:
@@ -1777,10 +1577,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Settings"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     patch:
       operationId: updateSettings
       tags: [settings]
@@ -1799,10 +1597,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   # ─── API Keys ───────────────────────────────────────────────────────────
   /api-keys:
     get:
@@ -1820,10 +1616,8 @@ paths:
                 maxItems: 100
                 items:
                   $ref: "#/components/schemas/APIKey"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     post:
       operationId: createAPIKey
       tags: [api-keys]
@@ -1852,10 +1646,8 @@ paths:
                     type: string
                     maxLength: 255
                     pattern: "^[A-Za-z0-9_-]+$"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /api-keys/{keyId}:
     parameters:
       - name: keyId
@@ -1874,12 +1666,8 @@ paths:
       responses:
         "204":
           description: API key deleted
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /api-keys/{keyId}/enable:
     parameters:
       - name: keyId
@@ -1902,12 +1690,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /api-keys/{keyId}/disable:
     parameters:
       - name: keyId
@@ -1930,12 +1714,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   # ─── Proxies ────────────────────────────────────────────────────────────
   /proxies:
     get:
@@ -1953,10 +1733,8 @@ paths:
                 maxItems: 100
                 items:
                   $ref: "#/components/schemas/Proxy"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     post:
       operationId: createProxy
       tags: [proxy]
@@ -1981,10 +1759,8 @@ paths:
                     type: string
                     format: uuid
                     maxLength: 36
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /proxies/{proxyId}:
     parameters:
       - name: proxyId
@@ -2009,12 +1785,8 @@ paths:
       responses:
         "200":
           description: Proxy updated
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
     delete:
       operationId: deleteProxy
       tags: [proxy]
@@ -2023,12 +1795,8 @@ paths:
       responses:
         "204":
           description: Proxy deleted
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   # ─── Badges ─────────────────────────────────────────────────────────────
   /badges/{monitorId}/status:
     parameters:
@@ -2044,12 +1812,8 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/SVGBadge"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /badges/{monitorId}/uptime:
     parameters:
       - $ref: '#/components/parameters/MonitorId'
@@ -2074,12 +1838,8 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/SVGBadge"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /badges/{monitorId}/latency:
     parameters:
       - $ref: '#/components/parameters/MonitorId'
@@ -2103,12 +1863,8 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/SVGBadge"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /badges/{monitorId}/response:
     parameters:
       - $ref: '#/components/parameters/MonitorId'
@@ -2123,12 +1879,8 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/SVGBadge"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /badges/{monitorId}/cert-exp:
     parameters:
       - $ref: '#/components/parameters/MonitorId'
@@ -2143,12 +1895,8 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/SVGBadge"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /status-pages/{slug}/events:
     parameters:
       - name: slug
@@ -2175,12 +1923,8 @@ paths:
                 type: string
                 maxLength: 65536
                 pattern: "^[\\s\\S]*$"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   # ─── System ─────────────────────────────────────────────────────────────
   /health:
     get:
@@ -2201,12 +1945,8 @@ paths:
                   status:
                     type: string
                     enum: [ok]
-        "400":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /info:
     get:
       operationId: getInfo
@@ -2242,12 +1982,8 @@ paths:
                     type: string
                     maxLength: 10
                     pattern: "^[+-]?[0-9]{1,2}(:[0-9]{2})?$"
-        "400":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /database/size:
     get:
       operationId: getDatabaseSize
@@ -2269,10 +2005,8 @@ paths:
                     minimum: 0
                     maximum: 9007199254740991
                     description: Size in bytes
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /database/shrink:
     post:
       operationId: shrinkDatabase
@@ -2286,10 +2020,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
   /statistics:
     delete:
       operationId: clearStatistics
@@ -2299,10 +2031,8 @@ paths:
       responses:
         "204":
           description: Statistics cleared
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "429":
-          $ref: "#/components/responses/RateLimited"
+        "default":
+          $ref: "#/components/responses/DefaultError"
 # ─── Components ─────────────────────────────────────────────────────────────
 components:
   securitySchemes:
@@ -2330,20 +2060,8 @@ components:
         enum: [flat, flat-square, for-the-badge, plastic, social]
         default: flat
   responses:
-    Unauthorized:
-      description: Authentication required
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ErrorResponse"
-    NotFound:
-      description: Resource not found
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ErrorResponse"
-    RateLimited:
-      description: Too many requests
+    DefaultError:
+      description: Error response
       content:
         application/json:
           schema:
@@ -2931,12 +2649,9 @@ components:
           maxLength: 36
           description: The monitor that produced this heartbeat.
         status:
-          type: integer
-          format: int32
-          minimum: 0
-          maximum: 3
-          enum: [0, 1, 2, 3]
-          description: "Monitor status at this point in time: 0=DOWN, 1=UP, 2=PENDING, 3=MAINTENANCE."
+          type: string
+          enum: [down, up, pending, maintenance, degraded]
+          description: "Monitor status at this point in time."
         time:
           type: string
           format: date-time

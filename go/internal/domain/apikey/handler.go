@@ -21,7 +21,7 @@ func NewHandler(repo Repository) *Handler {
 	return &Handler{repo: repo}
 }
 
-func (h *Handler) ListAPIKeys(ctx context.Context) (oas.ListAPIKeysRes, error) {
+func (h *Handler) ListAPIKeys(ctx context.Context) ([]oas.APIKey, error) {
 	userID, err := oasutil.UserIDFromCtx(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("getting user from context: %w", err)
@@ -32,14 +32,14 @@ func (h *Handler) ListAPIKeys(ctx context.Context) (oas.ListAPIKeysRes, error) {
 		return nil, fmt.Errorf("listing API keys: %w", err)
 	}
 
-	result := make(oas.ListAPIKeysOKApplicationJSON, 0, len(keys))
+	result := make([]oas.APIKey, 0, len(keys))
 	for _, k := range keys {
 		result = append(result, apiKeyToOAS(k))
 	}
-	return &result, nil
+	return result, nil
 }
 
-func (h *Handler) CreateAPIKey(ctx context.Context, req *oas.APIKeyInput) (oas.CreateAPIKeyRes, error) {
+func (h *Handler) CreateAPIKey(ctx context.Context, req *oas.APIKeyInput) (*oas.CreateAPIKeyCreated, error) {
 	userID, err := oasutil.UserIDFromCtx(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("getting user from context: %w", err)
@@ -74,21 +74,21 @@ func (h *Handler) CreateAPIKey(ctx context.Context, req *oas.APIKeyInput) (oas.C
 	}, nil
 }
 
-func (h *Handler) DeleteAPIKey(ctx context.Context, params oas.DeleteAPIKeyParams) (oas.DeleteAPIKeyRes, error) {
+func (h *Handler) DeleteAPIKey(ctx context.Context, params oas.DeleteAPIKeyParams) error {
 	if err := h.repo.Delete(ctx, params.KeyId.String()); err != nil {
-		return nil, fmt.Errorf("deleting API key: %w", err)
+		return fmt.Errorf("deleting API key: %w", err)
 	}
-	return &oas.DeleteAPIKeyNoContent{}, nil
+	return nil
 }
 
-func (h *Handler) EnableAPIKey(ctx context.Context, params oas.EnableAPIKeyParams) (oas.EnableAPIKeyRes, error) {
+func (h *Handler) EnableAPIKey(ctx context.Context, params oas.EnableAPIKeyParams) (*oas.MessageResponse, error) {
 	if err := h.repo.SetActive(ctx, params.KeyId.String(), true); err != nil {
 		return nil, fmt.Errorf("enabling API key: %w", err)
 	}
 	return &oas.MessageResponse{Message: "enabled"}, nil
 }
 
-func (h *Handler) DisableAPIKey(ctx context.Context, params oas.DisableAPIKeyParams) (oas.DisableAPIKeyRes, error) {
+func (h *Handler) DisableAPIKey(ctx context.Context, params oas.DisableAPIKeyParams) (*oas.MessageResponse, error) {
 	if err := h.repo.SetActive(ctx, params.KeyId.String(), false); err != nil {
 		return nil, fmt.Errorf("disabling API key: %w", err)
 	}

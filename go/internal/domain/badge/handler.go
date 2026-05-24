@@ -24,10 +24,10 @@ func NewHandler(hq HeartbeatQuerier) *Handler {
 	return &Handler{heartbeats: hq}
 }
 
-func (h *Handler) GetStatusBadge(ctx context.Context, params oas.GetStatusBadgeParams) (oas.GetStatusBadgeRes, error) {
+func (h *Handler) GetStatusBadge(ctx context.Context, params oas.GetStatusBadgeParams) (oas.SVGBadge, error) {
 	uptime, err := h.heartbeats.GetUptime(ctx, params.MonitorId.String(), 24)
 	if err != nil {
-		return &oas.SVGBadge{Data: strings.NewReader(renderBadge("Status", "Unknown", "#999"))}, nil //nolint:nilerr
+		return oas.SVGBadge{Data: strings.NewReader(renderBadge("Status", "Unknown", "#999"))}, nil //nolint:nilerr
 	}
 
 	label := "Up"
@@ -37,10 +37,10 @@ func (h *Handler) GetStatusBadge(ctx context.Context, params oas.GetStatusBadgeP
 		color = "#e05d44"
 	}
 
-	return &oas.SVGBadge{Data: strings.NewReader(renderBadge("Status", label, color))}, nil
+	return oas.SVGBadge{Data: strings.NewReader(renderBadge("Status", label, color))}, nil
 }
 
-func (h *Handler) GetUptimeBadge(ctx context.Context, params oas.GetUptimeBadgeParams) (oas.GetUptimeBadgeRes, error) {
+func (h *Handler) GetUptimeBadge(ctx context.Context, params oas.GetUptimeBadgeParams) (oas.SVGBadge, error) {
 	hours := 24
 	if params.Duration.IsSet() {
 		hours = int(params.Duration.Value)
@@ -48,7 +48,7 @@ func (h *Handler) GetUptimeBadge(ctx context.Context, params oas.GetUptimeBadgeP
 
 	uptime, err := h.heartbeats.GetUptime(ctx, params.MonitorId.String(), hours)
 	if err != nil {
-		return &oas.SVGBadge{Data: strings.NewReader(renderBadge("Uptime", "N/A", "#999"))}, nil //nolint:nilerr
+		return oas.SVGBadge{Data: strings.NewReader(renderBadge("Uptime", "N/A", "#999"))}, nil //nolint:nilerr
 	}
 
 	value := fmt.Sprintf("%.1f%%", uptime*100)
@@ -60,10 +60,10 @@ func (h *Handler) GetUptimeBadge(ctx context.Context, params oas.GetUptimeBadgeP
 		color = "#e05d44"
 	}
 
-	return &oas.SVGBadge{Data: strings.NewReader(renderBadge("Uptime", value, color))}, nil
+	return oas.SVGBadge{Data: strings.NewReader(renderBadge("Uptime", value, color))}, nil
 }
 
-func (h *Handler) GetLatencyBadge(ctx context.Context, params oas.GetLatencyBadgeParams) (oas.GetLatencyBadgeRes, error) {
+func (h *Handler) GetLatencyBadge(ctx context.Context, params oas.GetLatencyBadgeParams) (oas.SVGBadge, error) {
 	hours := 24
 	if params.Duration.IsSet() {
 		hours = int(params.Duration.Value)
@@ -71,25 +71,25 @@ func (h *Handler) GetLatencyBadge(ctx context.Context, params oas.GetLatencyBadg
 
 	latency, err := h.heartbeats.GetAverageLatency(ctx, params.MonitorId.String(), hours)
 	if err != nil {
-		return &oas.SVGBadge{Data: strings.NewReader(renderBadge("Latency", "N/A", "#999"))}, nil //nolint:nilerr
+		return oas.SVGBadge{Data: strings.NewReader(renderBadge("Latency", "N/A", "#999"))}, nil //nolint:nilerr
 	}
 
 	value := fmt.Sprintf("%.0fms", latency)
-	return &oas.SVGBadge{Data: strings.NewReader(renderBadge("Latency", value, "#4c1"))}, nil
+	return oas.SVGBadge{Data: strings.NewReader(renderBadge("Latency", value, "#4c1"))}, nil
 }
 
-func (h *Handler) GetResponseBadge(ctx context.Context, params oas.GetResponseBadgeParams) (oas.GetResponseBadgeRes, error) {
+func (h *Handler) GetResponseBadge(ctx context.Context, params oas.GetResponseBadgeParams) (oas.SVGBadge, error) {
 	resp, err := h.heartbeats.GetAverageResponse(ctx, params.MonitorId.String(), 24)
 	if err != nil {
-		return &oas.SVGBadge{Data: strings.NewReader(renderBadge("Response", "N/A", "#999"))}, nil //nolint:nilerr
+		return oas.SVGBadge{Data: strings.NewReader(renderBadge("Response", "N/A", "#999"))}, nil //nolint:nilerr
 	}
 
 	value := fmt.Sprintf("%.0fms", resp)
-	return &oas.SVGBadge{Data: strings.NewReader(renderBadge("Response", value, "#4c1"))}, nil
+	return oas.SVGBadge{Data: strings.NewReader(renderBadge("Response", value, "#4c1"))}, nil
 }
 
-func (h *Handler) GetCertExpiryBadge(_ context.Context, _ oas.GetCertExpiryBadgeParams) (oas.GetCertExpiryBadgeRes, error) {
-	return &oas.SVGBadge{Data: strings.NewReader(renderBadge("Cert Exp.", "N/A", "#999"))}, nil
+func (h *Handler) GetCertExpiryBadge(_ context.Context, _ oas.GetCertExpiryBadgeParams) (oas.SVGBadge, error) {
+	return oas.SVGBadge{Data: strings.NewReader(renderBadge("Cert Exp.", "N/A", "#999"))}, nil
 }
 
 func renderBadge(label, value, color string) string {

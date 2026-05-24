@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/go-faster/errors"
+	"github.com/google/uuid"
 	ht "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/middleware"
 	"github.com/ogen-go/ogen/ogenerrors"
@@ -120,8 +121,9 @@ func (s *Server) handleAddMonitorTagRequest(args [1]string, argsEscaped bool, w 
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -148,8 +150,9 @@ func (s *Server) handleAddMonitorTagRequest(args [1]string, argsEscaped bool, w 
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -181,7 +184,7 @@ func (s *Server) handleAddMonitorTagRequest(args [1]string, argsEscaped bool, w 
 		}
 	}()
 
-	var response AddMonitorTagRes
+	var response *AddMonitorTagCreated
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -202,7 +205,7 @@ func (s *Server) handleAddMonitorTagRequest(args [1]string, argsEscaped bool, w 
 		type (
 			Request  = *AddMonitorTagReq
 			Params   = AddMonitorTagParams
-			Response = AddMonitorTagRes
+			Response = *AddMonitorTagCreated
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -213,16 +216,27 @@ func (s *Server) handleAddMonitorTagRequest(args [1]string, argsEscaped bool, w 
 			mreq,
 			unpackAddMonitorTagParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.AddMonitorTag(ctx, request, params)
+				err = s.h.AddMonitorTag(ctx, request, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.AddMonitorTag(ctx, request, params)
+		err = s.h.AddMonitorTag(ctx, request, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -322,8 +336,9 @@ func (s *Server) handleChangePasswordRequest(args [0]string, argsEscaped bool, w
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -350,8 +365,9 @@ func (s *Server) handleChangePasswordRequest(args [0]string, argsEscaped bool, w
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -373,7 +389,7 @@ func (s *Server) handleChangePasswordRequest(args [0]string, argsEscaped bool, w
 		}
 	}()
 
-	var response ChangePasswordRes
+	var response *TokenResponse
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -389,7 +405,7 @@ func (s *Server) handleChangePasswordRequest(args [0]string, argsEscaped bool, w
 		type (
 			Request  = *ChangePasswordReq
 			Params   = struct{}
-			Response = ChangePasswordRes
+			Response = *TokenResponse
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -408,8 +424,19 @@ func (s *Server) handleChangePasswordRequest(args [0]string, argsEscaped bool, w
 		response, err = s.h.ChangePassword(ctx, request)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -509,8 +536,9 @@ func (s *Server) handleCheckDomainRequest(args [1]string, argsEscaped bool, w ht
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -537,8 +565,9 @@ func (s *Server) handleCheckDomainRequest(args [1]string, argsEscaped bool, w ht
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -555,7 +584,7 @@ func (s *Server) handleCheckDomainRequest(args [1]string, argsEscaped bool, w ht
 
 	var rawBody []byte
 
-	var response CheckDomainRes
+	var response *CheckDomainOK
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -576,7 +605,7 @@ func (s *Server) handleCheckDomainRequest(args [1]string, argsEscaped bool, w ht
 		type (
 			Request  = struct{}
 			Params   = CheckDomainParams
-			Response = CheckDomainRes
+			Response = *CheckDomainOK
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -595,8 +624,19 @@ func (s *Server) handleCheckDomainRequest(args [1]string, argsEscaped bool, w ht
 		response, err = s.h.CheckDomain(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -696,8 +736,9 @@ func (s *Server) handleClearEventsRequest(args [1]string, argsEscaped bool, w ht
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -724,8 +765,9 @@ func (s *Server) handleClearEventsRequest(args [1]string, argsEscaped bool, w ht
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -742,7 +784,7 @@ func (s *Server) handleClearEventsRequest(args [1]string, argsEscaped bool, w ht
 
 	var rawBody []byte
 
-	var response ClearEventsRes
+	var response *ClearEventsNoContent
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -763,7 +805,7 @@ func (s *Server) handleClearEventsRequest(args [1]string, argsEscaped bool, w ht
 		type (
 			Request  = struct{}
 			Params   = ClearEventsParams
-			Response = ClearEventsRes
+			Response = *ClearEventsNoContent
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -774,16 +816,27 @@ func (s *Server) handleClearEventsRequest(args [1]string, argsEscaped bool, w ht
 			mreq,
 			unpackClearEventsParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.ClearEvents(ctx, params)
+				err = s.h.ClearEvents(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.ClearEvents(ctx, params)
+		err = s.h.ClearEvents(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -883,8 +936,9 @@ func (s *Server) handleClearHeartbeatsRequest(args [1]string, argsEscaped bool, 
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -911,8 +965,9 @@ func (s *Server) handleClearHeartbeatsRequest(args [1]string, argsEscaped bool, 
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -929,7 +984,7 @@ func (s *Server) handleClearHeartbeatsRequest(args [1]string, argsEscaped bool, 
 
 	var rawBody []byte
 
-	var response ClearHeartbeatsRes
+	var response *ClearHeartbeatsNoContent
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -950,7 +1005,7 @@ func (s *Server) handleClearHeartbeatsRequest(args [1]string, argsEscaped bool, 
 		type (
 			Request  = struct{}
 			Params   = ClearHeartbeatsParams
-			Response = ClearHeartbeatsRes
+			Response = *ClearHeartbeatsNoContent
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -961,16 +1016,27 @@ func (s *Server) handleClearHeartbeatsRequest(args [1]string, argsEscaped bool, 
 			mreq,
 			unpackClearHeartbeatsParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.ClearHeartbeats(ctx, params)
+				err = s.h.ClearHeartbeats(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.ClearHeartbeats(ctx, params)
+		err = s.h.ClearHeartbeats(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -1070,8 +1136,9 @@ func (s *Server) handleClearStatisticsRequest(args [0]string, argsEscaped bool, 
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -1098,15 +1165,16 @@ func (s *Server) handleClearStatisticsRequest(args [0]string, argsEscaped bool, 
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
 
 	var rawBody []byte
 
-	var response ClearStatisticsRes
+	var response *ClearStatisticsNoContent
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -1122,7 +1190,7 @@ func (s *Server) handleClearStatisticsRequest(args [0]string, argsEscaped bool, 
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = ClearStatisticsRes
+			Response = *ClearStatisticsNoContent
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -1133,16 +1201,27 @@ func (s *Server) handleClearStatisticsRequest(args [0]string, argsEscaped bool, 
 			mreq,
 			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.ClearStatistics(ctx)
+				err = s.h.ClearStatistics(ctx)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.ClearStatistics(ctx)
+		err = s.h.ClearStatistics(ctx)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -1242,8 +1321,9 @@ func (s *Server) handleCreateAPIKeyRequest(args [0]string, argsEscaped bool, w h
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -1270,8 +1350,9 @@ func (s *Server) handleCreateAPIKeyRequest(args [0]string, argsEscaped bool, w h
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -1293,7 +1374,7 @@ func (s *Server) handleCreateAPIKeyRequest(args [0]string, argsEscaped bool, w h
 		}
 	}()
 
-	var response CreateAPIKeyRes
+	var response *CreateAPIKeyCreated
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -1309,7 +1390,7 @@ func (s *Server) handleCreateAPIKeyRequest(args [0]string, argsEscaped bool, w h
 		type (
 			Request  = *APIKeyInput
 			Params   = struct{}
-			Response = CreateAPIKeyRes
+			Response = *CreateAPIKeyCreated
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -1328,8 +1409,19 @@ func (s *Server) handleCreateAPIKeyRequest(args [0]string, argsEscaped bool, w h
 		response, err = s.h.CreateAPIKey(ctx, request)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -1429,8 +1521,9 @@ func (s *Server) handleCreateIncidentRequest(args [1]string, argsEscaped bool, w
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -1457,8 +1550,9 @@ func (s *Server) handleCreateIncidentRequest(args [1]string, argsEscaped bool, w
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -1490,7 +1584,7 @@ func (s *Server) handleCreateIncidentRequest(args [1]string, argsEscaped bool, w
 		}
 	}()
 
-	var response CreateIncidentRes
+	var response *Incident
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -1511,7 +1605,7 @@ func (s *Server) handleCreateIncidentRequest(args [1]string, argsEscaped bool, w
 		type (
 			Request  = *IncidentInput
 			Params   = CreateIncidentParams
-			Response = CreateIncidentRes
+			Response = *Incident
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -1530,8 +1624,19 @@ func (s *Server) handleCreateIncidentRequest(args [1]string, argsEscaped bool, w
 		response, err = s.h.CreateIncident(ctx, request, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -1631,8 +1736,9 @@ func (s *Server) handleCreateMaintenanceRequest(args [0]string, argsEscaped bool
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -1659,8 +1765,9 @@ func (s *Server) handleCreateMaintenanceRequest(args [0]string, argsEscaped bool
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -1682,7 +1789,7 @@ func (s *Server) handleCreateMaintenanceRequest(args [0]string, argsEscaped bool
 		}
 	}()
 
-	var response CreateMaintenanceRes
+	var response *CreateMaintenanceCreated
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -1698,7 +1805,7 @@ func (s *Server) handleCreateMaintenanceRequest(args [0]string, argsEscaped bool
 		type (
 			Request  = *MaintenanceInput
 			Params   = struct{}
-			Response = CreateMaintenanceRes
+			Response = *CreateMaintenanceCreated
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -1717,8 +1824,19 @@ func (s *Server) handleCreateMaintenanceRequest(args [0]string, argsEscaped bool
 		response, err = s.h.CreateMaintenance(ctx, request)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -1818,8 +1936,9 @@ func (s *Server) handleCreateMonitorRequest(args [0]string, argsEscaped bool, w 
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -1846,8 +1965,9 @@ func (s *Server) handleCreateMonitorRequest(args [0]string, argsEscaped bool, w 
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -1869,7 +1989,7 @@ func (s *Server) handleCreateMonitorRequest(args [0]string, argsEscaped bool, w 
 		}
 	}()
 
-	var response CreateMonitorRes
+	var response *CreateMonitorCreated
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -1885,7 +2005,7 @@ func (s *Server) handleCreateMonitorRequest(args [0]string, argsEscaped bool, w 
 		type (
 			Request  = *MonitorInput
 			Params   = struct{}
-			Response = CreateMonitorRes
+			Response = *CreateMonitorCreated
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -1904,8 +2024,19 @@ func (s *Server) handleCreateMonitorRequest(args [0]string, argsEscaped bool, w 
 		response, err = s.h.CreateMonitor(ctx, request)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -2005,8 +2136,9 @@ func (s *Server) handleCreateNotificationRequest(args [0]string, argsEscaped boo
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -2033,8 +2165,9 @@ func (s *Server) handleCreateNotificationRequest(args [0]string, argsEscaped boo
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -2056,7 +2189,7 @@ func (s *Server) handleCreateNotificationRequest(args [0]string, argsEscaped boo
 		}
 	}()
 
-	var response CreateNotificationRes
+	var response *CreateNotificationCreated
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -2072,7 +2205,7 @@ func (s *Server) handleCreateNotificationRequest(args [0]string, argsEscaped boo
 		type (
 			Request  = *NotificationInput
 			Params   = struct{}
-			Response = CreateNotificationRes
+			Response = *CreateNotificationCreated
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -2091,8 +2224,19 @@ func (s *Server) handleCreateNotificationRequest(args [0]string, argsEscaped boo
 		response, err = s.h.CreateNotification(ctx, request)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -2192,8 +2336,9 @@ func (s *Server) handleCreateProxyRequest(args [0]string, argsEscaped bool, w ht
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -2220,8 +2365,9 @@ func (s *Server) handleCreateProxyRequest(args [0]string, argsEscaped bool, w ht
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -2243,7 +2389,7 @@ func (s *Server) handleCreateProxyRequest(args [0]string, argsEscaped bool, w ht
 		}
 	}()
 
-	var response CreateProxyRes
+	var response *CreateProxyCreated
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -2259,7 +2405,7 @@ func (s *Server) handleCreateProxyRequest(args [0]string, argsEscaped bool, w ht
 		type (
 			Request  = *ProxyInput
 			Params   = struct{}
-			Response = CreateProxyRes
+			Response = *CreateProxyCreated
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -2278,8 +2424,19 @@ func (s *Server) handleCreateProxyRequest(args [0]string, argsEscaped bool, w ht
 		response, err = s.h.CreateProxy(ctx, request)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -2379,8 +2536,9 @@ func (s *Server) handleCreateStatusPageRequest(args [0]string, argsEscaped bool,
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -2407,8 +2565,9 @@ func (s *Server) handleCreateStatusPageRequest(args [0]string, argsEscaped bool,
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -2430,7 +2589,7 @@ func (s *Server) handleCreateStatusPageRequest(args [0]string, argsEscaped bool,
 		}
 	}()
 
-	var response CreateStatusPageRes
+	var response *CreateStatusPageCreated
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -2446,7 +2605,7 @@ func (s *Server) handleCreateStatusPageRequest(args [0]string, argsEscaped bool,
 		type (
 			Request  = *StatusPageInput
 			Params   = struct{}
-			Response = CreateStatusPageRes
+			Response = *CreateStatusPageCreated
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -2465,8 +2624,19 @@ func (s *Server) handleCreateStatusPageRequest(args [0]string, argsEscaped bool,
 		response, err = s.h.CreateStatusPage(ctx, request)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -2566,8 +2736,9 @@ func (s *Server) handleCreateTagRequest(args [0]string, argsEscaped bool, w http
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -2594,8 +2765,9 @@ func (s *Server) handleCreateTagRequest(args [0]string, argsEscaped bool, w http
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -2617,7 +2789,7 @@ func (s *Server) handleCreateTagRequest(args [0]string, argsEscaped bool, w http
 		}
 	}()
 
-	var response CreateTagRes
+	var response *Tag
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -2633,7 +2805,7 @@ func (s *Server) handleCreateTagRequest(args [0]string, argsEscaped bool, w http
 		type (
 			Request  = *TagInput
 			Params   = struct{}
-			Response = CreateTagRes
+			Response = *Tag
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -2652,8 +2824,19 @@ func (s *Server) handleCreateTagRequest(args [0]string, argsEscaped bool, w http
 		response, err = s.h.CreateTag(ctx, request)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -2753,8 +2936,9 @@ func (s *Server) handleDeleteAPIKeyRequest(args [1]string, argsEscaped bool, w h
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -2781,8 +2965,9 @@ func (s *Server) handleDeleteAPIKeyRequest(args [1]string, argsEscaped bool, w h
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -2799,7 +2984,7 @@ func (s *Server) handleDeleteAPIKeyRequest(args [1]string, argsEscaped bool, w h
 
 	var rawBody []byte
 
-	var response DeleteAPIKeyRes
+	var response *DeleteAPIKeyNoContent
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -2820,7 +3005,7 @@ func (s *Server) handleDeleteAPIKeyRequest(args [1]string, argsEscaped bool, w h
 		type (
 			Request  = struct{}
 			Params   = DeleteAPIKeyParams
-			Response = DeleteAPIKeyRes
+			Response = *DeleteAPIKeyNoContent
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -2831,16 +3016,27 @@ func (s *Server) handleDeleteAPIKeyRequest(args [1]string, argsEscaped bool, w h
 			mreq,
 			unpackDeleteAPIKeyParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.DeleteAPIKey(ctx, params)
+				err = s.h.DeleteAPIKey(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.DeleteAPIKey(ctx, params)
+		err = s.h.DeleteAPIKey(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -2940,8 +3136,9 @@ func (s *Server) handleDeleteIncidentRequest(args [2]string, argsEscaped bool, w
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -2968,8 +3165,9 @@ func (s *Server) handleDeleteIncidentRequest(args [2]string, argsEscaped bool, w
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -2986,7 +3184,7 @@ func (s *Server) handleDeleteIncidentRequest(args [2]string, argsEscaped bool, w
 
 	var rawBody []byte
 
-	var response DeleteIncidentRes
+	var response *DeleteIncidentNoContent
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -3011,7 +3209,7 @@ func (s *Server) handleDeleteIncidentRequest(args [2]string, argsEscaped bool, w
 		type (
 			Request  = struct{}
 			Params   = DeleteIncidentParams
-			Response = DeleteIncidentRes
+			Response = *DeleteIncidentNoContent
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -3022,16 +3220,27 @@ func (s *Server) handleDeleteIncidentRequest(args [2]string, argsEscaped bool, w
 			mreq,
 			unpackDeleteIncidentParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.DeleteIncident(ctx, params)
+				err = s.h.DeleteIncident(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.DeleteIncident(ctx, params)
+		err = s.h.DeleteIncident(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -3131,8 +3340,9 @@ func (s *Server) handleDeleteMaintenanceRequest(args [1]string, argsEscaped bool
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -3159,8 +3369,9 @@ func (s *Server) handleDeleteMaintenanceRequest(args [1]string, argsEscaped bool
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -3177,7 +3388,7 @@ func (s *Server) handleDeleteMaintenanceRequest(args [1]string, argsEscaped bool
 
 	var rawBody []byte
 
-	var response DeleteMaintenanceRes
+	var response *DeleteMaintenanceNoContent
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -3198,7 +3409,7 @@ func (s *Server) handleDeleteMaintenanceRequest(args [1]string, argsEscaped bool
 		type (
 			Request  = struct{}
 			Params   = DeleteMaintenanceParams
-			Response = DeleteMaintenanceRes
+			Response = *DeleteMaintenanceNoContent
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -3209,16 +3420,27 @@ func (s *Server) handleDeleteMaintenanceRequest(args [1]string, argsEscaped bool
 			mreq,
 			unpackDeleteMaintenanceParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.DeleteMaintenance(ctx, params)
+				err = s.h.DeleteMaintenance(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.DeleteMaintenance(ctx, params)
+		err = s.h.DeleteMaintenance(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -3318,8 +3540,9 @@ func (s *Server) handleDeleteMonitorRequest(args [1]string, argsEscaped bool, w 
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -3346,8 +3569,9 @@ func (s *Server) handleDeleteMonitorRequest(args [1]string, argsEscaped bool, w 
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -3364,7 +3588,7 @@ func (s *Server) handleDeleteMonitorRequest(args [1]string, argsEscaped bool, w 
 
 	var rawBody []byte
 
-	var response DeleteMonitorRes
+	var response *DeleteMonitorNoContent
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -3389,7 +3613,7 @@ func (s *Server) handleDeleteMonitorRequest(args [1]string, argsEscaped bool, w 
 		type (
 			Request  = struct{}
 			Params   = DeleteMonitorParams
-			Response = DeleteMonitorRes
+			Response = *DeleteMonitorNoContent
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -3400,16 +3624,27 @@ func (s *Server) handleDeleteMonitorRequest(args [1]string, argsEscaped bool, w 
 			mreq,
 			unpackDeleteMonitorParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.DeleteMonitor(ctx, params)
+				err = s.h.DeleteMonitor(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.DeleteMonitor(ctx, params)
+		err = s.h.DeleteMonitor(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -3509,8 +3744,9 @@ func (s *Server) handleDeleteMonitorTagRequest(args [2]string, argsEscaped bool,
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -3537,8 +3773,9 @@ func (s *Server) handleDeleteMonitorTagRequest(args [2]string, argsEscaped bool,
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -3555,7 +3792,7 @@ func (s *Server) handleDeleteMonitorTagRequest(args [2]string, argsEscaped bool,
 
 	var rawBody []byte
 
-	var response DeleteMonitorTagRes
+	var response *DeleteMonitorTagNoContent
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -3580,7 +3817,7 @@ func (s *Server) handleDeleteMonitorTagRequest(args [2]string, argsEscaped bool,
 		type (
 			Request  = struct{}
 			Params   = DeleteMonitorTagParams
-			Response = DeleteMonitorTagRes
+			Response = *DeleteMonitorTagNoContent
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -3591,16 +3828,27 @@ func (s *Server) handleDeleteMonitorTagRequest(args [2]string, argsEscaped bool,
 			mreq,
 			unpackDeleteMonitorTagParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.DeleteMonitorTag(ctx, params)
+				err = s.h.DeleteMonitorTag(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.DeleteMonitorTag(ctx, params)
+		err = s.h.DeleteMonitorTag(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -3700,8 +3948,9 @@ func (s *Server) handleDeleteNotificationRequest(args [1]string, argsEscaped boo
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -3728,8 +3977,9 @@ func (s *Server) handleDeleteNotificationRequest(args [1]string, argsEscaped boo
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -3746,7 +3996,7 @@ func (s *Server) handleDeleteNotificationRequest(args [1]string, argsEscaped boo
 
 	var rawBody []byte
 
-	var response DeleteNotificationRes
+	var response *DeleteNotificationNoContent
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -3767,7 +4017,7 @@ func (s *Server) handleDeleteNotificationRequest(args [1]string, argsEscaped boo
 		type (
 			Request  = struct{}
 			Params   = DeleteNotificationParams
-			Response = DeleteNotificationRes
+			Response = *DeleteNotificationNoContent
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -3778,16 +4028,27 @@ func (s *Server) handleDeleteNotificationRequest(args [1]string, argsEscaped boo
 			mreq,
 			unpackDeleteNotificationParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.DeleteNotification(ctx, params)
+				err = s.h.DeleteNotification(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.DeleteNotification(ctx, params)
+		err = s.h.DeleteNotification(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -3887,8 +4148,9 @@ func (s *Server) handleDeleteProxyRequest(args [1]string, argsEscaped bool, w ht
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -3915,8 +4177,9 @@ func (s *Server) handleDeleteProxyRequest(args [1]string, argsEscaped bool, w ht
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -3933,7 +4196,7 @@ func (s *Server) handleDeleteProxyRequest(args [1]string, argsEscaped bool, w ht
 
 	var rawBody []byte
 
-	var response DeleteProxyRes
+	var response *DeleteProxyNoContent
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -3954,7 +4217,7 @@ func (s *Server) handleDeleteProxyRequest(args [1]string, argsEscaped bool, w ht
 		type (
 			Request  = struct{}
 			Params   = DeleteProxyParams
-			Response = DeleteProxyRes
+			Response = *DeleteProxyNoContent
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -3965,16 +4228,27 @@ func (s *Server) handleDeleteProxyRequest(args [1]string, argsEscaped bool, w ht
 			mreq,
 			unpackDeleteProxyParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.DeleteProxy(ctx, params)
+				err = s.h.DeleteProxy(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.DeleteProxy(ctx, params)
+		err = s.h.DeleteProxy(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -4074,8 +4348,9 @@ func (s *Server) handleDeleteStatusPageRequest(args [1]string, argsEscaped bool,
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -4102,8 +4377,9 @@ func (s *Server) handleDeleteStatusPageRequest(args [1]string, argsEscaped bool,
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -4120,7 +4396,7 @@ func (s *Server) handleDeleteStatusPageRequest(args [1]string, argsEscaped bool,
 
 	var rawBody []byte
 
-	var response DeleteStatusPageRes
+	var response *DeleteStatusPageNoContent
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -4141,7 +4417,7 @@ func (s *Server) handleDeleteStatusPageRequest(args [1]string, argsEscaped bool,
 		type (
 			Request  = struct{}
 			Params   = DeleteStatusPageParams
-			Response = DeleteStatusPageRes
+			Response = *DeleteStatusPageNoContent
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -4152,16 +4428,27 @@ func (s *Server) handleDeleteStatusPageRequest(args [1]string, argsEscaped bool,
 			mreq,
 			unpackDeleteStatusPageParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.DeleteStatusPage(ctx, params)
+				err = s.h.DeleteStatusPage(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.DeleteStatusPage(ctx, params)
+		err = s.h.DeleteStatusPage(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -4261,8 +4548,9 @@ func (s *Server) handleDeleteTagRequest(args [1]string, argsEscaped bool, w http
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -4289,8 +4577,9 @@ func (s *Server) handleDeleteTagRequest(args [1]string, argsEscaped bool, w http
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -4307,7 +4596,7 @@ func (s *Server) handleDeleteTagRequest(args [1]string, argsEscaped bool, w http
 
 	var rawBody []byte
 
-	var response DeleteTagRes
+	var response *DeleteTagNoContent
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -4328,7 +4617,7 @@ func (s *Server) handleDeleteTagRequest(args [1]string, argsEscaped bool, w http
 		type (
 			Request  = struct{}
 			Params   = DeleteTagParams
-			Response = DeleteTagRes
+			Response = *DeleteTagNoContent
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -4339,16 +4628,27 @@ func (s *Server) handleDeleteTagRequest(args [1]string, argsEscaped bool, w http
 			mreq,
 			unpackDeleteTagParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.DeleteTag(ctx, params)
+				err = s.h.DeleteTag(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.DeleteTag(ctx, params)
+		err = s.h.DeleteTag(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -4448,8 +4748,9 @@ func (s *Server) handleDisable2FARequest(args [0]string, argsEscaped bool, w htt
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -4476,8 +4777,9 @@ func (s *Server) handleDisable2FARequest(args [0]string, argsEscaped bool, w htt
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -4499,7 +4801,7 @@ func (s *Server) handleDisable2FARequest(args [0]string, argsEscaped bool, w htt
 		}
 	}()
 
-	var response Disable2FARes
+	var response *MessageResponse
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -4515,7 +4817,7 @@ func (s *Server) handleDisable2FARequest(args [0]string, argsEscaped bool, w htt
 		type (
 			Request  = *Disable2FAReq
 			Params   = struct{}
-			Response = Disable2FARes
+			Response = *MessageResponse
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -4534,8 +4836,19 @@ func (s *Server) handleDisable2FARequest(args [0]string, argsEscaped bool, w htt
 		response, err = s.h.Disable2FA(ctx, request)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -4635,8 +4948,9 @@ func (s *Server) handleDisableAPIKeyRequest(args [1]string, argsEscaped bool, w 
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -4663,8 +4977,9 @@ func (s *Server) handleDisableAPIKeyRequest(args [1]string, argsEscaped bool, w 
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -4681,7 +4996,7 @@ func (s *Server) handleDisableAPIKeyRequest(args [1]string, argsEscaped bool, w 
 
 	var rawBody []byte
 
-	var response DisableAPIKeyRes
+	var response *MessageResponse
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -4702,7 +5017,7 @@ func (s *Server) handleDisableAPIKeyRequest(args [1]string, argsEscaped bool, w 
 		type (
 			Request  = struct{}
 			Params   = DisableAPIKeyParams
-			Response = DisableAPIKeyRes
+			Response = *MessageResponse
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -4721,8 +5036,19 @@ func (s *Server) handleDisableAPIKeyRequest(args [1]string, argsEscaped bool, w 
 		response, err = s.h.DisableAPIKey(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -4822,8 +5148,9 @@ func (s *Server) handleEnable2FARequest(args [0]string, argsEscaped bool, w http
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -4850,8 +5177,9 @@ func (s *Server) handleEnable2FARequest(args [0]string, argsEscaped bool, w http
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -4873,7 +5201,7 @@ func (s *Server) handleEnable2FARequest(args [0]string, argsEscaped bool, w http
 		}
 	}()
 
-	var response Enable2FARes
+	var response *MessageResponse
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -4889,7 +5217,7 @@ func (s *Server) handleEnable2FARequest(args [0]string, argsEscaped bool, w http
 		type (
 			Request  = *Enable2FAReq
 			Params   = struct{}
-			Response = Enable2FARes
+			Response = *MessageResponse
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -4908,8 +5236,19 @@ func (s *Server) handleEnable2FARequest(args [0]string, argsEscaped bool, w http
 		response, err = s.h.Enable2FA(ctx, request)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -5009,8 +5348,9 @@ func (s *Server) handleEnableAPIKeyRequest(args [1]string, argsEscaped bool, w h
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -5037,8 +5377,9 @@ func (s *Server) handleEnableAPIKeyRequest(args [1]string, argsEscaped bool, w h
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -5055,7 +5396,7 @@ func (s *Server) handleEnableAPIKeyRequest(args [1]string, argsEscaped bool, w h
 
 	var rawBody []byte
 
-	var response EnableAPIKeyRes
+	var response *MessageResponse
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -5076,7 +5417,7 @@ func (s *Server) handleEnableAPIKeyRequest(args [1]string, argsEscaped bool, w h
 		type (
 			Request  = struct{}
 			Params   = EnableAPIKeyParams
-			Response = EnableAPIKeyRes
+			Response = *MessageResponse
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -5095,8 +5436,19 @@ func (s *Server) handleEnableAPIKeyRequest(args [1]string, argsEscaped bool, w h
 		response, err = s.h.EnableAPIKey(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -5196,8 +5548,9 @@ func (s *Server) handleGet2FAStatusRequest(args [0]string, argsEscaped bool, w h
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -5224,15 +5577,16 @@ func (s *Server) handleGet2FAStatusRequest(args [0]string, argsEscaped bool, w h
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
 
 	var rawBody []byte
 
-	var response Get2FAStatusRes
+	var response *Get2FAStatusOK
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -5248,7 +5602,7 @@ func (s *Server) handleGet2FAStatusRequest(args [0]string, argsEscaped bool, w h
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = Get2FAStatusRes
+			Response = *Get2FAStatusOK
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -5267,8 +5621,19 @@ func (s *Server) handleGet2FAStatusRequest(args [0]string, argsEscaped bool, w h
 		response, err = s.h.Get2FAStatus(ctx)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -5370,7 +5735,7 @@ func (s *Server) handleGetCertExpiryBadgeRequest(args [1]string, argsEscaped boo
 
 	var rawBody []byte
 
-	var response GetCertExpiryBadgeRes
+	var response SVGBadge
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -5395,7 +5760,7 @@ func (s *Server) handleGetCertExpiryBadgeRequest(args [1]string, argsEscaped boo
 		type (
 			Request  = struct{}
 			Params   = GetCertExpiryBadgeParams
-			Response = GetCertExpiryBadgeRes
+			Response = SVGBadge
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -5414,8 +5779,19 @@ func (s *Server) handleGetCertExpiryBadgeRequest(args [1]string, argsEscaped boo
 		response, err = s.h.GetCertExpiryBadge(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -5515,8 +5891,9 @@ func (s *Server) handleGetChartDataRequest(args [1]string, argsEscaped bool, w h
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -5543,8 +5920,9 @@ func (s *Server) handleGetChartDataRequest(args [1]string, argsEscaped bool, w h
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -5561,7 +5939,7 @@ func (s *Server) handleGetChartDataRequest(args [1]string, argsEscaped bool, w h
 
 	var rawBody []byte
 
-	var response GetChartDataRes
+	var response []ChartPoint
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -5586,7 +5964,7 @@ func (s *Server) handleGetChartDataRequest(args [1]string, argsEscaped bool, w h
 		type (
 			Request  = struct{}
 			Params   = GetChartDataParams
-			Response = GetChartDataRes
+			Response = []ChartPoint
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -5605,8 +5983,19 @@ func (s *Server) handleGetChartDataRequest(args [1]string, argsEscaped bool, w h
 		response, err = s.h.GetChartData(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -5706,8 +6095,9 @@ func (s *Server) handleGetDatabaseSizeRequest(args [0]string, argsEscaped bool, 
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -5734,15 +6124,16 @@ func (s *Server) handleGetDatabaseSizeRequest(args [0]string, argsEscaped bool, 
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
 
 	var rawBody []byte
 
-	var response GetDatabaseSizeRes
+	var response *GetDatabaseSizeOK
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -5758,7 +6149,7 @@ func (s *Server) handleGetDatabaseSizeRequest(args [0]string, argsEscaped bool, 
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = GetDatabaseSizeRes
+			Response = *GetDatabaseSizeOK
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -5777,8 +6168,19 @@ func (s *Server) handleGetDatabaseSizeRequest(args [0]string, argsEscaped bool, 
 		response, err = s.h.GetDatabaseSize(ctx)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -5879,8 +6281,9 @@ func (s *Server) handleGetHeartbeatsRequest(args [1]string, argsEscaped bool, w 
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -5907,8 +6310,9 @@ func (s *Server) handleGetHeartbeatsRequest(args [1]string, argsEscaped bool, w 
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -5925,7 +6329,7 @@ func (s *Server) handleGetHeartbeatsRequest(args [1]string, argsEscaped bool, w 
 
 	var rawBody []byte
 
-	var response GetHeartbeatsRes
+	var response []Heartbeat
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -5954,7 +6358,7 @@ func (s *Server) handleGetHeartbeatsRequest(args [1]string, argsEscaped bool, w 
 		type (
 			Request  = struct{}
 			Params   = GetHeartbeatsParams
-			Response = GetHeartbeatsRes
+			Response = []Heartbeat
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -5973,8 +6377,19 @@ func (s *Server) handleGetHeartbeatsRequest(args [1]string, argsEscaped bool, w 
 		response, err = s.h.GetHeartbeats(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -6074,8 +6489,9 @@ func (s *Server) handleGetImportantHeartbeatsRequest(args [1]string, argsEscaped
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -6102,8 +6518,9 @@ func (s *Server) handleGetImportantHeartbeatsRequest(args [1]string, argsEscaped
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -6120,7 +6537,7 @@ func (s *Server) handleGetImportantHeartbeatsRequest(args [1]string, argsEscaped
 
 	var rawBody []byte
 
-	var response GetImportantHeartbeatsRes
+	var response *GetImportantHeartbeatsOK
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -6149,7 +6566,7 @@ func (s *Server) handleGetImportantHeartbeatsRequest(args [1]string, argsEscaped
 		type (
 			Request  = struct{}
 			Params   = GetImportantHeartbeatsParams
-			Response = GetImportantHeartbeatsRes
+			Response = *GetImportantHeartbeatsOK
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -6168,8 +6585,19 @@ func (s *Server) handleGetImportantHeartbeatsRequest(args [1]string, argsEscaped
 		response, err = s.h.GetImportantHeartbeats(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -6257,7 +6685,7 @@ func (s *Server) handleGetInfoRequest(args [0]string, argsEscaped bool, w http.R
 
 	var rawBody []byte
 
-	var response GetInfoRes
+	var response *GetInfoOK
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -6273,7 +6701,7 @@ func (s *Server) handleGetInfoRequest(args [0]string, argsEscaped bool, w http.R
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = GetInfoRes
+			Response = *GetInfoOK
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -6292,8 +6720,19 @@ func (s *Server) handleGetInfoRequest(args [0]string, argsEscaped bool, w http.R
 		response, err = s.h.GetInfo(ctx)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -6395,7 +6834,7 @@ func (s *Server) handleGetLatencyBadgeRequest(args [1]string, argsEscaped bool, 
 
 	var rawBody []byte
 
-	var response GetLatencyBadgeRes
+	var response SVGBadge
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -6424,7 +6863,7 @@ func (s *Server) handleGetLatencyBadgeRequest(args [1]string, argsEscaped bool, 
 		type (
 			Request  = struct{}
 			Params   = GetLatencyBadgeParams
-			Response = GetLatencyBadgeRes
+			Response = SVGBadge
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -6443,8 +6882,19 @@ func (s *Server) handleGetLatencyBadgeRequest(args [1]string, argsEscaped bool, 
 		response, err = s.h.GetLatencyBadge(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -6544,8 +6994,9 @@ func (s *Server) handleGetMaintenanceRequest(args [1]string, argsEscaped bool, w
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -6572,8 +7023,9 @@ func (s *Server) handleGetMaintenanceRequest(args [1]string, argsEscaped bool, w
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -6590,7 +7042,7 @@ func (s *Server) handleGetMaintenanceRequest(args [1]string, argsEscaped bool, w
 
 	var rawBody []byte
 
-	var response GetMaintenanceRes
+	var response *Maintenance
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -6611,7 +7063,7 @@ func (s *Server) handleGetMaintenanceRequest(args [1]string, argsEscaped bool, w
 		type (
 			Request  = struct{}
 			Params   = GetMaintenanceParams
-			Response = GetMaintenanceRes
+			Response = *Maintenance
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -6630,8 +7082,19 @@ func (s *Server) handleGetMaintenanceRequest(args [1]string, argsEscaped bool, w
 		response, err = s.h.GetMaintenance(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -6731,8 +7194,9 @@ func (s *Server) handleGetMaintenanceMonitorsRequest(args [1]string, argsEscaped
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -6759,8 +7223,9 @@ func (s *Server) handleGetMaintenanceMonitorsRequest(args [1]string, argsEscaped
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -6777,7 +7242,7 @@ func (s *Server) handleGetMaintenanceMonitorsRequest(args [1]string, argsEscaped
 
 	var rawBody []byte
 
-	var response GetMaintenanceMonitorsRes
+	var response []uuid.UUID
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -6798,7 +7263,7 @@ func (s *Server) handleGetMaintenanceMonitorsRequest(args [1]string, argsEscaped
 		type (
 			Request  = struct{}
 			Params   = GetMaintenanceMonitorsParams
-			Response = GetMaintenanceMonitorsRes
+			Response = []uuid.UUID
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -6817,8 +7282,19 @@ func (s *Server) handleGetMaintenanceMonitorsRequest(args [1]string, argsEscaped
 		response, err = s.h.GetMaintenanceMonitors(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -6918,8 +7394,9 @@ func (s *Server) handleGetMaintenanceStatusPagesRequest(args [1]string, argsEsca
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -6946,8 +7423,9 @@ func (s *Server) handleGetMaintenanceStatusPagesRequest(args [1]string, argsEsca
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -6964,7 +7442,7 @@ func (s *Server) handleGetMaintenanceStatusPagesRequest(args [1]string, argsEsca
 
 	var rawBody []byte
 
-	var response GetMaintenanceStatusPagesRes
+	var response []uuid.UUID
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -6985,7 +7463,7 @@ func (s *Server) handleGetMaintenanceStatusPagesRequest(args [1]string, argsEsca
 		type (
 			Request  = struct{}
 			Params   = GetMaintenanceStatusPagesParams
-			Response = GetMaintenanceStatusPagesRes
+			Response = []uuid.UUID
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -7004,8 +7482,19 @@ func (s *Server) handleGetMaintenanceStatusPagesRequest(args [1]string, argsEsca
 		response, err = s.h.GetMaintenanceStatusPages(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -7105,8 +7594,9 @@ func (s *Server) handleGetMonitorRequest(args [1]string, argsEscaped bool, w htt
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -7133,8 +7623,9 @@ func (s *Server) handleGetMonitorRequest(args [1]string, argsEscaped bool, w htt
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -7151,7 +7642,7 @@ func (s *Server) handleGetMonitorRequest(args [1]string, argsEscaped bool, w htt
 
 	var rawBody []byte
 
-	var response GetMonitorRes
+	var response *Monitor
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -7172,7 +7663,7 @@ func (s *Server) handleGetMonitorRequest(args [1]string, argsEscaped bool, w htt
 		type (
 			Request  = struct{}
 			Params   = GetMonitorParams
-			Response = GetMonitorRes
+			Response = *Monitor
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -7191,8 +7682,19 @@ func (s *Server) handleGetMonitorRequest(args [1]string, argsEscaped bool, w htt
 		response, err = s.h.GetMonitor(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -7292,8 +7794,9 @@ func (s *Server) handleGetMonitorUptimesRequest(args [0]string, argsEscaped bool
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -7320,15 +7823,16 @@ func (s *Server) handleGetMonitorUptimesRequest(args [0]string, argsEscaped bool
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
 
 	var rawBody []byte
 
-	var response GetMonitorUptimesRes
+	var response []GetMonitorUptimesOKItem
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -7344,7 +7848,7 @@ func (s *Server) handleGetMonitorUptimesRequest(args [0]string, argsEscaped bool
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = GetMonitorUptimesRes
+			Response = []GetMonitorUptimesOKItem
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -7363,8 +7867,19 @@ func (s *Server) handleGetMonitorUptimesRequest(args [0]string, argsEscaped bool
 		response, err = s.h.GetMonitorUptimes(ctx)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -7466,7 +7981,7 @@ func (s *Server) handleGetResponseBadgeRequest(args [1]string, argsEscaped bool,
 
 	var rawBody []byte
 
-	var response GetResponseBadgeRes
+	var response SVGBadge
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -7491,7 +8006,7 @@ func (s *Server) handleGetResponseBadgeRequest(args [1]string, argsEscaped bool,
 		type (
 			Request  = struct{}
 			Params   = GetResponseBadgeParams
-			Response = GetResponseBadgeRes
+			Response = SVGBadge
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -7510,8 +8025,19 @@ func (s *Server) handleGetResponseBadgeRequest(args [1]string, argsEscaped bool,
 		response, err = s.h.GetResponseBadge(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -7611,8 +8137,9 @@ func (s *Server) handleGetSettingsRequest(args [0]string, argsEscaped bool, w ht
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -7639,15 +8166,16 @@ func (s *Server) handleGetSettingsRequest(args [0]string, argsEscaped bool, w ht
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
 
 	var rawBody []byte
 
-	var response GetSettingsRes
+	var response *Settings
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -7663,7 +8191,7 @@ func (s *Server) handleGetSettingsRequest(args [0]string, argsEscaped bool, w ht
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = GetSettingsRes
+			Response = *Settings
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -7682,8 +8210,19 @@ func (s *Server) handleGetSettingsRequest(args [0]string, argsEscaped bool, w ht
 		response, err = s.h.GetSettings(ctx)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -7785,7 +8324,7 @@ func (s *Server) handleGetStatusBadgeRequest(args [1]string, argsEscaped bool, w
 
 	var rawBody []byte
 
-	var response GetStatusBadgeRes
+	var response SVGBadge
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -7810,7 +8349,7 @@ func (s *Server) handleGetStatusBadgeRequest(args [1]string, argsEscaped bool, w
 		type (
 			Request  = struct{}
 			Params   = GetStatusBadgeParams
-			Response = GetStatusBadgeRes
+			Response = SVGBadge
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -7829,8 +8368,19 @@ func (s *Server) handleGetStatusBadgeRequest(args [1]string, argsEscaped bool, w
 		response, err = s.h.GetStatusBadge(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -7932,7 +8482,7 @@ func (s *Server) handleGetStatusPageRequest(args [1]string, argsEscaped bool, w 
 
 	var rawBody []byte
 
-	var response GetStatusPageRes
+	var response *StatusPage
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -7953,7 +8503,7 @@ func (s *Server) handleGetStatusPageRequest(args [1]string, argsEscaped bool, w 
 		type (
 			Request  = struct{}
 			Params   = GetStatusPageParams
-			Response = GetStatusPageRes
+			Response = *StatusPage
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -7972,8 +8522,19 @@ func (s *Server) handleGetStatusPageRequest(args [1]string, argsEscaped bool, w 
 		response, err = s.h.GetStatusPage(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -8075,7 +8636,7 @@ func (s *Server) handleGetStatusPageBadgeRequest(args [1]string, argsEscaped boo
 
 	var rawBody []byte
 
-	var response GetStatusPageBadgeRes
+	var response GetStatusPageBadgeOK
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -8100,7 +8661,7 @@ func (s *Server) handleGetStatusPageBadgeRequest(args [1]string, argsEscaped boo
 		type (
 			Request  = struct{}
 			Params   = GetStatusPageBadgeParams
-			Response = GetStatusPageBadgeRes
+			Response = GetStatusPageBadgeOK
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -8119,8 +8680,19 @@ func (s *Server) handleGetStatusPageBadgeRequest(args [1]string, argsEscaped boo
 		response, err = s.h.GetStatusPageBadge(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -8222,7 +8794,7 @@ func (s *Server) handleGetStatusPageEventStreamRequest(args [1]string, argsEscap
 
 	var rawBody []byte
 
-	var response GetStatusPageEventStreamRes
+	var response GetStatusPageEventStreamOK
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -8243,7 +8815,7 @@ func (s *Server) handleGetStatusPageEventStreamRequest(args [1]string, argsEscap
 		type (
 			Request  = struct{}
 			Params   = GetStatusPageEventStreamParams
-			Response = GetStatusPageEventStreamRes
+			Response = GetStatusPageEventStreamOK
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -8262,8 +8834,19 @@ func (s *Server) handleGetStatusPageEventStreamRequest(args [1]string, argsEscap
 		response, err = s.h.GetStatusPageEventStream(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -8365,7 +8948,7 @@ func (s *Server) handleGetStatusPageHeartbeatsRequest(args [1]string, argsEscape
 
 	var rawBody []byte
 
-	var response GetStatusPageHeartbeatsRes
+	var response *GetStatusPageHeartbeatsOK
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -8386,7 +8969,7 @@ func (s *Server) handleGetStatusPageHeartbeatsRequest(args [1]string, argsEscape
 		type (
 			Request  = struct{}
 			Params   = GetStatusPageHeartbeatsParams
-			Response = GetStatusPageHeartbeatsRes
+			Response = *GetStatusPageHeartbeatsOK
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -8405,8 +8988,19 @@ func (s *Server) handleGetStatusPageHeartbeatsRequest(args [1]string, argsEscape
 		response, err = s.h.GetStatusPageHeartbeats(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -8508,7 +9102,7 @@ func (s *Server) handleGetUptimeBadgeRequest(args [1]string, argsEscaped bool, w
 
 	var rawBody []byte
 
-	var response GetUptimeBadgeRes
+	var response SVGBadge
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -8537,7 +9131,7 @@ func (s *Server) handleGetUptimeBadgeRequest(args [1]string, argsEscaped bool, w
 		type (
 			Request  = struct{}
 			Params   = GetUptimeBadgeParams
-			Response = GetUptimeBadgeRes
+			Response = SVGBadge
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -8556,8 +9150,19 @@ func (s *Server) handleGetUptimeBadgeRequest(args [1]string, argsEscaped bool, w
 		response, err = s.h.GetUptimeBadge(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -8645,7 +9250,7 @@ func (s *Server) handleHealthCheckRequest(args [0]string, argsEscaped bool, w ht
 
 	var rawBody []byte
 
-	var response HealthCheckRes
+	var response *HealthCheckOK
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -8661,7 +9266,7 @@ func (s *Server) handleHealthCheckRequest(args [0]string, argsEscaped bool, w ht
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = HealthCheckRes
+			Response = *HealthCheckOK
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -8680,8 +9285,19 @@ func (s *Server) handleHealthCheckRequest(args [0]string, argsEscaped bool, w ht
 		response, err = s.h.HealthCheck(ctx)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -8781,8 +9397,9 @@ func (s *Server) handleListAPIKeysRequest(args [0]string, argsEscaped bool, w ht
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -8809,15 +9426,16 @@ func (s *Server) handleListAPIKeysRequest(args [0]string, argsEscaped bool, w ht
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
 
 	var rawBody []byte
 
-	var response ListAPIKeysRes
+	var response []APIKey
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -8833,7 +9451,7 @@ func (s *Server) handleListAPIKeysRequest(args [0]string, argsEscaped bool, w ht
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = ListAPIKeysRes
+			Response = []APIKey
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -8852,8 +9470,19 @@ func (s *Server) handleListAPIKeysRequest(args [0]string, argsEscaped bool, w ht
 		response, err = s.h.ListAPIKeys(ctx)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -8955,7 +9584,7 @@ func (s *Server) handleListIncidentsRequest(args [1]string, argsEscaped bool, w 
 
 	var rawBody []byte
 
-	var response ListIncidentsRes
+	var response *ListIncidentsOK
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -8980,7 +9609,7 @@ func (s *Server) handleListIncidentsRequest(args [1]string, argsEscaped bool, w 
 		type (
 			Request  = struct{}
 			Params   = ListIncidentsParams
-			Response = ListIncidentsRes
+			Response = *ListIncidentsOK
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -8999,8 +9628,19 @@ func (s *Server) handleListIncidentsRequest(args [1]string, argsEscaped bool, w 
 		response, err = s.h.ListIncidents(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -9100,8 +9740,9 @@ func (s *Server) handleListMaintenanceRequest(args [0]string, argsEscaped bool, 
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -9128,15 +9769,16 @@ func (s *Server) handleListMaintenanceRequest(args [0]string, argsEscaped bool, 
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
 
 	var rawBody []byte
 
-	var response ListMaintenanceRes
+	var response []Maintenance
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -9152,7 +9794,7 @@ func (s *Server) handleListMaintenanceRequest(args [0]string, argsEscaped bool, 
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = ListMaintenanceRes
+			Response = []Maintenance
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -9171,8 +9813,19 @@ func (s *Server) handleListMaintenanceRequest(args [0]string, argsEscaped bool, 
 		response, err = s.h.ListMaintenance(ctx)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -9272,8 +9925,9 @@ func (s *Server) handleListMonitorsRequest(args [0]string, argsEscaped bool, w h
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -9300,15 +9954,16 @@ func (s *Server) handleListMonitorsRequest(args [0]string, argsEscaped bool, w h
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
 
 	var rawBody []byte
 
-	var response ListMonitorsRes
+	var response []Monitor
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -9324,7 +9979,7 @@ func (s *Server) handleListMonitorsRequest(args [0]string, argsEscaped bool, w h
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = ListMonitorsRes
+			Response = []Monitor
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -9343,8 +9998,19 @@ func (s *Server) handleListMonitorsRequest(args [0]string, argsEscaped bool, w h
 		response, err = s.h.ListMonitors(ctx)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -9444,8 +10110,9 @@ func (s *Server) handleListNotificationsRequest(args [0]string, argsEscaped bool
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -9472,15 +10139,16 @@ func (s *Server) handleListNotificationsRequest(args [0]string, argsEscaped bool
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
 
 	var rawBody []byte
 
-	var response ListNotificationsRes
+	var response []Notification
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -9496,7 +10164,7 @@ func (s *Server) handleListNotificationsRequest(args [0]string, argsEscaped bool
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = ListNotificationsRes
+			Response = []Notification
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -9515,8 +10183,19 @@ func (s *Server) handleListNotificationsRequest(args [0]string, argsEscaped bool
 		response, err = s.h.ListNotifications(ctx)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -9616,8 +10295,9 @@ func (s *Server) handleListProxiesRequest(args [0]string, argsEscaped bool, w ht
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -9644,15 +10324,16 @@ func (s *Server) handleListProxiesRequest(args [0]string, argsEscaped bool, w ht
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
 
 	var rawBody []byte
 
-	var response ListProxiesRes
+	var response []Proxy
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -9668,7 +10349,7 @@ func (s *Server) handleListProxiesRequest(args [0]string, argsEscaped bool, w ht
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = ListProxiesRes
+			Response = []Proxy
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -9687,8 +10368,19 @@ func (s *Server) handleListProxiesRequest(args [0]string, argsEscaped bool, w ht
 		response, err = s.h.ListProxies(ctx)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -9788,8 +10480,9 @@ func (s *Server) handleListRecentEventsRequest(args [0]string, argsEscaped bool,
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -9816,8 +10509,9 @@ func (s *Server) handleListRecentEventsRequest(args [0]string, argsEscaped bool,
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -9834,7 +10528,7 @@ func (s *Server) handleListRecentEventsRequest(args [0]string, argsEscaped bool,
 
 	var rawBody []byte
 
-	var response ListRecentEventsRes
+	var response *ListRecentEventsOK
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -9855,7 +10549,7 @@ func (s *Server) handleListRecentEventsRequest(args [0]string, argsEscaped bool,
 		type (
 			Request  = struct{}
 			Params   = ListRecentEventsParams
-			Response = ListRecentEventsRes
+			Response = *ListRecentEventsOK
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -9874,8 +10568,19 @@ func (s *Server) handleListRecentEventsRequest(args [0]string, argsEscaped bool,
 		response, err = s.h.ListRecentEvents(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -9975,8 +10680,9 @@ func (s *Server) handleListStatusPagesRequest(args [0]string, argsEscaped bool, 
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -10003,15 +10709,16 @@ func (s *Server) handleListStatusPagesRequest(args [0]string, argsEscaped bool, 
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
 
 	var rawBody []byte
 
-	var response ListStatusPagesRes
+	var response []StatusPage
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -10027,7 +10734,7 @@ func (s *Server) handleListStatusPagesRequest(args [0]string, argsEscaped bool, 
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = ListStatusPagesRes
+			Response = []StatusPage
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -10046,8 +10753,19 @@ func (s *Server) handleListStatusPagesRequest(args [0]string, argsEscaped bool, 
 		response, err = s.h.ListStatusPages(ctx)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -10147,8 +10865,9 @@ func (s *Server) handleListTagsRequest(args [0]string, argsEscaped bool, w http.
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -10175,15 +10894,16 @@ func (s *Server) handleListTagsRequest(args [0]string, argsEscaped bool, w http.
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
 
 	var rawBody []byte
 
-	var response ListTagsRes
+	var response []Tag
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -10199,7 +10919,7 @@ func (s *Server) handleListTagsRequest(args [0]string, argsEscaped bool, w http.
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = ListTagsRes
+			Response = []Tag
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -10218,8 +10938,19 @@ func (s *Server) handleListTagsRequest(args [0]string, argsEscaped bool, w http.
 		response, err = s.h.ListTags(ctx)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -10326,7 +11057,7 @@ func (s *Server) handleLoginRequest(args [0]string, argsEscaped bool, w http.Res
 		}
 	}()
 
-	var response LoginRes
+	var response *LoginResponse
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -10342,7 +11073,7 @@ func (s *Server) handleLoginRequest(args [0]string, argsEscaped bool, w http.Res
 		type (
 			Request  = *LoginRequest
 			Params   = struct{}
-			Response = LoginRes
+			Response = *LoginResponse
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -10361,8 +11092,19 @@ func (s *Server) handleLoginRequest(args [0]string, argsEscaped bool, w http.Res
 		response, err = s.h.Login(ctx, request)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -10462,8 +11204,9 @@ func (s *Server) handleLogoutRequest(args [0]string, argsEscaped bool, w http.Re
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -10490,15 +11233,16 @@ func (s *Server) handleLogoutRequest(args [0]string, argsEscaped bool, w http.Re
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
 
 	var rawBody []byte
 
-	var response LogoutRes
+	var response *LogoutNoContent
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -10514,7 +11258,7 @@ func (s *Server) handleLogoutRequest(args [0]string, argsEscaped bool, w http.Re
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = LogoutRes
+			Response = *LogoutNoContent
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -10525,16 +11269,27 @@ func (s *Server) handleLogoutRequest(args [0]string, argsEscaped bool, w http.Re
 			mreq,
 			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.Logout(ctx)
+				err = s.h.Logout(ctx)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.Logout(ctx)
+		err = s.h.Logout(ctx)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -10622,7 +11377,7 @@ func (s *Server) handleNeedSetupRequest(args [0]string, argsEscaped bool, w http
 
 	var rawBody []byte
 
-	var response NeedSetupRes
+	var response *NeedSetupOK
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -10638,7 +11393,7 @@ func (s *Server) handleNeedSetupRequest(args [0]string, argsEscaped bool, w http
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = NeedSetupRes
+			Response = *NeedSetupOK
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -10657,8 +11412,19 @@ func (s *Server) handleNeedSetupRequest(args [0]string, argsEscaped bool, w http
 		response, err = s.h.NeedSetup(ctx)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -10758,8 +11524,9 @@ func (s *Server) handlePauseMaintenanceRequest(args [1]string, argsEscaped bool,
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -10786,8 +11553,9 @@ func (s *Server) handlePauseMaintenanceRequest(args [1]string, argsEscaped bool,
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -10804,7 +11572,7 @@ func (s *Server) handlePauseMaintenanceRequest(args [1]string, argsEscaped bool,
 
 	var rawBody []byte
 
-	var response PauseMaintenanceRes
+	var response *MessageResponse
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -10825,7 +11593,7 @@ func (s *Server) handlePauseMaintenanceRequest(args [1]string, argsEscaped bool,
 		type (
 			Request  = struct{}
 			Params   = PauseMaintenanceParams
-			Response = PauseMaintenanceRes
+			Response = *MessageResponse
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -10844,8 +11612,19 @@ func (s *Server) handlePauseMaintenanceRequest(args [1]string, argsEscaped bool,
 		response, err = s.h.PauseMaintenance(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -10945,8 +11724,9 @@ func (s *Server) handlePauseMonitorRequest(args [1]string, argsEscaped bool, w h
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -10973,8 +11753,9 @@ func (s *Server) handlePauseMonitorRequest(args [1]string, argsEscaped bool, w h
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -10991,7 +11772,7 @@ func (s *Server) handlePauseMonitorRequest(args [1]string, argsEscaped bool, w h
 
 	var rawBody []byte
 
-	var response PauseMonitorRes
+	var response *MessageResponse
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -11012,7 +11793,7 @@ func (s *Server) handlePauseMonitorRequest(args [1]string, argsEscaped bool, w h
 		type (
 			Request  = struct{}
 			Params   = PauseMonitorParams
-			Response = PauseMonitorRes
+			Response = *MessageResponse
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -11031,8 +11812,19 @@ func (s *Server) handlePauseMonitorRequest(args [1]string, argsEscaped bool, w h
 		response, err = s.h.PauseMonitor(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -11132,8 +11924,9 @@ func (s *Server) handlePrepare2FARequest(args [0]string, argsEscaped bool, w htt
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -11160,8 +11953,9 @@ func (s *Server) handlePrepare2FARequest(args [0]string, argsEscaped bool, w htt
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -11183,7 +11977,7 @@ func (s *Server) handlePrepare2FARequest(args [0]string, argsEscaped bool, w htt
 		}
 	}()
 
-	var response Prepare2FARes
+	var response *Prepare2FAOK
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -11199,7 +11993,7 @@ func (s *Server) handlePrepare2FARequest(args [0]string, argsEscaped bool, w htt
 		type (
 			Request  = *Prepare2FAReq
 			Params   = struct{}
-			Response = Prepare2FARes
+			Response = *Prepare2FAOK
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -11218,8 +12012,19 @@ func (s *Server) handlePrepare2FARequest(args [0]string, argsEscaped bool, w htt
 		response, err = s.h.Prepare2FA(ctx, request)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -11326,7 +12131,7 @@ func (s *Server) handleRefreshTokenRequest(args [0]string, argsEscaped bool, w h
 		}
 	}()
 
-	var response RefreshTokenRes
+	var response *TokenResponse
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -11342,7 +12147,7 @@ func (s *Server) handleRefreshTokenRequest(args [0]string, argsEscaped bool, w h
 		type (
 			Request  = *RefreshTokenRequest
 			Params   = struct{}
-			Response = RefreshTokenRes
+			Response = *TokenResponse
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -11361,8 +12166,19 @@ func (s *Server) handleRefreshTokenRequest(args [0]string, argsEscaped bool, w h
 		response, err = s.h.RefreshToken(ctx, request)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -11462,8 +12278,9 @@ func (s *Server) handleResolveIncidentRequest(args [2]string, argsEscaped bool, 
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -11490,8 +12307,9 @@ func (s *Server) handleResolveIncidentRequest(args [2]string, argsEscaped bool, 
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -11508,7 +12326,7 @@ func (s *Server) handleResolveIncidentRequest(args [2]string, argsEscaped bool, 
 
 	var rawBody []byte
 
-	var response ResolveIncidentRes
+	var response *Incident
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -11533,7 +12351,7 @@ func (s *Server) handleResolveIncidentRequest(args [2]string, argsEscaped bool, 
 		type (
 			Request  = struct{}
 			Params   = ResolveIncidentParams
-			Response = ResolveIncidentRes
+			Response = *Incident
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -11552,8 +12370,19 @@ func (s *Server) handleResolveIncidentRequest(args [2]string, argsEscaped bool, 
 		response, err = s.h.ResolveIncident(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -11653,8 +12482,9 @@ func (s *Server) handleResumeMaintenanceRequest(args [1]string, argsEscaped bool
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -11681,8 +12511,9 @@ func (s *Server) handleResumeMaintenanceRequest(args [1]string, argsEscaped bool
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -11699,7 +12530,7 @@ func (s *Server) handleResumeMaintenanceRequest(args [1]string, argsEscaped bool
 
 	var rawBody []byte
 
-	var response ResumeMaintenanceRes
+	var response *MessageResponse
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -11720,7 +12551,7 @@ func (s *Server) handleResumeMaintenanceRequest(args [1]string, argsEscaped bool
 		type (
 			Request  = struct{}
 			Params   = ResumeMaintenanceParams
-			Response = ResumeMaintenanceRes
+			Response = *MessageResponse
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -11739,8 +12570,19 @@ func (s *Server) handleResumeMaintenanceRequest(args [1]string, argsEscaped bool
 		response, err = s.h.ResumeMaintenance(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -11840,8 +12682,9 @@ func (s *Server) handleResumeMonitorRequest(args [1]string, argsEscaped bool, w 
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -11868,8 +12711,9 @@ func (s *Server) handleResumeMonitorRequest(args [1]string, argsEscaped bool, w 
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -11886,7 +12730,7 @@ func (s *Server) handleResumeMonitorRequest(args [1]string, argsEscaped bool, w 
 
 	var rawBody []byte
 
-	var response ResumeMonitorRes
+	var response *MessageResponse
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -11907,7 +12751,7 @@ func (s *Server) handleResumeMonitorRequest(args [1]string, argsEscaped bool, w 
 		type (
 			Request  = struct{}
 			Params   = ResumeMonitorParams
-			Response = ResumeMonitorRes
+			Response = *MessageResponse
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -11926,8 +12770,19 @@ func (s *Server) handleResumeMonitorRequest(args [1]string, argsEscaped bool, w 
 		response, err = s.h.ResumeMonitor(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -12027,8 +12882,9 @@ func (s *Server) handleSetMaintenanceMonitorsRequest(args [1]string, argsEscaped
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -12055,8 +12911,9 @@ func (s *Server) handleSetMaintenanceMonitorsRequest(args [1]string, argsEscaped
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -12088,7 +12945,7 @@ func (s *Server) handleSetMaintenanceMonitorsRequest(args [1]string, argsEscaped
 		}
 	}()
 
-	var response SetMaintenanceMonitorsRes
+	var response *SetMaintenanceMonitorsOK
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -12109,7 +12966,7 @@ func (s *Server) handleSetMaintenanceMonitorsRequest(args [1]string, argsEscaped
 		type (
 			Request  = *SetMaintenanceMonitorsReq
 			Params   = SetMaintenanceMonitorsParams
-			Response = SetMaintenanceMonitorsRes
+			Response = *SetMaintenanceMonitorsOK
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -12120,16 +12977,27 @@ func (s *Server) handleSetMaintenanceMonitorsRequest(args [1]string, argsEscaped
 			mreq,
 			unpackSetMaintenanceMonitorsParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.SetMaintenanceMonitors(ctx, request, params)
+				err = s.h.SetMaintenanceMonitors(ctx, request, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.SetMaintenanceMonitors(ctx, request, params)
+		err = s.h.SetMaintenanceMonitors(ctx, request, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -12229,8 +13097,9 @@ func (s *Server) handleSetMaintenanceStatusPagesRequest(args [1]string, argsEsca
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -12257,8 +13126,9 @@ func (s *Server) handleSetMaintenanceStatusPagesRequest(args [1]string, argsEsca
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -12290,7 +13160,7 @@ func (s *Server) handleSetMaintenanceStatusPagesRequest(args [1]string, argsEsca
 		}
 	}()
 
-	var response SetMaintenanceStatusPagesRes
+	var response *SetMaintenanceStatusPagesOK
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -12311,7 +13181,7 @@ func (s *Server) handleSetMaintenanceStatusPagesRequest(args [1]string, argsEsca
 		type (
 			Request  = *SetMaintenanceStatusPagesReq
 			Params   = SetMaintenanceStatusPagesParams
-			Response = SetMaintenanceStatusPagesRes
+			Response = *SetMaintenanceStatusPagesOK
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -12322,16 +13192,27 @@ func (s *Server) handleSetMaintenanceStatusPagesRequest(args [1]string, argsEsca
 			mreq,
 			unpackSetMaintenanceStatusPagesParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.SetMaintenanceStatusPages(ctx, request, params)
+				err = s.h.SetMaintenanceStatusPages(ctx, request, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.SetMaintenanceStatusPages(ctx, request, params)
+		err = s.h.SetMaintenanceStatusPages(ctx, request, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -12473,8 +13354,19 @@ func (s *Server) handleSetupRequest(args [0]string, argsEscaped bool, w http.Res
 		response, err = s.h.Setup(ctx, request)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -12574,8 +13466,9 @@ func (s *Server) handleShrinkDatabaseRequest(args [0]string, argsEscaped bool, w
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -12602,15 +13495,16 @@ func (s *Server) handleShrinkDatabaseRequest(args [0]string, argsEscaped bool, w
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
 
 	var rawBody []byte
 
-	var response ShrinkDatabaseRes
+	var response *MessageResponse
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -12626,7 +13520,7 @@ func (s *Server) handleShrinkDatabaseRequest(args [0]string, argsEscaped bool, w
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = ShrinkDatabaseRes
+			Response = *MessageResponse
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -12645,8 +13539,19 @@ func (s *Server) handleShrinkDatabaseRequest(args [0]string, argsEscaped bool, w
 		response, err = s.h.ShrinkDatabase(ctx)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -12746,8 +13651,9 @@ func (s *Server) handleTestNotificationRequest(args [1]string, argsEscaped bool,
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -12774,8 +13680,9 @@ func (s *Server) handleTestNotificationRequest(args [1]string, argsEscaped bool,
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -12792,7 +13699,7 @@ func (s *Server) handleTestNotificationRequest(args [1]string, argsEscaped bool,
 
 	var rawBody []byte
 
-	var response TestNotificationRes
+	var response *MessageResponse
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -12813,7 +13720,7 @@ func (s *Server) handleTestNotificationRequest(args [1]string, argsEscaped bool,
 		type (
 			Request  = struct{}
 			Params   = TestNotificationParams
-			Response = TestNotificationRes
+			Response = *MessageResponse
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -12832,8 +13739,19 @@ func (s *Server) handleTestNotificationRequest(args [1]string, argsEscaped bool,
 		response, err = s.h.TestNotification(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -12933,8 +13851,9 @@ func (s *Server) handleUnpinIncidentRequest(args [2]string, argsEscaped bool, w 
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -12961,8 +13880,9 @@ func (s *Server) handleUnpinIncidentRequest(args [2]string, argsEscaped bool, w 
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -12979,7 +13899,7 @@ func (s *Server) handleUnpinIncidentRequest(args [2]string, argsEscaped bool, w 
 
 	var rawBody []byte
 
-	var response UnpinIncidentRes
+	var response *MessageResponse
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -13004,7 +13924,7 @@ func (s *Server) handleUnpinIncidentRequest(args [2]string, argsEscaped bool, w 
 		type (
 			Request  = struct{}
 			Params   = UnpinIncidentParams
-			Response = UnpinIncidentRes
+			Response = *MessageResponse
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -13023,8 +13943,19 @@ func (s *Server) handleUnpinIncidentRequest(args [2]string, argsEscaped bool, w 
 		response, err = s.h.UnpinIncident(ctx, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -13124,8 +14055,9 @@ func (s *Server) handleUpdateIncidentRequest(args [2]string, argsEscaped bool, w
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -13152,8 +14084,9 @@ func (s *Server) handleUpdateIncidentRequest(args [2]string, argsEscaped bool, w
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -13185,7 +14118,7 @@ func (s *Server) handleUpdateIncidentRequest(args [2]string, argsEscaped bool, w
 		}
 	}()
 
-	var response UpdateIncidentRes
+	var response *Incident
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -13210,7 +14143,7 @@ func (s *Server) handleUpdateIncidentRequest(args [2]string, argsEscaped bool, w
 		type (
 			Request  = *IncidentInput
 			Params   = UpdateIncidentParams
-			Response = UpdateIncidentRes
+			Response = *Incident
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -13229,8 +14162,19 @@ func (s *Server) handleUpdateIncidentRequest(args [2]string, argsEscaped bool, w
 		response, err = s.h.UpdateIncident(ctx, request, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -13330,8 +14274,9 @@ func (s *Server) handleUpdateMaintenanceRequest(args [1]string, argsEscaped bool
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -13358,8 +14303,9 @@ func (s *Server) handleUpdateMaintenanceRequest(args [1]string, argsEscaped bool
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -13391,7 +14337,7 @@ func (s *Server) handleUpdateMaintenanceRequest(args [1]string, argsEscaped bool
 		}
 	}()
 
-	var response UpdateMaintenanceRes
+	var response *Maintenance
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -13412,7 +14358,7 @@ func (s *Server) handleUpdateMaintenanceRequest(args [1]string, argsEscaped bool
 		type (
 			Request  = *MaintenanceInput
 			Params   = UpdateMaintenanceParams
-			Response = UpdateMaintenanceRes
+			Response = *Maintenance
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -13431,8 +14377,19 @@ func (s *Server) handleUpdateMaintenanceRequest(args [1]string, argsEscaped bool
 		response, err = s.h.UpdateMaintenance(ctx, request, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -13532,8 +14489,9 @@ func (s *Server) handleUpdateMonitorRequest(args [1]string, argsEscaped bool, w 
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -13560,8 +14518,9 @@ func (s *Server) handleUpdateMonitorRequest(args [1]string, argsEscaped bool, w 
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -13593,7 +14552,7 @@ func (s *Server) handleUpdateMonitorRequest(args [1]string, argsEscaped bool, w 
 		}
 	}()
 
-	var response UpdateMonitorRes
+	var response *Monitor
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -13614,7 +14573,7 @@ func (s *Server) handleUpdateMonitorRequest(args [1]string, argsEscaped bool, w 
 		type (
 			Request  = *MonitorInput
 			Params   = UpdateMonitorParams
-			Response = UpdateMonitorRes
+			Response = *Monitor
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -13633,8 +14592,19 @@ func (s *Server) handleUpdateMonitorRequest(args [1]string, argsEscaped bool, w 
 		response, err = s.h.UpdateMonitor(ctx, request, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -13734,8 +14704,9 @@ func (s *Server) handleUpdateMonitorTagRequest(args [2]string, argsEscaped bool,
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -13762,8 +14733,9 @@ func (s *Server) handleUpdateMonitorTagRequest(args [2]string, argsEscaped bool,
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -13795,7 +14767,7 @@ func (s *Server) handleUpdateMonitorTagRequest(args [2]string, argsEscaped bool,
 		}
 	}()
 
-	var response UpdateMonitorTagRes
+	var response *UpdateMonitorTagOK
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -13820,7 +14792,7 @@ func (s *Server) handleUpdateMonitorTagRequest(args [2]string, argsEscaped bool,
 		type (
 			Request  = *UpdateMonitorTagReq
 			Params   = UpdateMonitorTagParams
-			Response = UpdateMonitorTagRes
+			Response = *UpdateMonitorTagOK
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -13831,16 +14803,27 @@ func (s *Server) handleUpdateMonitorTagRequest(args [2]string, argsEscaped bool,
 			mreq,
 			unpackUpdateMonitorTagParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.UpdateMonitorTag(ctx, request, params)
+				err = s.h.UpdateMonitorTag(ctx, request, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.UpdateMonitorTag(ctx, request, params)
+		err = s.h.UpdateMonitorTag(ctx, request, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -13940,8 +14923,9 @@ func (s *Server) handleUpdateNotificationRequest(args [1]string, argsEscaped boo
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -13968,8 +14952,9 @@ func (s *Server) handleUpdateNotificationRequest(args [1]string, argsEscaped boo
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -14001,7 +14986,7 @@ func (s *Server) handleUpdateNotificationRequest(args [1]string, argsEscaped boo
 		}
 	}()
 
-	var response UpdateNotificationRes
+	var response *Notification
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -14022,7 +15007,7 @@ func (s *Server) handleUpdateNotificationRequest(args [1]string, argsEscaped boo
 		type (
 			Request  = *NotificationInput
 			Params   = UpdateNotificationParams
-			Response = UpdateNotificationRes
+			Response = *Notification
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -14041,8 +15026,19 @@ func (s *Server) handleUpdateNotificationRequest(args [1]string, argsEscaped boo
 		response, err = s.h.UpdateNotification(ctx, request, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -14142,8 +15138,9 @@ func (s *Server) handleUpdateProxyRequest(args [1]string, argsEscaped bool, w ht
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -14170,8 +15167,9 @@ func (s *Server) handleUpdateProxyRequest(args [1]string, argsEscaped bool, w ht
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -14203,7 +15201,7 @@ func (s *Server) handleUpdateProxyRequest(args [1]string, argsEscaped bool, w ht
 		}
 	}()
 
-	var response UpdateProxyRes
+	var response *UpdateProxyOK
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -14224,7 +15222,7 @@ func (s *Server) handleUpdateProxyRequest(args [1]string, argsEscaped bool, w ht
 		type (
 			Request  = *ProxyInput
 			Params   = UpdateProxyParams
-			Response = UpdateProxyRes
+			Response = *UpdateProxyOK
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -14235,16 +15233,27 @@ func (s *Server) handleUpdateProxyRequest(args [1]string, argsEscaped bool, w ht
 			mreq,
 			unpackUpdateProxyParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.UpdateProxy(ctx, request, params)
+				err = s.h.UpdateProxy(ctx, request, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.UpdateProxy(ctx, request, params)
+		err = s.h.UpdateProxy(ctx, request, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -14344,8 +15353,9 @@ func (s *Server) handleUpdateSettingsRequest(args [0]string, argsEscaped bool, w
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -14372,8 +15382,9 @@ func (s *Server) handleUpdateSettingsRequest(args [0]string, argsEscaped bool, w
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -14395,7 +15406,7 @@ func (s *Server) handleUpdateSettingsRequest(args [0]string, argsEscaped bool, w
 		}
 	}()
 
-	var response UpdateSettingsRes
+	var response *MessageResponse
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -14411,7 +15422,7 @@ func (s *Server) handleUpdateSettingsRequest(args [0]string, argsEscaped bool, w
 		type (
 			Request  = *Settings
 			Params   = struct{}
-			Response = UpdateSettingsRes
+			Response = *MessageResponse
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -14430,8 +15441,19 @@ func (s *Server) handleUpdateSettingsRequest(args [0]string, argsEscaped bool, w
 		response, err = s.h.UpdateSettings(ctx, request)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -14531,8 +15553,9 @@ func (s *Server) handleUpdateStatusPageRequest(args [1]string, argsEscaped bool,
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -14559,8 +15582,9 @@ func (s *Server) handleUpdateStatusPageRequest(args [1]string, argsEscaped bool,
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -14592,7 +15616,7 @@ func (s *Server) handleUpdateStatusPageRequest(args [1]string, argsEscaped bool,
 		}
 	}()
 
-	var response UpdateStatusPageRes
+	var response *StatusPage
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -14613,7 +15637,7 @@ func (s *Server) handleUpdateStatusPageRequest(args [1]string, argsEscaped bool,
 		type (
 			Request  = *StatusPageInput
 			Params   = UpdateStatusPageParams
-			Response = UpdateStatusPageRes
+			Response = *StatusPage
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -14632,8 +15656,19 @@ func (s *Server) handleUpdateStatusPageRequest(args [1]string, argsEscaped bool,
 		response, err = s.h.UpdateStatusPage(ctx, request, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 
@@ -14733,8 +15768,9 @@ func (s *Server) handleUpdateTagRequest(args [1]string, argsEscaped bool, w http
 					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:BearerAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
+				if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+					defer recordError("Security:BearerAuth", err)
+				}
 				return
 			}
 			if ok {
@@ -14761,8 +15797,9 @@ func (s *Server) handleUpdateTagRequest(args [1]string, argsEscaped bool, w http
 				OperationContext: opErrContext,
 				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
 			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
+			if encodeErr := encodeErrorResponse(s.h.NewError(ctx, err), w, span); encodeErr != nil {
+				defer recordError("Security", err)
+			}
 			return
 		}
 	}
@@ -14794,7 +15831,7 @@ func (s *Server) handleUpdateTagRequest(args [1]string, argsEscaped bool, w http
 		}
 	}()
 
-	var response UpdateTagRes
+	var response *Tag
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -14815,7 +15852,7 @@ func (s *Server) handleUpdateTagRequest(args [1]string, argsEscaped bool, w http
 		type (
 			Request  = *TagInput
 			Params   = UpdateTagParams
-			Response = UpdateTagRes
+			Response = *Tag
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -14834,8 +15871,19 @@ func (s *Server) handleUpdateTagRequest(args [1]string, argsEscaped bool, w http
 		response, err = s.h.UpdateTag(ctx, request, params)
 	}
 	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
+		if errRes, ok := errors.Into[*DefaultErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
 		return
 	}
 

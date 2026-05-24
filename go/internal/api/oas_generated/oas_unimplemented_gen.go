@@ -5,6 +5,7 @@ package oas
 import (
 	"context"
 
+	"github.com/google/uuid"
 	ht "github.com/ogen-go/ogen/http"
 )
 
@@ -18,8 +19,8 @@ var _ Handler = UnimplementedHandler{}
 // Add a tag to a monitor.
 //
 // POST /monitors/{monitorId}/tags
-func (UnimplementedHandler) AddMonitorTag(ctx context.Context, req *AddMonitorTagReq, params AddMonitorTagParams) (r AddMonitorTagRes, _ error) {
-	return r, ht.ErrNotImplemented
+func (UnimplementedHandler) AddMonitorTag(ctx context.Context, req *AddMonitorTagReq, params AddMonitorTagParams) error {
+	return ht.ErrNotImplemented
 }
 
 // ChangePassword implements changePassword operation.
@@ -27,7 +28,7 @@ func (UnimplementedHandler) AddMonitorTag(ctx context.Context, req *AddMonitorTa
 // Change current user password.
 //
 // PUT /auth/password
-func (UnimplementedHandler) ChangePassword(ctx context.Context, req *ChangePasswordReq) (r ChangePasswordRes, _ error) {
+func (UnimplementedHandler) ChangePassword(ctx context.Context, req *ChangePasswordReq) (r *TokenResponse, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -36,7 +37,7 @@ func (UnimplementedHandler) ChangePassword(ctx context.Context, req *ChangePassw
 // Check domain/TLD information.
 //
 // GET /monitors/{monitorId}/domain
-func (UnimplementedHandler) CheckDomain(ctx context.Context, params CheckDomainParams) (r CheckDomainRes, _ error) {
+func (UnimplementedHandler) CheckDomain(ctx context.Context, params CheckDomainParams) (r *CheckDomainOK, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -45,8 +46,8 @@ func (UnimplementedHandler) CheckDomain(ctx context.Context, params CheckDomainP
 // Clear important heartbeats (events) for a monitor.
 //
 // DELETE /monitors/{monitorId}/events
-func (UnimplementedHandler) ClearEvents(ctx context.Context, params ClearEventsParams) (r ClearEventsRes, _ error) {
-	return r, ht.ErrNotImplemented
+func (UnimplementedHandler) ClearEvents(ctx context.Context, params ClearEventsParams) error {
+	return ht.ErrNotImplemented
 }
 
 // ClearHeartbeats implements clearHeartbeats operation.
@@ -54,8 +55,8 @@ func (UnimplementedHandler) ClearEvents(ctx context.Context, params ClearEventsP
 // Clear all heartbeats for a monitor.
 //
 // DELETE /monitors/{monitorId}/heartbeats
-func (UnimplementedHandler) ClearHeartbeats(ctx context.Context, params ClearHeartbeatsParams) (r ClearHeartbeatsRes, _ error) {
-	return r, ht.ErrNotImplemented
+func (UnimplementedHandler) ClearHeartbeats(ctx context.Context, params ClearHeartbeatsParams) error {
+	return ht.ErrNotImplemented
 }
 
 // ClearStatistics implements clearStatistics operation.
@@ -63,8 +64,8 @@ func (UnimplementedHandler) ClearHeartbeats(ctx context.Context, params ClearHea
 // Clear all statistics data.
 //
 // DELETE /statistics
-func (UnimplementedHandler) ClearStatistics(ctx context.Context) (r ClearStatisticsRes, _ error) {
-	return r, ht.ErrNotImplemented
+func (UnimplementedHandler) ClearStatistics(ctx context.Context) error {
+	return ht.ErrNotImplemented
 }
 
 // CreateAPIKey implements createAPIKey operation.
@@ -72,7 +73,7 @@ func (UnimplementedHandler) ClearStatistics(ctx context.Context) (r ClearStatist
 // Create a new API key.
 //
 // POST /api-keys
-func (UnimplementedHandler) CreateAPIKey(ctx context.Context, req *APIKeyInput) (r CreateAPIKeyRes, _ error) {
+func (UnimplementedHandler) CreateAPIKey(ctx context.Context, req *APIKeyInput) (r *CreateAPIKeyCreated, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -81,7 +82,7 @@ func (UnimplementedHandler) CreateAPIKey(ctx context.Context, req *APIKeyInput) 
 // Create an incident on a status page.
 //
 // POST /status-pages/{slug}/incidents
-func (UnimplementedHandler) CreateIncident(ctx context.Context, req *IncidentInput, params CreateIncidentParams) (r CreateIncidentRes, _ error) {
+func (UnimplementedHandler) CreateIncident(ctx context.Context, req *IncidentInput, params CreateIncidentParams) (r *Incident, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -90,7 +91,7 @@ func (UnimplementedHandler) CreateIncident(ctx context.Context, req *IncidentInp
 // Create a maintenance window.
 //
 // POST /maintenance
-func (UnimplementedHandler) CreateMaintenance(ctx context.Context, req *MaintenanceInput) (r CreateMaintenanceRes, _ error) {
+func (UnimplementedHandler) CreateMaintenance(ctx context.Context, req *MaintenanceInput) (r *CreateMaintenanceCreated, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -99,7 +100,7 @@ func (UnimplementedHandler) CreateMaintenance(ctx context.Context, req *Maintena
 // Create a new monitor.
 //
 // POST /monitors
-func (UnimplementedHandler) CreateMonitor(ctx context.Context, req *MonitorInput) (r CreateMonitorRes, _ error) {
+func (UnimplementedHandler) CreateMonitor(ctx context.Context, req *MonitorInput) (r *CreateMonitorCreated, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -108,7 +109,7 @@ func (UnimplementedHandler) CreateMonitor(ctx context.Context, req *MonitorInput
 // Create a notification provider.
 //
 // POST /notifications
-func (UnimplementedHandler) CreateNotification(ctx context.Context, req *NotificationInput) (r CreateNotificationRes, _ error) {
+func (UnimplementedHandler) CreateNotification(ctx context.Context, req *NotificationInput) (r *CreateNotificationCreated, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -117,7 +118,7 @@ func (UnimplementedHandler) CreateNotification(ctx context.Context, req *Notific
 // Add a proxy.
 //
 // POST /proxies
-func (UnimplementedHandler) CreateProxy(ctx context.Context, req *ProxyInput) (r CreateProxyRes, _ error) {
+func (UnimplementedHandler) CreateProxy(ctx context.Context, req *ProxyInput) (r *CreateProxyCreated, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -126,7 +127,7 @@ func (UnimplementedHandler) CreateProxy(ctx context.Context, req *ProxyInput) (r
 // Create a status page.
 //
 // POST /status-pages
-func (UnimplementedHandler) CreateStatusPage(ctx context.Context, req *StatusPageInput) (r CreateStatusPageRes, _ error) {
+func (UnimplementedHandler) CreateStatusPage(ctx context.Context, req *StatusPageInput) (r *CreateStatusPageCreated, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -135,7 +136,7 @@ func (UnimplementedHandler) CreateStatusPage(ctx context.Context, req *StatusPag
 // Create a tag.
 //
 // POST /tags
-func (UnimplementedHandler) CreateTag(ctx context.Context, req *TagInput) (r CreateTagRes, _ error) {
+func (UnimplementedHandler) CreateTag(ctx context.Context, req *TagInput) (r *Tag, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -144,8 +145,8 @@ func (UnimplementedHandler) CreateTag(ctx context.Context, req *TagInput) (r Cre
 // Delete an API key.
 //
 // DELETE /api-keys/{keyId}
-func (UnimplementedHandler) DeleteAPIKey(ctx context.Context, params DeleteAPIKeyParams) (r DeleteAPIKeyRes, _ error) {
-	return r, ht.ErrNotImplemented
+func (UnimplementedHandler) DeleteAPIKey(ctx context.Context, params DeleteAPIKeyParams) error {
+	return ht.ErrNotImplemented
 }
 
 // DeleteIncident implements deleteIncident operation.
@@ -153,8 +154,8 @@ func (UnimplementedHandler) DeleteAPIKey(ctx context.Context, params DeleteAPIKe
 // Delete an incident.
 //
 // DELETE /status-pages/{slug}/incidents/{incidentId}
-func (UnimplementedHandler) DeleteIncident(ctx context.Context, params DeleteIncidentParams) (r DeleteIncidentRes, _ error) {
-	return r, ht.ErrNotImplemented
+func (UnimplementedHandler) DeleteIncident(ctx context.Context, params DeleteIncidentParams) error {
+	return ht.ErrNotImplemented
 }
 
 // DeleteMaintenance implements deleteMaintenance operation.
@@ -162,8 +163,8 @@ func (UnimplementedHandler) DeleteIncident(ctx context.Context, params DeleteInc
 // Delete a maintenance window.
 //
 // DELETE /maintenance/{maintenanceId}
-func (UnimplementedHandler) DeleteMaintenance(ctx context.Context, params DeleteMaintenanceParams) (r DeleteMaintenanceRes, _ error) {
-	return r, ht.ErrNotImplemented
+func (UnimplementedHandler) DeleteMaintenance(ctx context.Context, params DeleteMaintenanceParams) error {
+	return ht.ErrNotImplemented
 }
 
 // DeleteMonitor implements deleteMonitor operation.
@@ -171,8 +172,8 @@ func (UnimplementedHandler) DeleteMaintenance(ctx context.Context, params Delete
 // Delete a monitor.
 //
 // DELETE /monitors/{monitorId}
-func (UnimplementedHandler) DeleteMonitor(ctx context.Context, params DeleteMonitorParams) (r DeleteMonitorRes, _ error) {
-	return r, ht.ErrNotImplemented
+func (UnimplementedHandler) DeleteMonitor(ctx context.Context, params DeleteMonitorParams) error {
+	return ht.ErrNotImplemented
 }
 
 // DeleteMonitorTag implements deleteMonitorTag operation.
@@ -180,8 +181,8 @@ func (UnimplementedHandler) DeleteMonitor(ctx context.Context, params DeleteMoni
 // Remove a tag from a monitor.
 //
 // DELETE /monitors/{monitorId}/tags/{tagId}
-func (UnimplementedHandler) DeleteMonitorTag(ctx context.Context, params DeleteMonitorTagParams) (r DeleteMonitorTagRes, _ error) {
-	return r, ht.ErrNotImplemented
+func (UnimplementedHandler) DeleteMonitorTag(ctx context.Context, params DeleteMonitorTagParams) error {
+	return ht.ErrNotImplemented
 }
 
 // DeleteNotification implements deleteNotification operation.
@@ -189,8 +190,8 @@ func (UnimplementedHandler) DeleteMonitorTag(ctx context.Context, params DeleteM
 // Delete a notification provider.
 //
 // DELETE /notifications/{notificationId}
-func (UnimplementedHandler) DeleteNotification(ctx context.Context, params DeleteNotificationParams) (r DeleteNotificationRes, _ error) {
-	return r, ht.ErrNotImplemented
+func (UnimplementedHandler) DeleteNotification(ctx context.Context, params DeleteNotificationParams) error {
+	return ht.ErrNotImplemented
 }
 
 // DeleteProxy implements deleteProxy operation.
@@ -198,8 +199,8 @@ func (UnimplementedHandler) DeleteNotification(ctx context.Context, params Delet
 // Delete a proxy.
 //
 // DELETE /proxies/{proxyId}
-func (UnimplementedHandler) DeleteProxy(ctx context.Context, params DeleteProxyParams) (r DeleteProxyRes, _ error) {
-	return r, ht.ErrNotImplemented
+func (UnimplementedHandler) DeleteProxy(ctx context.Context, params DeleteProxyParams) error {
+	return ht.ErrNotImplemented
 }
 
 // DeleteStatusPage implements deleteStatusPage operation.
@@ -207,8 +208,8 @@ func (UnimplementedHandler) DeleteProxy(ctx context.Context, params DeleteProxyP
 // Delete a status page.
 //
 // DELETE /status-pages/{slug}
-func (UnimplementedHandler) DeleteStatusPage(ctx context.Context, params DeleteStatusPageParams) (r DeleteStatusPageRes, _ error) {
-	return r, ht.ErrNotImplemented
+func (UnimplementedHandler) DeleteStatusPage(ctx context.Context, params DeleteStatusPageParams) error {
+	return ht.ErrNotImplemented
 }
 
 // DeleteTag implements deleteTag operation.
@@ -216,8 +217,8 @@ func (UnimplementedHandler) DeleteStatusPage(ctx context.Context, params DeleteS
 // Delete a tag.
 //
 // DELETE /tags/{tagId}
-func (UnimplementedHandler) DeleteTag(ctx context.Context, params DeleteTagParams) (r DeleteTagRes, _ error) {
-	return r, ht.ErrNotImplemented
+func (UnimplementedHandler) DeleteTag(ctx context.Context, params DeleteTagParams) error {
+	return ht.ErrNotImplemented
 }
 
 // Disable2FA implements disable2FA operation.
@@ -225,7 +226,7 @@ func (UnimplementedHandler) DeleteTag(ctx context.Context, params DeleteTagParam
 // Disable 2FA.
 //
 // POST /auth/2fa/disable
-func (UnimplementedHandler) Disable2FA(ctx context.Context, req *Disable2FAReq) (r Disable2FARes, _ error) {
+func (UnimplementedHandler) Disable2FA(ctx context.Context, req *Disable2FAReq) (r *MessageResponse, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -234,7 +235,7 @@ func (UnimplementedHandler) Disable2FA(ctx context.Context, req *Disable2FAReq) 
 // Disable an API key.
 //
 // POST /api-keys/{keyId}/disable
-func (UnimplementedHandler) DisableAPIKey(ctx context.Context, params DisableAPIKeyParams) (r DisableAPIKeyRes, _ error) {
+func (UnimplementedHandler) DisableAPIKey(ctx context.Context, params DisableAPIKeyParams) (r *MessageResponse, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -243,7 +244,7 @@ func (UnimplementedHandler) DisableAPIKey(ctx context.Context, params DisableAPI
 // Enable 2FA after verifying token.
 //
 // POST /auth/2fa/enable
-func (UnimplementedHandler) Enable2FA(ctx context.Context, req *Enable2FAReq) (r Enable2FARes, _ error) {
+func (UnimplementedHandler) Enable2FA(ctx context.Context, req *Enable2FAReq) (r *MessageResponse, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -252,7 +253,7 @@ func (UnimplementedHandler) Enable2FA(ctx context.Context, req *Enable2FAReq) (r
 // Enable an API key.
 //
 // POST /api-keys/{keyId}/enable
-func (UnimplementedHandler) EnableAPIKey(ctx context.Context, params EnableAPIKeyParams) (r EnableAPIKeyRes, _ error) {
+func (UnimplementedHandler) EnableAPIKey(ctx context.Context, params EnableAPIKeyParams) (r *MessageResponse, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -261,7 +262,7 @@ func (UnimplementedHandler) EnableAPIKey(ctx context.Context, params EnableAPIKe
 // Get 2FA status for current user.
 //
 // GET /auth/2fa
-func (UnimplementedHandler) Get2FAStatus(ctx context.Context) (r Get2FAStatusRes, _ error) {
+func (UnimplementedHandler) Get2FAStatus(ctx context.Context) (r *Get2FAStatusOK, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -270,7 +271,7 @@ func (UnimplementedHandler) Get2FAStatus(ctx context.Context) (r Get2FAStatusRes
 // Get certificate expiry badge SVG.
 //
 // GET /badges/{monitorId}/cert-exp
-func (UnimplementedHandler) GetCertExpiryBadge(ctx context.Context, params GetCertExpiryBadgeParams) (r GetCertExpiryBadgeRes, _ error) {
+func (UnimplementedHandler) GetCertExpiryBadge(ctx context.Context, params GetCertExpiryBadgeParams) (r SVGBadge, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -279,7 +280,7 @@ func (UnimplementedHandler) GetCertExpiryBadge(ctx context.Context, params GetCe
 // Get aggregated chart data for a monitor.
 //
 // GET /monitors/{monitorId}/heartbeats/chart
-func (UnimplementedHandler) GetChartData(ctx context.Context, params GetChartDataParams) (r GetChartDataRes, _ error) {
+func (UnimplementedHandler) GetChartData(ctx context.Context, params GetChartDataParams) (r []ChartPoint, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -288,7 +289,7 @@ func (UnimplementedHandler) GetChartData(ctx context.Context, params GetChartDat
 // Get database size.
 //
 // GET /database/size
-func (UnimplementedHandler) GetDatabaseSize(ctx context.Context) (r GetDatabaseSizeRes, _ error) {
+func (UnimplementedHandler) GetDatabaseSize(ctx context.Context) (r *GetDatabaseSizeOK, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -298,7 +299,7 @@ func (UnimplementedHandler) GetDatabaseSize(ctx context.Context) (r GetDatabaseS
 // or `count` to get the N most recent heartbeats. If both are provided, `count` takes precedence.
 //
 // GET /monitors/{monitorId}/heartbeats
-func (UnimplementedHandler) GetHeartbeats(ctx context.Context, params GetHeartbeatsParams) (r GetHeartbeatsRes, _ error) {
+func (UnimplementedHandler) GetHeartbeats(ctx context.Context, params GetHeartbeatsParams) (r []Heartbeat, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -307,7 +308,7 @@ func (UnimplementedHandler) GetHeartbeats(ctx context.Context, params GetHeartbe
 // Get important heartbeats (status changes).
 //
 // GET /monitors/{monitorId}/events
-func (UnimplementedHandler) GetImportantHeartbeats(ctx context.Context, params GetImportantHeartbeatsParams) (r GetImportantHeartbeatsRes, _ error) {
+func (UnimplementedHandler) GetImportantHeartbeats(ctx context.Context, params GetImportantHeartbeatsParams) (r *GetImportantHeartbeatsOK, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -316,7 +317,7 @@ func (UnimplementedHandler) GetImportantHeartbeats(ctx context.Context, params G
 // Get server info (version, timezone).
 //
 // GET /info
-func (UnimplementedHandler) GetInfo(ctx context.Context) (r GetInfoRes, _ error) {
+func (UnimplementedHandler) GetInfo(ctx context.Context) (r *GetInfoOK, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -325,7 +326,7 @@ func (UnimplementedHandler) GetInfo(ctx context.Context) (r GetInfoRes, _ error)
 // Get average latency badge SVG.
 //
 // GET /badges/{monitorId}/latency
-func (UnimplementedHandler) GetLatencyBadge(ctx context.Context, params GetLatencyBadgeParams) (r GetLatencyBadgeRes, _ error) {
+func (UnimplementedHandler) GetLatencyBadge(ctx context.Context, params GetLatencyBadgeParams) (r SVGBadge, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -334,7 +335,7 @@ func (UnimplementedHandler) GetLatencyBadge(ctx context.Context, params GetLaten
 // Get a maintenance window.
 //
 // GET /maintenance/{maintenanceId}
-func (UnimplementedHandler) GetMaintenance(ctx context.Context, params GetMaintenanceParams) (r GetMaintenanceRes, _ error) {
+func (UnimplementedHandler) GetMaintenance(ctx context.Context, params GetMaintenanceParams) (r *Maintenance, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -343,7 +344,7 @@ func (UnimplementedHandler) GetMaintenance(ctx context.Context, params GetMainte
 // Get monitors for a maintenance window.
 //
 // GET /maintenance/{maintenanceId}/monitors
-func (UnimplementedHandler) GetMaintenanceMonitors(ctx context.Context, params GetMaintenanceMonitorsParams) (r GetMaintenanceMonitorsRes, _ error) {
+func (UnimplementedHandler) GetMaintenanceMonitors(ctx context.Context, params GetMaintenanceMonitorsParams) (r []uuid.UUID, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -352,7 +353,7 @@ func (UnimplementedHandler) GetMaintenanceMonitors(ctx context.Context, params G
 // Get status pages for a maintenance window.
 //
 // GET /maintenance/{maintenanceId}/status-pages
-func (UnimplementedHandler) GetMaintenanceStatusPages(ctx context.Context, params GetMaintenanceStatusPagesParams) (r GetMaintenanceStatusPagesRes, _ error) {
+func (UnimplementedHandler) GetMaintenanceStatusPages(ctx context.Context, params GetMaintenanceStatusPagesParams) (r []uuid.UUID, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -361,7 +362,7 @@ func (UnimplementedHandler) GetMaintenanceStatusPages(ctx context.Context, param
 // Get a monitor by ID.
 //
 // GET /monitors/{monitorId}
-func (UnimplementedHandler) GetMonitor(ctx context.Context, params GetMonitorParams) (r GetMonitorRes, _ error) {
+func (UnimplementedHandler) GetMonitor(ctx context.Context, params GetMonitorParams) (r *Monitor, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -370,7 +371,7 @@ func (UnimplementedHandler) GetMonitor(ctx context.Context, params GetMonitorPar
 // Get 24-hour uptime percentages for all active monitors.
 //
 // GET /monitors/uptimes
-func (UnimplementedHandler) GetMonitorUptimes(ctx context.Context) (r GetMonitorUptimesRes, _ error) {
+func (UnimplementedHandler) GetMonitorUptimes(ctx context.Context) (r []GetMonitorUptimesOKItem, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -379,7 +380,7 @@ func (UnimplementedHandler) GetMonitorUptimes(ctx context.Context) (r GetMonitor
 // Get last response time badge SVG.
 //
 // GET /badges/{monitorId}/response
-func (UnimplementedHandler) GetResponseBadge(ctx context.Context, params GetResponseBadgeParams) (r GetResponseBadgeRes, _ error) {
+func (UnimplementedHandler) GetResponseBadge(ctx context.Context, params GetResponseBadgeParams) (r SVGBadge, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -388,7 +389,7 @@ func (UnimplementedHandler) GetResponseBadge(ctx context.Context, params GetResp
 // Get all application settings.
 //
 // GET /settings
-func (UnimplementedHandler) GetSettings(ctx context.Context) (r GetSettingsRes, _ error) {
+func (UnimplementedHandler) GetSettings(ctx context.Context) (r *Settings, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -397,7 +398,7 @@ func (UnimplementedHandler) GetSettings(ctx context.Context) (r GetSettingsRes, 
 // Get status badge SVG for a monitor.
 //
 // GET /badges/{monitorId}/status
-func (UnimplementedHandler) GetStatusBadge(ctx context.Context, params GetStatusBadgeParams) (r GetStatusBadgeRes, _ error) {
+func (UnimplementedHandler) GetStatusBadge(ctx context.Context, params GetStatusBadgeParams) (r SVGBadge, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -406,7 +407,7 @@ func (UnimplementedHandler) GetStatusBadge(ctx context.Context, params GetStatus
 // Get public status page data.
 //
 // GET /status-pages/{slug}
-func (UnimplementedHandler) GetStatusPage(ctx context.Context, params GetStatusPageParams) (r GetStatusPageRes, _ error) {
+func (UnimplementedHandler) GetStatusPage(ctx context.Context, params GetStatusPageParams) (r *StatusPage, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -415,7 +416,7 @@ func (UnimplementedHandler) GetStatusPage(ctx context.Context, params GetStatusP
 // Get overall status badge for a status page.
 //
 // GET /status-pages/{slug}/badge
-func (UnimplementedHandler) GetStatusPageBadge(ctx context.Context, params GetStatusPageBadgeParams) (r GetStatusPageBadgeRes, _ error) {
+func (UnimplementedHandler) GetStatusPageBadge(ctx context.Context, params GetStatusPageBadgeParams) (r GetStatusPageBadgeOK, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -424,7 +425,7 @@ func (UnimplementedHandler) GetStatusPageBadge(ctx context.Context, params GetSt
 // Subscribe to real-time status page events via SSE.
 //
 // GET /status-pages/{slug}/events
-func (UnimplementedHandler) GetStatusPageEventStream(ctx context.Context, params GetStatusPageEventStreamParams) (r GetStatusPageEventStreamRes, _ error) {
+func (UnimplementedHandler) GetStatusPageEventStream(ctx context.Context, params GetStatusPageEventStreamParams) (r GetStatusPageEventStreamOK, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -433,7 +434,7 @@ func (UnimplementedHandler) GetStatusPageEventStream(ctx context.Context, params
 // Get current heartbeats for a public status page.
 //
 // GET /status-pages/{slug}/heartbeats
-func (UnimplementedHandler) GetStatusPageHeartbeats(ctx context.Context, params GetStatusPageHeartbeatsParams) (r GetStatusPageHeartbeatsRes, _ error) {
+func (UnimplementedHandler) GetStatusPageHeartbeats(ctx context.Context, params GetStatusPageHeartbeatsParams) (r *GetStatusPageHeartbeatsOK, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -442,7 +443,7 @@ func (UnimplementedHandler) GetStatusPageHeartbeats(ctx context.Context, params 
 // Get uptime percentage badge SVG.
 //
 // GET /badges/{monitorId}/uptime
-func (UnimplementedHandler) GetUptimeBadge(ctx context.Context, params GetUptimeBadgeParams) (r GetUptimeBadgeRes, _ error) {
+func (UnimplementedHandler) GetUptimeBadge(ctx context.Context, params GetUptimeBadgeParams) (r SVGBadge, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -451,7 +452,7 @@ func (UnimplementedHandler) GetUptimeBadge(ctx context.Context, params GetUptime
 // Health check endpoint.
 //
 // GET /health
-func (UnimplementedHandler) HealthCheck(ctx context.Context) (r HealthCheckRes, _ error) {
+func (UnimplementedHandler) HealthCheck(ctx context.Context) (r *HealthCheckOK, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -460,7 +461,7 @@ func (UnimplementedHandler) HealthCheck(ctx context.Context) (r HealthCheckRes, 
 // List all API keys.
 //
 // GET /api-keys
-func (UnimplementedHandler) ListAPIKeys(ctx context.Context) (r ListAPIKeysRes, _ error) {
+func (UnimplementedHandler) ListAPIKeys(ctx context.Context) (r []APIKey, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -469,7 +470,7 @@ func (UnimplementedHandler) ListAPIKeys(ctx context.Context) (r ListAPIKeysRes, 
 // Get incident history for a status page.
 //
 // GET /status-pages/{slug}/incidents
-func (UnimplementedHandler) ListIncidents(ctx context.Context, params ListIncidentsParams) (r ListIncidentsRes, _ error) {
+func (UnimplementedHandler) ListIncidents(ctx context.Context, params ListIncidentsParams) (r *ListIncidentsOK, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -478,7 +479,7 @@ func (UnimplementedHandler) ListIncidents(ctx context.Context, params ListIncide
 // List all maintenance windows.
 //
 // GET /maintenance
-func (UnimplementedHandler) ListMaintenance(ctx context.Context) (r ListMaintenanceRes, _ error) {
+func (UnimplementedHandler) ListMaintenance(ctx context.Context) (r []Maintenance, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -487,7 +488,7 @@ func (UnimplementedHandler) ListMaintenance(ctx context.Context) (r ListMaintena
 // List all monitors for the current user.
 //
 // GET /monitors
-func (UnimplementedHandler) ListMonitors(ctx context.Context) (r ListMonitorsRes, _ error) {
+func (UnimplementedHandler) ListMonitors(ctx context.Context) (r []Monitor, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -496,7 +497,7 @@ func (UnimplementedHandler) ListMonitors(ctx context.Context) (r ListMonitorsRes
 // List all notification providers.
 //
 // GET /notifications
-func (UnimplementedHandler) ListNotifications(ctx context.Context) (r ListNotificationsRes, _ error) {
+func (UnimplementedHandler) ListNotifications(ctx context.Context) (r []Notification, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -505,7 +506,7 @@ func (UnimplementedHandler) ListNotifications(ctx context.Context) (r ListNotifi
 // List proxies.
 //
 // GET /proxies
-func (UnimplementedHandler) ListProxies(ctx context.Context) (r ListProxiesRes, _ error) {
+func (UnimplementedHandler) ListProxies(ctx context.Context) (r []Proxy, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -514,7 +515,7 @@ func (UnimplementedHandler) ListProxies(ctx context.Context) (r ListProxiesRes, 
 // Get recent important heartbeats across all monitors.
 //
 // GET /events
-func (UnimplementedHandler) ListRecentEvents(ctx context.Context, params ListRecentEventsParams) (r ListRecentEventsRes, _ error) {
+func (UnimplementedHandler) ListRecentEvents(ctx context.Context, params ListRecentEventsParams) (r *ListRecentEventsOK, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -523,7 +524,7 @@ func (UnimplementedHandler) ListRecentEvents(ctx context.Context, params ListRec
 // List all status pages.
 //
 // GET /status-pages
-func (UnimplementedHandler) ListStatusPages(ctx context.Context) (r ListStatusPagesRes, _ error) {
+func (UnimplementedHandler) ListStatusPages(ctx context.Context) (r []StatusPage, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -532,7 +533,7 @@ func (UnimplementedHandler) ListStatusPages(ctx context.Context) (r ListStatusPa
 // List all tags.
 //
 // GET /tags
-func (UnimplementedHandler) ListTags(ctx context.Context) (r ListTagsRes, _ error) {
+func (UnimplementedHandler) ListTags(ctx context.Context) (r []Tag, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -541,7 +542,7 @@ func (UnimplementedHandler) ListTags(ctx context.Context) (r ListTagsRes, _ erro
 // Authenticate with username and password.
 //
 // POST /auth/login
-func (UnimplementedHandler) Login(ctx context.Context, req *LoginRequest) (r LoginRes, _ error) {
+func (UnimplementedHandler) Login(ctx context.Context, req *LoginRequest) (r *LoginResponse, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -550,8 +551,8 @@ func (UnimplementedHandler) Login(ctx context.Context, req *LoginRequest) (r Log
 // Invalidate current session.
 //
 // POST /auth/logout
-func (UnimplementedHandler) Logout(ctx context.Context) (r LogoutRes, _ error) {
-	return r, ht.ErrNotImplemented
+func (UnimplementedHandler) Logout(ctx context.Context) error {
+	return ht.ErrNotImplemented
 }
 
 // NeedSetup implements needSetup operation.
@@ -559,7 +560,7 @@ func (UnimplementedHandler) Logout(ctx context.Context) (r LogoutRes, _ error) {
 // Check if initial setup is required.
 //
 // GET /auth/setup
-func (UnimplementedHandler) NeedSetup(ctx context.Context) (r NeedSetupRes, _ error) {
+func (UnimplementedHandler) NeedSetup(ctx context.Context) (r *NeedSetupOK, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -568,7 +569,7 @@ func (UnimplementedHandler) NeedSetup(ctx context.Context) (r NeedSetupRes, _ er
 // Pause a maintenance window.
 //
 // POST /maintenance/{maintenanceId}/pause
-func (UnimplementedHandler) PauseMaintenance(ctx context.Context, params PauseMaintenanceParams) (r PauseMaintenanceRes, _ error) {
+func (UnimplementedHandler) PauseMaintenance(ctx context.Context, params PauseMaintenanceParams) (r *MessageResponse, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -577,7 +578,7 @@ func (UnimplementedHandler) PauseMaintenance(ctx context.Context, params PauseMa
 // Pause a monitor.
 //
 // POST /monitors/{monitorId}/pause
-func (UnimplementedHandler) PauseMonitor(ctx context.Context, params PauseMonitorParams) (r PauseMonitorRes, _ error) {
+func (UnimplementedHandler) PauseMonitor(ctx context.Context, params PauseMonitorParams) (r *MessageResponse, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -586,7 +587,7 @@ func (UnimplementedHandler) PauseMonitor(ctx context.Context, params PauseMonito
 // Generate 2FA secret and QR URI.
 //
 // POST /auth/2fa/prepare
-func (UnimplementedHandler) Prepare2FA(ctx context.Context, req *Prepare2FAReq) (r Prepare2FARes, _ error) {
+func (UnimplementedHandler) Prepare2FA(ctx context.Context, req *Prepare2FAReq) (r *Prepare2FAOK, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -595,7 +596,7 @@ func (UnimplementedHandler) Prepare2FA(ctx context.Context, req *Prepare2FAReq) 
 // Refresh JWT token.
 //
 // POST /auth/token/refresh
-func (UnimplementedHandler) RefreshToken(ctx context.Context, req *RefreshTokenRequest) (r RefreshTokenRes, _ error) {
+func (UnimplementedHandler) RefreshToken(ctx context.Context, req *RefreshTokenRequest) (r *TokenResponse, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -604,7 +605,7 @@ func (UnimplementedHandler) RefreshToken(ctx context.Context, req *RefreshTokenR
 // Mark an incident as resolved.
 //
 // POST /status-pages/{slug}/incidents/{incidentId}/resolve
-func (UnimplementedHandler) ResolveIncident(ctx context.Context, params ResolveIncidentParams) (r ResolveIncidentRes, _ error) {
+func (UnimplementedHandler) ResolveIncident(ctx context.Context, params ResolveIncidentParams) (r *Incident, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -613,7 +614,7 @@ func (UnimplementedHandler) ResolveIncident(ctx context.Context, params ResolveI
 // Resume a maintenance window.
 //
 // POST /maintenance/{maintenanceId}/resume
-func (UnimplementedHandler) ResumeMaintenance(ctx context.Context, params ResumeMaintenanceParams) (r ResumeMaintenanceRes, _ error) {
+func (UnimplementedHandler) ResumeMaintenance(ctx context.Context, params ResumeMaintenanceParams) (r *MessageResponse, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -622,7 +623,7 @@ func (UnimplementedHandler) ResumeMaintenance(ctx context.Context, params Resume
 // Resume a paused monitor.
 //
 // POST /monitors/{monitorId}/resume
-func (UnimplementedHandler) ResumeMonitor(ctx context.Context, params ResumeMonitorParams) (r ResumeMonitorRes, _ error) {
+func (UnimplementedHandler) ResumeMonitor(ctx context.Context, params ResumeMonitorParams) (r *MessageResponse, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -631,8 +632,8 @@ func (UnimplementedHandler) ResumeMonitor(ctx context.Context, params ResumeMoni
 // Set monitors for a maintenance window.
 //
 // PUT /maintenance/{maintenanceId}/monitors
-func (UnimplementedHandler) SetMaintenanceMonitors(ctx context.Context, req *SetMaintenanceMonitorsReq, params SetMaintenanceMonitorsParams) (r SetMaintenanceMonitorsRes, _ error) {
-	return r, ht.ErrNotImplemented
+func (UnimplementedHandler) SetMaintenanceMonitors(ctx context.Context, req *SetMaintenanceMonitorsReq, params SetMaintenanceMonitorsParams) error {
+	return ht.ErrNotImplemented
 }
 
 // SetMaintenanceStatusPages implements setMaintenanceStatusPages operation.
@@ -640,8 +641,8 @@ func (UnimplementedHandler) SetMaintenanceMonitors(ctx context.Context, req *Set
 // Set status pages for a maintenance window.
 //
 // PUT /maintenance/{maintenanceId}/status-pages
-func (UnimplementedHandler) SetMaintenanceStatusPages(ctx context.Context, req *SetMaintenanceStatusPagesReq, params SetMaintenanceStatusPagesParams) (r SetMaintenanceStatusPagesRes, _ error) {
-	return r, ht.ErrNotImplemented
+func (UnimplementedHandler) SetMaintenanceStatusPages(ctx context.Context, req *SetMaintenanceStatusPagesReq, params SetMaintenanceStatusPagesParams) error {
+	return ht.ErrNotImplemented
 }
 
 // Setup implements setup operation.
@@ -658,7 +659,7 @@ func (UnimplementedHandler) Setup(ctx context.Context, req *SetupReq) (r SetupRe
 // Shrink database (vacuum).
 //
 // POST /database/shrink
-func (UnimplementedHandler) ShrinkDatabase(ctx context.Context) (r ShrinkDatabaseRes, _ error) {
+func (UnimplementedHandler) ShrinkDatabase(ctx context.Context) (r *MessageResponse, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -667,7 +668,7 @@ func (UnimplementedHandler) ShrinkDatabase(ctx context.Context) (r ShrinkDatabas
 // Send a test notification.
 //
 // POST /notifications/{notificationId}/test
-func (UnimplementedHandler) TestNotification(ctx context.Context, params TestNotificationParams) (r TestNotificationRes, _ error) {
+func (UnimplementedHandler) TestNotification(ctx context.Context, params TestNotificationParams) (r *MessageResponse, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -676,7 +677,7 @@ func (UnimplementedHandler) TestNotification(ctx context.Context, params TestNot
 // Unpin an incident from the status page.
 //
 // POST /status-pages/{slug}/incidents/{incidentId}/unpin
-func (UnimplementedHandler) UnpinIncident(ctx context.Context, params UnpinIncidentParams) (r UnpinIncidentRes, _ error) {
+func (UnimplementedHandler) UnpinIncident(ctx context.Context, params UnpinIncidentParams) (r *MessageResponse, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -685,7 +686,7 @@ func (UnimplementedHandler) UnpinIncident(ctx context.Context, params UnpinIncid
 // Update an incident.
 //
 // PUT /status-pages/{slug}/incidents/{incidentId}
-func (UnimplementedHandler) UpdateIncident(ctx context.Context, req *IncidentInput, params UpdateIncidentParams) (r UpdateIncidentRes, _ error) {
+func (UnimplementedHandler) UpdateIncident(ctx context.Context, req *IncidentInput, params UpdateIncidentParams) (r *Incident, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -694,7 +695,7 @@ func (UnimplementedHandler) UpdateIncident(ctx context.Context, req *IncidentInp
 // Update a maintenance window.
 //
 // PUT /maintenance/{maintenanceId}
-func (UnimplementedHandler) UpdateMaintenance(ctx context.Context, req *MaintenanceInput, params UpdateMaintenanceParams) (r UpdateMaintenanceRes, _ error) {
+func (UnimplementedHandler) UpdateMaintenance(ctx context.Context, req *MaintenanceInput, params UpdateMaintenanceParams) (r *Maintenance, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -703,7 +704,7 @@ func (UnimplementedHandler) UpdateMaintenance(ctx context.Context, req *Maintena
 // Update a monitor.
 //
 // PUT /monitors/{monitorId}
-func (UnimplementedHandler) UpdateMonitor(ctx context.Context, req *MonitorInput, params UpdateMonitorParams) (r UpdateMonitorRes, _ error) {
+func (UnimplementedHandler) UpdateMonitor(ctx context.Context, req *MonitorInput, params UpdateMonitorParams) (r *Monitor, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -712,8 +713,8 @@ func (UnimplementedHandler) UpdateMonitor(ctx context.Context, req *MonitorInput
 // Update a monitor tag value.
 //
 // PUT /monitors/{monitorId}/tags/{tagId}
-func (UnimplementedHandler) UpdateMonitorTag(ctx context.Context, req *UpdateMonitorTagReq, params UpdateMonitorTagParams) (r UpdateMonitorTagRes, _ error) {
-	return r, ht.ErrNotImplemented
+func (UnimplementedHandler) UpdateMonitorTag(ctx context.Context, req *UpdateMonitorTagReq, params UpdateMonitorTagParams) error {
+	return ht.ErrNotImplemented
 }
 
 // UpdateNotification implements updateNotification operation.
@@ -721,7 +722,7 @@ func (UnimplementedHandler) UpdateMonitorTag(ctx context.Context, req *UpdateMon
 // Update a notification provider.
 //
 // PUT /notifications/{notificationId}
-func (UnimplementedHandler) UpdateNotification(ctx context.Context, req *NotificationInput, params UpdateNotificationParams) (r UpdateNotificationRes, _ error) {
+func (UnimplementedHandler) UpdateNotification(ctx context.Context, req *NotificationInput, params UpdateNotificationParams) (r *Notification, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -730,8 +731,8 @@ func (UnimplementedHandler) UpdateNotification(ctx context.Context, req *Notific
 // Update a proxy.
 //
 // PUT /proxies/{proxyId}
-func (UnimplementedHandler) UpdateProxy(ctx context.Context, req *ProxyInput, params UpdateProxyParams) (r UpdateProxyRes, _ error) {
-	return r, ht.ErrNotImplemented
+func (UnimplementedHandler) UpdateProxy(ctx context.Context, req *ProxyInput, params UpdateProxyParams) error {
+	return ht.ErrNotImplemented
 }
 
 // UpdateSettings implements updateSettings operation.
@@ -739,7 +740,7 @@ func (UnimplementedHandler) UpdateProxy(ctx context.Context, req *ProxyInput, pa
 // Update application settings.
 //
 // PATCH /settings
-func (UnimplementedHandler) UpdateSettings(ctx context.Context, req *Settings) (r UpdateSettingsRes, _ error) {
+func (UnimplementedHandler) UpdateSettings(ctx context.Context, req *Settings) (r *MessageResponse, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -748,7 +749,7 @@ func (UnimplementedHandler) UpdateSettings(ctx context.Context, req *Settings) (
 // Update a status page.
 //
 // PUT /status-pages/{slug}
-func (UnimplementedHandler) UpdateStatusPage(ctx context.Context, req *StatusPageInput, params UpdateStatusPageParams) (r UpdateStatusPageRes, _ error) {
+func (UnimplementedHandler) UpdateStatusPage(ctx context.Context, req *StatusPageInput, params UpdateStatusPageParams) (r *StatusPage, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -757,6 +758,14 @@ func (UnimplementedHandler) UpdateStatusPage(ctx context.Context, req *StatusPag
 // Update a tag.
 //
 // PUT /tags/{tagId}
-func (UnimplementedHandler) UpdateTag(ctx context.Context, req *TagInput, params UpdateTagParams) (r UpdateTagRes, _ error) {
+func (UnimplementedHandler) UpdateTag(ctx context.Context, req *TagInput, params UpdateTagParams) (r *Tag, _ error) {
 	return r, ht.ErrNotImplemented
+}
+
+// NewError creates *DefaultErrorStatusCode from error returned by handler.
+//
+// Used for common default response.
+func (UnimplementedHandler) NewError(ctx context.Context, err error) (r *DefaultErrorStatusCode) {
+	r = new(DefaultErrorStatusCode)
+	return r
 }

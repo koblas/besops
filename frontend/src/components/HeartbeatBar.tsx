@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
-import { STATUS_COLORS, type StatusValue } from '../lib/constants';
+import { STATUS, STATUS_COLORS, type StatusValue } from '../lib/constants';
 import { formatDateTime } from '../lib/formatters';
 import type { Heartbeat } from '../hooks/useHeartbeats';
 import dayjs from 'dayjs';
@@ -132,7 +132,7 @@ export function HeartbeatBar({ heartbeats, size = 'normal' }: HeartbeatBarProps)
       timeAgo = `${minutes} min ago`;
     }
 
-    const upCount = visibleBeats.filter(b => b.status === 1 || b.status === 4).length;
+    const upCount = visibleBeats.filter(b => b.status === STATUS.UP).length;
     const pct = ((upCount / visibleBeats.length) * 100).toFixed(visibleBeats.length > 20 ? 2 : 1);
 
     return { timeAgo, pct };
@@ -171,7 +171,7 @@ export function HeartbeatBar({ heartbeats, size = 'normal' }: HeartbeatBarProps)
         >
           <div>{formatDateTime(hoveredBeat.time)}</div>
           <div>
-            {hoveredBeat.msg || (hoveredBeat.status === 1 ? 'Up' : 'Down')}
+            {hoveredBeat.msg || (hoveredBeat.status === STATUS.UP ? 'Up' : 'Down')}
             {hoveredBeat.latency != null && ` (${hoveredBeat.latency}ms)`}
           </div>
         </div>

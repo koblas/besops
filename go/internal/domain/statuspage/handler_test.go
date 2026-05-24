@@ -145,9 +145,8 @@ func TestGetStatusPageHeartbeats_UnionsExplicitAndTagMonitors(t *testing.T) {
 
 	h := NewHandler(repo, hbReader, nil, WithMonitorResolver(resolver))
 
-	res, err := h.GetStatusPageHeartbeats(t.Context(), oas.GetStatusPageHeartbeatsParams{Slug: "prod"})
+	result, err := h.GetStatusPageHeartbeats(t.Context(), oas.GetStatusPageHeartbeatsParams{Slug: "prod"})
 	require.NoError(t, err)
-	result := res.(*oas.GetStatusPageHeartbeatsOK)
 
 	hbList := result.HeartbeatList
 	// Should have all 3 unique monitors (explicit + tagged, with sharedMon deduplicated)

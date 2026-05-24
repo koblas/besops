@@ -20,7 +20,7 @@ func NewHandler(repo Repository) *Handler {
 	return &Handler{repo: repo}
 }
 
-func (h *Handler) ListNotifications(ctx context.Context) (oas.ListNotificationsRes, error) {
+func (h *Handler) ListNotifications(ctx context.Context) ([]oas.Notification, error) {
 	userID, err := oasutil.UserIDFromCtx(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("getting user from context: %w", err)
@@ -31,14 +31,14 @@ func (h *Handler) ListNotifications(ctx context.Context) (oas.ListNotificationsR
 		return nil, fmt.Errorf("listing notifications: %w", err)
 	}
 
-	result := make(oas.ListNotificationsOKApplicationJSON, 0, len(notifs))
+	result := make([]oas.Notification, 0, len(notifs))
 	for _, n := range notifs {
 		result = append(result, notificationToOAS(n))
 	}
-	return &result, nil
+	return result, nil
 }
 
-func (h *Handler) CreateNotification(ctx context.Context, req *oas.NotificationInput) (oas.CreateNotificationRes, error) {
+func (h *Handler) CreateNotification(ctx context.Context, req *oas.NotificationInput) (*oas.CreateNotificationCreated, error) {
 	userID, err := oasutil.UserIDFromCtx(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("getting user from context: %w", err)
@@ -61,7 +61,7 @@ func (h *Handler) CreateNotification(ctx context.Context, req *oas.NotificationI
 	return &oas.CreateNotificationCreated{ID: oasutil.MustParseUUID(id)}, nil
 }
 
-func (h *Handler) UpdateNotification(ctx context.Context, req *oas.NotificationInput, params oas.UpdateNotificationParams) (oas.UpdateNotificationRes, error) {
+func (h *Handler) UpdateNotification(ctx context.Context, req *oas.NotificationInput, params oas.UpdateNotificationParams) (*oas.Notification, error) {
 	existing, err := h.repo.FindByID(ctx, params.NotificationId.String())
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -84,14 +84,14 @@ func (h *Handler) UpdateNotification(ctx context.Context, req *oas.NotificationI
 	return &result, nil
 }
 
-func (h *Handler) DeleteNotification(ctx context.Context, params oas.DeleteNotificationParams) (oas.DeleteNotificationRes, error) {
+func (h *Handler) DeleteNotification(ctx context.Context, params oas.DeleteNotificationParams) error {
 	if err := h.repo.Delete(ctx, params.NotificationId.String()); err != nil {
-		return nil, fmt.Errorf("deleting notification: %w", err)
+		return fmt.Errorf("deleting notification: %w", err)
 	}
-	return &oas.DeleteNotificationNoContent{}, nil
+	return nil
 }
 
-func (h *Handler) TestNotification(ctx context.Context, params oas.TestNotificationParams) (oas.TestNotificationRes, error) {
+func (h *Handler) TestNotification(ctx context.Context, params oas.TestNotificationParams) (*oas.MessageResponse, error) {
 	_, err := h.repo.FindByID(ctx, params.NotificationId.String())
 	if err != nil {
 		return nil, fmt.Errorf("finding notification: %w", err)

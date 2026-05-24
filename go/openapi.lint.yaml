@@ -1,16 +1,26 @@
 extends: all
 
 rules:
-  # Noisy OWASP rules — address incrementally, not gate CI
-  - id: owasp-rate-limit
+  # OWASP rules — covered by the "default" error response
+  - id: owasp-define-error-responses-401
     disabled: true
-  - id: owasp-rate-limit-retry-after
+  - id: owasp-define-error-responses-429
     disabled: true
   - id: owasp-define-error-responses-500
     disabled: true
   - id: owasp-define-error-validation
     disabled: true
+
+  # Noisy OWASP rules — address incrementally, not gate CI
+  - id: owasp-rate-limit
+    disabled: true
+  - id: owasp-rate-limit-retry-after
+    disabled: true
   - id: owasp-security-hosts-https-oas3
+    disabled: true
+
+  # Covered by the "default" error response pattern
+  - id: style-operation-error-response
     disabled: true
 
   # Documentation hints — too noisy for CI

@@ -30,7 +30,7 @@ func NewHandler(repo Repository, authProvider *auth.Provider, bootstrap bool) *H
 	}
 }
 
-func (h *Handler) NeedSetup(ctx context.Context) (oas.NeedSetupRes, error) {
+func (h *Handler) NeedSetup(ctx context.Context) (*oas.NeedSetupOK, error) {
 	if h.bootstrap {
 		return &oas.NeedSetupOK{NeedSetup: false}, nil
 	}
@@ -68,7 +68,7 @@ func (h *Handler) Setup(ctx context.Context, req *oas.SetupReq) (oas.SetupRes, e
 	return &oas.MessageResponse{Message: tokens.AccessToken}, nil
 }
 
-func (h *Handler) Login(ctx context.Context, req *oas.LoginRequest) (oas.LoginRes, error) {
+func (h *Handler) Login(ctx context.Context, req *oas.LoginRequest) (*oas.LoginResponse, error) {
 	result, err := h.auth.Authenticate(ctx, req.Username, req.Password)
 	if errors.Is(err, errs.ErrNotFound) && h.bootstrap {
 		result, err = h.bootstrapUser(ctx, req.Username, req.Password)
@@ -84,7 +84,7 @@ func (h *Handler) Login(ctx context.Context, req *oas.LoginRequest) (oas.LoginRe
 			}, nil
 		}
 		if verifyErr := h.auth.Verify2FA(ctx, result.UserID, req.Token.Value); verifyErr != nil {
-			return &oas.LoginUnauthorized{Error: "invalid 2FA token"}, nil //nolint:nilerr
+			return nil, errs.NewUnauthenticated(verifyErr, "invalid 2FA token")
 		}
 	}
 
@@ -116,11 +116,11 @@ func (h *Handler) bootstrapUser(ctx context.Context, username, password string) 
 	return result, nil
 }
 
-func (h *Handler) Logout(_ context.Context) (oas.LogoutRes, error) {
-	return &oas.LogoutNoContent{}, nil
+func (h *Handler) Logout(_ context.Context) error {
+	return nil
 }
 
-func (h *Handler) RefreshToken(ctx context.Context, req *oas.RefreshTokenRequest) (oas.RefreshTokenRes, error) {
+func (h *Handler) RefreshToken(ctx context.Context, req *oas.RefreshTokenRequest) (*oas.TokenResponse, error) {
 	tokens, err := h.auth.RefreshAccessToken(ctx, req.RefreshToken)
 	if err != nil {
 		return nil, errs.NewUnauthenticated(err, "invalid or expired refresh token")
@@ -129,7 +129,7 @@ func (h *Handler) RefreshToken(ctx context.Context, req *oas.RefreshTokenRequest
 	return &oas.TokenResponse{Token: tokens.AccessToken}, nil
 }
 
-func (h *Handler) ChangePassword(ctx context.Context, req *oas.ChangePasswordReq) (oas.ChangePasswordRes, error) {
+func (h *Handler) ChangePassword(ctx context.Context, req *oas.ChangePasswordReq) (*oas.TokenResponse, error) {
 	userID, err := oasutil.UserIDFromCtx(ctx)
 	if err != nil {
 		return nil, errs.NewUnauthenticated(err, "unauthorized")
@@ -161,7 +161,7 @@ func (h *Handler) ChangePassword(ctx context.Context, req *oas.ChangePasswordReq
 	return &oas.TokenResponse{Token: tokens.AccessToken}, nil
 }
 
-func (h *Handler) Get2FAStatus(ctx context.Context) (oas.Get2FAStatusRes, error) {
+func (h *Handler) Get2FAStatus(ctx context.Context) (*oas.Get2FAStatusOK, error) {
 	userID, err := oasutil.UserIDFromCtx(ctx)
 	if err != nil {
 		return nil, errs.NewUnauthenticated(err, "unauthorized")
@@ -175,7 +175,7 @@ func (h *Handler) Get2FAStatus(ctx context.Context) (oas.Get2FAStatusRes, error)
 	return &oas.Get2FAStatusOK{Enabled: user.TwoFAStatus}, nil
 }
 
-func (h *Handler) Prepare2FA(ctx context.Context, req *oas.Prepare2FAReq) (oas.Prepare2FARes, error) {
+func (h *Handler) Prepare2FA(ctx context.Context, req *oas.Prepare2FAReq) (*oas.Prepare2FAOK, error) {
 	userID, err := oasutil.UserIDFromCtx(ctx)
 	if err != nil {
 		return nil, errs.NewUnauthenticated(err, "unauthorized")
@@ -205,7 +205,7 @@ func (h *Handler) Prepare2FA(ctx context.Context, req *oas.Prepare2FAReq) (oas.P
 	return &oas.Prepare2FAOK{URI: *parsedURI}, nil
 }
 
-func (h *Handler) Enable2FA(ctx context.Context, req *oas.Enable2FAReq) (oas.Enable2FARes, error) {
+func (h *Handler) Enable2FA(ctx context.Context, req *oas.Enable2FAReq) (*oas.MessageResponse, error) {
 	userID, err := oasutil.UserIDFromCtx(ctx)
 	if err != nil {
 		return nil, errs.NewUnauthenticated(err, "unauthorized")
@@ -235,7 +235,7 @@ func (h *Handler) Enable2FA(ctx context.Context, req *oas.Enable2FAReq) (oas.Ena
 	return &oas.MessageResponse{Message: "2FA enabled"}, nil
 }
 
-func (h *Handler) Disable2FA(ctx context.Context, req *oas.Disable2FAReq) (oas.Disable2FARes, error) {
+func (h *Handler) Disable2FA(ctx context.Context, req *oas.Disable2FAReq) (*oas.MessageResponse, error) {
 	userID, err := oasutil.UserIDFromCtx(ctx)
 	if err != nil {
 		return nil, errs.NewUnauthenticated(err, "unauthorized")

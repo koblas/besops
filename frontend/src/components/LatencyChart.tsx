@@ -18,7 +18,7 @@ import { Chart } from 'react-chartjs-2';
 import { useChartData } from '../hooks/useHeartbeats';
 import type { Heartbeat, ChartPoint } from '../hooks/useHeartbeats';
 import { useMonitor } from '../hooks/useMonitors';
-import { STATUS_COLORS, STATUS } from '../lib/constants';
+import { STATUS_COLORS, STATUS, type StatusValue } from '../lib/constants';
 
 ChartJS.register(
   BarController,
@@ -57,7 +57,7 @@ function getBarColor(point: { down?: number; up?: number; maintenance?: number }
   return 'rgba(245, 182, 23, 0.41)';
 }
 
-function getHeartbeatBarColor(status: number): string {
+function getHeartbeatBarColor(status: StatusValue): string {
   switch (status) {
     case STATUS.MAINTENANCE:
       return 'rgba(23, 71, 245, 0.41)';
