@@ -77,6 +77,7 @@ var operationRolesBearerAuth = map[string][]string{
 	ListMonitorsOperation:              []string{},
 	ListNotificationsOperation:         []string{},
 	ListProxiesOperation:               []string{},
+	ListRecentEventsOperation:          []string{},
 	ListStatusPagesOperation:           []string{},
 	ListTagsOperation:                  []string{},
 	LogoutOperation:                    []string{},

@@ -510,6 +510,15 @@ func (UnimplementedHandler) ListProxies(ctx context.Context) (r []Proxy, _ error
 	return r, ht.ErrNotImplemented
 }
 
+// ListRecentEvents implements listRecentEvents operation.
+//
+// Get recent important heartbeats across all monitors.
+//
+// GET /events
+func (UnimplementedHandler) ListRecentEvents(ctx context.Context, params ListRecentEventsParams) (r *ListRecentEventsOK, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // ListStatusPages implements listStatusPages operation.
 //
 // List all status pages.

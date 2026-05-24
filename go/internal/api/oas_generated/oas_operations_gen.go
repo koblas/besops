@@ -61,6 +61,7 @@ const (
 	ListMonitorsOperation              OperationName = "ListMonitors"
 	ListNotificationsOperation         OperationName = "ListNotifications"
 	ListProxiesOperation               OperationName = "ListProxies"
+	ListRecentEventsOperation          OperationName = "ListRecentEvents"
 	ListStatusPagesOperation           OperationName = "ListStatusPages"
 	ListTagsOperation                  OperationName = "ListTags"
 	LoginOperation                     OperationName = "Login"

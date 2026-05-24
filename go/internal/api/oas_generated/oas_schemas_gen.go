@@ -2136,6 +2136,31 @@ func (s *ListIncidentsOK) SetNextCursor(val OptString) {
 	s.NextCursor = val
 }
 
+type ListRecentEventsOK struct {
+	Data  []Heartbeat `json:"data"`
+	Total int64       `json:"total"`
+}
+
+// GetData returns the value of Data.
+func (s *ListRecentEventsOK) GetData() []Heartbeat {
+	return s.Data
+}
+
+// GetTotal returns the value of Total.
+func (s *ListRecentEventsOK) GetTotal() int64 {
+	return s.Total
+}
+
+// SetData sets the value of Data.
+func (s *ListRecentEventsOK) SetData(val []Heartbeat) {
+	s.Data = val
+}
+
+// SetTotal sets the value of Total.
+func (s *ListRecentEventsOK) SetTotal(val int64) {
+	s.Total = val
+}
+
 // Credentials for authenticating a user session.
 // Ref: #/components/schemas/LoginRequest
 type LoginRequest struct {

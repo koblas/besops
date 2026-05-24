@@ -152,6 +152,9 @@ func (c *ComposedHandler) ClearEvents(ctx context.Context, params oas.ClearEvent
 	return c.heartbeats.ClearEvents(ctx, params)
 }
 
+func (c *ComposedHandler) ListRecentEvents(ctx context.Context, params oas.ListRecentEventsParams) (*oas.ListRecentEventsOK, error) {
+	return c.heartbeats.ListRecentEvents(ctx, params)
+}
 
 // --- Notification methods ---
 

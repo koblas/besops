@@ -190,6 +190,27 @@ func (r *sqliteRepo) GetUptime(ctx context.Context, monitorID string, hours int)
 	return float64(up) / float64(total), nil
 }
 
+func (r *sqliteRepo) GetAllImportant(ctx context.Context, limit int) ([]*Heartbeat, int64, error) {
+	countQ := models.Heartbeats.Query(
+		sm.Where(models.Heartbeats.Columns.Important.EQ(sqlite.Arg(true))),
+	)
+
+	total, err := countQ.Count(ctx, r.exc)
+	if err != nil {
+		return nil, 0, fmt.Errorf("counting all important heartbeats: %w", err)
+	}
+
+	hbs, err := models.Heartbeats.Query(
+		sm.Where(models.Heartbeats.Columns.Important.EQ(sqlite.Arg(true))),
+		sm.OrderBy(models.Heartbeats.Columns.Time).Desc(),
+		sm.Limit(limit),
+	).All(ctx, r.exc)
+	if err != nil {
+		return nil, 0, fmt.Errorf("querying all important heartbeats: %w", err)
+	}
+	return heartbeatsFromModels(hbs), total, nil
+}
+
 func heartbeatFromModel(m *models.Heartbeat) *Heartbeat {
 	hb := &Heartbeat{
 		ID:        m.ID,

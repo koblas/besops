@@ -54,3 +54,16 @@ export function useImportantHeartbeats(monitorId: string | undefined, limit = 25
     enabled: !!monitorId,
   });
 }
+
+export function useRecentEvents(limit = 25) {
+  return useQuery({
+    queryKey: ['events', 'all', limit],
+    queryFn: async () => {
+      const { data, error } = await api.GET('/events', {
+        params: { query: { limit } },
+      });
+      if (error) throw error;
+      return data as unknown as ImportantHeartbeatsResponse;
+    },
+  });
+}

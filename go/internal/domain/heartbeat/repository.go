@@ -14,4 +14,5 @@ type Repository interface {
 	GetAverageLatency(ctx context.Context, monitorID string, hours int) (float64, error)
 	GetAverageResponse(ctx context.Context, monitorID string, hours int) (float64, error)
 	GetUptime(ctx context.Context, monitorID string, hours int) (float64, error)
+	GetAllImportant(ctx context.Context, limit int) ([]*Heartbeat, int64, error)
 }

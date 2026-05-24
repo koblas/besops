@@ -138,6 +138,27 @@ func (h *Handler) GetChartData(ctx context.Context, params oas.GetChartDataParam
 }
 
 
+func (h *Handler) ListRecentEvents(ctx context.Context, params oas.ListRecentEventsParams) (*oas.ListRecentEventsOK, error) {
+	limit := 25
+	if params.Limit.IsSet() {
+		limit = params.Limit.Value
+	}
+
+	hbs, total, err := h.repo.GetAllImportant(ctx, limit)
+	if err != nil {
+		return nil, fmt.Errorf("getting recent events: %w", err)
+	}
+
+	events := make([]oas.Heartbeat, 0, len(hbs))
+	for _, hb := range hbs {
+		events = append(events, heartbeatToOAS(hb))
+	}
+	return &oas.ListRecentEventsOK{
+		Data:  events,
+		Total: total,
+	}, nil
+}
+
 func heartbeatToOAS(hb *Heartbeat) oas.Heartbeat {
 	result := oas.Heartbeat{
 		ID:        oasutil.MustParseUUID(hb.ID),

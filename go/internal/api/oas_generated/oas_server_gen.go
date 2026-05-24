@@ -211,6 +211,12 @@ type HeartbeatHandler interface {
 	//
 	// GET /monitors/{monitorId}/events
 	GetImportantHeartbeats(ctx context.Context, params GetImportantHeartbeatsParams) (*GetImportantHeartbeatsOK, error)
+	// ListRecentEvents implements listRecentEvents operation.
+	//
+	// Get recent important heartbeats across all monitors.
+	//
+	// GET /events
+	ListRecentEvents(ctx context.Context, params ListRecentEventsParams) (*ListRecentEventsOK, error)
 }
 
 // IncidentHandler handles operations described by OpenAPI v3 specification.
