@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/go-faster/errors"
+	"github.com/google/uuid"
 	"github.com/ogen-go/ogen/validate"
 )
 
@@ -23,7 +24,7 @@ func (s *APIKey) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]*$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -58,7 +59,7 @@ func (s *APIKeyInput) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]*$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -95,7 +96,7 @@ func (s *AddMonitorTagReq) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -208,8 +209,8 @@ func (s *ChartPoint) Validate() error {
 				if err := (validate.Int{
 					MinSet:        true,
 					Min:           0,
-					MaxSet:        false,
-					Max:           0,
+					MaxSet:        true,
+					Max:           9223372036854775807,
 					MinExclusive:  false,
 					MaxExclusive:  false,
 					MultipleOfSet: false,
@@ -236,8 +237,8 @@ func (s *ChartPoint) Validate() error {
 				if err := (validate.Int{
 					MinSet:        true,
 					Min:           0,
-					MaxSet:        false,
-					Max:           0,
+					MaxSet:        true,
+					Max:           2147483647,
 					MinExclusive:  false,
 					MaxExclusive:  false,
 					MultipleOfSet: false,
@@ -264,8 +265,8 @@ func (s *ChartPoint) Validate() error {
 				if err := (validate.Int{
 					MinSet:        true,
 					Min:           0,
-					MaxSet:        false,
-					Max:           0,
+					MaxSet:        true,
+					Max:           2147483647,
 					MinExclusive:  false,
 					MaxExclusive:  false,
 					MultipleOfSet: false,
@@ -320,8 +321,8 @@ func (s *ChartPoint) Validate() error {
 				if err := (validate.Int{
 					MinSet:        true,
 					Min:           0,
-					MaxSet:        false,
-					Max:           0,
+					MaxSet:        true,
+					Max:           2147483647,
 					MinExclusive:  false,
 					MaxExclusive:  false,
 					MultipleOfSet: false,
@@ -348,8 +349,8 @@ func (s *ChartPoint) Validate() error {
 				if err := (validate.Int{
 					MinSet:        true,
 					Min:           0,
-					MaxSet:        false,
-					Max:           0,
+					MaxSet:        true,
+					Max:           2147483647,
 					MinExclusive:  false,
 					MaxExclusive:  false,
 					MultipleOfSet: false,
@@ -367,6 +368,148 @@ func (s *ChartPoint) Validate() error {
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
 			Name:  "latencyMax",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s *CheckDomainOK) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.Domain.Get(); ok {
+			if err := func() error {
+				if err := (validate.String{
+					MinLength:     0,
+					MinLengthSet:  false,
+					MaxLength:     255,
+					MaxLengthSet:  true,
+					Email:         false,
+					Hostname:      true,
+					Regex:         nil,
+					MinNumeric:    0,
+					MinNumericSet: false,
+					MaxNumeric:    0,
+					MaxNumericSet: false,
+				}).Validate(string(value)); err != nil {
+					return errors.Wrap(err, "string")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "domain",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if value, ok := s.Tld.Get(); ok {
+			if err := func() error {
+				if err := (validate.String{
+					MinLength:     0,
+					MinLengthSet:  false,
+					MaxLength:     63,
+					MaxLengthSet:  true,
+					Email:         false,
+					Hostname:      false,
+					Regex:         regexMap["^[a-zA-Z][a-zA-Z0-9-]*$"],
+					MinNumeric:    0,
+					MinNumericSet: false,
+					MaxNumeric:    0,
+					MaxNumericSet: false,
+				}).Validate(string(value)); err != nil {
+					return errors.Wrap(err, "string")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "tld",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s *CreateAPIKeyCreated) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := (validate.String{
+			MinLength:     0,
+			MinLengthSet:  false,
+			MaxLength:     255,
+			MaxLengthSet:  true,
+			Email:         false,
+			Hostname:      false,
+			Regex:         regexMap["^[A-Za-z0-9_-]+$"],
+			MinNumeric:    0,
+			MinNumericSet: false,
+			MaxNumeric:    0,
+			MaxNumericSet: false,
+		}).Validate(string(s.Key)); err != nil {
+			return errors.Wrap(err, "string")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "key",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s *CreateStatusPageCreated) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := (validate.String{
+			MinLength:     0,
+			MinLengthSet:  false,
+			MaxLength:     128,
+			MaxLengthSet:  true,
+			Email:         false,
+			Hostname:      false,
+			Regex:         regexMap["^[a-z0-9]([a-z0-9-]*[a-z0-9])?$"],
+			MinNumeric:    0,
+			MinNumericSet: false,
+			MaxNumeric:    0,
+			MaxNumericSet: false,
+		}).Validate(string(s.Slug)); err != nil {
+			return errors.Wrap(err, "string")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "slug",
 			Error: err,
 		})
 	}
@@ -437,7 +580,7 @@ func (s *DnsMonitorConfig) Validate() error {
 					MaxLength:     255,
 					MaxLengthSet:  true,
 					Email:         false,
-					Hostname:      false,
+					Hostname:      true,
 					Regex:         nil,
 					MinNumeric:    0,
 					MinNumericSet: false,
@@ -513,7 +656,7 @@ func (s *DnsMonitorConfig) Validate() error {
 					MaxLength:     255,
 					MaxLengthSet:  true,
 					Email:         false,
-					Hostname:      false,
+					Hostname:      true,
 					Regex:         nil,
 					MinNumeric:    0,
 					MinNumericSet: false,
@@ -659,7 +802,7 @@ func (s *ErrorResponse) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]*$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -721,6 +864,105 @@ func (s ErrorResponseCode) Validate() error {
 	}
 }
 
+func (s GetChartDataOKApplicationJSON) Validate() error {
+	alias := ([]ChartPoint)(s)
+	if alias == nil {
+		return errors.New("nil is invalid value")
+	}
+	if err := (validate.Array{
+		MinLength:    0,
+		MinLengthSet: false,
+		MaxLength:    500,
+		MaxLengthSet: true,
+	}).ValidateLength(len(alias)); err != nil {
+		return errors.Wrap(err, "array")
+	}
+	var failures []validate.FieldError
+	for i, elem := range alias {
+		if err := func() error {
+			if err := elem.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			failures = append(failures, validate.FieldError{
+				Name:  fmt.Sprintf("[%d]", i),
+				Error: err,
+			})
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s *GetDatabaseSizeOK) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := (validate.Int{
+			MinSet:        true,
+			Min:           0,
+			MaxSet:        true,
+			Max:           9223372036854775807,
+			MinExclusive:  false,
+			MaxExclusive:  false,
+			MultipleOfSet: false,
+			MultipleOf:    0,
+			Pattern:       nil,
+		}).Validate(int64(s.Size)); err != nil {
+			return errors.Wrap(err, "int")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "size",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s GetHeartbeatsOKApplicationJSON) Validate() error {
+	alias := ([]Heartbeat)(s)
+	if alias == nil {
+		return errors.New("nil is invalid value")
+	}
+	if err := (validate.Array{
+		MinLength:    0,
+		MinLengthSet: false,
+		MaxLength:    500,
+		MaxLengthSet: true,
+	}).ValidateLength(len(alias)); err != nil {
+		return errors.Wrap(err, "array")
+	}
+	var failures []validate.FieldError
+	for i, elem := range alias {
+		if err := func() error {
+			if err := elem.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			failures = append(failures, validate.FieldError{
+				Name:  fmt.Sprintf("[%d]", i),
+				Error: err,
+			})
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
 func (s *GetImportantHeartbeatsOK) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -730,6 +972,14 @@ func (s *GetImportantHeartbeatsOK) Validate() error {
 	if err := func() error {
 		if s.Data == nil {
 			return errors.New("nil is invalid value")
+		}
+		if err := (validate.Array{
+			MinLength:    0,
+			MinLengthSet: false,
+			MaxLength:    100,
+			MaxLengthSet: true,
+		}).ValidateLength(len(s.Data)); err != nil {
+			return errors.Wrap(err, "array")
 		}
 		var failures []validate.FieldError
 		for i, elem := range s.Data {
@@ -755,28 +1005,247 @@ func (s *GetImportantHeartbeatsOK) Validate() error {
 			Error: err,
 		})
 	}
+	if err := func() error {
+		if err := (validate.Int{
+			MinSet:        true,
+			Min:           0,
+			MaxSet:        true,
+			Max:           9223372036854775807,
+			MinExclusive:  false,
+			MaxExclusive:  false,
+			MultipleOfSet: false,
+			MultipleOf:    0,
+			Pattern:       nil,
+		}).Validate(int64(s.Total)); err != nil {
+			return errors.Wrap(err, "int")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "total",
+			Error: err,
+		})
+	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
 }
 
-func (s GetMonitorUptimesOK) Validate() error {
+func (s *GetInfoOK) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
 	var failures []validate.FieldError
-	for key, elem := range s {
+	if err := func() error {
+		if value, ok := s.Version.Get(); ok {
+			if err := func() error {
+				if err := (validate.String{
+					MinLength:     0,
+					MinLengthSet:  false,
+					MaxLength:     50,
+					MaxLengthSet:  true,
+					Email:         false,
+					Hostname:      false,
+					Regex:         regexMap["^[0-9]+\\.[0-9]+\\.[0-9]+.*$"],
+					MinNumeric:    0,
+					MinNumericSet: false,
+					MaxNumeric:    0,
+					MaxNumericSet: false,
+				}).Validate(string(value)); err != nil {
+					return errors.Wrap(err, "string")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "version",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if value, ok := s.LatestVersion.Get(); ok {
+			if err := func() error {
+				if err := (validate.String{
+					MinLength:     0,
+					MinLengthSet:  false,
+					MaxLength:     50,
+					MaxLengthSet:  true,
+					Email:         false,
+					Hostname:      false,
+					Regex:         regexMap["^[0-9]+\\.[0-9]+\\.[0-9]+.*$"],
+					MinNumeric:    0,
+					MinNumericSet: false,
+					MaxNumeric:    0,
+					MaxNumericSet: false,
+				}).Validate(string(value)); err != nil {
+					return errors.Wrap(err, "string")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "latestVersion",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if value, ok := s.ServerTimezone.Get(); ok {
+			if err := func() error {
+				if err := (validate.String{
+					MinLength:     0,
+					MinLengthSet:  false,
+					MaxLength:     64,
+					MaxLengthSet:  true,
+					Email:         false,
+					Hostname:      false,
+					Regex:         regexMap["^[A-Za-z_/+-]+$"],
+					MinNumeric:    0,
+					MinNumericSet: false,
+					MaxNumeric:    0,
+					MaxNumericSet: false,
+				}).Validate(string(value)); err != nil {
+					return errors.Wrap(err, "string")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "serverTimezone",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if value, ok := s.ServerTimezoneOffset.Get(); ok {
+			if err := func() error {
+				if err := (validate.String{
+					MinLength:     0,
+					MinLengthSet:  false,
+					MaxLength:     10,
+					MaxLengthSet:  true,
+					Email:         false,
+					Hostname:      false,
+					Regex:         regexMap["^[+-]?[0-9]{1,2}(:[0-9]{2})?$"],
+					MinNumeric:    0,
+					MinNumericSet: false,
+					MaxNumeric:    0,
+					MaxNumericSet: false,
+				}).Validate(string(value)); err != nil {
+					return errors.Wrap(err, "string")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "serverTimezoneOffset",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s GetMaintenanceMonitorsOKApplicationJSON) Validate() error {
+	alias := ([]uuid.UUID)(s)
+	if alias == nil {
+		return errors.New("nil is invalid value")
+	}
+	if err := (validate.Array{
+		MinLength:    0,
+		MinLengthSet: false,
+		MaxLength:    500,
+		MaxLengthSet: true,
+	}).ValidateLength(len(alias)); err != nil {
+		return errors.Wrap(err, "array")
+	}
+	return nil
+}
+
+func (s GetMaintenanceStatusPagesOKApplicationJSON) Validate() error {
+	alias := ([]uuid.UUID)(s)
+	if alias == nil {
+		return errors.New("nil is invalid value")
+	}
+	if err := (validate.Array{
+		MinLength:    0,
+		MinLengthSet: false,
+		MaxLength:    100,
+		MaxLengthSet: true,
+	}).ValidateLength(len(alias)); err != nil {
+		return errors.Wrap(err, "array")
+	}
+	return nil
+}
+
+func (s GetMonitorUptimesOKApplicationJSON) Validate() error {
+	alias := ([]GetMonitorUptimesOKItem)(s)
+	if alias == nil {
+		return errors.New("nil is invalid value")
+	}
+	if err := (validate.Array{
+		MinLength:    0,
+		MinLengthSet: false,
+		MaxLength:    10000,
+		MaxLengthSet: true,
+	}).ValidateLength(len(alias)); err != nil {
+		return errors.Wrap(err, "array")
+	}
+	var failures []validate.FieldError
+	for i, elem := range alias {
 		if err := func() error {
-			if err := (validate.Float{}).Validate(float64(elem)); err != nil {
-				return errors.Wrap(err, "float")
+			if err := elem.Validate(); err != nil {
+				return err
 			}
 			return nil
 		}(); err != nil {
 			failures = append(failures, validate.FieldError{
-				Name:  key,
+				Name:  fmt.Sprintf("[%d]", i),
 				Error: err,
 			})
 		}
 	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
 
+func (s *GetMonitorUptimesOKItem) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := (validate.Float{}).Validate(float64(s.Uptime)); err != nil {
+			return errors.Wrap(err, "float")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "uptime",
+			Error: err,
+		})
+	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
@@ -807,15 +1276,33 @@ func (s *GetStatusPageHeartbeatsOK) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if value, ok := s.HeartbeatList.Get(); ok {
+		if s.HeartbeatList == nil {
+			return nil // optional
+		}
+		if err := (validate.Array{
+			MinLength:    0,
+			MinLengthSet: false,
+			MaxLength:    10000,
+			MaxLengthSet: true,
+		}).ValidateLength(len(s.HeartbeatList)); err != nil {
+			return errors.Wrap(err, "array")
+		}
+		var failures []validate.FieldError
+		for i, elem := range s.HeartbeatList {
 			if err := func() error {
-				if err := value.Validate(); err != nil {
+				if err := elem.Validate(); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return err
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
 			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
 		}
 		return nil
 	}(); err != nil {
@@ -825,20 +1312,74 @@ func (s *GetStatusPageHeartbeatsOK) Validate() error {
 		})
 	}
 	if err := func() error {
-		if value, ok := s.UptimeList.Get(); ok {
+		if s.UptimeList == nil {
+			return nil // optional
+		}
+		if err := (validate.Array{
+			MinLength:    0,
+			MinLengthSet: false,
+			MaxLength:    10000,
+			MaxLengthSet: true,
+		}).ValidateLength(len(s.UptimeList)); err != nil {
+			return errors.Wrap(err, "array")
+		}
+		var failures []validate.FieldError
+		for i, elem := range s.UptimeList {
 			if err := func() error {
-				if err := value.Validate(); err != nil {
+				if err := elem.Validate(); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return err
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
 			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
 		}
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
 			Name:  "uptimeList",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if s.MonitorNames == nil {
+			return nil // optional
+		}
+		if err := (validate.Array{
+			MinLength:    0,
+			MinLengthSet: false,
+			MaxLength:    10000,
+			MaxLengthSet: true,
+		}).ValidateLength(len(s.MonitorNames)); err != nil {
+			return errors.Wrap(err, "array")
+		}
+		var failures []validate.FieldError
+		for i, elem := range s.MonitorNames {
+			if err := func() error {
+				if err := elem.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
+			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "monitorNames",
 			Error: err,
 		})
 	}
@@ -848,61 +1389,106 @@ func (s *GetStatusPageHeartbeatsOK) Validate() error {
 	return nil
 }
 
-func (s GetStatusPageHeartbeatsOKHeartbeatList) Validate() error {
-	var failures []validate.FieldError
-	for key, elem := range s {
-		if err := func() error {
-			if elem == nil {
-				return errors.New("nil is invalid value")
-			}
-			var failures []validate.FieldError
-			for i, elem := range elem {
-				if err := func() error {
-					if err := elem.Validate(); err != nil {
-						return err
-					}
-					return nil
-				}(); err != nil {
-					failures = append(failures, validate.FieldError{
-						Name:  fmt.Sprintf("[%d]", i),
-						Error: err,
-					})
-				}
-			}
-			if len(failures) > 0 {
-				return &validate.Error{Fields: failures}
-			}
-			return nil
-		}(); err != nil {
-			failures = append(failures, validate.FieldError{
-				Name:  key,
-				Error: err,
-			})
-		}
+func (s *GetStatusPageHeartbeatsOKHeartbeatListItem) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
 	}
 
+	var failures []validate.FieldError
+	if err := func() error {
+		if s.Heartbeats == nil {
+			return errors.New("nil is invalid value")
+		}
+		if err := (validate.Array{
+			MinLength:    0,
+			MinLengthSet: false,
+			MaxLength:    500,
+			MaxLengthSet: true,
+		}).ValidateLength(len(s.Heartbeats)); err != nil {
+			return errors.Wrap(err, "array")
+		}
+		var failures []validate.FieldError
+		for i, elem := range s.Heartbeats {
+			if err := func() error {
+				if err := elem.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
+			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "heartbeats",
+			Error: err,
+		})
+	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
 }
 
-func (s GetStatusPageHeartbeatsOKUptimeList) Validate() error {
-	var failures []validate.FieldError
-	for key, elem := range s {
-		if err := func() error {
-			if err := (validate.Float{}).Validate(float64(elem)); err != nil {
-				return errors.Wrap(err, "float")
-			}
-			return nil
-		}(); err != nil {
-			failures = append(failures, validate.FieldError{
-				Name:  key,
-				Error: err,
-			})
-		}
+func (s *GetStatusPageHeartbeatsOKMonitorNamesItem) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
 	}
 
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := (validate.String{
+			MinLength:     0,
+			MinLengthSet:  false,
+			MaxLength:     150,
+			MaxLengthSet:  true,
+			Email:         false,
+			Hostname:      false,
+			Regex:         regexMap["^[\\s\\S]*$"],
+			MinNumeric:    0,
+			MinNumericSet: false,
+			MaxNumeric:    0,
+			MaxNumericSet: false,
+		}).Validate(string(s.Name)); err != nil {
+			return errors.Wrap(err, "string")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "name",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s *GetStatusPageHeartbeatsOKUptimeListItem) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := (validate.Float{}).Validate(float64(s.Uptime)); err != nil {
+			return errors.Wrap(err, "float")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "uptime",
+			Error: err,
+		})
+	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
@@ -978,36 +1564,6 @@ func (s *GrpcMonitorConfig) Validate() error {
 		})
 	}
 	if err := func() error {
-		if value, ok := s.GrpcUrl.Get(); ok {
-			if err := func() error {
-				if err := (validate.String{
-					MinLength:     0,
-					MinLengthSet:  false,
-					MaxLength:     2048,
-					MaxLengthSet:  true,
-					Email:         false,
-					Hostname:      false,
-					Regex:         nil,
-					MinNumeric:    0,
-					MinNumericSet: false,
-					MaxNumeric:    0,
-					MaxNumericSet: false,
-				}).Validate(string(value)); err != nil {
-					return errors.Wrap(err, "string")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "grpcUrl",
-			Error: err,
-		})
-	}
-	if err := func() error {
 		if value, ok := s.GrpcServiceName.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
@@ -1017,7 +1573,7 @@ func (s *GrpcMonitorConfig) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[A-Za-z0-9_./-]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -1047,7 +1603,7 @@ func (s *GrpcMonitorConfig) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[A-Za-z0-9_./-]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -1141,7 +1697,7 @@ func (s *Heartbeat) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -1167,8 +1723,8 @@ func (s *Heartbeat) Validate() error {
 				if err := (validate.Int{
 					MinSet:        true,
 					Min:           0,
-					MaxSet:        false,
-					Max:           0,
+					MaxSet:        true,
+					Max:           9223372036854775807,
 					MinExclusive:  false,
 					MaxExclusive:  false,
 					MultipleOfSet: false,
@@ -1195,8 +1751,8 @@ func (s *Heartbeat) Validate() error {
 				if err := (validate.Int{
 					MinSet:        true,
 					Min:           0,
-					MaxSet:        false,
-					Max:           0,
+					MaxSet:        true,
+					Max:           9223372036854775807,
 					MinExclusive:  false,
 					MaxExclusive:  false,
 					MultipleOfSet: false,
@@ -1252,36 +1808,6 @@ func (s *HttpMonitorConfig) Validate() error {
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
 			Name:  "kind",
-			Error: err,
-		})
-	}
-	if err := func() error {
-		if value, ok := s.URL.Get(); ok {
-			if err := func() error {
-				if err := (validate.String{
-					MinLength:     0,
-					MinLengthSet:  false,
-					MaxLength:     2048,
-					MaxLengthSet:  true,
-					Email:         false,
-					Hostname:      false,
-					Regex:         nil,
-					MinNumeric:    0,
-					MinNumericSet: false,
-					MaxNumeric:    0,
-					MaxNumericSet: false,
-				}).Validate(string(value)); err != nil {
-					return errors.Wrap(err, "string")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "url",
 			Error: err,
 		})
 	}
@@ -1349,7 +1875,7 @@ func (s *HttpMonitorConfig) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -1379,7 +1905,7 @@ func (s *HttpMonitorConfig) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -1409,7 +1935,7 @@ func (s *HttpMonitorConfig) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -1479,7 +2005,7 @@ func (s *HttpMonitorConfig) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[0-9]{3}(-[0-9]{3})?$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -1515,7 +2041,7 @@ func (s *HttpMonitorConfig) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -1545,7 +2071,7 @@ func (s *HttpMonitorConfig) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -1575,7 +2101,7 @@ func (s *HttpMonitorConfig) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -1615,7 +2141,7 @@ func (s *HttpMonitorConfigHeadersItem) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[A-Za-z0-9_-]+$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -1638,7 +2164,7 @@ func (s *HttpMonitorConfigHeadersItem) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]*$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -1703,7 +2229,7 @@ func (s *Incident) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]*$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -1726,7 +2252,7 @@ func (s *Incident) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]*$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -1772,7 +2298,7 @@ func (s *IncidentInput) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]*$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -1795,7 +2321,7 @@ func (s *IncidentInput) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]*$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -1865,6 +2391,39 @@ func (s IncidentStyle) Validate() error {
 	}
 }
 
+func (s ListAPIKeysOKApplicationJSON) Validate() error {
+	alias := ([]APIKey)(s)
+	if alias == nil {
+		return errors.New("nil is invalid value")
+	}
+	if err := (validate.Array{
+		MinLength:    0,
+		MinLengthSet: false,
+		MaxLength:    100,
+		MaxLengthSet: true,
+	}).ValidateLength(len(alias)); err != nil {
+		return errors.Wrap(err, "array")
+	}
+	var failures []validate.FieldError
+	for i, elem := range alias {
+		if err := func() error {
+			if err := elem.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			failures = append(failures, validate.FieldError{
+				Name:  fmt.Sprintf("[%d]", i),
+				Error: err,
+			})
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
 func (s *ListIncidentsOK) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -1872,6 +2431,17 @@ func (s *ListIncidentsOK) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
+		if s.Incidents == nil {
+			return nil // optional
+		}
+		if err := (validate.Array{
+			MinLength:    0,
+			MinLengthSet: false,
+			MaxLength:    100,
+			MaxLengthSet: true,
+		}).ValidateLength(len(s.Incidents)); err != nil {
+			return errors.Wrap(err, "array")
+		}
 		var failures []validate.FieldError
 		for i, elem := range s.Incidents {
 			if err := func() error {
@@ -1896,6 +2466,168 @@ func (s *ListIncidentsOK) Validate() error {
 			Error: err,
 		})
 	}
+	if err := func() error {
+		if value, ok := s.NextCursor.Get(); ok {
+			if err := func() error {
+				if err := (validate.String{
+					MinLength:     0,
+					MinLengthSet:  false,
+					MaxLength:     100,
+					MaxLengthSet:  true,
+					Email:         false,
+					Hostname:      false,
+					Regex:         regexMap["^[\\s\\S]*$"],
+					MinNumeric:    0,
+					MinNumericSet: false,
+					MaxNumeric:    0,
+					MaxNumericSet: false,
+				}).Validate(string(value)); err != nil {
+					return errors.Wrap(err, "string")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "nextCursor",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s ListMaintenanceOKApplicationJSON) Validate() error {
+	alias := ([]Maintenance)(s)
+	if alias == nil {
+		return errors.New("nil is invalid value")
+	}
+	if err := (validate.Array{
+		MinLength:    0,
+		MinLengthSet: false,
+		MaxLength:    100,
+		MaxLengthSet: true,
+	}).ValidateLength(len(alias)); err != nil {
+		return errors.Wrap(err, "array")
+	}
+	var failures []validate.FieldError
+	for i, elem := range alias {
+		if err := func() error {
+			if err := elem.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			failures = append(failures, validate.FieldError{
+				Name:  fmt.Sprintf("[%d]", i),
+				Error: err,
+			})
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s ListMonitorsOKApplicationJSON) Validate() error {
+	alias := ([]Monitor)(s)
+	if alias == nil {
+		return errors.New("nil is invalid value")
+	}
+	if err := (validate.Array{
+		MinLength:    0,
+		MinLengthSet: false,
+		MaxLength:    500,
+		MaxLengthSet: true,
+	}).ValidateLength(len(alias)); err != nil {
+		return errors.Wrap(err, "array")
+	}
+	var failures []validate.FieldError
+	for i, elem := range alias {
+		if err := func() error {
+			if err := elem.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			failures = append(failures, validate.FieldError{
+				Name:  fmt.Sprintf("[%d]", i),
+				Error: err,
+			})
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s ListNotificationsOKApplicationJSON) Validate() error {
+	alias := ([]Notification)(s)
+	if alias == nil {
+		return errors.New("nil is invalid value")
+	}
+	if err := (validate.Array{
+		MinLength:    0,
+		MinLengthSet: false,
+		MaxLength:    100,
+		MaxLengthSet: true,
+	}).ValidateLength(len(alias)); err != nil {
+		return errors.Wrap(err, "array")
+	}
+	var failures []validate.FieldError
+	for i, elem := range alias {
+		if err := func() error {
+			if err := elem.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			failures = append(failures, validate.FieldError{
+				Name:  fmt.Sprintf("[%d]", i),
+				Error: err,
+			})
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s ListProxiesOKApplicationJSON) Validate() error {
+	alias := ([]Proxy)(s)
+	if alias == nil {
+		return errors.New("nil is invalid value")
+	}
+	if err := (validate.Array{
+		MinLength:    0,
+		MinLengthSet: false,
+		MaxLength:    100,
+		MaxLengthSet: true,
+	}).ValidateLength(len(alias)); err != nil {
+		return errors.Wrap(err, "array")
+	}
+	var failures []validate.FieldError
+	for i, elem := range alias {
+		if err := func() error {
+			if err := elem.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			failures = append(failures, validate.FieldError{
+				Name:  fmt.Sprintf("[%d]", i),
+				Error: err,
+			})
+		}
+	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
@@ -1911,6 +2643,14 @@ func (s *ListRecentEventsOK) Validate() error {
 	if err := func() error {
 		if s.Data == nil {
 			return errors.New("nil is invalid value")
+		}
+		if err := (validate.Array{
+			MinLength:    0,
+			MinLengthSet: false,
+			MaxLength:    100,
+			MaxLengthSet: true,
+		}).ValidateLength(len(s.Data)); err != nil {
+			return errors.Wrap(err, "array")
 		}
 		var failures []validate.FieldError
 		for i, elem := range s.Data {
@@ -1936,6 +2676,93 @@ func (s *ListRecentEventsOK) Validate() error {
 			Error: err,
 		})
 	}
+	if err := func() error {
+		if err := (validate.Int{
+			MinSet:        true,
+			Min:           0,
+			MaxSet:        true,
+			Max:           9223372036854775807,
+			MinExclusive:  false,
+			MaxExclusive:  false,
+			MultipleOfSet: false,
+			MultipleOf:    0,
+			Pattern:       nil,
+		}).Validate(int64(s.Total)); err != nil {
+			return errors.Wrap(err, "int")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "total",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s ListStatusPagesOKApplicationJSON) Validate() error {
+	alias := ([]StatusPage)(s)
+	if alias == nil {
+		return errors.New("nil is invalid value")
+	}
+	if err := (validate.Array{
+		MinLength:    0,
+		MinLengthSet: false,
+		MaxLength:    100,
+		MaxLengthSet: true,
+	}).ValidateLength(len(alias)); err != nil {
+		return errors.Wrap(err, "array")
+	}
+	var failures []validate.FieldError
+	for i, elem := range alias {
+		if err := func() error {
+			if err := elem.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			failures = append(failures, validate.FieldError{
+				Name:  fmt.Sprintf("[%d]", i),
+				Error: err,
+			})
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s ListTagsOKApplicationJSON) Validate() error {
+	alias := ([]Tag)(s)
+	if alias == nil {
+		return errors.New("nil is invalid value")
+	}
+	if err := (validate.Array{
+		MinLength:    0,
+		MinLengthSet: false,
+		MaxLength:    100,
+		MaxLengthSet: true,
+	}).ValidateLength(len(alias)); err != nil {
+		return errors.Wrap(err, "array")
+	}
+	var failures []validate.FieldError
+	for i, elem := range alias {
+		if err := func() error {
+			if err := elem.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			failures = append(failures, validate.FieldError{
+				Name:  fmt.Sprintf("[%d]", i),
+				Error: err,
+			})
+		}
+	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
@@ -1956,7 +2783,7 @@ func (s *LoginRequest) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]+$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -2030,6 +2857,71 @@ func (s *LoginRequest) Validate() error {
 	return nil
 }
 
+func (s *LoginResponse) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := (validate.String{
+			MinLength:     0,
+			MinLengthSet:  false,
+			MaxLength:     2048,
+			MaxLengthSet:  true,
+			Email:         false,
+			Hostname:      false,
+			Regex:         regexMap["^[A-Za-z0-9_.-]+$"],
+			MinNumeric:    0,
+			MinNumericSet: false,
+			MaxNumeric:    0,
+			MaxNumericSet: false,
+		}).Validate(string(s.Token)); err != nil {
+			return errors.Wrap(err, "string")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "token",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if value, ok := s.RefreshToken.Get(); ok {
+			if err := func() error {
+				if err := (validate.String{
+					MinLength:     0,
+					MinLengthSet:  false,
+					MaxLength:     2048,
+					MaxLengthSet:  true,
+					Email:         false,
+					Hostname:      false,
+					Regex:         regexMap["^[A-Za-z0-9_.-]+$"],
+					MinNumeric:    0,
+					MinNumericSet: false,
+					MaxNumeric:    0,
+					MaxNumericSet: false,
+				}).Validate(string(value)); err != nil {
+					return errors.Wrap(err, "string")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "refreshToken",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
 func (s *LoginTooManyRequests) Validate() error {
 	alias := (*ErrorResponse)(s)
 	if err := alias.Validate(); err != nil {
@@ -2060,7 +2952,7 @@ func (s *Maintenance) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]*$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -2085,7 +2977,7 @@ func (s *Maintenance) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -2306,7 +3198,7 @@ func (s *Maintenance) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[0-9*,/\\- ]+$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -2364,7 +3256,7 @@ func (s *Maintenance) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[A-Za-z_/+-]+$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -2404,7 +3296,7 @@ func (s *MaintenanceInput) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]*$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -2429,7 +3321,7 @@ func (s *MaintenanceInput) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -2650,7 +3542,7 @@ func (s *MaintenanceInput) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[0-9*,/\\- ]+$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -2708,7 +3600,7 @@ func (s *MaintenanceInput) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[A-Za-z_/+-]+$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -2786,7 +3678,7 @@ func (s *MessageResponse) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]*$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -2821,7 +3713,7 @@ func (s *Monitor) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]+$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -2969,7 +3861,7 @@ func (s *Monitor) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -3096,54 +3988,100 @@ func (s *Monitor) Validate() error {
 	return nil
 }
 
-func (s MonitorConfig) Validate() error {
+func (s *MonitorConfig) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := (validate.String{
+			MinLength:     0,
+			MinLengthSet:  false,
+			MaxLength:     30,
+			MaxLengthSet:  true,
+			Email:         false,
+			Hostname:      false,
+			Regex:         regexMap["^[\\s\\S]*$"],
+			MinNumeric:    0,
+			MinNumericSet: false,
+			MaxNumeric:    0,
+			MaxNumericSet: false,
+		}).Validate(string(s.Kind)); err != nil {
+			return errors.Wrap(err, "string")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "kind",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if err := s.OneOf.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "OneOf",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s MonitorConfigSum) Validate() error {
 	switch s.Type {
-	case HttpMonitorConfigMonitorConfig:
+	case HttpMonitorConfigMonitorConfigSum:
 		if err := s.HttpMonitorConfig.Validate(); err != nil {
 			return err
 		}
 		return nil
-	case PortMonitorConfigMonitorConfig:
+	case PortMonitorConfigMonitorConfigSum:
 		if err := s.PortMonitorConfig.Validate(); err != nil {
 			return err
 		}
 		return nil
-	case PingMonitorConfigMonitorConfig:
+	case PingMonitorConfigMonitorConfigSum:
 		if err := s.PingMonitorConfig.Validate(); err != nil {
 			return err
 		}
 		return nil
-	case DnsMonitorConfigMonitorConfig:
+	case DnsMonitorConfigMonitorConfigSum:
 		if err := s.DnsMonitorConfig.Validate(); err != nil {
 			return err
 		}
 		return nil
-	case GrpcMonitorConfigMonitorConfig:
+	case GrpcMonitorConfigMonitorConfigSum:
 		if err := s.GrpcMonitorConfig.Validate(); err != nil {
 			return err
 		}
 		return nil
-	case MqttMonitorConfigMonitorConfig:
+	case MqttMonitorConfigMonitorConfigSum:
 		if err := s.MqttMonitorConfig.Validate(); err != nil {
 			return err
 		}
 		return nil
-	case RedisMonitorConfigMonitorConfig:
+	case RedisMonitorConfigMonitorConfigSum:
 		if err := s.RedisMonitorConfig.Validate(); err != nil {
 			return err
 		}
 		return nil
-	case SmtpMonitorConfigMonitorConfig:
+	case SmtpMonitorConfigMonitorConfigSum:
 		if err := s.SmtpMonitorConfig.Validate(); err != nil {
 			return err
 		}
 		return nil
-	case TailscalePingMonitorConfigMonitorConfig:
+	case TailscalePingMonitorConfigMonitorConfigSum:
 		if err := s.TailscalePingMonitorConfig.Validate(); err != nil {
 			return err
 		}
 		return nil
-	case GroupMonitorConfigMonitorConfig:
+	case GroupMonitorConfigMonitorConfigSum:
 		if err := s.GroupMonitorConfig.Validate(); err != nil {
 			return err
 		}
@@ -3167,7 +4105,7 @@ func (s *MonitorInput) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]*$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -3190,7 +4128,7 @@ func (s *MonitorInput) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]*$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -3327,7 +4265,7 @@ func (s *MonitorInput) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -3427,7 +4365,7 @@ func (s *MonitorTag) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -3457,7 +4395,7 @@ func (s *MonitorTag) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^#[0-9a-fA-F]{3,8}$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -3487,7 +4425,7 @@ func (s *MonitorTag) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -3590,7 +4528,7 @@ func (s *MqttMonitorConfig) Validate() error {
 					MaxLength:     255,
 					MaxLengthSet:  true,
 					Email:         false,
-					Hostname:      false,
+					Hostname:      true,
 					Regex:         nil,
 					MinNumeric:    0,
 					MinNumericSet: false,
@@ -3649,7 +4587,7 @@ func (s *MqttMonitorConfig) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]+$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -3679,7 +4617,7 @@ func (s *MqttMonitorConfig) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -3709,7 +4647,7 @@ func (s *MqttMonitorConfig) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -3739,7 +4677,7 @@ func (s *MqttMonitorConfig) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -3788,7 +4726,7 @@ func (s *Notification) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]*$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -3811,7 +4749,7 @@ func (s *Notification) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]*$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -3826,33 +4764,6 @@ func (s *Notification) Validate() error {
 			Error: err,
 		})
 	}
-	if err := func() error {
-		if value, ok := s.Config.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "config",
-			Error: err,
-		})
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s NotificationConfig) Validate() error {
-	var failures []validate.FieldError
-
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
@@ -3873,7 +4784,7 @@ func (s *NotificationInput) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]*$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -3896,7 +4807,7 @@ func (s *NotificationInput) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]*$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -3911,26 +4822,6 @@ func (s *NotificationInput) Validate() error {
 			Error: err,
 		})
 	}
-	if err := func() error {
-		if err := s.Config.Validate(); err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "config",
-			Error: err,
-		})
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s NotificationInputConfig) Validate() error {
-	var failures []validate.FieldError
-
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
@@ -3963,7 +4854,7 @@ func (s *PingMonitorConfig) Validate() error {
 					MaxLength:     255,
 					MaxLengthSet:  true,
 					Email:         false,
-					Hostname:      false,
+					Hostname:      true,
 					Regex:         nil,
 					MinNumeric:    0,
 					MinNumericSet: false,
@@ -4053,7 +4944,7 @@ func (s *PortMonitorConfig) Validate() error {
 					MaxLength:     255,
 					MaxLengthSet:  true,
 					Email:         false,
-					Hostname:      false,
+					Hostname:      true,
 					Regex:         nil,
 					MinNumeric:    0,
 					MinNumericSet: false,
@@ -4117,41 +5008,6 @@ func (s PortMonitorConfigKind) Validate() error {
 	}
 }
 
-func (s *Prepare2FAOK) Validate() error {
-	if s == nil {
-		return validate.ErrNilPointer
-	}
-
-	var failures []validate.FieldError
-	if err := func() error {
-		if err := (validate.String{
-			MinLength:     0,
-			MinLengthSet:  false,
-			MaxLength:     500,
-			MaxLengthSet:  true,
-			Email:         false,
-			Hostname:      false,
-			Regex:         nil,
-			MinNumeric:    0,
-			MinNumericSet: false,
-			MaxNumeric:    0,
-			MaxNumericSet: false,
-		}).Validate(string(s.URI)); err != nil {
-			return errors.Wrap(err, "string")
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "uri",
-			Error: err,
-		})
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
 func (s *Prepare2FAReq) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -4211,7 +5067,7 @@ func (s *Proxy) Validate() error {
 			MaxLength:     255,
 			MaxLengthSet:  true,
 			Email:         false,
-			Hostname:      false,
+			Hostname:      true,
 			Regex:         nil,
 			MinNumeric:    0,
 			MinNumericSet: false,
@@ -4258,7 +5114,7 @@ func (s *Proxy) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -4288,7 +5144,7 @@ func (s *Proxy) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -4338,7 +5194,7 @@ func (s *ProxyInput) Validate() error {
 			MaxLength:     255,
 			MaxLengthSet:  true,
 			Email:         false,
-			Hostname:      false,
+			Hostname:      true,
 			Regex:         nil,
 			MinNumeric:    0,
 			MinNumericSet: false,
@@ -4385,7 +5241,7 @@ func (s *ProxyInput) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -4415,7 +5271,7 @@ func (s *ProxyInput) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -4505,7 +5361,7 @@ func (s *RedisMonitorConfig) Validate() error {
 					MaxLength:     255,
 					MaxLengthSet:  true,
 					Email:         false,
-					Hostname:      false,
+					Hostname:      true,
 					Regex:         nil,
 					MinNumeric:    0,
 					MinNumericSet: false,
@@ -4564,7 +5420,7 @@ func (s *RedisMonitorConfig) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -4597,6 +5453,41 @@ func (s RedisMonitorConfigKind) Validate() error {
 	default:
 		return errors.Errorf("invalid value: %v", s)
 	}
+}
+
+func (s *RefreshTokenRequest) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := (validate.String{
+			MinLength:     0,
+			MinLengthSet:  false,
+			MaxLength:     2048,
+			MaxLengthSet:  true,
+			Email:         false,
+			Hostname:      false,
+			Regex:         regexMap["^[A-Za-z0-9_.-]+$"],
+			MinNumeric:    0,
+			MinNumericSet: false,
+			MaxNumeric:    0,
+			MaxNumericSet: false,
+		}).Validate(string(s.RefreshToken)); err != nil {
+			return errors.Wrap(err, "string")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "refreshToken",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
 }
 
 func (s *SetMaintenanceMonitorsReq) Validate() error {
@@ -4668,36 +5559,6 @@ func (s *Settings) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if value, ok := s.PrimaryBaseURL.Get(); ok {
-			if err := func() error {
-				if err := (validate.String{
-					MinLength:     0,
-					MinLengthSet:  false,
-					MaxLength:     2048,
-					MaxLengthSet:  true,
-					Email:         false,
-					Hostname:      false,
-					Regex:         nil,
-					MinNumeric:    0,
-					MinNumericSet: false,
-					MaxNumeric:    0,
-					MaxNumericSet: false,
-				}).Validate(string(value)); err != nil {
-					return errors.Wrap(err, "string")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "primaryBaseURL",
-			Error: err,
-		})
-	}
-	if err := func() error {
 		if value, ok := s.ServerTimezone.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
@@ -4707,7 +5568,7 @@ func (s *Settings) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[A-Za-z_/+-]+$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -4783,7 +5644,7 @@ func (s *Settings) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[a-z0-9]([a-z0-9-]*[a-z0-9])?$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -4834,7 +5695,7 @@ func (s *SetupReq) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]+$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -4904,7 +5765,7 @@ func (s *SmtpMonitorConfig) Validate() error {
 					MaxLength:     255,
 					MaxLengthSet:  true,
 					Email:         false,
-					Hostname:      false,
+					Hostname:      true,
 					Regex:         nil,
 					MinNumeric:    0,
 					MinNumericSet: false,
@@ -5005,7 +5866,7 @@ func (s *StatusPage) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]*$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -5030,7 +5891,7 @@ func (s *StatusPage) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -5060,7 +5921,7 @@ func (s *StatusPage) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -5108,7 +5969,7 @@ func (s *StatusPage) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -5138,7 +5999,7 @@ func (s *StatusPage) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -5168,7 +6029,7 @@ func (s *StatusPage) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^(G-[A-Z0-9]+|UA-[0-9]+-[0-9]+)?$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -5244,7 +6105,7 @@ func (s *StatusPageGroup) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]*$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -5345,7 +6206,7 @@ func (s *StatusPageInput) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]*$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -5393,7 +6254,7 @@ func (s *StatusPageInput) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -5423,7 +6284,7 @@ func (s *StatusPageInput) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -5471,7 +6332,7 @@ func (s *StatusPageInput) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -5501,7 +6362,7 @@ func (s *StatusPageInput) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -5531,7 +6392,7 @@ func (s *StatusPageInput) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^(G-[A-Z0-9]+|UA-[0-9]+-[0-9]+)?$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -5633,7 +6494,7 @@ func (s *Tag) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]*$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -5691,7 +6552,7 @@ func (s *TagInput) Validate() error {
 			MaxLengthSet:  true,
 			Email:         false,
 			Hostname:      false,
-			Regex:         nil,
+			Regex:         regexMap["^[\\s\\S]*$"],
 			MinNumeric:    0,
 			MinNumericSet: false,
 			MaxNumeric:    0,
@@ -5761,7 +6622,7 @@ func (s *TailscalePingMonitorConfig) Validate() error {
 					MaxLength:     255,
 					MaxLengthSet:  true,
 					Email:         false,
-					Hostname:      false,
+					Hostname:      true,
 					Regex:         nil,
 					MinNumeric:    0,
 					MinNumericSet: false,
@@ -5797,6 +6658,41 @@ func (s TailscalePingMonitorConfigKind) Validate() error {
 	}
 }
 
+func (s *TokenResponse) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := (validate.String{
+			MinLength:     0,
+			MinLengthSet:  false,
+			MaxLength:     2048,
+			MaxLengthSet:  true,
+			Email:         false,
+			Hostname:      false,
+			Regex:         regexMap["^[A-Za-z0-9_.-]+$"],
+			MinNumeric:    0,
+			MinNumericSet: false,
+			MaxNumeric:    0,
+			MaxNumericSet: false,
+		}).Validate(string(s.Token)); err != nil {
+			return errors.Wrap(err, "string")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "token",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
 func (s *UpdateMonitorTagReq) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -5813,7 +6709,7 @@ func (s *UpdateMonitorTagReq) Validate() error {
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[\\s\\S]*$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,

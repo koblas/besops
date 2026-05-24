@@ -4,8 +4,6 @@ package oas
 
 import (
 	"context"
-
-	"github.com/google/uuid"
 )
 
 // Handler handles operations described by OpenAPI v3 specification.
@@ -35,31 +33,31 @@ type APIKeyHandler interface {
 	// Create a new API key.
 	//
 	// POST /api-keys
-	CreateAPIKey(ctx context.Context, req *APIKeyInput) (*CreateAPIKeyCreated, error)
+	CreateAPIKey(ctx context.Context, req *APIKeyInput) (CreateAPIKeyRes, error)
 	// DeleteAPIKey implements deleteAPIKey operation.
 	//
 	// Delete an API key.
 	//
 	// DELETE /api-keys/{keyId}
-	DeleteAPIKey(ctx context.Context, params DeleteAPIKeyParams) error
+	DeleteAPIKey(ctx context.Context, params DeleteAPIKeyParams) (DeleteAPIKeyRes, error)
 	// DisableAPIKey implements disableAPIKey operation.
 	//
 	// Disable an API key.
 	//
 	// POST /api-keys/{keyId}/disable
-	DisableAPIKey(ctx context.Context, params DisableAPIKeyParams) (*MessageResponse, error)
+	DisableAPIKey(ctx context.Context, params DisableAPIKeyParams) (DisableAPIKeyRes, error)
 	// EnableAPIKey implements enableAPIKey operation.
 	//
 	// Enable an API key.
 	//
 	// POST /api-keys/{keyId}/enable
-	EnableAPIKey(ctx context.Context, params EnableAPIKeyParams) (*MessageResponse, error)
+	EnableAPIKey(ctx context.Context, params EnableAPIKeyParams) (EnableAPIKeyRes, error)
 	// ListAPIKeys implements listAPIKeys operation.
 	//
 	// List all API keys.
 	//
 	// GET /api-keys
-	ListAPIKeys(ctx context.Context) ([]APIKey, error)
+	ListAPIKeys(ctx context.Context) (ListAPIKeysRes, error)
 }
 
 // AuthHandler handles operations described by OpenAPI v3 specification.
@@ -77,19 +75,19 @@ type AuthHandler interface {
 	// Disable 2FA.
 	//
 	// POST /auth/2fa/disable
-	Disable2FA(ctx context.Context, req *Disable2FAReq) (*MessageResponse, error)
+	Disable2FA(ctx context.Context, req *Disable2FAReq) (Disable2FARes, error)
 	// Enable2FA implements enable2FA operation.
 	//
 	// Enable 2FA after verifying token.
 	//
 	// POST /auth/2fa/enable
-	Enable2FA(ctx context.Context, req *Enable2FAReq) (*MessageResponse, error)
+	Enable2FA(ctx context.Context, req *Enable2FAReq) (Enable2FARes, error)
 	// Get2FAStatus implements get2FAStatus operation.
 	//
 	// Get 2FA status for current user.
 	//
 	// GET /auth/2fa
-	Get2FAStatus(ctx context.Context) (*Get2FAStatusOK, error)
+	Get2FAStatus(ctx context.Context) (Get2FAStatusRes, error)
 	// Login implements login operation.
 	//
 	// Authenticate with username and password.
@@ -101,19 +99,19 @@ type AuthHandler interface {
 	// Invalidate current session.
 	//
 	// POST /auth/logout
-	Logout(ctx context.Context) error
+	Logout(ctx context.Context) (LogoutRes, error)
 	// NeedSetup implements needSetup operation.
 	//
 	// Check if initial setup is required.
 	//
 	// GET /auth/setup
-	NeedSetup(ctx context.Context) (*NeedSetupOK, error)
+	NeedSetup(ctx context.Context) (NeedSetupRes, error)
 	// Prepare2FA implements prepare2FA operation.
 	//
 	// Generate 2FA secret and QR URI.
 	//
 	// POST /auth/2fa/prepare
-	Prepare2FA(ctx context.Context, req *Prepare2FAReq) (*Prepare2FAOK, error)
+	Prepare2FA(ctx context.Context, req *Prepare2FAReq) (Prepare2FARes, error)
 	// RefreshToken implements refreshToken operation.
 	//
 	// Refresh JWT token.
@@ -137,31 +135,31 @@ type BadgeHandler interface {
 	// Get certificate expiry badge SVG.
 	//
 	// GET /badges/{monitorId}/cert-exp
-	GetCertExpiryBadge(ctx context.Context, params GetCertExpiryBadgeParams) (SVGBadge, error)
+	GetCertExpiryBadge(ctx context.Context, params GetCertExpiryBadgeParams) (GetCertExpiryBadgeRes, error)
 	// GetLatencyBadge implements getLatencyBadge operation.
 	//
 	// Get average latency badge SVG.
 	//
 	// GET /badges/{monitorId}/latency
-	GetLatencyBadge(ctx context.Context, params GetLatencyBadgeParams) (SVGBadge, error)
+	GetLatencyBadge(ctx context.Context, params GetLatencyBadgeParams) (GetLatencyBadgeRes, error)
 	// GetResponseBadge implements getResponseBadge operation.
 	//
 	// Get last response time badge SVG.
 	//
 	// GET /badges/{monitorId}/response
-	GetResponseBadge(ctx context.Context, params GetResponseBadgeParams) (SVGBadge, error)
+	GetResponseBadge(ctx context.Context, params GetResponseBadgeParams) (GetResponseBadgeRes, error)
 	// GetStatusBadge implements getStatusBadge operation.
 	//
 	// Get status badge SVG for a monitor.
 	//
 	// GET /badges/{monitorId}/status
-	GetStatusBadge(ctx context.Context, params GetStatusBadgeParams) (SVGBadge, error)
+	GetStatusBadge(ctx context.Context, params GetStatusBadgeParams) (GetStatusBadgeRes, error)
 	// GetUptimeBadge implements getUptimeBadge operation.
 	//
 	// Get uptime percentage badge SVG.
 	//
 	// GET /badges/{monitorId}/uptime
-	GetUptimeBadge(ctx context.Context, params GetUptimeBadgeParams) (SVGBadge, error)
+	GetUptimeBadge(ctx context.Context, params GetUptimeBadgeParams) (GetUptimeBadgeRes, error)
 }
 
 // EventHandler handles operations described by OpenAPI v3 specification.
@@ -173,7 +171,7 @@ type EventHandler interface {
 	// Subscribe to real-time status page events via SSE.
 	//
 	// GET /status-pages/{slug}/events
-	GetStatusPageEventStream(ctx context.Context, params GetStatusPageEventStreamParams) (GetStatusPageEventStreamOK, error)
+	GetStatusPageEventStream(ctx context.Context, params GetStatusPageEventStreamParams) (GetStatusPageEventStreamRes, error)
 }
 
 // HeartbeatHandler handles operations described by OpenAPI v3 specification.
@@ -185,38 +183,38 @@ type HeartbeatHandler interface {
 	// Clear important heartbeats (events) for a monitor.
 	//
 	// DELETE /monitors/{monitorId}/events
-	ClearEvents(ctx context.Context, params ClearEventsParams) error
+	ClearEvents(ctx context.Context, params ClearEventsParams) (ClearEventsRes, error)
 	// ClearHeartbeats implements clearHeartbeats operation.
 	//
 	// Clear all heartbeats for a monitor.
 	//
 	// DELETE /monitors/{monitorId}/heartbeats
-	ClearHeartbeats(ctx context.Context, params ClearHeartbeatsParams) error
+	ClearHeartbeats(ctx context.Context, params ClearHeartbeatsParams) (ClearHeartbeatsRes, error)
 	// GetChartData implements getChartData operation.
 	//
 	// Get aggregated chart data for a monitor.
 	//
 	// GET /monitors/{monitorId}/heartbeats/chart
-	GetChartData(ctx context.Context, params GetChartDataParams) ([]ChartPoint, error)
+	GetChartData(ctx context.Context, params GetChartDataParams) (GetChartDataRes, error)
 	// GetHeartbeats implements getHeartbeats operation.
 	//
 	// Returns heartbeat history. Use either `hours` to get all heartbeats within a time window,
 	// or `count` to get the N most recent heartbeats. If both are provided, `count` takes precedence.
 	//
 	// GET /monitors/{monitorId}/heartbeats
-	GetHeartbeats(ctx context.Context, params GetHeartbeatsParams) ([]Heartbeat, error)
+	GetHeartbeats(ctx context.Context, params GetHeartbeatsParams) (GetHeartbeatsRes, error)
 	// GetImportantHeartbeats implements getImportantHeartbeats operation.
 	//
 	// Get important heartbeats (status changes).
 	//
 	// GET /monitors/{monitorId}/events
-	GetImportantHeartbeats(ctx context.Context, params GetImportantHeartbeatsParams) (*GetImportantHeartbeatsOK, error)
+	GetImportantHeartbeats(ctx context.Context, params GetImportantHeartbeatsParams) (GetImportantHeartbeatsRes, error)
 	// ListRecentEvents implements listRecentEvents operation.
 	//
 	// Get recent important heartbeats across all monitors.
 	//
 	// GET /events
-	ListRecentEvents(ctx context.Context, params ListRecentEventsParams) (*ListRecentEventsOK, error)
+	ListRecentEvents(ctx context.Context, params ListRecentEventsParams) (ListRecentEventsRes, error)
 }
 
 // IncidentHandler handles operations described by OpenAPI v3 specification.
@@ -228,37 +226,37 @@ type IncidentHandler interface {
 	// Create an incident on a status page.
 	//
 	// POST /status-pages/{slug}/incidents
-	CreateIncident(ctx context.Context, req *IncidentInput, params CreateIncidentParams) (*Incident, error)
+	CreateIncident(ctx context.Context, req *IncidentInput, params CreateIncidentParams) (CreateIncidentRes, error)
 	// DeleteIncident implements deleteIncident operation.
 	//
 	// Delete an incident.
 	//
 	// DELETE /status-pages/{slug}/incidents/{incidentId}
-	DeleteIncident(ctx context.Context, params DeleteIncidentParams) error
+	DeleteIncident(ctx context.Context, params DeleteIncidentParams) (DeleteIncidentRes, error)
 	// ListIncidents implements listIncidents operation.
 	//
 	// Get incident history for a status page.
 	//
 	// GET /status-pages/{slug}/incidents
-	ListIncidents(ctx context.Context, params ListIncidentsParams) (*ListIncidentsOK, error)
+	ListIncidents(ctx context.Context, params ListIncidentsParams) (ListIncidentsRes, error)
 	// ResolveIncident implements resolveIncident operation.
 	//
 	// Mark an incident as resolved.
 	//
 	// POST /status-pages/{slug}/incidents/{incidentId}/resolve
-	ResolveIncident(ctx context.Context, params ResolveIncidentParams) (*Incident, error)
+	ResolveIncident(ctx context.Context, params ResolveIncidentParams) (ResolveIncidentRes, error)
 	// UnpinIncident implements unpinIncident operation.
 	//
 	// Unpin an incident from the status page.
 	//
 	// POST /status-pages/{slug}/incidents/{incidentId}/unpin
-	UnpinIncident(ctx context.Context, params UnpinIncidentParams) (*MessageResponse, error)
+	UnpinIncident(ctx context.Context, params UnpinIncidentParams) (UnpinIncidentRes, error)
 	// UpdateIncident implements updateIncident operation.
 	//
 	// Update an incident.
 	//
 	// PUT /status-pages/{slug}/incidents/{incidentId}
-	UpdateIncident(ctx context.Context, req *IncidentInput, params UpdateIncidentParams) (*Incident, error)
+	UpdateIncident(ctx context.Context, req *IncidentInput, params UpdateIncidentParams) (UpdateIncidentRes, error)
 }
 
 // MaintenanceHandler handles operations described by OpenAPI v3 specification.
@@ -270,67 +268,67 @@ type MaintenanceHandler interface {
 	// Create a maintenance window.
 	//
 	// POST /maintenance
-	CreateMaintenance(ctx context.Context, req *MaintenanceInput) (*CreateMaintenanceCreated, error)
+	CreateMaintenance(ctx context.Context, req *MaintenanceInput) (CreateMaintenanceRes, error)
 	// DeleteMaintenance implements deleteMaintenance operation.
 	//
 	// Delete a maintenance window.
 	//
 	// DELETE /maintenance/{maintenanceId}
-	DeleteMaintenance(ctx context.Context, params DeleteMaintenanceParams) error
+	DeleteMaintenance(ctx context.Context, params DeleteMaintenanceParams) (DeleteMaintenanceRes, error)
 	// GetMaintenance implements getMaintenance operation.
 	//
 	// Get a maintenance window.
 	//
 	// GET /maintenance/{maintenanceId}
-	GetMaintenance(ctx context.Context, params GetMaintenanceParams) (*Maintenance, error)
+	GetMaintenance(ctx context.Context, params GetMaintenanceParams) (GetMaintenanceRes, error)
 	// GetMaintenanceMonitors implements getMaintenanceMonitors operation.
 	//
 	// Get monitors for a maintenance window.
 	//
 	// GET /maintenance/{maintenanceId}/monitors
-	GetMaintenanceMonitors(ctx context.Context, params GetMaintenanceMonitorsParams) ([]uuid.UUID, error)
+	GetMaintenanceMonitors(ctx context.Context, params GetMaintenanceMonitorsParams) (GetMaintenanceMonitorsRes, error)
 	// GetMaintenanceStatusPages implements getMaintenanceStatusPages operation.
 	//
 	// Get status pages for a maintenance window.
 	//
 	// GET /maintenance/{maintenanceId}/status-pages
-	GetMaintenanceStatusPages(ctx context.Context, params GetMaintenanceStatusPagesParams) ([]uuid.UUID, error)
+	GetMaintenanceStatusPages(ctx context.Context, params GetMaintenanceStatusPagesParams) (GetMaintenanceStatusPagesRes, error)
 	// ListMaintenance implements listMaintenance operation.
 	//
 	// List all maintenance windows.
 	//
 	// GET /maintenance
-	ListMaintenance(ctx context.Context) ([]Maintenance, error)
+	ListMaintenance(ctx context.Context) (ListMaintenanceRes, error)
 	// PauseMaintenance implements pauseMaintenance operation.
 	//
 	// Pause a maintenance window.
 	//
 	// POST /maintenance/{maintenanceId}/pause
-	PauseMaintenance(ctx context.Context, params PauseMaintenanceParams) (*MessageResponse, error)
+	PauseMaintenance(ctx context.Context, params PauseMaintenanceParams) (PauseMaintenanceRes, error)
 	// ResumeMaintenance implements resumeMaintenance operation.
 	//
 	// Resume a maintenance window.
 	//
 	// POST /maintenance/{maintenanceId}/resume
-	ResumeMaintenance(ctx context.Context, params ResumeMaintenanceParams) (*MessageResponse, error)
+	ResumeMaintenance(ctx context.Context, params ResumeMaintenanceParams) (ResumeMaintenanceRes, error)
 	// SetMaintenanceMonitors implements setMaintenanceMonitors operation.
 	//
 	// Set monitors for a maintenance window.
 	//
 	// PUT /maintenance/{maintenanceId}/monitors
-	SetMaintenanceMonitors(ctx context.Context, req *SetMaintenanceMonitorsReq, params SetMaintenanceMonitorsParams) error
+	SetMaintenanceMonitors(ctx context.Context, req *SetMaintenanceMonitorsReq, params SetMaintenanceMonitorsParams) (SetMaintenanceMonitorsRes, error)
 	// SetMaintenanceStatusPages implements setMaintenanceStatusPages operation.
 	//
 	// Set status pages for a maintenance window.
 	//
 	// PUT /maintenance/{maintenanceId}/status-pages
-	SetMaintenanceStatusPages(ctx context.Context, req *SetMaintenanceStatusPagesReq, params SetMaintenanceStatusPagesParams) error
+	SetMaintenanceStatusPages(ctx context.Context, req *SetMaintenanceStatusPagesReq, params SetMaintenanceStatusPagesParams) (SetMaintenanceStatusPagesRes, error)
 	// UpdateMaintenance implements updateMaintenance operation.
 	//
 	// Update a maintenance window.
 	//
 	// PUT /maintenance/{maintenanceId}
-	UpdateMaintenance(ctx context.Context, req *MaintenanceInput, params UpdateMaintenanceParams) (*Maintenance, error)
+	UpdateMaintenance(ctx context.Context, req *MaintenanceInput, params UpdateMaintenanceParams) (UpdateMaintenanceRes, error)
 }
 
 // MonitorHandler handles operations described by OpenAPI v3 specification.
@@ -342,13 +340,13 @@ type MonitorHandler interface {
 	// Check domain/TLD information.
 	//
 	// GET /monitors/{monitorId}/domain
-	CheckDomain(ctx context.Context, params CheckDomainParams) (*CheckDomainOK, error)
+	CheckDomain(ctx context.Context, params CheckDomainParams) (CheckDomainRes, error)
 	// CreateMonitor implements createMonitor operation.
 	//
 	// Create a new monitor.
 	//
 	// POST /monitors
-	CreateMonitor(ctx context.Context, req *MonitorInput) (*CreateMonitorCreated, error)
+	CreateMonitor(ctx context.Context, req *MonitorInput) (CreateMonitorRes, error)
 	// DeleteMonitor implements deleteMonitor operation.
 	//
 	// Delete a monitor.
@@ -366,25 +364,25 @@ type MonitorHandler interface {
 	// Get 24-hour uptime percentages for all active monitors.
 	//
 	// GET /monitors/uptimes
-	GetMonitorUptimes(ctx context.Context) (GetMonitorUptimesOK, error)
+	GetMonitorUptimes(ctx context.Context) (GetMonitorUptimesRes, error)
 	// ListMonitors implements listMonitors operation.
 	//
 	// List all monitors for the current user.
 	//
 	// GET /monitors
-	ListMonitors(ctx context.Context) ([]Monitor, error)
+	ListMonitors(ctx context.Context) (ListMonitorsRes, error)
 	// PauseMonitor implements pauseMonitor operation.
 	//
 	// Pause a monitor.
 	//
 	// POST /monitors/{monitorId}/pause
-	PauseMonitor(ctx context.Context, params PauseMonitorParams) (*MessageResponse, error)
+	PauseMonitor(ctx context.Context, params PauseMonitorParams) (PauseMonitorRes, error)
 	// ResumeMonitor implements resumeMonitor operation.
 	//
 	// Resume a paused monitor.
 	//
 	// POST /monitors/{monitorId}/resume
-	ResumeMonitor(ctx context.Context, params ResumeMonitorParams) (*MessageResponse, error)
+	ResumeMonitor(ctx context.Context, params ResumeMonitorParams) (ResumeMonitorRes, error)
 	// UpdateMonitor implements updateMonitor operation.
 	//
 	// Update a monitor.
@@ -402,31 +400,31 @@ type NotificationHandler interface {
 	// Create a notification provider.
 	//
 	// POST /notifications
-	CreateNotification(ctx context.Context, req *NotificationInput) (*CreateNotificationCreated, error)
+	CreateNotification(ctx context.Context, req *NotificationInput) (CreateNotificationRes, error)
 	// DeleteNotification implements deleteNotification operation.
 	//
 	// Delete a notification provider.
 	//
 	// DELETE /notifications/{notificationId}
-	DeleteNotification(ctx context.Context, params DeleteNotificationParams) error
+	DeleteNotification(ctx context.Context, params DeleteNotificationParams) (DeleteNotificationRes, error)
 	// ListNotifications implements listNotifications operation.
 	//
 	// List all notification providers.
 	//
 	// GET /notifications
-	ListNotifications(ctx context.Context) ([]Notification, error)
+	ListNotifications(ctx context.Context) (ListNotificationsRes, error)
 	// TestNotification implements testNotification operation.
 	//
 	// Send a test notification.
 	//
 	// POST /notifications/{notificationId}/test
-	TestNotification(ctx context.Context, params TestNotificationParams) (*MessageResponse, error)
+	TestNotification(ctx context.Context, params TestNotificationParams) (TestNotificationRes, error)
 	// UpdateNotification implements updateNotification operation.
 	//
 	// Update a notification provider.
 	//
 	// PUT /notifications/{notificationId}
-	UpdateNotification(ctx context.Context, req *NotificationInput, params UpdateNotificationParams) (*Notification, error)
+	UpdateNotification(ctx context.Context, req *NotificationInput, params UpdateNotificationParams) (UpdateNotificationRes, error)
 }
 
 // ProxyHandler handles operations described by OpenAPI v3 specification.
@@ -438,25 +436,25 @@ type ProxyHandler interface {
 	// Add a proxy.
 	//
 	// POST /proxies
-	CreateProxy(ctx context.Context, req *ProxyInput) (*CreateProxyCreated, error)
+	CreateProxy(ctx context.Context, req *ProxyInput) (CreateProxyRes, error)
 	// DeleteProxy implements deleteProxy operation.
 	//
 	// Delete a proxy.
 	//
 	// DELETE /proxies/{proxyId}
-	DeleteProxy(ctx context.Context, params DeleteProxyParams) error
+	DeleteProxy(ctx context.Context, params DeleteProxyParams) (DeleteProxyRes, error)
 	// ListProxies implements listProxies operation.
 	//
 	// List proxies.
 	//
 	// GET /proxies
-	ListProxies(ctx context.Context) ([]Proxy, error)
+	ListProxies(ctx context.Context) (ListProxiesRes, error)
 	// UpdateProxy implements updateProxy operation.
 	//
 	// Update a proxy.
 	//
 	// PUT /proxies/{proxyId}
-	UpdateProxy(ctx context.Context, req *ProxyInput, params UpdateProxyParams) error
+	UpdateProxy(ctx context.Context, req *ProxyInput, params UpdateProxyParams) (UpdateProxyRes, error)
 }
 
 // SettingsHandler handles operations described by OpenAPI v3 specification.
@@ -468,13 +466,13 @@ type SettingsHandler interface {
 	// Get all application settings.
 	//
 	// GET /settings
-	GetSettings(ctx context.Context) (*Settings, error)
+	GetSettings(ctx context.Context) (GetSettingsRes, error)
 	// UpdateSettings implements updateSettings operation.
 	//
 	// Update application settings.
 	//
 	// PATCH /settings
-	UpdateSettings(ctx context.Context, req *Settings) (*MessageResponse, error)
+	UpdateSettings(ctx context.Context, req *Settings) (UpdateSettingsRes, error)
 }
 
 // StatusPageHandler handles operations described by OpenAPI v3 specification.
@@ -486,13 +484,13 @@ type StatusPageHandler interface {
 	// Create a status page.
 	//
 	// POST /status-pages
-	CreateStatusPage(ctx context.Context, req *StatusPageInput) (*CreateStatusPageCreated, error)
+	CreateStatusPage(ctx context.Context, req *StatusPageInput) (CreateStatusPageRes, error)
 	// DeleteStatusPage implements deleteStatusPage operation.
 	//
 	// Delete a status page.
 	//
 	// DELETE /status-pages/{slug}
-	DeleteStatusPage(ctx context.Context, params DeleteStatusPageParams) error
+	DeleteStatusPage(ctx context.Context, params DeleteStatusPageParams) (DeleteStatusPageRes, error)
 	// GetStatusPage implements getStatusPage operation.
 	//
 	// Get public status page data.
@@ -504,25 +502,25 @@ type StatusPageHandler interface {
 	// Get overall status badge for a status page.
 	//
 	// GET /status-pages/{slug}/badge
-	GetStatusPageBadge(ctx context.Context, params GetStatusPageBadgeParams) (GetStatusPageBadgeOK, error)
+	GetStatusPageBadge(ctx context.Context, params GetStatusPageBadgeParams) (GetStatusPageBadgeRes, error)
 	// GetStatusPageHeartbeats implements getStatusPageHeartbeats operation.
 	//
 	// Get current heartbeats for a public status page.
 	//
 	// GET /status-pages/{slug}/heartbeats
-	GetStatusPageHeartbeats(ctx context.Context, params GetStatusPageHeartbeatsParams) (*GetStatusPageHeartbeatsOK, error)
+	GetStatusPageHeartbeats(ctx context.Context, params GetStatusPageHeartbeatsParams) (GetStatusPageHeartbeatsRes, error)
 	// ListStatusPages implements listStatusPages operation.
 	//
 	// List all status pages.
 	//
 	// GET /status-pages
-	ListStatusPages(ctx context.Context) ([]StatusPage, error)
+	ListStatusPages(ctx context.Context) (ListStatusPagesRes, error)
 	// UpdateStatusPage implements updateStatusPage operation.
 	//
 	// Update a status page.
 	//
 	// PUT /status-pages/{slug}
-	UpdateStatusPage(ctx context.Context, req *StatusPageInput, params UpdateStatusPageParams) (*StatusPage, error)
+	UpdateStatusPage(ctx context.Context, req *StatusPageInput, params UpdateStatusPageParams) (UpdateStatusPageRes, error)
 }
 
 // SystemHandler handles operations described by OpenAPI v3 specification.
@@ -534,31 +532,31 @@ type SystemHandler interface {
 	// Clear all statistics data.
 	//
 	// DELETE /statistics
-	ClearStatistics(ctx context.Context) error
+	ClearStatistics(ctx context.Context) (ClearStatisticsRes, error)
 	// GetDatabaseSize implements getDatabaseSize operation.
 	//
 	// Get database size.
 	//
 	// GET /database/size
-	GetDatabaseSize(ctx context.Context) (*GetDatabaseSizeOK, error)
+	GetDatabaseSize(ctx context.Context) (GetDatabaseSizeRes, error)
 	// GetInfo implements getInfo operation.
 	//
 	// Get server info (version, timezone).
 	//
 	// GET /info
-	GetInfo(ctx context.Context) (*GetInfoOK, error)
+	GetInfo(ctx context.Context) (GetInfoRes, error)
 	// HealthCheck implements healthCheck operation.
 	//
 	// Health check endpoint.
 	//
 	// GET /health
-	HealthCheck(ctx context.Context) (*HealthCheckOK, error)
+	HealthCheck(ctx context.Context) (HealthCheckRes, error)
 	// ShrinkDatabase implements shrinkDatabase operation.
 	//
 	// Shrink database (vacuum).
 	//
 	// POST /database/shrink
-	ShrinkDatabase(ctx context.Context) (*MessageResponse, error)
+	ShrinkDatabase(ctx context.Context) (ShrinkDatabaseRes, error)
 }
 
 // TagHandler handles operations described by OpenAPI v3 specification.
@@ -570,43 +568,43 @@ type TagHandler interface {
 	// Add a tag to a monitor.
 	//
 	// POST /monitors/{monitorId}/tags
-	AddMonitorTag(ctx context.Context, req *AddMonitorTagReq, params AddMonitorTagParams) error
+	AddMonitorTag(ctx context.Context, req *AddMonitorTagReq, params AddMonitorTagParams) (AddMonitorTagRes, error)
 	// CreateTag implements createTag operation.
 	//
 	// Create a tag.
 	//
 	// POST /tags
-	CreateTag(ctx context.Context, req *TagInput) (*Tag, error)
+	CreateTag(ctx context.Context, req *TagInput) (CreateTagRes, error)
 	// DeleteMonitorTag implements deleteMonitorTag operation.
 	//
 	// Remove a tag from a monitor.
 	//
 	// DELETE /monitors/{monitorId}/tags/{tagId}
-	DeleteMonitorTag(ctx context.Context, params DeleteMonitorTagParams) error
+	DeleteMonitorTag(ctx context.Context, params DeleteMonitorTagParams) (DeleteMonitorTagRes, error)
 	// DeleteTag implements deleteTag operation.
 	//
 	// Delete a tag.
 	//
 	// DELETE /tags/{tagId}
-	DeleteTag(ctx context.Context, params DeleteTagParams) error
+	DeleteTag(ctx context.Context, params DeleteTagParams) (DeleteTagRes, error)
 	// ListTags implements listTags operation.
 	//
 	// List all tags.
 	//
 	// GET /tags
-	ListTags(ctx context.Context) ([]Tag, error)
+	ListTags(ctx context.Context) (ListTagsRes, error)
 	// UpdateMonitorTag implements updateMonitorTag operation.
 	//
 	// Update a monitor tag value.
 	//
 	// PUT /monitors/{monitorId}/tags/{tagId}
-	UpdateMonitorTag(ctx context.Context, req *UpdateMonitorTagReq, params UpdateMonitorTagParams) error
+	UpdateMonitorTag(ctx context.Context, req *UpdateMonitorTagReq, params UpdateMonitorTagParams) (UpdateMonitorTagRes, error)
 	// UpdateTag implements updateTag operation.
 	//
 	// Update a tag.
 	//
 	// PUT /tags/{tagId}
-	UpdateTag(ctx context.Context, req *TagInput, params UpdateTagParams) (*Tag, error)
+	UpdateTag(ctx context.Context, req *TagInput, params UpdateTagParams) (UpdateTagRes, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and

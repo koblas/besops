@@ -54,13 +54,13 @@ func (c *Calculator) AggregateMinutely(ctx context.Context) error {
 
 	return c.aggregate(ctx, bucketStart, bucketEnd, func(ctx context.Context, monitorID string, s *statBucket) error {
 		return c.stats.UpsertMinutely(ctx, &stats.StatMinutely{
-			MonitorID: monitorID,
-			Timestamp: bucketStart.Unix(),
+			MonitorID:  monitorID,
+			Timestamp:  bucketStart.Unix(),
 			Latency:    s.avgLatency(),
 			LatencyMin: s.latencyMin,
 			LatencyMax: s.latencyMax,
-			Up:        s.up,
-			Down:      s.down,
+			Up:         s.up,
+			Down:       s.down,
 		})
 	})
 }
@@ -73,13 +73,13 @@ func (c *Calculator) AggregateHourly(ctx context.Context) error {
 
 	return c.aggregate(ctx, bucketStart, bucketEnd, func(ctx context.Context, monitorID string, s *statBucket) error {
 		return c.stats.UpsertHourly(ctx, &stats.StatHourly{
-			MonitorID: monitorID,
-			Timestamp: bucketStart.Unix(),
+			MonitorID:  monitorID,
+			Timestamp:  bucketStart.Unix(),
 			Latency:    s.avgLatency(),
 			LatencyMin: s.latencyMin,
 			LatencyMax: s.latencyMax,
-			Up:        s.up,
-			Down:      s.down,
+			Up:         s.up,
+			Down:       s.down,
 		})
 	})
 }
@@ -92,13 +92,13 @@ func (c *Calculator) AggregateDaily(ctx context.Context) error {
 
 	return c.aggregate(ctx, bucketStart, bucketEnd, func(ctx context.Context, monitorID string, s *statBucket) error {
 		return c.stats.UpsertDaily(ctx, &stats.StatDaily{
-			MonitorID: monitorID,
-			Timestamp: bucketStart.Unix(),
+			MonitorID:  monitorID,
+			Timestamp:  bucketStart.Unix(),
 			Latency:    s.avgLatency(),
 			LatencyMin: s.latencyMin,
 			LatencyMax: s.latencyMax,
-			Up:        s.up,
-			Down:      s.down,
+			Up:         s.up,
+			Down:       s.down,
 		})
 	})
 }
@@ -130,8 +130,8 @@ func (c *Calculator) aggregate(ctx context.Context, from, to time.Time, upsert u
 }
 
 type statBucket struct {
-	up      int
-	down    int
+	up         int
+	down       int
 	latencySum int64
 	latencyMin int64
 	latencyMax int64

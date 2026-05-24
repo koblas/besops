@@ -23,4 +23,3 @@ func (s *SecurityHandler) HandleBearerAuth(ctx context.Context, _ oas.OperationN
 	}
 	return auth.ContextWithUserID(ctx, userID), nil
 }
-

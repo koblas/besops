@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/url"
 	"sync"
 
 	oas "github.com/koblas/besops/internal/api/oas_generated"
@@ -29,7 +30,7 @@ func NewHandler(repo Repository, authProvider *auth.Provider, bootstrap bool) *H
 	}
 }
 
-func (h *Handler) NeedSetup(ctx context.Context) (*oas.NeedSetupOK, error) {
+func (h *Handler) NeedSetup(ctx context.Context) (oas.NeedSetupRes, error) {
 	if h.bootstrap {
 		return &oas.NeedSetupOK{NeedSetup: false}, nil
 	}
@@ -115,8 +116,8 @@ func (h *Handler) bootstrapUser(ctx context.Context, username, password string) 
 	return result, nil
 }
 
-func (h *Handler) Logout(_ context.Context) error {
-	return nil
+func (h *Handler) Logout(_ context.Context) (oas.LogoutRes, error) {
+	return &oas.LogoutNoContent{}, nil
 }
 
 func (h *Handler) RefreshToken(ctx context.Context, req *oas.RefreshTokenRequest) (oas.RefreshTokenRes, error) {
@@ -160,7 +161,7 @@ func (h *Handler) ChangePassword(ctx context.Context, req *oas.ChangePasswordReq
 	return &oas.TokenResponse{Token: tokens.AccessToken}, nil
 }
 
-func (h *Handler) Get2FAStatus(ctx context.Context) (*oas.Get2FAStatusOK, error) {
+func (h *Handler) Get2FAStatus(ctx context.Context) (oas.Get2FAStatusRes, error) {
 	userID, err := oasutil.UserIDFromCtx(ctx)
 	if err != nil {
 		return nil, errs.NewUnauthenticated(err, "unauthorized")
@@ -174,7 +175,7 @@ func (h *Handler) Get2FAStatus(ctx context.Context) (*oas.Get2FAStatusOK, error)
 	return &oas.Get2FAStatusOK{Enabled: user.TwoFAStatus}, nil
 }
 
-func (h *Handler) Prepare2FA(ctx context.Context, req *oas.Prepare2FAReq) (*oas.Prepare2FAOK, error) {
+func (h *Handler) Prepare2FA(ctx context.Context, req *oas.Prepare2FAReq) (oas.Prepare2FARes, error) {
 	userID, err := oasutil.UserIDFromCtx(ctx)
 	if err != nil {
 		return nil, errs.NewUnauthenticated(err, "unauthorized")
@@ -196,10 +197,15 @@ func (h *Handler) Prepare2FA(ctx context.Context, req *oas.Prepare2FAReq) (*oas.
 
 	h.pendingTOTP.Store(userID, secret)
 
-	return &oas.Prepare2FAOK{URI: uri}, nil
+	parsedURI, parseErr := url.Parse(uri)
+	if parseErr != nil {
+		return nil, fmt.Errorf("parsing TOTP URI: %w", parseErr)
+	}
+
+	return &oas.Prepare2FAOK{URI: *parsedURI}, nil
 }
 
-func (h *Handler) Enable2FA(ctx context.Context, req *oas.Enable2FAReq) (*oas.MessageResponse, error) {
+func (h *Handler) Enable2FA(ctx context.Context, req *oas.Enable2FAReq) (oas.Enable2FARes, error) {
 	userID, err := oasutil.UserIDFromCtx(ctx)
 	if err != nil {
 		return nil, errs.NewUnauthenticated(err, "unauthorized")
@@ -229,7 +235,7 @@ func (h *Handler) Enable2FA(ctx context.Context, req *oas.Enable2FAReq) (*oas.Me
 	return &oas.MessageResponse{Message: "2FA enabled"}, nil
 }
 
-func (h *Handler) Disable2FA(ctx context.Context, req *oas.Disable2FAReq) (*oas.MessageResponse, error) {
+func (h *Handler) Disable2FA(ctx context.Context, req *oas.Disable2FAReq) (oas.Disable2FARes, error) {
 	userID, err := oasutil.UserIDFromCtx(ctx)
 	if err != nil {
 		return nil, errs.NewUnauthenticated(err, "unauthorized")

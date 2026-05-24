@@ -45,11 +45,12 @@ func TestHandler_CreateTag(t *testing.T) {
 	ctx := context.Background()
 	handler, _ := setupHandler(t)
 
-	result, err := handler.CreateTag(ctx, &oas.TagInput{
+	res, err := handler.CreateTag(ctx, &oas.TagInput{
 		Name:  "new-tag",
 		Color: "#ff0000",
 	})
 	require.NoError(t, err)
+	result := res.(*oas.Tag)
 	require.Equal(t, "new-tag", result.Name)
 	require.Equal(t, "#ff0000", result.Color)
 	require.NotEqual(t, uuid.Nil, result.ID)
@@ -59,9 +60,10 @@ func TestHandler_ListTags_Empty(t *testing.T) {
 	ctx := context.Background()
 	handler, _ := setupHandler(t)
 
-	tags, err := handler.ListTags(ctx)
+	res, err := handler.ListTags(ctx)
 	require.NoError(t, err)
-	require.Empty(t, tags)
+	tags := res.(*oas.ListTagsOKApplicationJSON)
+	require.Empty(t, *tags)
 }
 
 func TestHandler_ListTags_ReturnsTags(t *testing.T) {
@@ -73,22 +75,25 @@ func TestHandler_ListTags_ReturnsTags(t *testing.T) {
 	_, err = handler.CreateTag(ctx, &oas.TagInput{Name: "b", Color: "#b"})
 	require.NoError(t, err)
 
-	tags, err := handler.ListTags(ctx)
+	res, err := handler.ListTags(ctx)
 	require.NoError(t, err)
-	require.Len(t, tags, 2)
+	tags := res.(*oas.ListTagsOKApplicationJSON)
+	require.Len(t, *tags, 2)
 }
 
 func TestHandler_UpdateTag(t *testing.T) {
 	ctx := context.Background()
 	handler, _ := setupHandler(t)
 
-	created, err := handler.CreateTag(ctx, &oas.TagInput{Name: "old", Color: "#111"})
+	createRes, err := handler.CreateTag(ctx, &oas.TagInput{Name: "old", Color: "#111"})
 	require.NoError(t, err)
+	created := createRes.(*oas.Tag)
 
-	updated, err := handler.UpdateTag(ctx, &oas.TagInput{Name: "new", Color: "#222"}, oas.UpdateTagParams{
+	updateRes, err := handler.UpdateTag(ctx, &oas.TagInput{Name: "new", Color: "#222"}, oas.UpdateTagParams{
 		TagId: created.ID,
 	})
 	require.NoError(t, err)
+	updated := updateRes.(*oas.Tag)
 	require.Equal(t, "new", updated.Name)
 	require.Equal(t, "#222", updated.Color)
 }
@@ -97,27 +102,30 @@ func TestHandler_DeleteTag(t *testing.T) {
 	ctx := context.Background()
 	handler, _ := setupHandler(t)
 
-	created, err := handler.CreateTag(ctx, &oas.TagInput{Name: "delete-me", Color: "#000"})
+	createRes, err := handler.CreateTag(ctx, &oas.TagInput{Name: "delete-me", Color: "#000"})
 	require.NoError(t, err)
+	created := createRes.(*oas.Tag)
 
-	err = handler.DeleteTag(ctx, oas.DeleteTagParams{TagId: created.ID})
+	_, err = handler.DeleteTag(ctx, oas.DeleteTagParams{TagId: created.ID})
 	require.NoError(t, err)
 
 	// Verify it's gone
-	tags, err := handler.ListTags(ctx)
+	res, err := handler.ListTags(ctx)
 	require.NoError(t, err)
-	require.Empty(t, tags)
+	tags := res.(*oas.ListTagsOKApplicationJSON)
+	require.Empty(t, *tags)
 }
 
 func TestHandler_AddMonitorTag(t *testing.T) {
 	ctx := context.Background()
 	handler, fix := setupHandler(t)
 
-	created, err := handler.CreateTag(ctx, &oas.TagInput{Name: "assign-me", Color: "#abc"})
+	createRes, err := handler.CreateTag(ctx, &oas.TagInput{Name: "assign-me", Color: "#abc"})
 	require.NoError(t, err)
+	created := createRes.(*oas.Tag)
 
 	monitorUUID, _ := uuid.Parse(fix.monitorID)
-	err = handler.AddMonitorTag(ctx, &oas.AddMonitorTagReq{
+	_, err = handler.AddMonitorTag(ctx, &oas.AddMonitorTagReq{
 		TagId: created.ID,
 	}, oas.AddMonitorTagParams{
 		MonitorId: monitorUUID,
@@ -135,11 +143,12 @@ func TestHandler_AddMonitorTag_InvalidMonitor(t *testing.T) {
 	ctx := context.Background()
 	handler, _ := setupHandler(t)
 
-	created, err := handler.CreateTag(ctx, &oas.TagInput{Name: "orphan", Color: "#000"})
+	createRes, err := handler.CreateTag(ctx, &oas.TagInput{Name: "orphan", Color: "#000"})
 	require.NoError(t, err)
+	created := createRes.(*oas.Tag)
 
 	fakeMonitorID := uuid.New()
-	err = handler.AddMonitorTag(ctx, &oas.AddMonitorTagReq{
+	_, err = handler.AddMonitorTag(ctx, &oas.AddMonitorTagReq{
 		TagId: created.ID,
 	}, oas.AddMonitorTagParams{
 		MonitorId: fakeMonitorID,
@@ -152,7 +161,7 @@ func TestHandler_AddMonitorTag_InvalidTag(t *testing.T) {
 	handler, fix := setupHandler(t)
 
 	monitorUUID, _ := uuid.Parse(fix.monitorID)
-	err := handler.AddMonitorTag(ctx, &oas.AddMonitorTagReq{
+	_, err := handler.AddMonitorTag(ctx, &oas.AddMonitorTagReq{
 		TagId: uuid.New(),
 	}, oas.AddMonitorTagParams{
 		MonitorId: monitorUUID,
@@ -164,18 +173,19 @@ func TestHandler_DeleteMonitorTag(t *testing.T) {
 	ctx := context.Background()
 	handler, fix := setupHandler(t)
 
-	created, err := handler.CreateTag(ctx, &oas.TagInput{Name: "remove-me", Color: "#f00"})
+	createRes, err := handler.CreateTag(ctx, &oas.TagInput{Name: "remove-me", Color: "#f00"})
 	require.NoError(t, err)
+	created := createRes.(*oas.Tag)
 
 	monitorUUID, _ := uuid.Parse(fix.monitorID)
-	err = handler.AddMonitorTag(ctx, &oas.AddMonitorTagReq{
+	_, err = handler.AddMonitorTag(ctx, &oas.AddMonitorTagReq{
 		TagId: created.ID,
 	}, oas.AddMonitorTagParams{
 		MonitorId: monitorUUID,
 	})
 	require.NoError(t, err)
 
-	err = handler.DeleteMonitorTag(ctx, oas.DeleteMonitorTagParams{
+	_, err = handler.DeleteMonitorTag(ctx, oas.DeleteMonitorTagParams{
 		MonitorId: monitorUUID,
 		TagId:     created.ID,
 	})
@@ -190,12 +200,13 @@ func TestHandler_DeleteMonitorTag_NotAssigned(t *testing.T) {
 	ctx := context.Background()
 	handler, fix := setupHandler(t)
 
-	created, err := handler.CreateTag(ctx, &oas.TagInput{Name: "never-assigned", Color: "#000"})
+	createRes, err := handler.CreateTag(ctx, &oas.TagInput{Name: "never-assigned", Color: "#000"})
 	require.NoError(t, err)
+	created := createRes.(*oas.Tag)
 
 	monitorUUID, _ := uuid.Parse(fix.monitorID)
 	// Should not error when removing a tag that isn't assigned
-	err = handler.DeleteMonitorTag(ctx, oas.DeleteMonitorTagParams{
+	_, err = handler.DeleteMonitorTag(ctx, oas.DeleteMonitorTagParams{
 		MonitorId: monitorUUID,
 		TagId:     created.ID,
 	})

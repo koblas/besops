@@ -48,19 +48,19 @@ func DefaultConfig() Config {
 
 // flagToKoanf maps CLI flag names (kebab-case) to koanf keys (snake_case).
 var flagToKoanf = map[string]string{
-	"host":                 "host",
-	"port":                 "port",
-	"database-url":        "database_url",
-	"ssl":                  "ssl",
-	"ssl-cert":            "ssl_cert",
-	"ssl-key":             "ssl_key",
-	"demo":                "demo",
-	"trust-proxy":         "trust_proxy",
+	"host":                  "host",
+	"port":                  "port",
+	"database-url":          "database_url",
+	"ssl":                   "ssl",
+	"ssl-cert":              "ssl_cert",
+	"ssl-key":               "ssl_key",
+	"demo":                  "demo",
+	"trust-proxy":           "trust_proxy",
 	"keep-data-period-days": "keep_data_period_days",
-	"bootstrap":           "bootstrap",
-	"log-level":           "log_level",
-	"jwt-secret":          "jwt_secret",
-	"otel-endpoint":       "otel_endpoint",
+	"bootstrap":             "bootstrap",
+	"log-level":             "log_level",
+	"jwt-secret":            "jwt_secret",
+	"otel-endpoint":         "otel_endpoint",
 }
 
 // registerFlags creates the FlagSet with all recognized flags.

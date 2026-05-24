@@ -125,12 +125,12 @@ func (s *stubTagRepo) FindByID(_ context.Context, id string) (*tag.Tag, error) {
 	return t, nil
 }
 
-func (s *stubTagRepo) FindAll(_ context.Context) ([]*tag.Tag, error)                 { return nil, nil }
-func (s *stubTagRepo) Create(_ context.Context, _ *tag.Tag) (string, error)          { return "", nil }
-func (s *stubTagRepo) Update(_ context.Context, _ *tag.Tag) error                    { return nil }
-func (s *stubTagRepo) Delete(_ context.Context, _ string) error                      { return nil }
-func (s *stubTagRepo) AddToMonitor(_ context.Context, _, _, _ string) error          { return nil }
-func (s *stubTagRepo) RemoveFromMonitor(_ context.Context, _, _ string) error        { return nil }
+func (s *stubTagRepo) FindAll(_ context.Context) ([]*tag.Tag, error)          { return nil, nil }
+func (s *stubTagRepo) Create(_ context.Context, _ *tag.Tag) (string, error)   { return "", nil }
+func (s *stubTagRepo) Update(_ context.Context, _ *tag.Tag) error             { return nil }
+func (s *stubTagRepo) Delete(_ context.Context, _ string) error               { return nil }
+func (s *stubTagRepo) AddToMonitor(_ context.Context, _, _, _ string) error   { return nil }
+func (s *stubTagRepo) RemoveFromMonitor(_ context.Context, _, _ string) error { return nil }
 
 func TestTagProviderAdapter_ReturnsTagNames(t *testing.T) {
 	repo := &stubTagRepo{
@@ -200,8 +200,8 @@ func TestTagReaderAdapter_ReturnsFullMonitorTagInfo(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, infos, 2)
 
-	assert.Equal(t, domainmonitor.MonitorTagInfo{TagID: "t1", Name: "region", Color: "#00ff00", Value: "us-east-1"}, infos[0])
-	assert.Equal(t, domainmonitor.MonitorTagInfo{TagID: "t2", Name: "env", Color: "#0000ff", Value: ""}, infos[1])
+	assert.Equal(t, domainmonitor.TagInfo{TagID: "t1", Name: "region", Color: "#00ff00", Value: "us-east-1"}, infos[0])
+	assert.Equal(t, domainmonitor.TagInfo{TagID: "t2", Name: "env", Color: "#0000ff", Value: ""}, infos[1])
 }
 
 func TestTagReaderAdapter_SkipsMissingTag(t *testing.T) {

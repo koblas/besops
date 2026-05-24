@@ -107,7 +107,7 @@ func DeriveSigningKey(secret string) (*ecdsa.PrivateKey, error) {
 
 	priv := &ecdsa.PrivateKey{
 		PublicKey: ecdsa.PublicKey{Curve: curve},
-		D:        d,
+		D:         d,
 	}
 	priv.PublicKey.X, priv.PublicKey.Y = curve.ScalarBaseMult(d.Bytes())
 

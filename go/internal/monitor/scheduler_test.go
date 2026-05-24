@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/koblas/besops/internal/broadcast"
-	domainmonitor "github.com/koblas/besops/internal/domain/monitor"
 	"github.com/koblas/besops/internal/domain/heartbeat"
+	domainmonitor "github.com/koblas/besops/internal/domain/monitor"
 	"github.com/koblas/besops/lib/status"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

@@ -12,8 +12,8 @@ import (
 
 var _ oas.MonitorHandler = (*Handler)(nil)
 
-// MonitorScheduler is the interface the handler uses to notify the scheduler of changes.
-type MonitorScheduler interface {
+// Scheduler is the interface the handler uses to notify the scheduler of changes.
+type Scheduler interface {
 	StartMonitor(ctx context.Context, id string) error
 	StopMonitor(ctx context.Context, id string)
 	RestartMonitor(ctx context.Context, id string) error
@@ -24,8 +24,8 @@ type UptimeProvider interface {
 	GetUptime(ctx context.Context, monitorID string, hours int) (float64, error)
 }
 
-// MonitorTagInfo holds resolved tag data for API responses.
-type MonitorTagInfo struct {
+// TagInfo holds resolved tag data for API responses.
+type TagInfo struct {
 	TagID string
 	Name  string
 	Color string
@@ -34,21 +34,21 @@ type MonitorTagInfo struct {
 
 // TagReader loads tags for monitors in API responses.
 type TagReader interface {
-	GetMonitorTags(ctx context.Context, monitorID string) ([]MonitorTagInfo, error)
+	GetMonitorTags(ctx context.Context, monitorID string) ([]TagInfo, error)
 }
 
 type Handler struct {
 	repo      Repository
-	scheduler MonitorScheduler
+	scheduler Scheduler
 	uptimes   UptimeProvider
 	tags      TagReader
 }
 
-func NewHandler(repo Repository, scheduler MonitorScheduler, uptimes UptimeProvider, tags TagReader) *Handler {
+func NewHandler(repo Repository, scheduler Scheduler, uptimes UptimeProvider, tags TagReader) *Handler {
 	return &Handler{repo: repo, scheduler: scheduler, uptimes: uptimes, tags: tags}
 }
 
-func (h *Handler) ListMonitors(ctx context.Context) ([]oas.Monitor, error) {
+func (h *Handler) ListMonitors(ctx context.Context) (oas.ListMonitorsRes, error) {
 	userID, err := oasutil.UserIDFromCtx(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("getting user from context: %w", err)
@@ -59,7 +59,7 @@ func (h *Handler) ListMonitors(ctx context.Context) ([]oas.Monitor, error) {
 		return nil, fmt.Errorf("listing monitors: %w", err)
 	}
 
-	result := make([]oas.Monitor, 0, len(monitors))
+	result := make(oas.ListMonitorsOKApplicationJSON, 0, len(monitors))
 	for _, m := range monitors {
 		om := monitorToOAS(m)
 		if h.tags != nil {
@@ -67,7 +67,7 @@ func (h *Handler) ListMonitors(ctx context.Context) ([]oas.Monitor, error) {
 		}
 		result = append(result, om)
 	}
-	return result, nil
+	return &result, nil
 }
 
 func (h *Handler) GetMonitor(ctx context.Context, params oas.GetMonitorParams) (oas.GetMonitorRes, error) {
@@ -85,7 +85,7 @@ func (h *Handler) GetMonitor(ctx context.Context, params oas.GetMonitorParams) (
 	return &result, nil
 }
 
-func (h *Handler) CreateMonitor(ctx context.Context, req *oas.MonitorInput) (*oas.CreateMonitorCreated, error) {
+func (h *Handler) CreateMonitor(ctx context.Context, req *oas.MonitorInput) (oas.CreateMonitorRes, error) {
 	userID, err := oasutil.UserIDFromCtx(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("getting user from context: %w", err)
@@ -141,7 +141,7 @@ func (h *Handler) DeleteMonitor(ctx context.Context, params oas.DeleteMonitorPar
 	return &oas.DeleteMonitorNoContent{}, nil
 }
 
-func (h *Handler) PauseMonitor(ctx context.Context, params oas.PauseMonitorParams) (*oas.MessageResponse, error) {
+func (h *Handler) PauseMonitor(ctx context.Context, params oas.PauseMonitorParams) (oas.PauseMonitorRes, error) {
 	m, err := h.repo.FindByID(ctx, params.MonitorId.String())
 	if err != nil {
 		return nil, fmt.Errorf("finding monitor: %w", err)
@@ -156,7 +156,7 @@ func (h *Handler) PauseMonitor(ctx context.Context, params oas.PauseMonitorParam
 	return &oas.MessageResponse{Message: "paused"}, nil
 }
 
-func (h *Handler) ResumeMonitor(ctx context.Context, params oas.ResumeMonitorParams) (*oas.MessageResponse, error) {
+func (h *Handler) ResumeMonitor(ctx context.Context, params oas.ResumeMonitorParams) (oas.ResumeMonitorRes, error) {
 	m, err := h.repo.FindByID(ctx, params.MonitorId.String())
 	if err != nil {
 		return nil, fmt.Errorf("finding monitor: %w", err)
@@ -171,7 +171,7 @@ func (h *Handler) ResumeMonitor(ctx context.Context, params oas.ResumeMonitorPar
 	return &oas.MessageResponse{Message: "resumed"}, nil
 }
 
-func (h *Handler) CheckDomain(ctx context.Context, params oas.CheckDomainParams) (*oas.CheckDomainOK, error) {
+func (h *Handler) CheckDomain(ctx context.Context, params oas.CheckDomainParams) (oas.CheckDomainRes, error) {
 	// TODO: implement domain/TLS check
 	_ = params.MonitorId
 	return &oas.CheckDomainOK{}, nil
@@ -200,13 +200,13 @@ func monitorToOAS(m *Monitor) oas.Monitor {
 		Name:               m.Name,
 		Type:               oas.MonitorType(m.Type),
 		Active:             m.Active,
-		Interval:           oas.NewOptInt(m.Interval),
-		Timeout:            oas.NewOptInt(m.Timeout),
-		MaxRetries:         oas.NewOptInt(m.MaxRetries),
-		RetryInterval:      oas.NewOptInt(m.RetryInterval),
+		Interval:           oas.NewOptInt32(int32(m.Interval)),      //nolint:gosec // small config value
+		Timeout:            oas.NewOptInt32(int32(m.Timeout)),       //nolint:gosec // small config value
+		MaxRetries:         oas.NewOptInt32(int32(m.MaxRetries)),    //nolint:gosec // small config value
+		RetryInterval:      oas.NewOptInt32(int32(m.RetryInterval)), //nolint:gosec // small config value
 		Description:        oasutil.PtrToOptString(m.Description),
 		UpsideDown:         oas.NewOptBool(m.UpsideDown),
-		ResendInterval:     oas.NewOptInt(m.ResendInterval),
+		ResendInterval:     oas.NewOptInt32(int32(m.ResendInterval)), //nolint:gosec // small config value
 		ExpiryNotification: oas.NewOptBool(m.ExpiryNotification),
 	}
 
@@ -249,16 +249,16 @@ func applyMonitorInput(m *Monitor, req *oas.MonitorInput) {
 		m.Active = req.Active.Value
 	}
 	if req.Interval.IsSet() {
-		m.Interval = req.Interval.Value
+		m.Interval = int(req.Interval.Value)
 	}
 	if req.MaxRetries.IsSet() {
-		m.MaxRetries = req.MaxRetries.Value
+		m.MaxRetries = int(req.MaxRetries.Value)
 	}
 	if req.Timeout.IsSet() {
-		m.Timeout = req.Timeout.Value
+		m.Timeout = int(req.Timeout.Value)
 	}
 	if req.RetryInterval.IsSet() {
-		m.RetryInterval = req.RetryInterval.Value
+		m.RetryInterval = int(req.RetryInterval.Value)
 	}
 	if req.Description.IsSet() {
 		m.Description = req.Description.Value
@@ -267,7 +267,7 @@ func applyMonitorInput(m *Monitor, req *oas.MonitorInput) {
 		m.UpsideDown = req.UpsideDown.Value
 	}
 	if req.ResendInterval.IsSet() {
-		m.ResendInterval = req.ResendInterval.Value
+		m.ResendInterval = int(req.ResendInterval.Value)
 	}
 	if req.ExpiryNotification.IsSet() {
 		m.ExpiryNotification = req.ExpiryNotification.Value
@@ -293,18 +293,21 @@ func marshalConfig(cfg *oas.MonitorConfig) string {
 	return string(b)
 }
 
-func (h *Handler) GetMonitorUptimes(ctx context.Context) (oas.GetMonitorUptimesOK, error) {
+func (h *Handler) GetMonitorUptimes(ctx context.Context) (oas.GetMonitorUptimesRes, error) {
 	ids, err := h.repo.FindAllActiveIDs(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("loading active monitor IDs: %w", err)
 	}
 
-	result := make(oas.GetMonitorUptimesOK, len(ids))
+	result := make(oas.GetMonitorUptimesOKApplicationJSON, 0, len(ids))
 	for _, id := range ids {
 		up, upErr := h.uptimes.GetUptime(ctx, id, 24)
 		if upErr == nil {
-			result[id] = up
+			result = append(result, oas.GetMonitorUptimesOKItem{
+				MonitorId: oasutil.MustParseUUID(id),
+				Uptime:    up,
+			})
 		}
 	}
-	return result, nil
+	return &result, nil
 }

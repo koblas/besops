@@ -311,7 +311,6 @@ func (a *App) shutdown(ctx context.Context) error {
 	return nil
 }
 
-
 // chartRepoAdapter bridges stats.Handler to the heartbeat.ChartRepository interface.
 type chartRepoAdapter struct {
 	stats *stats.Handler
@@ -320,14 +319,14 @@ type chartRepoAdapter struct {
 func (a *chartRepoAdapter) GetMinutely(ctx context.Context, monitorID string, since int64) ([]heartbeat.ChartPoint, error) {
 	rows, err := a.stats.GetMinutely(ctx, monitorID, since)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("getting minutely stats: %w", err)
 	}
 	result := make([]heartbeat.ChartPoint, 0, len(rows))
 	for _, r := range rows {
 		result = append(result, heartbeat.ChartPoint{
-			Timestamp: r.Timestamp,
-			Up:        r.Up,
-			Down:      r.Down,
+			Timestamp:  r.Timestamp,
+			Up:         r.Up,
+			Down:       r.Down,
 			Latency:    r.Latency,
 			LatencyMin: r.LatencyMin,
 			LatencyMax: r.LatencyMax,
@@ -339,14 +338,14 @@ func (a *chartRepoAdapter) GetMinutely(ctx context.Context, monitorID string, si
 func (a *chartRepoAdapter) GetHourly(ctx context.Context, monitorID string, since int64) ([]heartbeat.ChartPoint, error) {
 	rows, err := a.stats.GetHourly(ctx, monitorID, since)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("getting hourly stats: %w", err)
 	}
 	result := make([]heartbeat.ChartPoint, 0, len(rows))
 	for _, r := range rows {
 		result = append(result, heartbeat.ChartPoint{
-			Timestamp: r.Timestamp,
-			Up:        r.Up,
-			Down:      r.Down,
+			Timestamp:  r.Timestamp,
+			Up:         r.Up,
+			Down:       r.Down,
 			Latency:    r.Latency,
 			LatencyMin: r.LatencyMin,
 			LatencyMax: r.LatencyMax,
@@ -358,14 +357,14 @@ func (a *chartRepoAdapter) GetHourly(ctx context.Context, monitorID string, sinc
 func (a *chartRepoAdapter) GetDaily(ctx context.Context, monitorID string, since int64) ([]heartbeat.ChartPoint, error) {
 	rows, err := a.stats.GetDaily(ctx, monitorID, since)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("getting daily stats: %w", err)
 	}
 	result := make([]heartbeat.ChartPoint, 0, len(rows))
 	for _, r := range rows {
 		result = append(result, heartbeat.ChartPoint{
-			Timestamp: r.Timestamp,
-			Up:        r.Up,
-			Down:      r.Down,
+			Timestamp:  r.Timestamp,
+			Up:         r.Up,
+			Down:       r.Down,
 			Latency:    r.Latency,
 			LatencyMin: r.LatencyMin,
 			LatencyMax: r.LatencyMax,
@@ -382,7 +381,7 @@ type monitorNameAdapter struct {
 func (a *monitorNameAdapter) FindNameByID(ctx context.Context, id string) (string, error) {
 	m, err := a.monitorRepo.FindByID(ctx, id)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("finding monitor %s: %w", id, err)
 	}
 	return m.Name, nil
 }
@@ -395,7 +394,7 @@ type notificationRuleAdapter struct {
 func (a *notificationRuleAdapter) GetRulesForMonitor(ctx context.Context, monitorID string) ([]corenotification.Rule, error) {
 	notifs, err := a.repo.GetForMonitor(ctx, monitorID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("getting notification rules for monitor %s: %w", monitorID, err)
 	}
 
 	rules := make([]corenotification.Rule, 0, len(notifs))
@@ -462,7 +461,7 @@ type tagProviderAdapter struct {
 func (a *tagProviderAdapter) GetTagsForMonitor(ctx context.Context, monitorID string) ([]string, error) {
 	mts, err := a.tagRepo.GetForMonitor(ctx, monitorID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("getting tags for monitor %s: %w", monitorID, err)
 	}
 
 	names := make([]string, 0, len(mts))
@@ -485,7 +484,7 @@ type monitorResolverAdapter struct {
 func (a *monitorResolverAdapter) FindIDsByTagIDs(ctx context.Context, tagIDs []string) ([]string, error) {
 	monitors, err := a.monitorRepo.FindByTagIDs(ctx, tagIDs)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("finding monitors by tag IDs: %w", err)
 	}
 	ids := make([]string, len(monitors))
 	for i, m := range monitors {
@@ -499,20 +498,20 @@ type tagReaderAdapter struct {
 	tagRepo tag.Repository
 }
 
-func (a *tagReaderAdapter) GetMonitorTags(ctx context.Context, monitorID string) ([]domainmonitor.MonitorTagInfo, error) {
+func (a *tagReaderAdapter) GetMonitorTags(ctx context.Context, monitorID string) ([]domainmonitor.TagInfo, error) {
 	mts, err := a.tagRepo.GetForMonitor(ctx, monitorID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("getting tags for monitor %s: %w", monitorID, err)
 	}
 
-	result := make([]domainmonitor.MonitorTagInfo, 0, len(mts))
+	result := make([]domainmonitor.TagInfo, 0, len(mts))
 	for _, mt := range mts {
 		t, tagErr := a.tagRepo.FindByID(ctx, mt.TagID)
 		if tagErr != nil {
 			slog.WarnContext(ctx, "tag not found for monitor, skipping", slog.String("tag_id", mt.TagID), slog.String("monitor_id", monitorID), slog.Any("error", tagErr))
 			continue
 		}
-		result = append(result, domainmonitor.MonitorTagInfo{
+		result = append(result, domainmonitor.TagInfo{
 			TagID: mt.TagID,
 			Name:  t.Name,
 			Color: t.Color,

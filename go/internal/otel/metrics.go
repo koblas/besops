@@ -94,5 +94,8 @@ func (m *MetricsExporter) Record(ctx context.Context, monitor telemetry.MonitorI
 }
 
 func (m *MetricsExporter) Shutdown(ctx context.Context) error {
-	return m.provider.Shutdown(ctx)
+	if err := m.provider.Shutdown(ctx); err != nil {
+		return fmt.Errorf("shutting down metrics provider: %w", err)
+	}
+	return nil
 }

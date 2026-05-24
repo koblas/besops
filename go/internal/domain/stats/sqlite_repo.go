@@ -72,14 +72,14 @@ func (r *sqliteRepo) GetMinutely(ctx context.Context, monitorID string, since in
 	result := make([]*StatMinutely, len(ms))
 	for i, m := range ms {
 		result[i] = &StatMinutely{
-			ID:        m.ID,
-			MonitorID: m.MonitorID,
-			Timestamp: m.Timestamp,
+			ID:         m.ID,
+			MonitorID:  m.MonitorID,
+			Timestamp:  m.Timestamp,
 			Latency:    m.Latency.GetOrZero(),
 			LatencyMin: m.LatencyMin.GetOrZero(),
 			LatencyMax: m.LatencyMax.GetOrZero(),
-			Up:        int(m.Up),
-			Down:      int(m.Down),
+			Up:         int(m.Up),
+			Down:       int(m.Down),
 		}
 	}
 	return result, nil
@@ -97,14 +97,14 @@ func (r *sqliteRepo) GetHourly(ctx context.Context, monitorID string, since int6
 	result := make([]*StatHourly, len(hs))
 	for i, m := range hs {
 		result[i] = &StatHourly{
-			ID:        m.ID,
-			MonitorID: m.MonitorID,
-			Timestamp: m.Timestamp,
+			ID:         m.ID,
+			MonitorID:  m.MonitorID,
+			Timestamp:  m.Timestamp,
 			Latency:    m.Latency.GetOrZero(),
 			LatencyMin: m.LatencyMin.GetOrZero(),
 			LatencyMax: m.LatencyMax.GetOrZero(),
-			Up:        int(m.Up),
-			Down:      int(m.Down),
+			Up:         int(m.Up),
+			Down:       int(m.Down),
 		}
 	}
 	return result, nil
@@ -122,14 +122,14 @@ func (r *sqliteRepo) GetDaily(ctx context.Context, monitorID string, since int64
 	result := make([]*StatDaily, len(ds))
 	for i, m := range ds {
 		result[i] = &StatDaily{
-			ID:        m.ID,
-			MonitorID: m.MonitorID,
-			Timestamp: m.Timestamp,
+			ID:         m.ID,
+			MonitorID:  m.MonitorID,
+			Timestamp:  m.Timestamp,
 			Latency:    m.Latency.GetOrZero(),
 			LatencyMin: m.LatencyMin.GetOrZero(),
 			LatencyMax: m.LatencyMax.GetOrZero(),
-			Up:        int(m.Up),
-			Down:      int(m.Down),
+			Up:         int(m.Up),
+			Down:       int(m.Down),
 		}
 	}
 	return result, nil

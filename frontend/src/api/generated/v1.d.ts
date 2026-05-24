@@ -381,6 +381,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the notification provider */
                 notificationId: string;
             };
             cookie?: never;
@@ -401,6 +402,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the notification provider */
                 notificationId: string;
             };
             cookie?: never;
@@ -438,6 +440,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the tag */
                 tagId: string;
             };
             cookie?: never;
@@ -480,6 +483,7 @@ export interface paths {
             path: {
                 /** @description Unique identifier of the monitor. */
                 monitorId: components["parameters"]["MonitorId"];
+                /** @description Unique identifier of the tag */
                 tagId: string;
             };
             cookie?: never;
@@ -518,6 +522,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the maintenance window */
                 maintenanceId: string;
             };
             cookie?: never;
@@ -539,6 +544,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the maintenance window */
                 maintenanceId: string;
             };
             cookie?: never;
@@ -558,6 +564,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the maintenance window */
                 maintenanceId: string;
             };
             cookie?: never;
@@ -577,6 +584,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the maintenance window */
                 maintenanceId: string;
             };
             cookie?: never;
@@ -597,6 +605,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the maintenance window */
                 maintenanceId: string;
             };
             cookie?: never;
@@ -635,6 +644,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                /** @description URL-safe identifier of the status page */
                 slug: string;
             };
             cookie?: never;
@@ -656,6 +666,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                /** @description URL-safe identifier of the status page */
                 slug: string;
             };
             cookie?: never;
@@ -675,6 +686,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                /** @description URL-safe identifier of the status page */
                 slug: string;
             };
             cookie?: never;
@@ -694,6 +706,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                /** @description URL-safe identifier of the status page */
                 slug: string;
             };
             cookie?: never;
@@ -714,7 +727,9 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                /** @description URL-safe identifier of the status page */
                 slug: string;
+                /** @description Unique identifier of the incident */
                 incidentId: string;
             };
             cookie?: never;
@@ -735,7 +750,9 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                /** @description URL-safe identifier of the status page */
                 slug: string;
+                /** @description Unique identifier of the incident */
                 incidentId: string;
             };
             cookie?: never;
@@ -755,7 +772,9 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                /** @description URL-safe identifier of the status page */
                 slug: string;
+                /** @description Unique identifier of the incident */
                 incidentId: string;
             };
             cookie?: never;
@@ -811,6 +830,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the API key */
                 keyId: string;
             };
             cookie?: never;
@@ -830,6 +850,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the API key */
                 keyId: string;
             };
             cookie?: never;
@@ -849,6 +870,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the API key */
                 keyId: string;
             };
             cookie?: never;
@@ -886,6 +908,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the proxy */
                 proxyId: string;
             };
             cookie?: never;
@@ -1006,6 +1029,7 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
+                /** @description URL-safe identifier of the status page */
                 slug: string;
             };
             cookie?: never;
@@ -1163,19 +1187,34 @@ export interface components {
             /** @enum {string} */
             type: "http" | "port" | "ping" | "keyword" | "json-query" | "grpc-keyword" | "dns" | "steam" | "gamedig" | "mqtt" | "sqlserver" | "postgres" | "mysql" | "mongodb" | "radius" | "redis" | "group" | "snmp" | "rabbitmq" | "tailscale-ping" | "real-browser" | "manual";
             active: boolean;
-            /** @default 60 */
+            /**
+             * Format: int32
+             * @default 60
+             */
             interval: number;
-            /** @default 48 */
+            /**
+             * Format: int32
+             * @default 48
+             */
             timeout: number;
-            /** @default 0 */
+            /**
+             * Format: int32
+             * @default 0
+             */
             maxRetries: number;
-            /** @default 60 */
+            /**
+             * Format: int32
+             * @default 60
+             */
             retryInterval: number;
             description?: string;
             upsideDown?: boolean;
             tags?: components["schemas"]["MonitorTag"][];
             notificationIds?: string[];
-            /** @default 0 */
+            /**
+             * Format: int32
+             * @default 0
+             */
             resendInterval: number;
             expiryNotification?: boolean;
             config?: components["schemas"]["MonitorConfig"];
@@ -1186,29 +1225,50 @@ export interface components {
             type: string;
             /** @default true */
             active: boolean;
-            /** @default 60 */
+            /**
+             * Format: int32
+             * @default 60
+             */
             interval: number;
-            /** @default 48 */
+            /**
+             * Format: int32
+             * @default 48
+             */
             timeout: number;
-            /** @default 0 */
+            /**
+             * Format: int32
+             * @default 0
+             */
             maxRetries: number;
-            /** @default 60 */
+            /**
+             * Format: int32
+             * @default 60
+             */
             retryInterval: number;
             description?: string;
             upsideDown?: boolean;
             notificationIds?: string[];
-            /** @default 0 */
+            /**
+             * Format: int32
+             * @default 0
+             */
             resendInterval: number;
             expiryNotification?: boolean;
             config: components["schemas"]["MonitorConfig"];
         };
-        MonitorConfig: components["schemas"]["HttpMonitorConfig"] | components["schemas"]["PortMonitorConfig"] | components["schemas"]["PingMonitorConfig"] | components["schemas"]["DnsMonitorConfig"] | components["schemas"]["GrpcMonitorConfig"] | components["schemas"]["MqttMonitorConfig"] | components["schemas"]["RedisMonitorConfig"] | components["schemas"]["SmtpMonitorConfig"] | components["schemas"]["TailscalePingMonitorConfig"] | components["schemas"]["GroupMonitorConfig"];
+        /** @description Type-specific configuration for a monitor, discriminated by the kind field. */
+        MonitorConfig: {
+            /** @description Discriminator field identifying the monitor configuration type. */
+            kind: string;
+        } & (components["schemas"]["HttpMonitorConfig"] | components["schemas"]["PortMonitorConfig"] | components["schemas"]["PingMonitorConfig"] | components["schemas"]["DnsMonitorConfig"] | components["schemas"]["GrpcMonitorConfig"] | components["schemas"]["MqttMonitorConfig"] | components["schemas"]["RedisMonitorConfig"] | components["schemas"]["SmtpMonitorConfig"] | components["schemas"]["TailscalePingMonitorConfig"] | components["schemas"]["GroupMonitorConfig"]);
+        /** @description Configuration for HTTP/HTTPS monitor checks including keyword and JSON path matching. */
         HttpMonitorConfig: {
             /**
              * @description discriminator enum property added by openapi-typescript
              * @enum {string}
              */
             kind: "http";
+            /** Format: uri */
             url?: string;
             /**
              * @default GET
@@ -1222,7 +1282,10 @@ export interface components {
             body?: string;
             basicAuthUser?: string;
             basicAuthPass?: string;
-            /** @default 10 */
+            /**
+             * Format: int32
+             * @default 10
+             */
             maxRedirects: number;
             acceptedStatusCodes?: string[];
             ignoreTls?: boolean;
@@ -1233,57 +1296,74 @@ export interface components {
             /** Format: uuid */
             proxyId?: string;
         };
+        /** @description Configuration for TCP port connectivity checks. */
         PortMonitorConfig: {
             /**
              * @description discriminator enum property added by openapi-typescript
              * @enum {string}
              */
             kind: "port";
+            /** Format: hostname */
             hostname?: string;
+            /** Format: int32 */
             port?: number;
             ignoreTls?: boolean;
         };
+        /** @description Configuration for ICMP ping checks. */
         PingMonitorConfig: {
             /**
              * @description discriminator enum property added by openapi-typescript
              * @enum {string}
              */
             kind: "ping";
+            /** Format: hostname */
             hostname?: string;
-            /** @default 56 */
+            /**
+             * Format: int32
+             * @default 56
+             */
             packetSize: number;
         };
+        /** @description Configuration for DNS resolution checks. */
         DnsMonitorConfig: {
             /**
              * @description discriminator enum property added by openapi-typescript
              * @enum {string}
              */
             kind: "dns";
+            /** Format: hostname */
             hostname?: string;
+            /** Format: int32 */
             port?: number;
             /** @enum {string} */
             dnsResolveType?: "A" | "AAAA" | "CAA" | "CNAME" | "MX" | "NS" | "PTR" | "SOA" | "SRV" | "TXT";
+            /** Format: hostname */
             dnsResolveServer?: string;
         };
+        /** @description Configuration for gRPC health checks with keyword matching. */
         GrpcMonitorConfig: {
             /**
              * @description discriminator enum property added by openapi-typescript
              * @enum {string}
              */
             kind: "grpc-keyword";
+            /** Format: uri */
             grpcUrl?: string;
             grpcServiceName?: string;
             grpcMethod?: string;
             grpcEnableTls?: boolean;
             ignoreTls?: boolean;
         };
+        /** @description Configuration for MQTT broker connectivity and message checks. */
         MqttMonitorConfig: {
             /**
              * @description discriminator enum property added by openapi-typescript
              * @enum {string}
              */
             kind: "mqtt";
+            /** Format: hostname */
             hostname?: string;
+            /** Format: int32 */
             port?: number;
             mqttTopic?: string;
             mqttSuccessMessage?: string;
@@ -1291,34 +1371,43 @@ export interface components {
             mqttPassword?: string;
             ignoreTls?: boolean;
         };
+        /** @description Configuration for Redis connectivity checks. */
         RedisMonitorConfig: {
             /**
              * @description discriminator enum property added by openapi-typescript
              * @enum {string}
              */
             kind: "redis";
+            /** Format: hostname */
             hostname?: string;
+            /** Format: int32 */
             port?: number;
             databaseQuery?: string;
         };
+        /** @description Configuration for SMTP server connectivity checks. */
         SmtpMonitorConfig: {
             /**
              * @description discriminator enum property added by openapi-typescript
              * @enum {string}
              */
             kind: "smtp";
+            /** Format: hostname */
             hostname?: string;
+            /** Format: int32 */
             port?: number;
             ignoreTls?: boolean;
         };
+        /** @description Configuration for Tailscale DERP ping checks. */
         TailscalePingMonitorConfig: {
             /**
              * @description discriminator enum property added by openapi-typescript
              * @enum {string}
              */
             kind: "tailscale-ping";
+            /** Format: hostname */
             hostname?: string;
         };
+        /** @description Configuration for a group monitor that aggregates the status of member monitors. */
         GroupMonitorConfig: {
             /**
              * @description discriminator enum property added by openapi-typescript
@@ -1341,6 +1430,7 @@ export interface components {
              */
             monitorId: string;
             /**
+             * Format: int32
              * @description Monitor status at this point in time: 0=DOWN, 1=UP, 2=PENDING, 3=MAINTENANCE.
              * @enum {integer}
              */
@@ -1372,15 +1462,27 @@ export interface components {
              * @description Unix timestamp (seconds) for the start of this interval.
              */
             timestamp?: number;
-            /** @description Number of successful checks in this interval. */
+            /**
+             * Format: int32
+             * @description Number of successful checks in this interval.
+             */
             up?: number;
-            /** @description Number of failed checks in this interval. */
+            /**
+             * Format: int32
+             * @description Number of failed checks in this interval.
+             */
             down?: number;
             /** @description Average response time in milliseconds for this interval. */
             latency?: number;
-            /** @description Minimum response time in milliseconds for this interval. */
+            /**
+             * Format: int32
+             * @description Minimum response time in milliseconds for this interval.
+             */
             latencyMin?: number;
-            /** @description Maximum response time in milliseconds for this interval. */
+            /**
+             * Format: int32
+             * @description Maximum response time in milliseconds for this interval.
+             */
             latencyMax?: number;
         };
         /** @description A configured notification provider that can receive alerts when monitors change status. */
@@ -1397,9 +1499,7 @@ export interface components {
             /** @description Whether this notification provider is active and will receive alerts. */
             active: boolean;
             /** @description Provider-specific configuration (e.g., webhook URL, API token, channel). Shape depends on the provider type. */
-            config?: {
-                [key: string]: unknown;
-            };
+            config?: unknown;
         };
         /** @description Input for creating or updating a notification provider configuration. */
         NotificationInput: {
@@ -1413,9 +1513,7 @@ export interface components {
              */
             active: boolean;
             /** @description Provider-specific configuration. Required fields depend on the provider type. */
-            config: {
-                [key: string]: unknown;
-            };
+            config: unknown;
             /**
              * @description If true, automatically link this notification to all existing monitors.
              * @default false
@@ -1491,11 +1589,17 @@ export interface components {
             weekdays?: number[];
             /** @description Days of the month (1-31) for recurring-day-of-month strategy. */
             daysOfMonth?: number[];
-            /** @description Interval in days between recurrences for recurring-interval strategy. */
+            /**
+             * Format: int32
+             * @description Interval in days between recurrences for recurring-interval strategy.
+             */
             intervalDay?: number;
             /** @description Cron expression for cron-based scheduling strategy. */
             cron?: string;
-            /** @description Duration of each maintenance window in minutes. */
+            /**
+             * Format: int32
+             * @description Duration of each maintenance window in minutes.
+             */
             durationMinutes?: number;
             /** @description IANA timezone identifier for scheduling (e.g., 'America/New_York'). */
             timezoneOption?: string;
@@ -1534,11 +1638,17 @@ export interface components {
             weekdays?: number[];
             /** @description Days of the month (1-31) for recurring-day-of-month strategy. */
             daysOfMonth?: number[];
-            /** @description Interval in days between recurrences. */
+            /**
+             * Format: int32
+             * @description Interval in days between recurrences.
+             */
             intervalDay?: number;
             /** @description Cron expression for cron-based scheduling. */
             cron?: string;
-            /** @description Duration of each maintenance window in minutes. */
+            /**
+             * Format: int32
+             * @description Duration of each maintenance window in minutes.
+             */
             durationMinutes?: number;
             /** @description IANA timezone identifier for scheduling (e.g., 'America/New_York'). */
             timezoneOption?: string;
@@ -1628,7 +1738,10 @@ export interface components {
             id?: string;
             /** @description Display name of the group. */
             name: string;
-            /** @description Sort order weight (lower values appear first). */
+            /**
+             * Format: int32
+             * @description Sort order weight (lower values appear first).
+             */
             weight?: number;
             /** @description IDs of monitors to include in this group. */
             monitorIds?: string[];
@@ -1685,7 +1798,10 @@ export interface components {
         };
         /** @description Application-wide configuration settings. All fields are optional on update (PATCH semantics). */
         Settings: {
-            /** @description The public-facing base URL of this instance (used in notifications and badges). */
+            /**
+             * Format: uri
+             * @description The public-facing base URL of this instance (used in notifications and badges).
+             */
             primaryBaseURL?: string;
             /** @description IANA timezone identifier for server-side time display (e.g., 'America/New_York'). */
             serverTimezone?: string;
@@ -1700,7 +1816,10 @@ export interface components {
             disableAuth?: boolean;
             /** @description Whether API key authentication is enabled for programmatic access. */
             apiKeysEnabled?: boolean;
-            /** @description Number of days to retain heartbeat data before automatic cleanup. */
+            /**
+             * Format: int32
+             * @description Number of days to retain heartbeat data before automatic cleanup.
+             */
             keepDataPeriodDays?: number;
             /** @description Slug of the default status page shown when entryPage is 'statusPage'. */
             statusPageSlug?: string;
@@ -1749,9 +1868,15 @@ export interface components {
              * @enum {string}
              */
             protocol: "http" | "https" | "socks" | "socks5" | "socks5h" | "socks4";
-            /** @description Proxy server hostname or IP address. */
+            /**
+             * Format: hostname
+             * @description Proxy server hostname or IP address.
+             */
             host: string;
-            /** @description Proxy server port number. */
+            /**
+             * Format: int32
+             * @description Proxy server port number.
+             */
             port: number;
             /** @description Whether this proxy is currently available for use. */
             active: boolean;
@@ -1773,9 +1898,15 @@ export interface components {
              * @enum {string}
              */
             protocol: "http" | "https" | "socks" | "socks5" | "socks5h" | "socks4";
-            /** @description Proxy server hostname or IP address. */
+            /**
+             * Format: hostname
+             * @description Proxy server hostname or IP address.
+             */
             host: string;
-            /** @description Proxy server port number. */
+            /**
+             * Format: int32
+             * @description Proxy server port number.
+             */
             port: number;
             /**
              * @description Whether this proxy should be available for use immediately.
@@ -1895,6 +2026,7 @@ export interface operations {
                 };
                 content?: never;
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     refreshToken: {
@@ -1942,6 +2074,7 @@ export interface operations {
                     };
                 };
             };
+            400: components["responses"]["NotFound"];
         };
     };
     setup: {
@@ -2029,6 +2162,7 @@ export interface operations {
                     };
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     prepare2FA: {
@@ -2054,10 +2188,12 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** Format: uri */
                         uri: string;
                     };
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     enable2FA: {
@@ -2086,6 +2222,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     disable2FA: {
@@ -2113,6 +2250,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     getMonitorUptimes: {
@@ -2124,17 +2262,21 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Map of monitor ID to uptime ratio (0.0–1.0) */
+            /** @description Uptime ratios (0.0–1.0) for each active monitor */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        [key: string]: number;
-                    };
+                        /** Format: uuid */
+                        monitorId: string;
+                        /** Format: double */
+                        uptime: number;
+                    }[];
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     listMonitors: {
@@ -2155,6 +2297,7 @@ export interface operations {
                     "application/json": components["schemas"]["Monitor"][];
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     createMonitor: {
@@ -2182,6 +2325,7 @@ export interface operations {
                     };
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     getMonitor: {
@@ -2239,6 +2383,7 @@ export interface operations {
     deleteMonitor: {
         parameters: {
             query?: {
+                /** @description Whether to also delete child monitors in a group */
                 deleteChildren?: boolean;
             };
             header?: never;
@@ -2281,6 +2426,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     resumeMonitor: {
@@ -2304,6 +2450,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     checkDomain: {
@@ -2325,11 +2472,13 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** Format: hostname */
                         domain?: string;
                         tld?: string;
                     };
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     getHeartbeats: {
@@ -2358,6 +2507,7 @@ export interface operations {
                     "application/json": components["schemas"]["Heartbeat"][];
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     clearHeartbeats: {
@@ -2379,11 +2529,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            404: components["responses"]["NotFound"];
         };
     };
     getChartData: {
         parameters: {
             query?: {
+                /** @description Number of hours of chart data to return */
                 hours?: number;
             };
             header?: never;
@@ -2404,12 +2556,15 @@ export interface operations {
                     "application/json": components["schemas"]["ChartPoint"][];
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     getImportantHeartbeats: {
         parameters: {
             query?: {
+                /** @description Number of records to skip for pagination */
                 offset?: number;
+                /** @description Maximum number of records to return */
                 limit?: number;
             };
             header?: never;
@@ -2434,6 +2589,7 @@ export interface operations {
                     };
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     clearEvents: {
@@ -2455,11 +2611,13 @@ export interface operations {
                 };
                 content?: never;
             };
+            404: components["responses"]["NotFound"];
         };
     };
     listRecentEvents: {
         parameters: {
             query?: {
+                /** @description Maximum number of records to return */
                 limit?: number;
             };
             header?: never;
@@ -2481,6 +2639,7 @@ export interface operations {
                     };
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     listNotifications: {
@@ -2501,6 +2660,7 @@ export interface operations {
                     "application/json": components["schemas"]["Notification"][];
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     createNotification: {
@@ -2528,6 +2688,7 @@ export interface operations {
                     };
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     updateNotification: {
@@ -2535,6 +2696,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the notification provider */
                 notificationId: string;
             };
             cookie?: never;
@@ -2554,6 +2716,7 @@ export interface operations {
                     "application/json": components["schemas"]["Notification"];
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     deleteNotification: {
@@ -2561,6 +2724,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the notification provider */
                 notificationId: string;
             };
             cookie?: never;
@@ -2574,6 +2738,7 @@ export interface operations {
                 };
                 content?: never;
             };
+            404: components["responses"]["NotFound"];
         };
     };
     testNotification: {
@@ -2581,6 +2746,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the notification provider */
                 notificationId: string;
             };
             cookie?: never;
@@ -2596,6 +2762,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     listTags: {
@@ -2616,6 +2783,7 @@ export interface operations {
                     "application/json": components["schemas"]["Tag"][];
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     createTag: {
@@ -2640,6 +2808,7 @@ export interface operations {
                     "application/json": components["schemas"]["Tag"];
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     updateTag: {
@@ -2647,6 +2816,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the tag */
                 tagId: string;
             };
             cookie?: never;
@@ -2666,6 +2836,7 @@ export interface operations {
                     "application/json": components["schemas"]["Tag"];
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     deleteTag: {
@@ -2673,6 +2844,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the tag */
                 tagId: string;
             };
             cookie?: never;
@@ -2686,6 +2858,7 @@ export interface operations {
                 };
                 content?: never;
             };
+            404: components["responses"]["NotFound"];
         };
     };
     addMonitorTag: {
@@ -2715,6 +2888,7 @@ export interface operations {
                 };
                 content?: never;
             };
+            404: components["responses"]["NotFound"];
         };
     };
     updateMonitorTag: {
@@ -2724,6 +2898,7 @@ export interface operations {
             path: {
                 /** @description Unique identifier of the monitor. */
                 monitorId: components["parameters"]["MonitorId"];
+                /** @description Unique identifier of the tag */
                 tagId: string;
             };
             cookie?: never;
@@ -2743,6 +2918,7 @@ export interface operations {
                 };
                 content?: never;
             };
+            404: components["responses"]["NotFound"];
         };
     };
     deleteMonitorTag: {
@@ -2752,6 +2928,7 @@ export interface operations {
             path: {
                 /** @description Unique identifier of the monitor. */
                 monitorId: components["parameters"]["MonitorId"];
+                /** @description Unique identifier of the tag */
                 tagId: string;
             };
             cookie?: never;
@@ -2765,6 +2942,7 @@ export interface operations {
                 };
                 content?: never;
             };
+            404: components["responses"]["NotFound"];
         };
     };
     listMaintenance: {
@@ -2785,6 +2963,7 @@ export interface operations {
                     "application/json": components["schemas"]["Maintenance"][];
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     createMaintenance: {
@@ -2812,6 +2991,7 @@ export interface operations {
                     };
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     getMaintenance: {
@@ -2819,6 +2999,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the maintenance window */
                 maintenanceId: string;
             };
             cookie?: never;
@@ -2834,6 +3015,7 @@ export interface operations {
                     "application/json": components["schemas"]["Maintenance"];
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     updateMaintenance: {
@@ -2841,6 +3023,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the maintenance window */
                 maintenanceId: string;
             };
             cookie?: never;
@@ -2860,6 +3043,7 @@ export interface operations {
                     "application/json": components["schemas"]["Maintenance"];
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     deleteMaintenance: {
@@ -2867,6 +3051,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the maintenance window */
                 maintenanceId: string;
             };
             cookie?: never;
@@ -2880,6 +3065,7 @@ export interface operations {
                 };
                 content?: never;
             };
+            404: components["responses"]["NotFound"];
         };
     };
     pauseMaintenance: {
@@ -2887,6 +3073,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the maintenance window */
                 maintenanceId: string;
             };
             cookie?: never;
@@ -2902,6 +3089,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     resumeMaintenance: {
@@ -2909,6 +3097,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the maintenance window */
                 maintenanceId: string;
             };
             cookie?: never;
@@ -2924,6 +3113,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     getMaintenanceMonitors: {
@@ -2931,6 +3121,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the maintenance window */
                 maintenanceId: string;
             };
             cookie?: never;
@@ -2946,6 +3137,7 @@ export interface operations {
                     "application/json": string[];
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     setMaintenanceMonitors: {
@@ -2953,6 +3145,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the maintenance window */
                 maintenanceId: string;
             };
             cookie?: never;
@@ -2972,6 +3165,7 @@ export interface operations {
                 };
                 content?: never;
             };
+            404: components["responses"]["NotFound"];
         };
     };
     getMaintenanceStatusPages: {
@@ -2979,6 +3173,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the maintenance window */
                 maintenanceId: string;
             };
             cookie?: never;
@@ -2994,6 +3189,7 @@ export interface operations {
                     "application/json": string[];
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     setMaintenanceStatusPages: {
@@ -3001,6 +3197,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the maintenance window */
                 maintenanceId: string;
             };
             cookie?: never;
@@ -3020,6 +3217,7 @@ export interface operations {
                 };
                 content?: never;
             };
+            404: components["responses"]["NotFound"];
         };
     };
     listStatusPages: {
@@ -3040,6 +3238,7 @@ export interface operations {
                     "application/json": components["schemas"]["StatusPage"][];
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     createStatusPage: {
@@ -3066,6 +3265,7 @@ export interface operations {
                     };
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     getStatusPage: {
@@ -3073,6 +3273,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description URL-safe identifier of the status page */
                 slug: string;
             };
             cookie?: never;
@@ -3096,6 +3297,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description URL-safe identifier of the status page */
                 slug: string;
             };
             cookie?: never;
@@ -3115,6 +3317,7 @@ export interface operations {
                     "application/json": components["schemas"]["StatusPage"];
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     deleteStatusPage: {
@@ -3122,6 +3325,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description URL-safe identifier of the status page */
                 slug: string;
             };
             cookie?: never;
@@ -3135,6 +3339,7 @@ export interface operations {
                 };
                 content?: never;
             };
+            404: components["responses"]["NotFound"];
         };
     };
     getStatusPageHeartbeats: {
@@ -3142,6 +3347,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description URL-safe identifier of the status page */
                 slug: string;
             };
             cookie?: never;
@@ -3156,27 +3362,36 @@ export interface operations {
                 content: {
                     "application/json": {
                         heartbeatList?: {
-                            [key: string]: components["schemas"]["Heartbeat"][];
-                        };
+                            /** Format: uuid */
+                            monitorId: string;
+                            heartbeats: components["schemas"]["Heartbeat"][];
+                        }[];
                         uptimeList?: {
-                            [key: string]: number;
-                        };
-                        /** @description Map of monitor ID to display name */
+                            /** Format: uuid */
+                            monitorId: string;
+                            uptime: number;
+                        }[];
+                        /** @description Monitor ID to display name */
                         monitorNames?: {
-                            [key: string]: string;
-                        };
+                            /** Format: uuid */
+                            monitorId: string;
+                            name: string;
+                        }[];
                     };
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     getStatusPageBadge: {
         parameters: {
             query?: {
+                /** @description Visual style of the rendered SVG badge */
                 style?: "flat" | "flat-square" | "for-the-badge" | "plastic" | "social";
             };
             header?: never;
             path: {
+                /** @description URL-safe identifier of the status page */
                 slug: string;
             };
             cookie?: never;
@@ -3192,15 +3407,18 @@ export interface operations {
                     "image/svg+xml": string;
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     listIncidents: {
         parameters: {
             query?: {
+                /** @description Pagination cursor for fetching the next page of results */
                 cursor?: string;
             };
             header?: never;
             path: {
+                /** @description URL-safe identifier of the status page */
                 slug: string;
             };
             cookie?: never;
@@ -3219,6 +3437,7 @@ export interface operations {
                     };
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     createIncident: {
@@ -3226,6 +3445,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description URL-safe identifier of the status page */
                 slug: string;
             };
             cookie?: never;
@@ -3245,6 +3465,7 @@ export interface operations {
                     "application/json": components["schemas"]["Incident"];
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     updateIncident: {
@@ -3252,7 +3473,9 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description URL-safe identifier of the status page */
                 slug: string;
+                /** @description Unique identifier of the incident */
                 incidentId: string;
             };
             cookie?: never;
@@ -3272,6 +3495,7 @@ export interface operations {
                     "application/json": components["schemas"]["Incident"];
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     deleteIncident: {
@@ -3279,7 +3503,9 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description URL-safe identifier of the status page */
                 slug: string;
+                /** @description Unique identifier of the incident */
                 incidentId: string;
             };
             cookie?: never;
@@ -3293,6 +3519,7 @@ export interface operations {
                 };
                 content?: never;
             };
+            404: components["responses"]["NotFound"];
         };
     };
     resolveIncident: {
@@ -3300,7 +3527,9 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description URL-safe identifier of the status page */
                 slug: string;
+                /** @description Unique identifier of the incident */
                 incidentId: string;
             };
             cookie?: never;
@@ -3316,6 +3545,7 @@ export interface operations {
                     "application/json": components["schemas"]["Incident"];
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     unpinIncident: {
@@ -3323,7 +3553,9 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description URL-safe identifier of the status page */
                 slug: string;
+                /** @description Unique identifier of the incident */
                 incidentId: string;
             };
             cookie?: never;
@@ -3339,6 +3571,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     getSettings: {
@@ -3359,6 +3592,7 @@ export interface operations {
                     "application/json": components["schemas"]["Settings"];
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     updateSettings: {
@@ -3383,6 +3617,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     listAPIKeys: {
@@ -3403,6 +3638,7 @@ export interface operations {
                     "application/json": components["schemas"]["APIKey"][];
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     createAPIKey: {
@@ -3431,6 +3667,7 @@ export interface operations {
                     };
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     deleteAPIKey: {
@@ -3438,6 +3675,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the API key */
                 keyId: string;
             };
             cookie?: never;
@@ -3451,6 +3689,7 @@ export interface operations {
                 };
                 content?: never;
             };
+            404: components["responses"]["NotFound"];
         };
     };
     enableAPIKey: {
@@ -3458,6 +3697,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the API key */
                 keyId: string;
             };
             cookie?: never;
@@ -3473,6 +3713,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     disableAPIKey: {
@@ -3480,6 +3721,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the API key */
                 keyId: string;
             };
             cookie?: never;
@@ -3495,6 +3737,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     listProxies: {
@@ -3515,6 +3758,7 @@ export interface operations {
                     "application/json": components["schemas"]["Proxy"][];
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     createProxy: {
@@ -3542,6 +3786,7 @@ export interface operations {
                     };
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     updateProxy: {
@@ -3549,6 +3794,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the proxy */
                 proxyId: string;
             };
             cookie?: never;
@@ -3566,6 +3812,7 @@ export interface operations {
                 };
                 content?: never;
             };
+            404: components["responses"]["NotFound"];
         };
     };
     deleteProxy: {
@@ -3573,6 +3820,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Unique identifier of the proxy */
                 proxyId: string;
             };
             cookie?: never;
@@ -3586,6 +3834,7 @@ export interface operations {
                 };
                 content?: never;
             };
+            404: components["responses"]["NotFound"];
         };
     };
     getStatusBadge: {
@@ -3604,11 +3853,13 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["SVGBadge"];
+            404: components["responses"]["NotFound"];
         };
     };
     getUptimeBadge: {
         parameters: {
             query?: {
+                /** @description Duration in hours for uptime calculation */
                 duration?: number;
                 /** @description Visual style of the rendered SVG badge. */
                 style?: components["parameters"]["BadgeStyle"];
@@ -3623,11 +3874,13 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["SVGBadge"];
+            404: components["responses"]["NotFound"];
         };
     };
     getLatencyBadge: {
         parameters: {
             query?: {
+                /** @description Duration in hours for latency calculation */
                 duration?: number;
                 /** @description Visual style of the rendered SVG badge. */
                 style?: components["parameters"]["BadgeStyle"];
@@ -3642,6 +3895,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["SVGBadge"];
+            404: components["responses"]["NotFound"];
         };
     };
     getResponseBadge: {
@@ -3660,6 +3914,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["SVGBadge"];
+            404: components["responses"]["NotFound"];
         };
     };
     getCertExpiryBadge: {
@@ -3678,6 +3933,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: components["responses"]["SVGBadge"];
+            404: components["responses"]["NotFound"];
         };
     };
     getStatusPageEventStream: {
@@ -3685,6 +3941,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description URL-safe identifier of the status page */
                 slug: string;
             };
             cookie?: never;
@@ -3700,6 +3957,7 @@ export interface operations {
                     "text/event-stream": string;
                 };
             };
+            404: components["responses"]["NotFound"];
         };
     };
     healthCheck: {
@@ -3723,6 +3981,7 @@ export interface operations {
                     };
                 };
             };
+            400: components["responses"]["NotFound"];
         };
     };
     getInfo: {
@@ -3743,12 +4002,14 @@ export interface operations {
                     "application/json": {
                         version?: string;
                         latestVersion?: string;
+                        /** Format: uri */
                         primaryBaseURL?: string;
                         serverTimezone?: string;
                         serverTimezoneOffset?: string;
                     };
                 };
             };
+            400: components["responses"]["NotFound"];
         };
     };
     getDatabaseSize: {
@@ -3775,6 +4036,7 @@ export interface operations {
                     };
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     shrinkDatabase: {
@@ -3795,6 +4057,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
     clearStatistics: {
@@ -3813,6 +4076,7 @@ export interface operations {
                 };
                 content?: never;
             };
+            401: components["responses"]["Unauthorized"];
         };
     };
 }

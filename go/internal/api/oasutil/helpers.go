@@ -31,11 +31,11 @@ func PtrToOptString(s string) oas.OptString {
 	return oas.NewOptString(s)
 }
 
-func PtrIntToOptInt(p *int) oas.OptInt {
+func PtrIntToOptInt32(p *int) oas.OptInt32 {
 	if p == nil {
-		return oas.OptInt{}
+		return oas.OptInt32{}
 	}
-	return oas.NewOptInt(*p)
+	return oas.NewOptInt32(int32(*p)) //nolint:gosec // values are small config integers, overflow not possible
 }
 
 func OptStringValue(o oas.OptString) string {
@@ -45,9 +45,9 @@ func OptStringValue(o oas.OptString) string {
 	return ""
 }
 
-func OptIntValue(o oas.OptInt, defaultVal int) int {
+func OptIntValue(o oas.OptInt32, defaultVal int) int {
 	if o.IsSet() {
-		return o.Value
+		return int(o.Value)
 	}
 	return defaultVal
 }
@@ -66,4 +66,3 @@ func OptUUIDPtr(o oas.OptUUID) *string {
 	}
 	return nil
 }
-

@@ -15,6 +15,7 @@ test:
 
 lint:
 	golangci-lint run
+	go run github.com/speakeasy-api/openapi/cmd/openapi@latest spec lint --config openapi.lint.yaml api/openapi.yaml
 
 fmt:
 	gofmt -w .

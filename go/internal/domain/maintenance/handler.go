@@ -23,20 +23,20 @@ func NewHandler(repo Repository) *Handler {
 	return &Handler{repo: repo}
 }
 
-func (h *Handler) ListMaintenance(ctx context.Context) ([]oas.Maintenance, error) {
+func (h *Handler) ListMaintenance(ctx context.Context) (oas.ListMaintenanceRes, error) {
 	list, err := h.repo.FindAll(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("listing maintenance windows: %w", err)
 	}
 
-	result := make([]oas.Maintenance, 0, len(list))
+	result := make(oas.ListMaintenanceOKApplicationJSON, 0, len(list))
 	for _, m := range list {
 		result = append(result, maintenanceToOAS(m))
 	}
-	return result, nil
+	return &result, nil
 }
 
-func (h *Handler) GetMaintenance(ctx context.Context, params oas.GetMaintenanceParams) (*oas.Maintenance, error) {
+func (h *Handler) GetMaintenance(ctx context.Context, params oas.GetMaintenanceParams) (oas.GetMaintenanceRes, error) {
 	m, err := h.repo.FindByID(ctx, params.MaintenanceId.String())
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -48,7 +48,7 @@ func (h *Handler) GetMaintenance(ctx context.Context, params oas.GetMaintenanceP
 	return &result, nil
 }
 
-func (h *Handler) CreateMaintenance(ctx context.Context, req *oas.MaintenanceInput) (*oas.CreateMaintenanceCreated, error) {
+func (h *Handler) CreateMaintenance(ctx context.Context, req *oas.MaintenanceInput) (oas.CreateMaintenanceRes, error) {
 	userID, err := oasutil.UserIDFromCtx(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("getting user from context: %w", err)
@@ -63,7 +63,7 @@ func (h *Handler) CreateMaintenance(ctx context.Context, req *oas.MaintenanceInp
 	return &oas.CreateMaintenanceCreated{ID: oasutil.MustParseUUID(id)}, nil
 }
 
-func (h *Handler) UpdateMaintenance(ctx context.Context, req *oas.MaintenanceInput, params oas.UpdateMaintenanceParams) (*oas.Maintenance, error) {
+func (h *Handler) UpdateMaintenance(ctx context.Context, req *oas.MaintenanceInput, params oas.UpdateMaintenanceParams) (oas.UpdateMaintenanceRes, error) {
 	existing, err := h.repo.FindByID(ctx, params.MaintenanceId.String())
 	if err != nil {
 		return nil, fmt.Errorf("finding maintenance: %w", err)
@@ -78,14 +78,14 @@ func (h *Handler) UpdateMaintenance(ctx context.Context, req *oas.MaintenanceInp
 	return &result, nil
 }
 
-func (h *Handler) DeleteMaintenance(ctx context.Context, params oas.DeleteMaintenanceParams) error {
+func (h *Handler) DeleteMaintenance(ctx context.Context, params oas.DeleteMaintenanceParams) (oas.DeleteMaintenanceRes, error) {
 	if err := h.repo.Delete(ctx, params.MaintenanceId.String()); err != nil {
-		return fmt.Errorf("deleting maintenance: %w", err)
+		return nil, fmt.Errorf("deleting maintenance: %w", err)
 	}
-	return nil
+	return &oas.DeleteMaintenanceNoContent{}, nil
 }
 
-func (h *Handler) PauseMaintenance(ctx context.Context, params oas.PauseMaintenanceParams) (*oas.MessageResponse, error) {
+func (h *Handler) PauseMaintenance(ctx context.Context, params oas.PauseMaintenanceParams) (oas.PauseMaintenanceRes, error) {
 	m, err := h.repo.FindByID(ctx, params.MaintenanceId.String())
 	if err != nil {
 		return nil, fmt.Errorf("finding maintenance: %w", err)
@@ -97,7 +97,7 @@ func (h *Handler) PauseMaintenance(ctx context.Context, params oas.PauseMaintena
 	return &oas.MessageResponse{Message: "paused"}, nil
 }
 
-func (h *Handler) ResumeMaintenance(ctx context.Context, params oas.ResumeMaintenanceParams) (*oas.MessageResponse, error) {
+func (h *Handler) ResumeMaintenance(ctx context.Context, params oas.ResumeMaintenanceParams) (oas.ResumeMaintenanceRes, error) {
 	m, err := h.repo.FindByID(ctx, params.MaintenanceId.String())
 	if err != nil {
 		return nil, fmt.Errorf("finding maintenance: %w", err)
@@ -109,53 +109,53 @@ func (h *Handler) ResumeMaintenance(ctx context.Context, params oas.ResumeMainte
 	return &oas.MessageResponse{Message: "resumed"}, nil
 }
 
-func (h *Handler) GetMaintenanceMonitors(ctx context.Context, params oas.GetMaintenanceMonitorsParams) ([]uuid.UUID, error) {
+func (h *Handler) GetMaintenanceMonitors(ctx context.Context, params oas.GetMaintenanceMonitorsParams) (oas.GetMaintenanceMonitorsRes, error) {
 	ids, err := h.repo.GetMonitorMaintenanceIDs(ctx, params.MaintenanceId.String())
 	if err != nil {
 		return nil, fmt.Errorf("getting maintenance monitors: %w", err)
 	}
-	result := make([]uuid.UUID, 0, len(ids))
+	result := make(oas.GetMaintenanceMonitorsOKApplicationJSON, 0, len(ids))
 	for _, id := range ids {
 		result = append(result, oasutil.MustParseUUID(id))
 	}
-	return result, nil
+	return &result, nil
 }
 
-func (h *Handler) SetMaintenanceMonitors(ctx context.Context, req *oas.SetMaintenanceMonitorsReq, params oas.SetMaintenanceMonitorsParams) error {
+func (h *Handler) SetMaintenanceMonitors(ctx context.Context, req *oas.SetMaintenanceMonitorsReq, params oas.SetMaintenanceMonitorsParams) (oas.SetMaintenanceMonitorsRes, error) {
 	ids := make([]string, len(req.MonitorIds))
 	for i, id := range req.MonitorIds {
 		ids[i] = id.String()
 	}
 
 	if err := h.repo.SetMonitorIDs(ctx, params.MaintenanceId.String(), ids); err != nil {
-		return fmt.Errorf("setting maintenance monitors: %w", err)
+		return nil, fmt.Errorf("setting maintenance monitors: %w", err)
 	}
-	return nil
+	return &oas.SetMaintenanceMonitorsOK{}, nil
 }
 
-func (h *Handler) GetMaintenanceStatusPages(ctx context.Context, params oas.GetMaintenanceStatusPagesParams) ([]uuid.UUID, error) {
+func (h *Handler) GetMaintenanceStatusPages(ctx context.Context, params oas.GetMaintenanceStatusPagesParams) (oas.GetMaintenanceStatusPagesRes, error) {
 	ids, err := h.repo.GetStatusPageIDs(ctx, params.MaintenanceId.String())
 	if err != nil {
 		return nil, fmt.Errorf("getting maintenance status pages: %w", err)
 	}
 
-	result := make([]uuid.UUID, len(ids))
-	for i, id := range ids {
-		result[i] = uuid.MustParse(id)
+	result := make(oas.GetMaintenanceStatusPagesOKApplicationJSON, 0, len(ids))
+	for _, id := range ids {
+		result = append(result, uuid.MustParse(id))
 	}
-	return result, nil
+	return &result, nil
 }
 
-func (h *Handler) SetMaintenanceStatusPages(ctx context.Context, req *oas.SetMaintenanceStatusPagesReq, params oas.SetMaintenanceStatusPagesParams) error {
+func (h *Handler) SetMaintenanceStatusPages(ctx context.Context, req *oas.SetMaintenanceStatusPagesReq, params oas.SetMaintenanceStatusPagesParams) (oas.SetMaintenanceStatusPagesRes, error) {
 	ids := make([]string, len(req.StatusPageIds))
 	for i, id := range req.StatusPageIds {
 		ids[i] = id.String()
 	}
 
 	if err := h.repo.SetStatusPageIDs(ctx, params.MaintenanceId.String(), ids); err != nil {
-		return fmt.Errorf("setting maintenance status pages: %w", err)
+		return nil, fmt.Errorf("setting maintenance status pages: %w", err)
 	}
-	return nil
+	return &oas.SetMaintenanceStatusPagesOK{}, nil
 }
 
 func maintenanceToOAS(m *Maintenance) oas.Maintenance {
@@ -181,19 +181,19 @@ func maintenanceToOAS(m *Maintenance) oas.Maintenance {
 		result.EndTime = oas.NewOptString(m.EndTime)
 	}
 	if m.Weekdays != "" {
-		result.Weekdays = parseIntList(m.Weekdays)
+		result.Weekdays = parseInt32List(m.Weekdays)
 	}
 	if m.DaysOfMonth != "" {
-		result.DaysOfMonth = parseIntList(m.DaysOfMonth)
+		result.DaysOfMonth = parseInt32List(m.DaysOfMonth)
 	}
 	if m.IntervalDay > 0 {
-		result.IntervalDay = oas.NewOptInt(m.IntervalDay)
+		result.IntervalDay = oas.NewOptInt32(int32(m.IntervalDay)) //nolint:gosec // small config value
 	}
 	if m.CronExpression != "" {
 		result.Cron = oas.NewOptString(m.CronExpression)
 	}
 	if m.DurationMinutes > 0 {
-		result.DurationMinutes = oas.NewOptInt(m.DurationMinutes)
+		result.DurationMinutes = oas.NewOptInt32(int32(m.DurationMinutes)) //nolint:gosec // small config value
 	}
 	if m.TimezoneOption != "" {
 		result.TimezoneOption = oas.NewOptString(m.TimezoneOption)
@@ -224,10 +224,10 @@ func maintenanceFromInput(req *oas.MaintenanceInput, userID string) *Maintenance
 		m.EndDate = &t
 	}
 	if len(req.Weekdays) > 0 {
-		m.Weekdays = intListToJSON(req.Weekdays)
+		m.Weekdays = int32ListToJSON(req.Weekdays)
 	}
 	if len(req.DaysOfMonth) > 0 {
-		m.DaysOfMonth = intListToJSON(req.DaysOfMonth)
+		m.DaysOfMonth = int32ListToJSON(req.DaysOfMonth)
 	}
 	return m
 }
@@ -256,40 +256,45 @@ func applyMaintenanceInput(m *Maintenance, req *oas.MaintenanceInput) {
 		m.EndTime = req.EndTime.Value
 	}
 	if len(req.Weekdays) > 0 {
-		m.Weekdays = intListToJSON(req.Weekdays)
+		m.Weekdays = int32ListToJSON(req.Weekdays)
 	}
 	if len(req.DaysOfMonth) > 0 {
-		m.DaysOfMonth = intListToJSON(req.DaysOfMonth)
+		m.DaysOfMonth = int32ListToJSON(req.DaysOfMonth)
 	}
 	if req.IntervalDay.IsSet() {
-		m.IntervalDay = req.IntervalDay.Value
+		m.IntervalDay = int(req.IntervalDay.Value)
 	}
 	if req.Cron.IsSet() {
 		m.CronExpression = req.Cron.Value
 	}
 	if req.DurationMinutes.IsSet() {
-		m.DurationMinutes = req.DurationMinutes.Value
+		m.DurationMinutes = int(req.DurationMinutes.Value)
 	}
 	if req.TimezoneOption.IsSet() {
 		m.TimezoneOption = req.TimezoneOption.Value
 	}
 }
 
-func parseIntList(s string) []int {
-	var result []int
-	if err := json.Unmarshal([]byte(s), &result); err == nil {
+func parseInt32List(s string) []int32 {
+	var raw []int
+	if err := json.Unmarshal([]byte(s), &raw); err == nil {
+		result := make([]int32, len(raw))
+		for i, v := range raw {
+			result[i] = int32(v) //nolint:gosec // weekday/day-of-month values, no overflow
+		}
 		return result
 	}
+	var result []int32
 	parts := strings.Split(s, ",")
 	for _, p := range parts {
 		if v, err := strconv.Atoi(strings.TrimSpace(p)); err == nil {
-			result = append(result, v)
+			result = append(result, int32(v)) //nolint:gosec // weekday/day-of-month values, no overflow
 		}
 	}
 	return result
 }
 
-func intListToJSON(vals []int) string {
+func int32ListToJSON(vals []int32) string {
 	b, _ := json.Marshal(vals)
 	return string(b)
 }

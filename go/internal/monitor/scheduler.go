@@ -3,6 +3,7 @@ package monitor
 import (
 	"container/heap"
 	"context"
+	"fmt"
 	"log/slog"
 	"sync"
 	"time"
@@ -68,7 +69,7 @@ type Scheduler struct {
 	queue    schedHeap
 	configs  map[string]*Config   // monitorID -> current config
 	lastFire map[string]time.Time // monitorID -> last time check was dispatched
-	wake     chan struct{}         // signal the loop when queue changes
+	wake     chan struct{}        // signal the loop when queue changes
 
 	store     Store
 	hbStore   HeartbeatStore
@@ -136,7 +137,7 @@ func (s *Scheduler) Start(ctx context.Context) error {
 
 	ids, err := s.store.FindAllActiveIDs(ctx)
 	if err != nil {
-		return err
+		return fmt.Errorf("loading active monitor IDs: %w", err)
 	}
 
 	slog.InfoContext(ctx, "scheduler starting", slog.Int("active_monitors", len(ids)))
@@ -148,7 +149,7 @@ func (s *Scheduler) Start(ctx context.Context) error {
 	}
 
 	s.wg.Add(1)
-	go s.loop()
+	go s.loop() //nolint:contextcheck // loop uses s.ctx set above
 
 	return nil
 }
@@ -215,12 +216,12 @@ func (s *Scheduler) addMonitorImmediate(id string) error {
 func (s *Scheduler) loadAndSchedule(id string, immediate bool) error {
 	mon, err := s.store.FindByID(s.ctx, id)
 	if err != nil {
-		return err
+		return fmt.Errorf("loading monitor %s: %w", id, err)
 	}
 
 	_, err = s.registry.Get(mon.Type)
 	if err != nil {
-		return err
+		return fmt.Errorf("getting checker for type %s: %w", mon.Type, err)
 	}
 
 	cfg := modelToConfig(mon)

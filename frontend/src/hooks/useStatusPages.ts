@@ -78,15 +78,35 @@ export function useDeleteStatusPage() {
   });
 }
 
+type Heartbeat = components['schemas']['Heartbeat'];
+
+interface HeartbeatData {
+  heartbeatList: Record<string, Heartbeat[]>;
+  uptimeList: Record<string, number>;
+  monitorNames: Record<string, string>;
+}
+
 export function useStatusPageHeartbeats(slug: string | undefined) {
   return useQuery({
     queryKey: ['status-pages', slug, 'heartbeats'],
-    queryFn: async () => {
+    queryFn: async (): Promise<HeartbeatData> => {
       const { data, error } = await api.GET('/status-pages/{slug}/heartbeats', {
         params: { path: { slug: slug! } },
       });
       if (error) throw error;
-      return data;
+      const heartbeatList: Record<string, Heartbeat[]> = {};
+      for (const item of data?.heartbeatList ?? []) {
+        heartbeatList[item.monitorId] = item.heartbeats;
+      }
+      const uptimeList: Record<string, number> = {};
+      for (const item of data?.uptimeList ?? []) {
+        uptimeList[`${item.monitorId}_24`] = item.uptime;
+      }
+      const monitorNames: Record<string, string> = {};
+      for (const item of data?.monitorNames ?? []) {
+        monitorNames[item.monitorId] = item.name;
+      }
+      return { heartbeatList, uptimeList, monitorNames };
     },
     enabled: !!slug,
   });

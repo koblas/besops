@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"strings"
 
@@ -29,7 +30,7 @@ type GroupChecker struct {
 }
 
 func (c *GroupChecker) Type() string { return "group" }
-func (c *GroupChecker) IsAggregate()  {}
+func (c *GroupChecker) IsAggregate() {}
 
 func (c *GroupChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.CheckResult, error) {
 	slog.DebugContext(ctx, "group check starting", slog.String("monitor", cfg.ID), slog.Int("tag_count", len(cfg.GroupTagIDs)))
@@ -106,5 +107,9 @@ func (c *GroupChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.
 }
 
 func (c *GroupChecker) resolveMembers(ctx context.Context, cfg *monitor.Config) ([]*domainmonitor.Monitor, error) {
-	return c.TagFinder.FindByTagIDs(ctx, cfg.GroupTagIDs)
+	members, err := c.TagFinder.FindByTagIDs(ctx, cfg.GroupTagIDs)
+	if err != nil {
+		return nil, fmt.Errorf("resolving group members by tag IDs: %w", err)
+	}
+	return members, nil
 }

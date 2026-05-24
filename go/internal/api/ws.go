@@ -39,7 +39,7 @@ func NewWebSocketHandler(events broadcast.Subscriber, authProvider *auth.Provide
 			slog.ErrorContext(r.Context(), "ws: accept failed", slog.Any("error", err))
 			return
 		}
-		defer conn.CloseNow()
+		defer conn.CloseNow() //nolint:errcheck // best-effort close on websocket teardown
 
 		ctx := r.Context()
 		sub := events.Subscribe()

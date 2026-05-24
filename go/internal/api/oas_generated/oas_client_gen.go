@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/go-faster/errors"
-	"github.com/google/uuid"
 	"github.com/ogen-go/ogen/conv"
 	ht "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/ogenerrors"
@@ -54,31 +53,31 @@ type APIKeyInvoker interface {
 	// Create a new API key.
 	//
 	// POST /api-keys
-	CreateAPIKey(ctx context.Context, request *APIKeyInput) (*CreateAPIKeyCreated, error)
+	CreateAPIKey(ctx context.Context, request *APIKeyInput) (CreateAPIKeyRes, error)
 	// DeleteAPIKey invokes deleteAPIKey operation.
 	//
 	// Delete an API key.
 	//
 	// DELETE /api-keys/{keyId}
-	DeleteAPIKey(ctx context.Context, params DeleteAPIKeyParams) error
+	DeleteAPIKey(ctx context.Context, params DeleteAPIKeyParams) (DeleteAPIKeyRes, error)
 	// DisableAPIKey invokes disableAPIKey operation.
 	//
 	// Disable an API key.
 	//
 	// POST /api-keys/{keyId}/disable
-	DisableAPIKey(ctx context.Context, params DisableAPIKeyParams) (*MessageResponse, error)
+	DisableAPIKey(ctx context.Context, params DisableAPIKeyParams) (DisableAPIKeyRes, error)
 	// EnableAPIKey invokes enableAPIKey operation.
 	//
 	// Enable an API key.
 	//
 	// POST /api-keys/{keyId}/enable
-	EnableAPIKey(ctx context.Context, params EnableAPIKeyParams) (*MessageResponse, error)
+	EnableAPIKey(ctx context.Context, params EnableAPIKeyParams) (EnableAPIKeyRes, error)
 	// ListAPIKeys invokes listAPIKeys operation.
 	//
 	// List all API keys.
 	//
 	// GET /api-keys
-	ListAPIKeys(ctx context.Context) ([]APIKey, error)
+	ListAPIKeys(ctx context.Context) (ListAPIKeysRes, error)
 }
 
 // AuthInvoker invokes operations described by OpenAPI v3 specification.
@@ -96,19 +95,19 @@ type AuthInvoker interface {
 	// Disable 2FA.
 	//
 	// POST /auth/2fa/disable
-	Disable2FA(ctx context.Context, request *Disable2FAReq) (*MessageResponse, error)
+	Disable2FA(ctx context.Context, request *Disable2FAReq) (Disable2FARes, error)
 	// Enable2FA invokes enable2FA operation.
 	//
 	// Enable 2FA after verifying token.
 	//
 	// POST /auth/2fa/enable
-	Enable2FA(ctx context.Context, request *Enable2FAReq) (*MessageResponse, error)
+	Enable2FA(ctx context.Context, request *Enable2FAReq) (Enable2FARes, error)
 	// Get2FAStatus invokes get2FAStatus operation.
 	//
 	// Get 2FA status for current user.
 	//
 	// GET /auth/2fa
-	Get2FAStatus(ctx context.Context) (*Get2FAStatusOK, error)
+	Get2FAStatus(ctx context.Context) (Get2FAStatusRes, error)
 	// Login invokes login operation.
 	//
 	// Authenticate with username and password.
@@ -120,19 +119,19 @@ type AuthInvoker interface {
 	// Invalidate current session.
 	//
 	// POST /auth/logout
-	Logout(ctx context.Context) error
+	Logout(ctx context.Context) (LogoutRes, error)
 	// NeedSetup invokes needSetup operation.
 	//
 	// Check if initial setup is required.
 	//
 	// GET /auth/setup
-	NeedSetup(ctx context.Context) (*NeedSetupOK, error)
+	NeedSetup(ctx context.Context) (NeedSetupRes, error)
 	// Prepare2FA invokes prepare2FA operation.
 	//
 	// Generate 2FA secret and QR URI.
 	//
 	// POST /auth/2fa/prepare
-	Prepare2FA(ctx context.Context, request *Prepare2FAReq) (*Prepare2FAOK, error)
+	Prepare2FA(ctx context.Context, request *Prepare2FAReq) (Prepare2FARes, error)
 	// RefreshToken invokes refreshToken operation.
 	//
 	// Refresh JWT token.
@@ -156,31 +155,31 @@ type BadgeInvoker interface {
 	// Get certificate expiry badge SVG.
 	//
 	// GET /badges/{monitorId}/cert-exp
-	GetCertExpiryBadge(ctx context.Context, params GetCertExpiryBadgeParams) (SVGBadge, error)
+	GetCertExpiryBadge(ctx context.Context, params GetCertExpiryBadgeParams) (GetCertExpiryBadgeRes, error)
 	// GetLatencyBadge invokes getLatencyBadge operation.
 	//
 	// Get average latency badge SVG.
 	//
 	// GET /badges/{monitorId}/latency
-	GetLatencyBadge(ctx context.Context, params GetLatencyBadgeParams) (SVGBadge, error)
+	GetLatencyBadge(ctx context.Context, params GetLatencyBadgeParams) (GetLatencyBadgeRes, error)
 	// GetResponseBadge invokes getResponseBadge operation.
 	//
 	// Get last response time badge SVG.
 	//
 	// GET /badges/{monitorId}/response
-	GetResponseBadge(ctx context.Context, params GetResponseBadgeParams) (SVGBadge, error)
+	GetResponseBadge(ctx context.Context, params GetResponseBadgeParams) (GetResponseBadgeRes, error)
 	// GetStatusBadge invokes getStatusBadge operation.
 	//
 	// Get status badge SVG for a monitor.
 	//
 	// GET /badges/{monitorId}/status
-	GetStatusBadge(ctx context.Context, params GetStatusBadgeParams) (SVGBadge, error)
+	GetStatusBadge(ctx context.Context, params GetStatusBadgeParams) (GetStatusBadgeRes, error)
 	// GetUptimeBadge invokes getUptimeBadge operation.
 	//
 	// Get uptime percentage badge SVG.
 	//
 	// GET /badges/{monitorId}/uptime
-	GetUptimeBadge(ctx context.Context, params GetUptimeBadgeParams) (SVGBadge, error)
+	GetUptimeBadge(ctx context.Context, params GetUptimeBadgeParams) (GetUptimeBadgeRes, error)
 }
 
 // EventInvoker invokes operations described by OpenAPI v3 specification.
@@ -192,7 +191,7 @@ type EventInvoker interface {
 	// Subscribe to real-time status page events via SSE.
 	//
 	// GET /status-pages/{slug}/events
-	GetStatusPageEventStream(ctx context.Context, params GetStatusPageEventStreamParams) (GetStatusPageEventStreamOK, error)
+	GetStatusPageEventStream(ctx context.Context, params GetStatusPageEventStreamParams) (GetStatusPageEventStreamRes, error)
 }
 
 // HeartbeatInvoker invokes operations described by OpenAPI v3 specification.
@@ -204,38 +203,38 @@ type HeartbeatInvoker interface {
 	// Clear important heartbeats (events) for a monitor.
 	//
 	// DELETE /monitors/{monitorId}/events
-	ClearEvents(ctx context.Context, params ClearEventsParams) error
+	ClearEvents(ctx context.Context, params ClearEventsParams) (ClearEventsRes, error)
 	// ClearHeartbeats invokes clearHeartbeats operation.
 	//
 	// Clear all heartbeats for a monitor.
 	//
 	// DELETE /monitors/{monitorId}/heartbeats
-	ClearHeartbeats(ctx context.Context, params ClearHeartbeatsParams) error
+	ClearHeartbeats(ctx context.Context, params ClearHeartbeatsParams) (ClearHeartbeatsRes, error)
 	// GetChartData invokes getChartData operation.
 	//
 	// Get aggregated chart data for a monitor.
 	//
 	// GET /monitors/{monitorId}/heartbeats/chart
-	GetChartData(ctx context.Context, params GetChartDataParams) ([]ChartPoint, error)
+	GetChartData(ctx context.Context, params GetChartDataParams) (GetChartDataRes, error)
 	// GetHeartbeats invokes getHeartbeats operation.
 	//
 	// Returns heartbeat history. Use either `hours` to get all heartbeats within a time window,
 	// or `count` to get the N most recent heartbeats. If both are provided, `count` takes precedence.
 	//
 	// GET /monitors/{monitorId}/heartbeats
-	GetHeartbeats(ctx context.Context, params GetHeartbeatsParams) ([]Heartbeat, error)
+	GetHeartbeats(ctx context.Context, params GetHeartbeatsParams) (GetHeartbeatsRes, error)
 	// GetImportantHeartbeats invokes getImportantHeartbeats operation.
 	//
 	// Get important heartbeats (status changes).
 	//
 	// GET /monitors/{monitorId}/events
-	GetImportantHeartbeats(ctx context.Context, params GetImportantHeartbeatsParams) (*GetImportantHeartbeatsOK, error)
+	GetImportantHeartbeats(ctx context.Context, params GetImportantHeartbeatsParams) (GetImportantHeartbeatsRes, error)
 	// ListRecentEvents invokes listRecentEvents operation.
 	//
 	// Get recent important heartbeats across all monitors.
 	//
 	// GET /events
-	ListRecentEvents(ctx context.Context, params ListRecentEventsParams) (*ListRecentEventsOK, error)
+	ListRecentEvents(ctx context.Context, params ListRecentEventsParams) (ListRecentEventsRes, error)
 }
 
 // IncidentInvoker invokes operations described by OpenAPI v3 specification.
@@ -247,37 +246,37 @@ type IncidentInvoker interface {
 	// Create an incident on a status page.
 	//
 	// POST /status-pages/{slug}/incidents
-	CreateIncident(ctx context.Context, request *IncidentInput, params CreateIncidentParams) (*Incident, error)
+	CreateIncident(ctx context.Context, request *IncidentInput, params CreateIncidentParams) (CreateIncidentRes, error)
 	// DeleteIncident invokes deleteIncident operation.
 	//
 	// Delete an incident.
 	//
 	// DELETE /status-pages/{slug}/incidents/{incidentId}
-	DeleteIncident(ctx context.Context, params DeleteIncidentParams) error
+	DeleteIncident(ctx context.Context, params DeleteIncidentParams) (DeleteIncidentRes, error)
 	// ListIncidents invokes listIncidents operation.
 	//
 	// Get incident history for a status page.
 	//
 	// GET /status-pages/{slug}/incidents
-	ListIncidents(ctx context.Context, params ListIncidentsParams) (*ListIncidentsOK, error)
+	ListIncidents(ctx context.Context, params ListIncidentsParams) (ListIncidentsRes, error)
 	// ResolveIncident invokes resolveIncident operation.
 	//
 	// Mark an incident as resolved.
 	//
 	// POST /status-pages/{slug}/incidents/{incidentId}/resolve
-	ResolveIncident(ctx context.Context, params ResolveIncidentParams) (*Incident, error)
+	ResolveIncident(ctx context.Context, params ResolveIncidentParams) (ResolveIncidentRes, error)
 	// UnpinIncident invokes unpinIncident operation.
 	//
 	// Unpin an incident from the status page.
 	//
 	// POST /status-pages/{slug}/incidents/{incidentId}/unpin
-	UnpinIncident(ctx context.Context, params UnpinIncidentParams) (*MessageResponse, error)
+	UnpinIncident(ctx context.Context, params UnpinIncidentParams) (UnpinIncidentRes, error)
 	// UpdateIncident invokes updateIncident operation.
 	//
 	// Update an incident.
 	//
 	// PUT /status-pages/{slug}/incidents/{incidentId}
-	UpdateIncident(ctx context.Context, request *IncidentInput, params UpdateIncidentParams) (*Incident, error)
+	UpdateIncident(ctx context.Context, request *IncidentInput, params UpdateIncidentParams) (UpdateIncidentRes, error)
 }
 
 // MaintenanceInvoker invokes operations described by OpenAPI v3 specification.
@@ -289,67 +288,67 @@ type MaintenanceInvoker interface {
 	// Create a maintenance window.
 	//
 	// POST /maintenance
-	CreateMaintenance(ctx context.Context, request *MaintenanceInput) (*CreateMaintenanceCreated, error)
+	CreateMaintenance(ctx context.Context, request *MaintenanceInput) (CreateMaintenanceRes, error)
 	// DeleteMaintenance invokes deleteMaintenance operation.
 	//
 	// Delete a maintenance window.
 	//
 	// DELETE /maintenance/{maintenanceId}
-	DeleteMaintenance(ctx context.Context, params DeleteMaintenanceParams) error
+	DeleteMaintenance(ctx context.Context, params DeleteMaintenanceParams) (DeleteMaintenanceRes, error)
 	// GetMaintenance invokes getMaintenance operation.
 	//
 	// Get a maintenance window.
 	//
 	// GET /maintenance/{maintenanceId}
-	GetMaintenance(ctx context.Context, params GetMaintenanceParams) (*Maintenance, error)
+	GetMaintenance(ctx context.Context, params GetMaintenanceParams) (GetMaintenanceRes, error)
 	// GetMaintenanceMonitors invokes getMaintenanceMonitors operation.
 	//
 	// Get monitors for a maintenance window.
 	//
 	// GET /maintenance/{maintenanceId}/monitors
-	GetMaintenanceMonitors(ctx context.Context, params GetMaintenanceMonitorsParams) ([]uuid.UUID, error)
+	GetMaintenanceMonitors(ctx context.Context, params GetMaintenanceMonitorsParams) (GetMaintenanceMonitorsRes, error)
 	// GetMaintenanceStatusPages invokes getMaintenanceStatusPages operation.
 	//
 	// Get status pages for a maintenance window.
 	//
 	// GET /maintenance/{maintenanceId}/status-pages
-	GetMaintenanceStatusPages(ctx context.Context, params GetMaintenanceStatusPagesParams) ([]uuid.UUID, error)
+	GetMaintenanceStatusPages(ctx context.Context, params GetMaintenanceStatusPagesParams) (GetMaintenanceStatusPagesRes, error)
 	// ListMaintenance invokes listMaintenance operation.
 	//
 	// List all maintenance windows.
 	//
 	// GET /maintenance
-	ListMaintenance(ctx context.Context) ([]Maintenance, error)
+	ListMaintenance(ctx context.Context) (ListMaintenanceRes, error)
 	// PauseMaintenance invokes pauseMaintenance operation.
 	//
 	// Pause a maintenance window.
 	//
 	// POST /maintenance/{maintenanceId}/pause
-	PauseMaintenance(ctx context.Context, params PauseMaintenanceParams) (*MessageResponse, error)
+	PauseMaintenance(ctx context.Context, params PauseMaintenanceParams) (PauseMaintenanceRes, error)
 	// ResumeMaintenance invokes resumeMaintenance operation.
 	//
 	// Resume a maintenance window.
 	//
 	// POST /maintenance/{maintenanceId}/resume
-	ResumeMaintenance(ctx context.Context, params ResumeMaintenanceParams) (*MessageResponse, error)
+	ResumeMaintenance(ctx context.Context, params ResumeMaintenanceParams) (ResumeMaintenanceRes, error)
 	// SetMaintenanceMonitors invokes setMaintenanceMonitors operation.
 	//
 	// Set monitors for a maintenance window.
 	//
 	// PUT /maintenance/{maintenanceId}/monitors
-	SetMaintenanceMonitors(ctx context.Context, request *SetMaintenanceMonitorsReq, params SetMaintenanceMonitorsParams) error
+	SetMaintenanceMonitors(ctx context.Context, request *SetMaintenanceMonitorsReq, params SetMaintenanceMonitorsParams) (SetMaintenanceMonitorsRes, error)
 	// SetMaintenanceStatusPages invokes setMaintenanceStatusPages operation.
 	//
 	// Set status pages for a maintenance window.
 	//
 	// PUT /maintenance/{maintenanceId}/status-pages
-	SetMaintenanceStatusPages(ctx context.Context, request *SetMaintenanceStatusPagesReq, params SetMaintenanceStatusPagesParams) error
+	SetMaintenanceStatusPages(ctx context.Context, request *SetMaintenanceStatusPagesReq, params SetMaintenanceStatusPagesParams) (SetMaintenanceStatusPagesRes, error)
 	// UpdateMaintenance invokes updateMaintenance operation.
 	//
 	// Update a maintenance window.
 	//
 	// PUT /maintenance/{maintenanceId}
-	UpdateMaintenance(ctx context.Context, request *MaintenanceInput, params UpdateMaintenanceParams) (*Maintenance, error)
+	UpdateMaintenance(ctx context.Context, request *MaintenanceInput, params UpdateMaintenanceParams) (UpdateMaintenanceRes, error)
 }
 
 // MonitorInvoker invokes operations described by OpenAPI v3 specification.
@@ -361,13 +360,13 @@ type MonitorInvoker interface {
 	// Check domain/TLD information.
 	//
 	// GET /monitors/{monitorId}/domain
-	CheckDomain(ctx context.Context, params CheckDomainParams) (*CheckDomainOK, error)
+	CheckDomain(ctx context.Context, params CheckDomainParams) (CheckDomainRes, error)
 	// CreateMonitor invokes createMonitor operation.
 	//
 	// Create a new monitor.
 	//
 	// POST /monitors
-	CreateMonitor(ctx context.Context, request *MonitorInput) (*CreateMonitorCreated, error)
+	CreateMonitor(ctx context.Context, request *MonitorInput) (CreateMonitorRes, error)
 	// DeleteMonitor invokes deleteMonitor operation.
 	//
 	// Delete a monitor.
@@ -385,25 +384,25 @@ type MonitorInvoker interface {
 	// Get 24-hour uptime percentages for all active monitors.
 	//
 	// GET /monitors/uptimes
-	GetMonitorUptimes(ctx context.Context) (GetMonitorUptimesOK, error)
+	GetMonitorUptimes(ctx context.Context) (GetMonitorUptimesRes, error)
 	// ListMonitors invokes listMonitors operation.
 	//
 	// List all monitors for the current user.
 	//
 	// GET /monitors
-	ListMonitors(ctx context.Context) ([]Monitor, error)
+	ListMonitors(ctx context.Context) (ListMonitorsRes, error)
 	// PauseMonitor invokes pauseMonitor operation.
 	//
 	// Pause a monitor.
 	//
 	// POST /monitors/{monitorId}/pause
-	PauseMonitor(ctx context.Context, params PauseMonitorParams) (*MessageResponse, error)
+	PauseMonitor(ctx context.Context, params PauseMonitorParams) (PauseMonitorRes, error)
 	// ResumeMonitor invokes resumeMonitor operation.
 	//
 	// Resume a paused monitor.
 	//
 	// POST /monitors/{monitorId}/resume
-	ResumeMonitor(ctx context.Context, params ResumeMonitorParams) (*MessageResponse, error)
+	ResumeMonitor(ctx context.Context, params ResumeMonitorParams) (ResumeMonitorRes, error)
 	// UpdateMonitor invokes updateMonitor operation.
 	//
 	// Update a monitor.
@@ -421,31 +420,31 @@ type NotificationInvoker interface {
 	// Create a notification provider.
 	//
 	// POST /notifications
-	CreateNotification(ctx context.Context, request *NotificationInput) (*CreateNotificationCreated, error)
+	CreateNotification(ctx context.Context, request *NotificationInput) (CreateNotificationRes, error)
 	// DeleteNotification invokes deleteNotification operation.
 	//
 	// Delete a notification provider.
 	//
 	// DELETE /notifications/{notificationId}
-	DeleteNotification(ctx context.Context, params DeleteNotificationParams) error
+	DeleteNotification(ctx context.Context, params DeleteNotificationParams) (DeleteNotificationRes, error)
 	// ListNotifications invokes listNotifications operation.
 	//
 	// List all notification providers.
 	//
 	// GET /notifications
-	ListNotifications(ctx context.Context) ([]Notification, error)
+	ListNotifications(ctx context.Context) (ListNotificationsRes, error)
 	// TestNotification invokes testNotification operation.
 	//
 	// Send a test notification.
 	//
 	// POST /notifications/{notificationId}/test
-	TestNotification(ctx context.Context, params TestNotificationParams) (*MessageResponse, error)
+	TestNotification(ctx context.Context, params TestNotificationParams) (TestNotificationRes, error)
 	// UpdateNotification invokes updateNotification operation.
 	//
 	// Update a notification provider.
 	//
 	// PUT /notifications/{notificationId}
-	UpdateNotification(ctx context.Context, request *NotificationInput, params UpdateNotificationParams) (*Notification, error)
+	UpdateNotification(ctx context.Context, request *NotificationInput, params UpdateNotificationParams) (UpdateNotificationRes, error)
 }
 
 // ProxyInvoker invokes operations described by OpenAPI v3 specification.
@@ -457,25 +456,25 @@ type ProxyInvoker interface {
 	// Add a proxy.
 	//
 	// POST /proxies
-	CreateProxy(ctx context.Context, request *ProxyInput) (*CreateProxyCreated, error)
+	CreateProxy(ctx context.Context, request *ProxyInput) (CreateProxyRes, error)
 	// DeleteProxy invokes deleteProxy operation.
 	//
 	// Delete a proxy.
 	//
 	// DELETE /proxies/{proxyId}
-	DeleteProxy(ctx context.Context, params DeleteProxyParams) error
+	DeleteProxy(ctx context.Context, params DeleteProxyParams) (DeleteProxyRes, error)
 	// ListProxies invokes listProxies operation.
 	//
 	// List proxies.
 	//
 	// GET /proxies
-	ListProxies(ctx context.Context) ([]Proxy, error)
+	ListProxies(ctx context.Context) (ListProxiesRes, error)
 	// UpdateProxy invokes updateProxy operation.
 	//
 	// Update a proxy.
 	//
 	// PUT /proxies/{proxyId}
-	UpdateProxy(ctx context.Context, request *ProxyInput, params UpdateProxyParams) error
+	UpdateProxy(ctx context.Context, request *ProxyInput, params UpdateProxyParams) (UpdateProxyRes, error)
 }
 
 // SettingsInvoker invokes operations described by OpenAPI v3 specification.
@@ -487,13 +486,13 @@ type SettingsInvoker interface {
 	// Get all application settings.
 	//
 	// GET /settings
-	GetSettings(ctx context.Context) (*Settings, error)
+	GetSettings(ctx context.Context) (GetSettingsRes, error)
 	// UpdateSettings invokes updateSettings operation.
 	//
 	// Update application settings.
 	//
 	// PATCH /settings
-	UpdateSettings(ctx context.Context, request *Settings) (*MessageResponse, error)
+	UpdateSettings(ctx context.Context, request *Settings) (UpdateSettingsRes, error)
 }
 
 // StatusPageInvoker invokes operations described by OpenAPI v3 specification.
@@ -505,13 +504,13 @@ type StatusPageInvoker interface {
 	// Create a status page.
 	//
 	// POST /status-pages
-	CreateStatusPage(ctx context.Context, request *StatusPageInput) (*CreateStatusPageCreated, error)
+	CreateStatusPage(ctx context.Context, request *StatusPageInput) (CreateStatusPageRes, error)
 	// DeleteStatusPage invokes deleteStatusPage operation.
 	//
 	// Delete a status page.
 	//
 	// DELETE /status-pages/{slug}
-	DeleteStatusPage(ctx context.Context, params DeleteStatusPageParams) error
+	DeleteStatusPage(ctx context.Context, params DeleteStatusPageParams) (DeleteStatusPageRes, error)
 	// GetStatusPage invokes getStatusPage operation.
 	//
 	// Get public status page data.
@@ -523,25 +522,25 @@ type StatusPageInvoker interface {
 	// Get overall status badge for a status page.
 	//
 	// GET /status-pages/{slug}/badge
-	GetStatusPageBadge(ctx context.Context, params GetStatusPageBadgeParams) (GetStatusPageBadgeOK, error)
+	GetStatusPageBadge(ctx context.Context, params GetStatusPageBadgeParams) (GetStatusPageBadgeRes, error)
 	// GetStatusPageHeartbeats invokes getStatusPageHeartbeats operation.
 	//
 	// Get current heartbeats for a public status page.
 	//
 	// GET /status-pages/{slug}/heartbeats
-	GetStatusPageHeartbeats(ctx context.Context, params GetStatusPageHeartbeatsParams) (*GetStatusPageHeartbeatsOK, error)
+	GetStatusPageHeartbeats(ctx context.Context, params GetStatusPageHeartbeatsParams) (GetStatusPageHeartbeatsRes, error)
 	// ListStatusPages invokes listStatusPages operation.
 	//
 	// List all status pages.
 	//
 	// GET /status-pages
-	ListStatusPages(ctx context.Context) ([]StatusPage, error)
+	ListStatusPages(ctx context.Context) (ListStatusPagesRes, error)
 	// UpdateStatusPage invokes updateStatusPage operation.
 	//
 	// Update a status page.
 	//
 	// PUT /status-pages/{slug}
-	UpdateStatusPage(ctx context.Context, request *StatusPageInput, params UpdateStatusPageParams) (*StatusPage, error)
+	UpdateStatusPage(ctx context.Context, request *StatusPageInput, params UpdateStatusPageParams) (UpdateStatusPageRes, error)
 }
 
 // SystemInvoker invokes operations described by OpenAPI v3 specification.
@@ -553,31 +552,31 @@ type SystemInvoker interface {
 	// Clear all statistics data.
 	//
 	// DELETE /statistics
-	ClearStatistics(ctx context.Context) error
+	ClearStatistics(ctx context.Context) (ClearStatisticsRes, error)
 	// GetDatabaseSize invokes getDatabaseSize operation.
 	//
 	// Get database size.
 	//
 	// GET /database/size
-	GetDatabaseSize(ctx context.Context) (*GetDatabaseSizeOK, error)
+	GetDatabaseSize(ctx context.Context) (GetDatabaseSizeRes, error)
 	// GetInfo invokes getInfo operation.
 	//
 	// Get server info (version, timezone).
 	//
 	// GET /info
-	GetInfo(ctx context.Context) (*GetInfoOK, error)
+	GetInfo(ctx context.Context) (GetInfoRes, error)
 	// HealthCheck invokes healthCheck operation.
 	//
 	// Health check endpoint.
 	//
 	// GET /health
-	HealthCheck(ctx context.Context) (*HealthCheckOK, error)
+	HealthCheck(ctx context.Context) (HealthCheckRes, error)
 	// ShrinkDatabase invokes shrinkDatabase operation.
 	//
 	// Shrink database (vacuum).
 	//
 	// POST /database/shrink
-	ShrinkDatabase(ctx context.Context) (*MessageResponse, error)
+	ShrinkDatabase(ctx context.Context) (ShrinkDatabaseRes, error)
 }
 
 // TagInvoker invokes operations described by OpenAPI v3 specification.
@@ -589,43 +588,43 @@ type TagInvoker interface {
 	// Add a tag to a monitor.
 	//
 	// POST /monitors/{monitorId}/tags
-	AddMonitorTag(ctx context.Context, request *AddMonitorTagReq, params AddMonitorTagParams) error
+	AddMonitorTag(ctx context.Context, request *AddMonitorTagReq, params AddMonitorTagParams) (AddMonitorTagRes, error)
 	// CreateTag invokes createTag operation.
 	//
 	// Create a tag.
 	//
 	// POST /tags
-	CreateTag(ctx context.Context, request *TagInput) (*Tag, error)
+	CreateTag(ctx context.Context, request *TagInput) (CreateTagRes, error)
 	// DeleteMonitorTag invokes deleteMonitorTag operation.
 	//
 	// Remove a tag from a monitor.
 	//
 	// DELETE /monitors/{monitorId}/tags/{tagId}
-	DeleteMonitorTag(ctx context.Context, params DeleteMonitorTagParams) error
+	DeleteMonitorTag(ctx context.Context, params DeleteMonitorTagParams) (DeleteMonitorTagRes, error)
 	// DeleteTag invokes deleteTag operation.
 	//
 	// Delete a tag.
 	//
 	// DELETE /tags/{tagId}
-	DeleteTag(ctx context.Context, params DeleteTagParams) error
+	DeleteTag(ctx context.Context, params DeleteTagParams) (DeleteTagRes, error)
 	// ListTags invokes listTags operation.
 	//
 	// List all tags.
 	//
 	// GET /tags
-	ListTags(ctx context.Context) ([]Tag, error)
+	ListTags(ctx context.Context) (ListTagsRes, error)
 	// UpdateMonitorTag invokes updateMonitorTag operation.
 	//
 	// Update a monitor tag value.
 	//
 	// PUT /monitors/{monitorId}/tags/{tagId}
-	UpdateMonitorTag(ctx context.Context, request *UpdateMonitorTagReq, params UpdateMonitorTagParams) error
+	UpdateMonitorTag(ctx context.Context, request *UpdateMonitorTagReq, params UpdateMonitorTagParams) (UpdateMonitorTagRes, error)
 	// UpdateTag invokes updateTag operation.
 	//
 	// Update a tag.
 	//
 	// PUT /tags/{tagId}
-	UpdateTag(ctx context.Context, request *TagInput, params UpdateTagParams) (*Tag, error)
+	UpdateTag(ctx context.Context, request *TagInput, params UpdateTagParams) (UpdateTagRes, error)
 }
 
 // Client implements OAS client.
@@ -674,12 +673,12 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 // Add a tag to a monitor.
 //
 // POST /monitors/{monitorId}/tags
-func (c *Client) AddMonitorTag(ctx context.Context, request *AddMonitorTagReq, params AddMonitorTagParams) error {
-	_, err := c.sendAddMonitorTag(ctx, request, params)
-	return err
+func (c *Client) AddMonitorTag(ctx context.Context, request *AddMonitorTagReq, params AddMonitorTagParams) (AddMonitorTagRes, error) {
+	res, err := c.sendAddMonitorTag(ctx, request, params)
+	return res, err
 }
 
-func (c *Client) sendAddMonitorTag(ctx context.Context, request *AddMonitorTagReq, params AddMonitorTagParams) (res *AddMonitorTagCreated, err error) {
+func (c *Client) sendAddMonitorTag(ctx context.Context, request *AddMonitorTagReq, params AddMonitorTagParams) (res AddMonitorTagRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("addMonitorTag"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -913,12 +912,12 @@ func (c *Client) sendChangePassword(ctx context.Context, request *ChangePassword
 // Check domain/TLD information.
 //
 // GET /monitors/{monitorId}/domain
-func (c *Client) CheckDomain(ctx context.Context, params CheckDomainParams) (*CheckDomainOK, error) {
+func (c *Client) CheckDomain(ctx context.Context, params CheckDomainParams) (CheckDomainRes, error) {
 	res, err := c.sendCheckDomain(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendCheckDomain(ctx context.Context, params CheckDomainParams) (res *CheckDomainOK, err error) {
+func (c *Client) sendCheckDomain(ctx context.Context, params CheckDomainParams) (res CheckDomainRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("checkDomain"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -1039,12 +1038,12 @@ func (c *Client) sendCheckDomain(ctx context.Context, params CheckDomainParams) 
 // Clear important heartbeats (events) for a monitor.
 //
 // DELETE /monitors/{monitorId}/events
-func (c *Client) ClearEvents(ctx context.Context, params ClearEventsParams) error {
-	_, err := c.sendClearEvents(ctx, params)
-	return err
+func (c *Client) ClearEvents(ctx context.Context, params ClearEventsParams) (ClearEventsRes, error) {
+	res, err := c.sendClearEvents(ctx, params)
+	return res, err
 }
 
-func (c *Client) sendClearEvents(ctx context.Context, params ClearEventsParams) (res *ClearEventsNoContent, err error) {
+func (c *Client) sendClearEvents(ctx context.Context, params ClearEventsParams) (res ClearEventsRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("clearEvents"),
 		semconv.HTTPRequestMethodKey.String("DELETE"),
@@ -1165,12 +1164,12 @@ func (c *Client) sendClearEvents(ctx context.Context, params ClearEventsParams) 
 // Clear all heartbeats for a monitor.
 //
 // DELETE /monitors/{monitorId}/heartbeats
-func (c *Client) ClearHeartbeats(ctx context.Context, params ClearHeartbeatsParams) error {
-	_, err := c.sendClearHeartbeats(ctx, params)
-	return err
+func (c *Client) ClearHeartbeats(ctx context.Context, params ClearHeartbeatsParams) (ClearHeartbeatsRes, error) {
+	res, err := c.sendClearHeartbeats(ctx, params)
+	return res, err
 }
 
-func (c *Client) sendClearHeartbeats(ctx context.Context, params ClearHeartbeatsParams) (res *ClearHeartbeatsNoContent, err error) {
+func (c *Client) sendClearHeartbeats(ctx context.Context, params ClearHeartbeatsParams) (res ClearHeartbeatsRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("clearHeartbeats"),
 		semconv.HTTPRequestMethodKey.String("DELETE"),
@@ -1291,12 +1290,12 @@ func (c *Client) sendClearHeartbeats(ctx context.Context, params ClearHeartbeats
 // Clear all statistics data.
 //
 // DELETE /statistics
-func (c *Client) ClearStatistics(ctx context.Context) error {
-	_, err := c.sendClearStatistics(ctx)
-	return err
+func (c *Client) ClearStatistics(ctx context.Context) (ClearStatisticsRes, error) {
+	res, err := c.sendClearStatistics(ctx)
+	return res, err
 }
 
-func (c *Client) sendClearStatistics(ctx context.Context) (res *ClearStatisticsNoContent, err error) {
+func (c *Client) sendClearStatistics(ctx context.Context) (res ClearStatisticsRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("clearStatistics"),
 		semconv.HTTPRequestMethodKey.String("DELETE"),
@@ -1398,12 +1397,12 @@ func (c *Client) sendClearStatistics(ctx context.Context) (res *ClearStatisticsN
 // Create a new API key.
 //
 // POST /api-keys
-func (c *Client) CreateAPIKey(ctx context.Context, request *APIKeyInput) (*CreateAPIKeyCreated, error) {
+func (c *Client) CreateAPIKey(ctx context.Context, request *APIKeyInput) (CreateAPIKeyRes, error) {
 	res, err := c.sendCreateAPIKey(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendCreateAPIKey(ctx context.Context, request *APIKeyInput) (res *CreateAPIKeyCreated, err error) {
+func (c *Client) sendCreateAPIKey(ctx context.Context, request *APIKeyInput) (res CreateAPIKeyRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("createAPIKey"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -1508,12 +1507,12 @@ func (c *Client) sendCreateAPIKey(ctx context.Context, request *APIKeyInput) (re
 // Create an incident on a status page.
 //
 // POST /status-pages/{slug}/incidents
-func (c *Client) CreateIncident(ctx context.Context, request *IncidentInput, params CreateIncidentParams) (*Incident, error) {
+func (c *Client) CreateIncident(ctx context.Context, request *IncidentInput, params CreateIncidentParams) (CreateIncidentRes, error) {
 	res, err := c.sendCreateIncident(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendCreateIncident(ctx context.Context, request *IncidentInput, params CreateIncidentParams) (res *Incident, err error) {
+func (c *Client) sendCreateIncident(ctx context.Context, request *IncidentInput, params CreateIncidentParams) (res CreateIncidentRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("createIncident"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -1637,12 +1636,12 @@ func (c *Client) sendCreateIncident(ctx context.Context, request *IncidentInput,
 // Create a maintenance window.
 //
 // POST /maintenance
-func (c *Client) CreateMaintenance(ctx context.Context, request *MaintenanceInput) (*CreateMaintenanceCreated, error) {
+func (c *Client) CreateMaintenance(ctx context.Context, request *MaintenanceInput) (CreateMaintenanceRes, error) {
 	res, err := c.sendCreateMaintenance(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendCreateMaintenance(ctx context.Context, request *MaintenanceInput) (res *CreateMaintenanceCreated, err error) {
+func (c *Client) sendCreateMaintenance(ctx context.Context, request *MaintenanceInput) (res CreateMaintenanceRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("createMaintenance"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -1747,12 +1746,12 @@ func (c *Client) sendCreateMaintenance(ctx context.Context, request *Maintenance
 // Create a new monitor.
 //
 // POST /monitors
-func (c *Client) CreateMonitor(ctx context.Context, request *MonitorInput) (*CreateMonitorCreated, error) {
+func (c *Client) CreateMonitor(ctx context.Context, request *MonitorInput) (CreateMonitorRes, error) {
 	res, err := c.sendCreateMonitor(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendCreateMonitor(ctx context.Context, request *MonitorInput) (res *CreateMonitorCreated, err error) {
+func (c *Client) sendCreateMonitor(ctx context.Context, request *MonitorInput) (res CreateMonitorRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("createMonitor"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -1857,12 +1856,12 @@ func (c *Client) sendCreateMonitor(ctx context.Context, request *MonitorInput) (
 // Create a notification provider.
 //
 // POST /notifications
-func (c *Client) CreateNotification(ctx context.Context, request *NotificationInput) (*CreateNotificationCreated, error) {
+func (c *Client) CreateNotification(ctx context.Context, request *NotificationInput) (CreateNotificationRes, error) {
 	res, err := c.sendCreateNotification(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendCreateNotification(ctx context.Context, request *NotificationInput) (res *CreateNotificationCreated, err error) {
+func (c *Client) sendCreateNotification(ctx context.Context, request *NotificationInput) (res CreateNotificationRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("createNotification"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -1967,12 +1966,12 @@ func (c *Client) sendCreateNotification(ctx context.Context, request *Notificati
 // Add a proxy.
 //
 // POST /proxies
-func (c *Client) CreateProxy(ctx context.Context, request *ProxyInput) (*CreateProxyCreated, error) {
+func (c *Client) CreateProxy(ctx context.Context, request *ProxyInput) (CreateProxyRes, error) {
 	res, err := c.sendCreateProxy(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendCreateProxy(ctx context.Context, request *ProxyInput) (res *CreateProxyCreated, err error) {
+func (c *Client) sendCreateProxy(ctx context.Context, request *ProxyInput) (res CreateProxyRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("createProxy"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -2077,12 +2076,12 @@ func (c *Client) sendCreateProxy(ctx context.Context, request *ProxyInput) (res 
 // Create a status page.
 //
 // POST /status-pages
-func (c *Client) CreateStatusPage(ctx context.Context, request *StatusPageInput) (*CreateStatusPageCreated, error) {
+func (c *Client) CreateStatusPage(ctx context.Context, request *StatusPageInput) (CreateStatusPageRes, error) {
 	res, err := c.sendCreateStatusPage(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendCreateStatusPage(ctx context.Context, request *StatusPageInput) (res *CreateStatusPageCreated, err error) {
+func (c *Client) sendCreateStatusPage(ctx context.Context, request *StatusPageInput) (res CreateStatusPageRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("createStatusPage"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -2187,12 +2186,12 @@ func (c *Client) sendCreateStatusPage(ctx context.Context, request *StatusPageIn
 // Create a tag.
 //
 // POST /tags
-func (c *Client) CreateTag(ctx context.Context, request *TagInput) (*Tag, error) {
+func (c *Client) CreateTag(ctx context.Context, request *TagInput) (CreateTagRes, error) {
 	res, err := c.sendCreateTag(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendCreateTag(ctx context.Context, request *TagInput) (res *Tag, err error) {
+func (c *Client) sendCreateTag(ctx context.Context, request *TagInput) (res CreateTagRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("createTag"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -2297,12 +2296,12 @@ func (c *Client) sendCreateTag(ctx context.Context, request *TagInput) (res *Tag
 // Delete an API key.
 //
 // DELETE /api-keys/{keyId}
-func (c *Client) DeleteAPIKey(ctx context.Context, params DeleteAPIKeyParams) error {
-	_, err := c.sendDeleteAPIKey(ctx, params)
-	return err
+func (c *Client) DeleteAPIKey(ctx context.Context, params DeleteAPIKeyParams) (DeleteAPIKeyRes, error) {
+	res, err := c.sendDeleteAPIKey(ctx, params)
+	return res, err
 }
 
-func (c *Client) sendDeleteAPIKey(ctx context.Context, params DeleteAPIKeyParams) (res *DeleteAPIKeyNoContent, err error) {
+func (c *Client) sendDeleteAPIKey(ctx context.Context, params DeleteAPIKeyParams) (res DeleteAPIKeyRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("deleteAPIKey"),
 		semconv.HTTPRequestMethodKey.String("DELETE"),
@@ -2422,12 +2421,12 @@ func (c *Client) sendDeleteAPIKey(ctx context.Context, params DeleteAPIKeyParams
 // Delete an incident.
 //
 // DELETE /status-pages/{slug}/incidents/{incidentId}
-func (c *Client) DeleteIncident(ctx context.Context, params DeleteIncidentParams) error {
-	_, err := c.sendDeleteIncident(ctx, params)
-	return err
+func (c *Client) DeleteIncident(ctx context.Context, params DeleteIncidentParams) (DeleteIncidentRes, error) {
+	res, err := c.sendDeleteIncident(ctx, params)
+	return res, err
 }
 
-func (c *Client) sendDeleteIncident(ctx context.Context, params DeleteIncidentParams) (res *DeleteIncidentNoContent, err error) {
+func (c *Client) sendDeleteIncident(ctx context.Context, params DeleteIncidentParams) (res DeleteIncidentRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("deleteIncident"),
 		semconv.HTTPRequestMethodKey.String("DELETE"),
@@ -2566,12 +2565,12 @@ func (c *Client) sendDeleteIncident(ctx context.Context, params DeleteIncidentPa
 // Delete a maintenance window.
 //
 // DELETE /maintenance/{maintenanceId}
-func (c *Client) DeleteMaintenance(ctx context.Context, params DeleteMaintenanceParams) error {
-	_, err := c.sendDeleteMaintenance(ctx, params)
-	return err
+func (c *Client) DeleteMaintenance(ctx context.Context, params DeleteMaintenanceParams) (DeleteMaintenanceRes, error) {
+	res, err := c.sendDeleteMaintenance(ctx, params)
+	return res, err
 }
 
-func (c *Client) sendDeleteMaintenance(ctx context.Context, params DeleteMaintenanceParams) (res *DeleteMaintenanceNoContent, err error) {
+func (c *Client) sendDeleteMaintenance(ctx context.Context, params DeleteMaintenanceParams) (res DeleteMaintenanceRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("deleteMaintenance"),
 		semconv.HTTPRequestMethodKey.String("DELETE"),
@@ -2837,12 +2836,12 @@ func (c *Client) sendDeleteMonitor(ctx context.Context, params DeleteMonitorPara
 // Remove a tag from a monitor.
 //
 // DELETE /monitors/{monitorId}/tags/{tagId}
-func (c *Client) DeleteMonitorTag(ctx context.Context, params DeleteMonitorTagParams) error {
-	_, err := c.sendDeleteMonitorTag(ctx, params)
-	return err
+func (c *Client) DeleteMonitorTag(ctx context.Context, params DeleteMonitorTagParams) (DeleteMonitorTagRes, error) {
+	res, err := c.sendDeleteMonitorTag(ctx, params)
+	return res, err
 }
 
-func (c *Client) sendDeleteMonitorTag(ctx context.Context, params DeleteMonitorTagParams) (res *DeleteMonitorTagNoContent, err error) {
+func (c *Client) sendDeleteMonitorTag(ctx context.Context, params DeleteMonitorTagParams) (res DeleteMonitorTagRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("deleteMonitorTag"),
 		semconv.HTTPRequestMethodKey.String("DELETE"),
@@ -2981,12 +2980,12 @@ func (c *Client) sendDeleteMonitorTag(ctx context.Context, params DeleteMonitorT
 // Delete a notification provider.
 //
 // DELETE /notifications/{notificationId}
-func (c *Client) DeleteNotification(ctx context.Context, params DeleteNotificationParams) error {
-	_, err := c.sendDeleteNotification(ctx, params)
-	return err
+func (c *Client) DeleteNotification(ctx context.Context, params DeleteNotificationParams) (DeleteNotificationRes, error) {
+	res, err := c.sendDeleteNotification(ctx, params)
+	return res, err
 }
 
-func (c *Client) sendDeleteNotification(ctx context.Context, params DeleteNotificationParams) (res *DeleteNotificationNoContent, err error) {
+func (c *Client) sendDeleteNotification(ctx context.Context, params DeleteNotificationParams) (res DeleteNotificationRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("deleteNotification"),
 		semconv.HTTPRequestMethodKey.String("DELETE"),
@@ -3106,12 +3105,12 @@ func (c *Client) sendDeleteNotification(ctx context.Context, params DeleteNotifi
 // Delete a proxy.
 //
 // DELETE /proxies/{proxyId}
-func (c *Client) DeleteProxy(ctx context.Context, params DeleteProxyParams) error {
-	_, err := c.sendDeleteProxy(ctx, params)
-	return err
+func (c *Client) DeleteProxy(ctx context.Context, params DeleteProxyParams) (DeleteProxyRes, error) {
+	res, err := c.sendDeleteProxy(ctx, params)
+	return res, err
 }
 
-func (c *Client) sendDeleteProxy(ctx context.Context, params DeleteProxyParams) (res *DeleteProxyNoContent, err error) {
+func (c *Client) sendDeleteProxy(ctx context.Context, params DeleteProxyParams) (res DeleteProxyRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("deleteProxy"),
 		semconv.HTTPRequestMethodKey.String("DELETE"),
@@ -3231,12 +3230,12 @@ func (c *Client) sendDeleteProxy(ctx context.Context, params DeleteProxyParams) 
 // Delete a status page.
 //
 // DELETE /status-pages/{slug}
-func (c *Client) DeleteStatusPage(ctx context.Context, params DeleteStatusPageParams) error {
-	_, err := c.sendDeleteStatusPage(ctx, params)
-	return err
+func (c *Client) DeleteStatusPage(ctx context.Context, params DeleteStatusPageParams) (DeleteStatusPageRes, error) {
+	res, err := c.sendDeleteStatusPage(ctx, params)
+	return res, err
 }
 
-func (c *Client) sendDeleteStatusPage(ctx context.Context, params DeleteStatusPageParams) (res *DeleteStatusPageNoContent, err error) {
+func (c *Client) sendDeleteStatusPage(ctx context.Context, params DeleteStatusPageParams) (res DeleteStatusPageRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("deleteStatusPage"),
 		semconv.HTTPRequestMethodKey.String("DELETE"),
@@ -3356,12 +3355,12 @@ func (c *Client) sendDeleteStatusPage(ctx context.Context, params DeleteStatusPa
 // Delete a tag.
 //
 // DELETE /tags/{tagId}
-func (c *Client) DeleteTag(ctx context.Context, params DeleteTagParams) error {
-	_, err := c.sendDeleteTag(ctx, params)
-	return err
+func (c *Client) DeleteTag(ctx context.Context, params DeleteTagParams) (DeleteTagRes, error) {
+	res, err := c.sendDeleteTag(ctx, params)
+	return res, err
 }
 
-func (c *Client) sendDeleteTag(ctx context.Context, params DeleteTagParams) (res *DeleteTagNoContent, err error) {
+func (c *Client) sendDeleteTag(ctx context.Context, params DeleteTagParams) (res DeleteTagRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("deleteTag"),
 		semconv.HTTPRequestMethodKey.String("DELETE"),
@@ -3481,12 +3480,12 @@ func (c *Client) sendDeleteTag(ctx context.Context, params DeleteTagParams) (res
 // Disable 2FA.
 //
 // POST /auth/2fa/disable
-func (c *Client) Disable2FA(ctx context.Context, request *Disable2FAReq) (*MessageResponse, error) {
+func (c *Client) Disable2FA(ctx context.Context, request *Disable2FAReq) (Disable2FARes, error) {
 	res, err := c.sendDisable2FA(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendDisable2FA(ctx context.Context, request *Disable2FAReq) (res *MessageResponse, err error) {
+func (c *Client) sendDisable2FA(ctx context.Context, request *Disable2FAReq) (res Disable2FARes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("disable2FA"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -3591,12 +3590,12 @@ func (c *Client) sendDisable2FA(ctx context.Context, request *Disable2FAReq) (re
 // Disable an API key.
 //
 // POST /api-keys/{keyId}/disable
-func (c *Client) DisableAPIKey(ctx context.Context, params DisableAPIKeyParams) (*MessageResponse, error) {
+func (c *Client) DisableAPIKey(ctx context.Context, params DisableAPIKeyParams) (DisableAPIKeyRes, error) {
 	res, err := c.sendDisableAPIKey(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendDisableAPIKey(ctx context.Context, params DisableAPIKeyParams) (res *MessageResponse, err error) {
+func (c *Client) sendDisableAPIKey(ctx context.Context, params DisableAPIKeyParams) (res DisableAPIKeyRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("disableAPIKey"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -3717,12 +3716,12 @@ func (c *Client) sendDisableAPIKey(ctx context.Context, params DisableAPIKeyPara
 // Enable 2FA after verifying token.
 //
 // POST /auth/2fa/enable
-func (c *Client) Enable2FA(ctx context.Context, request *Enable2FAReq) (*MessageResponse, error) {
+func (c *Client) Enable2FA(ctx context.Context, request *Enable2FAReq) (Enable2FARes, error) {
 	res, err := c.sendEnable2FA(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendEnable2FA(ctx context.Context, request *Enable2FAReq) (res *MessageResponse, err error) {
+func (c *Client) sendEnable2FA(ctx context.Context, request *Enable2FAReq) (res Enable2FARes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("enable2FA"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -3827,12 +3826,12 @@ func (c *Client) sendEnable2FA(ctx context.Context, request *Enable2FAReq) (res 
 // Enable an API key.
 //
 // POST /api-keys/{keyId}/enable
-func (c *Client) EnableAPIKey(ctx context.Context, params EnableAPIKeyParams) (*MessageResponse, error) {
+func (c *Client) EnableAPIKey(ctx context.Context, params EnableAPIKeyParams) (EnableAPIKeyRes, error) {
 	res, err := c.sendEnableAPIKey(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendEnableAPIKey(ctx context.Context, params EnableAPIKeyParams) (res *MessageResponse, err error) {
+func (c *Client) sendEnableAPIKey(ctx context.Context, params EnableAPIKeyParams) (res EnableAPIKeyRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("enableAPIKey"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -3953,12 +3952,12 @@ func (c *Client) sendEnableAPIKey(ctx context.Context, params EnableAPIKeyParams
 // Get 2FA status for current user.
 //
 // GET /auth/2fa
-func (c *Client) Get2FAStatus(ctx context.Context) (*Get2FAStatusOK, error) {
+func (c *Client) Get2FAStatus(ctx context.Context) (Get2FAStatusRes, error) {
 	res, err := c.sendGet2FAStatus(ctx)
 	return res, err
 }
 
-func (c *Client) sendGet2FAStatus(ctx context.Context) (res *Get2FAStatusOK, err error) {
+func (c *Client) sendGet2FAStatus(ctx context.Context) (res Get2FAStatusRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("get2FAStatus"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -4060,12 +4059,12 @@ func (c *Client) sendGet2FAStatus(ctx context.Context) (res *Get2FAStatusOK, err
 // Get certificate expiry badge SVG.
 //
 // GET /badges/{monitorId}/cert-exp
-func (c *Client) GetCertExpiryBadge(ctx context.Context, params GetCertExpiryBadgeParams) (SVGBadge, error) {
+func (c *Client) GetCertExpiryBadge(ctx context.Context, params GetCertExpiryBadgeParams) (GetCertExpiryBadgeRes, error) {
 	res, err := c.sendGetCertExpiryBadge(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendGetCertExpiryBadge(ctx context.Context, params GetCertExpiryBadgeParams) (res SVGBadge, err error) {
+func (c *Client) sendGetCertExpiryBadge(ctx context.Context, params GetCertExpiryBadgeParams) (res GetCertExpiryBadgeRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getCertExpiryBadge"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -4174,12 +4173,12 @@ func (c *Client) sendGetCertExpiryBadge(ctx context.Context, params GetCertExpir
 // Get aggregated chart data for a monitor.
 //
 // GET /monitors/{monitorId}/heartbeats/chart
-func (c *Client) GetChartData(ctx context.Context, params GetChartDataParams) ([]ChartPoint, error) {
+func (c *Client) GetChartData(ctx context.Context, params GetChartDataParams) (GetChartDataRes, error) {
 	res, err := c.sendGetChartData(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendGetChartData(ctx context.Context, params GetChartDataParams) (res []ChartPoint, err error) {
+func (c *Client) sendGetChartData(ctx context.Context, params GetChartDataParams) (res GetChartDataRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getChartData"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -4251,7 +4250,7 @@ func (c *Client) sendGetChartData(ctx context.Context, params GetChartDataParams
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.Hours.Get(); ok {
-				return e.EncodeValue(conv.IntToString(val))
+				return e.EncodeValue(conv.Int32ToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -4321,12 +4320,12 @@ func (c *Client) sendGetChartData(ctx context.Context, params GetChartDataParams
 // Get database size.
 //
 // GET /database/size
-func (c *Client) GetDatabaseSize(ctx context.Context) (*GetDatabaseSizeOK, error) {
+func (c *Client) GetDatabaseSize(ctx context.Context) (GetDatabaseSizeRes, error) {
 	res, err := c.sendGetDatabaseSize(ctx)
 	return res, err
 }
 
-func (c *Client) sendGetDatabaseSize(ctx context.Context) (res *GetDatabaseSizeOK, err error) {
+func (c *Client) sendGetDatabaseSize(ctx context.Context) (res GetDatabaseSizeRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getDatabaseSize"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -4429,12 +4428,12 @@ func (c *Client) sendGetDatabaseSize(ctx context.Context) (res *GetDatabaseSizeO
 // or `count` to get the N most recent heartbeats. If both are provided, `count` takes precedence.
 //
 // GET /monitors/{monitorId}/heartbeats
-func (c *Client) GetHeartbeats(ctx context.Context, params GetHeartbeatsParams) ([]Heartbeat, error) {
+func (c *Client) GetHeartbeats(ctx context.Context, params GetHeartbeatsParams) (GetHeartbeatsRes, error) {
 	res, err := c.sendGetHeartbeats(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendGetHeartbeats(ctx context.Context, params GetHeartbeatsParams) (res []Heartbeat, err error) {
+func (c *Client) sendGetHeartbeats(ctx context.Context, params GetHeartbeatsParams) (res GetHeartbeatsRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getHeartbeats"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -4506,7 +4505,7 @@ func (c *Client) sendGetHeartbeats(ctx context.Context, params GetHeartbeatsPara
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.Hours.Get(); ok {
-				return e.EncodeValue(conv.IntToString(val))
+				return e.EncodeValue(conv.Int32ToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -4523,7 +4522,7 @@ func (c *Client) sendGetHeartbeats(ctx context.Context, params GetHeartbeatsPara
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.Count.Get(); ok {
-				return e.EncodeValue(conv.IntToString(val))
+				return e.EncodeValue(conv.Int32ToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -4593,12 +4592,12 @@ func (c *Client) sendGetHeartbeats(ctx context.Context, params GetHeartbeatsPara
 // Get important heartbeats (status changes).
 //
 // GET /monitors/{monitorId}/events
-func (c *Client) GetImportantHeartbeats(ctx context.Context, params GetImportantHeartbeatsParams) (*GetImportantHeartbeatsOK, error) {
+func (c *Client) GetImportantHeartbeats(ctx context.Context, params GetImportantHeartbeatsParams) (GetImportantHeartbeatsRes, error) {
 	res, err := c.sendGetImportantHeartbeats(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendGetImportantHeartbeats(ctx context.Context, params GetImportantHeartbeatsParams) (res *GetImportantHeartbeatsOK, err error) {
+func (c *Client) sendGetImportantHeartbeats(ctx context.Context, params GetImportantHeartbeatsParams) (res GetImportantHeartbeatsRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getImportantHeartbeats"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -4670,7 +4669,7 @@ func (c *Client) sendGetImportantHeartbeats(ctx context.Context, params GetImpor
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.Offset.Get(); ok {
-				return e.EncodeValue(conv.IntToString(val))
+				return e.EncodeValue(conv.Int32ToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -4687,7 +4686,7 @@ func (c *Client) sendGetImportantHeartbeats(ctx context.Context, params GetImpor
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.Limit.Get(); ok {
-				return e.EncodeValue(conv.IntToString(val))
+				return e.EncodeValue(conv.Int32ToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -4757,12 +4756,12 @@ func (c *Client) sendGetImportantHeartbeats(ctx context.Context, params GetImpor
 // Get server info (version, timezone).
 //
 // GET /info
-func (c *Client) GetInfo(ctx context.Context) (*GetInfoOK, error) {
+func (c *Client) GetInfo(ctx context.Context) (GetInfoRes, error) {
 	res, err := c.sendGetInfo(ctx)
 	return res, err
 }
 
-func (c *Client) sendGetInfo(ctx context.Context) (res *GetInfoOK, err error) {
+func (c *Client) sendGetInfo(ctx context.Context) (res GetInfoRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getInfo"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -4831,12 +4830,12 @@ func (c *Client) sendGetInfo(ctx context.Context) (res *GetInfoOK, err error) {
 // Get average latency badge SVG.
 //
 // GET /badges/{monitorId}/latency
-func (c *Client) GetLatencyBadge(ctx context.Context, params GetLatencyBadgeParams) (SVGBadge, error) {
+func (c *Client) GetLatencyBadge(ctx context.Context, params GetLatencyBadgeParams) (GetLatencyBadgeRes, error) {
 	res, err := c.sendGetLatencyBadge(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendGetLatencyBadge(ctx context.Context, params GetLatencyBadgeParams) (res SVGBadge, err error) {
+func (c *Client) sendGetLatencyBadge(ctx context.Context, params GetLatencyBadgeParams) (res GetLatencyBadgeRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getLatencyBadge"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -4908,7 +4907,7 @@ func (c *Client) sendGetLatencyBadge(ctx context.Context, params GetLatencyBadge
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.Duration.Get(); ok {
-				return e.EncodeValue(conv.IntToString(val))
+				return e.EncodeValue(conv.Int32ToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -4962,12 +4961,12 @@ func (c *Client) sendGetLatencyBadge(ctx context.Context, params GetLatencyBadge
 // Get a maintenance window.
 //
 // GET /maintenance/{maintenanceId}
-func (c *Client) GetMaintenance(ctx context.Context, params GetMaintenanceParams) (*Maintenance, error) {
+func (c *Client) GetMaintenance(ctx context.Context, params GetMaintenanceParams) (GetMaintenanceRes, error) {
 	res, err := c.sendGetMaintenance(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendGetMaintenance(ctx context.Context, params GetMaintenanceParams) (res *Maintenance, err error) {
+func (c *Client) sendGetMaintenance(ctx context.Context, params GetMaintenanceParams) (res GetMaintenanceRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getMaintenance"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -5087,12 +5086,12 @@ func (c *Client) sendGetMaintenance(ctx context.Context, params GetMaintenancePa
 // Get monitors for a maintenance window.
 //
 // GET /maintenance/{maintenanceId}/monitors
-func (c *Client) GetMaintenanceMonitors(ctx context.Context, params GetMaintenanceMonitorsParams) ([]uuid.UUID, error) {
+func (c *Client) GetMaintenanceMonitors(ctx context.Context, params GetMaintenanceMonitorsParams) (GetMaintenanceMonitorsRes, error) {
 	res, err := c.sendGetMaintenanceMonitors(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendGetMaintenanceMonitors(ctx context.Context, params GetMaintenanceMonitorsParams) (res []uuid.UUID, err error) {
+func (c *Client) sendGetMaintenanceMonitors(ctx context.Context, params GetMaintenanceMonitorsParams) (res GetMaintenanceMonitorsRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getMaintenanceMonitors"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -5213,12 +5212,12 @@ func (c *Client) sendGetMaintenanceMonitors(ctx context.Context, params GetMaint
 // Get status pages for a maintenance window.
 //
 // GET /maintenance/{maintenanceId}/status-pages
-func (c *Client) GetMaintenanceStatusPages(ctx context.Context, params GetMaintenanceStatusPagesParams) ([]uuid.UUID, error) {
+func (c *Client) GetMaintenanceStatusPages(ctx context.Context, params GetMaintenanceStatusPagesParams) (GetMaintenanceStatusPagesRes, error) {
 	res, err := c.sendGetMaintenanceStatusPages(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendGetMaintenanceStatusPages(ctx context.Context, params GetMaintenanceStatusPagesParams) (res []uuid.UUID, err error) {
+func (c *Client) sendGetMaintenanceStatusPages(ctx context.Context, params GetMaintenanceStatusPagesParams) (res GetMaintenanceStatusPagesRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getMaintenanceStatusPages"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -5464,12 +5463,12 @@ func (c *Client) sendGetMonitor(ctx context.Context, params GetMonitorParams) (r
 // Get 24-hour uptime percentages for all active monitors.
 //
 // GET /monitors/uptimes
-func (c *Client) GetMonitorUptimes(ctx context.Context) (GetMonitorUptimesOK, error) {
+func (c *Client) GetMonitorUptimes(ctx context.Context) (GetMonitorUptimesRes, error) {
 	res, err := c.sendGetMonitorUptimes(ctx)
 	return res, err
 }
 
-func (c *Client) sendGetMonitorUptimes(ctx context.Context) (res GetMonitorUptimesOK, err error) {
+func (c *Client) sendGetMonitorUptimes(ctx context.Context) (res GetMonitorUptimesRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getMonitorUptimes"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -5571,12 +5570,12 @@ func (c *Client) sendGetMonitorUptimes(ctx context.Context) (res GetMonitorUptim
 // Get last response time badge SVG.
 //
 // GET /badges/{monitorId}/response
-func (c *Client) GetResponseBadge(ctx context.Context, params GetResponseBadgeParams) (SVGBadge, error) {
+func (c *Client) GetResponseBadge(ctx context.Context, params GetResponseBadgeParams) (GetResponseBadgeRes, error) {
 	res, err := c.sendGetResponseBadge(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendGetResponseBadge(ctx context.Context, params GetResponseBadgeParams) (res SVGBadge, err error) {
+func (c *Client) sendGetResponseBadge(ctx context.Context, params GetResponseBadgeParams) (res GetResponseBadgeRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getResponseBadge"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -5685,12 +5684,12 @@ func (c *Client) sendGetResponseBadge(ctx context.Context, params GetResponseBad
 // Get all application settings.
 //
 // GET /settings
-func (c *Client) GetSettings(ctx context.Context) (*Settings, error) {
+func (c *Client) GetSettings(ctx context.Context) (GetSettingsRes, error) {
 	res, err := c.sendGetSettings(ctx)
 	return res, err
 }
 
-func (c *Client) sendGetSettings(ctx context.Context) (res *Settings, err error) {
+func (c *Client) sendGetSettings(ctx context.Context) (res GetSettingsRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getSettings"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -5792,12 +5791,12 @@ func (c *Client) sendGetSettings(ctx context.Context) (res *Settings, err error)
 // Get status badge SVG for a monitor.
 //
 // GET /badges/{monitorId}/status
-func (c *Client) GetStatusBadge(ctx context.Context, params GetStatusBadgeParams) (SVGBadge, error) {
+func (c *Client) GetStatusBadge(ctx context.Context, params GetStatusBadgeParams) (GetStatusBadgeRes, error) {
 	res, err := c.sendGetStatusBadge(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendGetStatusBadge(ctx context.Context, params GetStatusBadgeParams) (res SVGBadge, err error) {
+func (c *Client) sendGetStatusBadge(ctx context.Context, params GetStatusBadgeParams) (res GetStatusBadgeRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getStatusBadge"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -5998,12 +5997,12 @@ func (c *Client) sendGetStatusPage(ctx context.Context, params GetStatusPagePara
 // Get overall status badge for a status page.
 //
 // GET /status-pages/{slug}/badge
-func (c *Client) GetStatusPageBadge(ctx context.Context, params GetStatusPageBadgeParams) (GetStatusPageBadgeOK, error) {
+func (c *Client) GetStatusPageBadge(ctx context.Context, params GetStatusPageBadgeParams) (GetStatusPageBadgeRes, error) {
 	res, err := c.sendGetStatusPageBadge(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendGetStatusPageBadge(ctx context.Context, params GetStatusPageBadgeParams) (res GetStatusPageBadgeOK, err error) {
+func (c *Client) sendGetStatusPageBadge(ctx context.Context, params GetStatusPageBadgeParams) (res GetStatusPageBadgeRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getStatusPageBadge"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -6112,12 +6111,12 @@ func (c *Client) sendGetStatusPageBadge(ctx context.Context, params GetStatusPag
 // Subscribe to real-time status page events via SSE.
 //
 // GET /status-pages/{slug}/events
-func (c *Client) GetStatusPageEventStream(ctx context.Context, params GetStatusPageEventStreamParams) (GetStatusPageEventStreamOK, error) {
+func (c *Client) GetStatusPageEventStream(ctx context.Context, params GetStatusPageEventStreamParams) (GetStatusPageEventStreamRes, error) {
 	res, err := c.sendGetStatusPageEventStream(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendGetStatusPageEventStream(ctx context.Context, params GetStatusPageEventStreamParams) (res GetStatusPageEventStreamOK, err error) {
+func (c *Client) sendGetStatusPageEventStream(ctx context.Context, params GetStatusPageEventStreamParams) (res GetStatusPageEventStreamRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getStatusPageEventStream"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -6205,12 +6204,12 @@ func (c *Client) sendGetStatusPageEventStream(ctx context.Context, params GetSta
 // Get current heartbeats for a public status page.
 //
 // GET /status-pages/{slug}/heartbeats
-func (c *Client) GetStatusPageHeartbeats(ctx context.Context, params GetStatusPageHeartbeatsParams) (*GetStatusPageHeartbeatsOK, error) {
+func (c *Client) GetStatusPageHeartbeats(ctx context.Context, params GetStatusPageHeartbeatsParams) (GetStatusPageHeartbeatsRes, error) {
 	res, err := c.sendGetStatusPageHeartbeats(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendGetStatusPageHeartbeats(ctx context.Context, params GetStatusPageHeartbeatsParams) (res *GetStatusPageHeartbeatsOK, err error) {
+func (c *Client) sendGetStatusPageHeartbeats(ctx context.Context, params GetStatusPageHeartbeatsParams) (res GetStatusPageHeartbeatsRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getStatusPageHeartbeats"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -6298,12 +6297,12 @@ func (c *Client) sendGetStatusPageHeartbeats(ctx context.Context, params GetStat
 // Get uptime percentage badge SVG.
 //
 // GET /badges/{monitorId}/uptime
-func (c *Client) GetUptimeBadge(ctx context.Context, params GetUptimeBadgeParams) (SVGBadge, error) {
+func (c *Client) GetUptimeBadge(ctx context.Context, params GetUptimeBadgeParams) (GetUptimeBadgeRes, error) {
 	res, err := c.sendGetUptimeBadge(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendGetUptimeBadge(ctx context.Context, params GetUptimeBadgeParams) (res SVGBadge, err error) {
+func (c *Client) sendGetUptimeBadge(ctx context.Context, params GetUptimeBadgeParams) (res GetUptimeBadgeRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getUptimeBadge"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -6375,7 +6374,7 @@ func (c *Client) sendGetUptimeBadge(ctx context.Context, params GetUptimeBadgePa
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.Duration.Get(); ok {
-				return e.EncodeValue(conv.IntToString(val))
+				return e.EncodeValue(conv.Int32ToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -6429,12 +6428,12 @@ func (c *Client) sendGetUptimeBadge(ctx context.Context, params GetUptimeBadgePa
 // Health check endpoint.
 //
 // GET /health
-func (c *Client) HealthCheck(ctx context.Context) (*HealthCheckOK, error) {
+func (c *Client) HealthCheck(ctx context.Context) (HealthCheckRes, error) {
 	res, err := c.sendHealthCheck(ctx)
 	return res, err
 }
 
-func (c *Client) sendHealthCheck(ctx context.Context) (res *HealthCheckOK, err error) {
+func (c *Client) sendHealthCheck(ctx context.Context) (res HealthCheckRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("healthCheck"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -6503,12 +6502,12 @@ func (c *Client) sendHealthCheck(ctx context.Context) (res *HealthCheckOK, err e
 // List all API keys.
 //
 // GET /api-keys
-func (c *Client) ListAPIKeys(ctx context.Context) ([]APIKey, error) {
+func (c *Client) ListAPIKeys(ctx context.Context) (ListAPIKeysRes, error) {
 	res, err := c.sendListAPIKeys(ctx)
 	return res, err
 }
 
-func (c *Client) sendListAPIKeys(ctx context.Context) (res []APIKey, err error) {
+func (c *Client) sendListAPIKeys(ctx context.Context) (res ListAPIKeysRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("listAPIKeys"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -6610,12 +6609,12 @@ func (c *Client) sendListAPIKeys(ctx context.Context) (res []APIKey, err error) 
 // Get incident history for a status page.
 //
 // GET /status-pages/{slug}/incidents
-func (c *Client) ListIncidents(ctx context.Context, params ListIncidentsParams) (*ListIncidentsOK, error) {
+func (c *Client) ListIncidents(ctx context.Context, params ListIncidentsParams) (ListIncidentsRes, error) {
 	res, err := c.sendListIncidents(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendListIncidents(ctx context.Context, params ListIncidentsParams) (res *ListIncidentsOK, err error) {
+func (c *Client) sendListIncidents(ctx context.Context, params ListIncidentsParams) (res ListIncidentsRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("listIncidents"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -6724,12 +6723,12 @@ func (c *Client) sendListIncidents(ctx context.Context, params ListIncidentsPara
 // List all maintenance windows.
 //
 // GET /maintenance
-func (c *Client) ListMaintenance(ctx context.Context) ([]Maintenance, error) {
+func (c *Client) ListMaintenance(ctx context.Context) (ListMaintenanceRes, error) {
 	res, err := c.sendListMaintenance(ctx)
 	return res, err
 }
 
-func (c *Client) sendListMaintenance(ctx context.Context) (res []Maintenance, err error) {
+func (c *Client) sendListMaintenance(ctx context.Context) (res ListMaintenanceRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("listMaintenance"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -6831,12 +6830,12 @@ func (c *Client) sendListMaintenance(ctx context.Context) (res []Maintenance, er
 // List all monitors for the current user.
 //
 // GET /monitors
-func (c *Client) ListMonitors(ctx context.Context) ([]Monitor, error) {
+func (c *Client) ListMonitors(ctx context.Context) (ListMonitorsRes, error) {
 	res, err := c.sendListMonitors(ctx)
 	return res, err
 }
 
-func (c *Client) sendListMonitors(ctx context.Context) (res []Monitor, err error) {
+func (c *Client) sendListMonitors(ctx context.Context) (res ListMonitorsRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("listMonitors"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -6938,12 +6937,12 @@ func (c *Client) sendListMonitors(ctx context.Context) (res []Monitor, err error
 // List all notification providers.
 //
 // GET /notifications
-func (c *Client) ListNotifications(ctx context.Context) ([]Notification, error) {
+func (c *Client) ListNotifications(ctx context.Context) (ListNotificationsRes, error) {
 	res, err := c.sendListNotifications(ctx)
 	return res, err
 }
 
-func (c *Client) sendListNotifications(ctx context.Context) (res []Notification, err error) {
+func (c *Client) sendListNotifications(ctx context.Context) (res ListNotificationsRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("listNotifications"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -7045,12 +7044,12 @@ func (c *Client) sendListNotifications(ctx context.Context) (res []Notification,
 // List proxies.
 //
 // GET /proxies
-func (c *Client) ListProxies(ctx context.Context) ([]Proxy, error) {
+func (c *Client) ListProxies(ctx context.Context) (ListProxiesRes, error) {
 	res, err := c.sendListProxies(ctx)
 	return res, err
 }
 
-func (c *Client) sendListProxies(ctx context.Context) (res []Proxy, err error) {
+func (c *Client) sendListProxies(ctx context.Context) (res ListProxiesRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("listProxies"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -7152,12 +7151,12 @@ func (c *Client) sendListProxies(ctx context.Context) (res []Proxy, err error) {
 // Get recent important heartbeats across all monitors.
 //
 // GET /events
-func (c *Client) ListRecentEvents(ctx context.Context, params ListRecentEventsParams) (*ListRecentEventsOK, error) {
+func (c *Client) ListRecentEvents(ctx context.Context, params ListRecentEventsParams) (ListRecentEventsRes, error) {
 	res, err := c.sendListRecentEvents(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendListRecentEvents(ctx context.Context, params ListRecentEventsParams) (res *ListRecentEventsOK, err error) {
+func (c *Client) sendListRecentEvents(ctx context.Context, params ListRecentEventsParams) (res ListRecentEventsRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("listRecentEvents"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -7210,7 +7209,7 @@ func (c *Client) sendListRecentEvents(ctx context.Context, params ListRecentEven
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.Limit.Get(); ok {
-				return e.EncodeValue(conv.IntToString(val))
+				return e.EncodeValue(conv.Int32ToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -7280,12 +7279,12 @@ func (c *Client) sendListRecentEvents(ctx context.Context, params ListRecentEven
 // List all status pages.
 //
 // GET /status-pages
-func (c *Client) ListStatusPages(ctx context.Context) ([]StatusPage, error) {
+func (c *Client) ListStatusPages(ctx context.Context) (ListStatusPagesRes, error) {
 	res, err := c.sendListStatusPages(ctx)
 	return res, err
 }
 
-func (c *Client) sendListStatusPages(ctx context.Context) (res []StatusPage, err error) {
+func (c *Client) sendListStatusPages(ctx context.Context) (res ListStatusPagesRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("listStatusPages"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -7387,12 +7386,12 @@ func (c *Client) sendListStatusPages(ctx context.Context) (res []StatusPage, err
 // List all tags.
 //
 // GET /tags
-func (c *Client) ListTags(ctx context.Context) ([]Tag, error) {
+func (c *Client) ListTags(ctx context.Context) (ListTagsRes, error) {
 	res, err := c.sendListTags(ctx)
 	return res, err
 }
 
-func (c *Client) sendListTags(ctx context.Context) (res []Tag, err error) {
+func (c *Client) sendListTags(ctx context.Context) (res ListTagsRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("listTags"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -7571,12 +7570,12 @@ func (c *Client) sendLogin(ctx context.Context, request *LoginRequest) (res Logi
 // Invalidate current session.
 //
 // POST /auth/logout
-func (c *Client) Logout(ctx context.Context) error {
-	_, err := c.sendLogout(ctx)
-	return err
+func (c *Client) Logout(ctx context.Context) (LogoutRes, error) {
+	res, err := c.sendLogout(ctx)
+	return res, err
 }
 
-func (c *Client) sendLogout(ctx context.Context) (res *LogoutNoContent, err error) {
+func (c *Client) sendLogout(ctx context.Context) (res LogoutRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("logout"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -7678,12 +7677,12 @@ func (c *Client) sendLogout(ctx context.Context) (res *LogoutNoContent, err erro
 // Check if initial setup is required.
 //
 // GET /auth/setup
-func (c *Client) NeedSetup(ctx context.Context) (*NeedSetupOK, error) {
+func (c *Client) NeedSetup(ctx context.Context) (NeedSetupRes, error) {
 	res, err := c.sendNeedSetup(ctx)
 	return res, err
 }
 
-func (c *Client) sendNeedSetup(ctx context.Context) (res *NeedSetupOK, err error) {
+func (c *Client) sendNeedSetup(ctx context.Context) (res NeedSetupRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("needSetup"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -7752,12 +7751,12 @@ func (c *Client) sendNeedSetup(ctx context.Context) (res *NeedSetupOK, err error
 // Pause a maintenance window.
 //
 // POST /maintenance/{maintenanceId}/pause
-func (c *Client) PauseMaintenance(ctx context.Context, params PauseMaintenanceParams) (*MessageResponse, error) {
+func (c *Client) PauseMaintenance(ctx context.Context, params PauseMaintenanceParams) (PauseMaintenanceRes, error) {
 	res, err := c.sendPauseMaintenance(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendPauseMaintenance(ctx context.Context, params PauseMaintenanceParams) (res *MessageResponse, err error) {
+func (c *Client) sendPauseMaintenance(ctx context.Context, params PauseMaintenanceParams) (res PauseMaintenanceRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("pauseMaintenance"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -7878,12 +7877,12 @@ func (c *Client) sendPauseMaintenance(ctx context.Context, params PauseMaintenan
 // Pause a monitor.
 //
 // POST /monitors/{monitorId}/pause
-func (c *Client) PauseMonitor(ctx context.Context, params PauseMonitorParams) (*MessageResponse, error) {
+func (c *Client) PauseMonitor(ctx context.Context, params PauseMonitorParams) (PauseMonitorRes, error) {
 	res, err := c.sendPauseMonitor(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendPauseMonitor(ctx context.Context, params PauseMonitorParams) (res *MessageResponse, err error) {
+func (c *Client) sendPauseMonitor(ctx context.Context, params PauseMonitorParams) (res PauseMonitorRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("pauseMonitor"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -8004,12 +8003,12 @@ func (c *Client) sendPauseMonitor(ctx context.Context, params PauseMonitorParams
 // Generate 2FA secret and QR URI.
 //
 // POST /auth/2fa/prepare
-func (c *Client) Prepare2FA(ctx context.Context, request *Prepare2FAReq) (*Prepare2FAOK, error) {
+func (c *Client) Prepare2FA(ctx context.Context, request *Prepare2FAReq) (Prepare2FARes, error) {
 	res, err := c.sendPrepare2FA(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendPrepare2FA(ctx context.Context, request *Prepare2FAReq) (res *Prepare2FAOK, err error) {
+func (c *Client) sendPrepare2FA(ctx context.Context, request *Prepare2FAReq) (res Prepare2FARes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("prepare2FA"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -8191,12 +8190,12 @@ func (c *Client) sendRefreshToken(ctx context.Context, request *RefreshTokenRequ
 // Mark an incident as resolved.
 //
 // POST /status-pages/{slug}/incidents/{incidentId}/resolve
-func (c *Client) ResolveIncident(ctx context.Context, params ResolveIncidentParams) (*Incident, error) {
+func (c *Client) ResolveIncident(ctx context.Context, params ResolveIncidentParams) (ResolveIncidentRes, error) {
 	res, err := c.sendResolveIncident(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendResolveIncident(ctx context.Context, params ResolveIncidentParams) (res *Incident, err error) {
+func (c *Client) sendResolveIncident(ctx context.Context, params ResolveIncidentParams) (res ResolveIncidentRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("resolveIncident"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -8336,12 +8335,12 @@ func (c *Client) sendResolveIncident(ctx context.Context, params ResolveIncident
 // Resume a maintenance window.
 //
 // POST /maintenance/{maintenanceId}/resume
-func (c *Client) ResumeMaintenance(ctx context.Context, params ResumeMaintenanceParams) (*MessageResponse, error) {
+func (c *Client) ResumeMaintenance(ctx context.Context, params ResumeMaintenanceParams) (ResumeMaintenanceRes, error) {
 	res, err := c.sendResumeMaintenance(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendResumeMaintenance(ctx context.Context, params ResumeMaintenanceParams) (res *MessageResponse, err error) {
+func (c *Client) sendResumeMaintenance(ctx context.Context, params ResumeMaintenanceParams) (res ResumeMaintenanceRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("resumeMaintenance"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -8462,12 +8461,12 @@ func (c *Client) sendResumeMaintenance(ctx context.Context, params ResumeMainten
 // Resume a paused monitor.
 //
 // POST /monitors/{monitorId}/resume
-func (c *Client) ResumeMonitor(ctx context.Context, params ResumeMonitorParams) (*MessageResponse, error) {
+func (c *Client) ResumeMonitor(ctx context.Context, params ResumeMonitorParams) (ResumeMonitorRes, error) {
 	res, err := c.sendResumeMonitor(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendResumeMonitor(ctx context.Context, params ResumeMonitorParams) (res *MessageResponse, err error) {
+func (c *Client) sendResumeMonitor(ctx context.Context, params ResumeMonitorParams) (res ResumeMonitorRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("resumeMonitor"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -8588,12 +8587,12 @@ func (c *Client) sendResumeMonitor(ctx context.Context, params ResumeMonitorPara
 // Set monitors for a maintenance window.
 //
 // PUT /maintenance/{maintenanceId}/monitors
-func (c *Client) SetMaintenanceMonitors(ctx context.Context, request *SetMaintenanceMonitorsReq, params SetMaintenanceMonitorsParams) error {
-	_, err := c.sendSetMaintenanceMonitors(ctx, request, params)
-	return err
+func (c *Client) SetMaintenanceMonitors(ctx context.Context, request *SetMaintenanceMonitorsReq, params SetMaintenanceMonitorsParams) (SetMaintenanceMonitorsRes, error) {
+	res, err := c.sendSetMaintenanceMonitors(ctx, request, params)
+	return res, err
 }
 
-func (c *Client) sendSetMaintenanceMonitors(ctx context.Context, request *SetMaintenanceMonitorsReq, params SetMaintenanceMonitorsParams) (res *SetMaintenanceMonitorsOK, err error) {
+func (c *Client) sendSetMaintenanceMonitors(ctx context.Context, request *SetMaintenanceMonitorsReq, params SetMaintenanceMonitorsParams) (res SetMaintenanceMonitorsRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("setMaintenanceMonitors"),
 		semconv.HTTPRequestMethodKey.String("PUT"),
@@ -8717,12 +8716,12 @@ func (c *Client) sendSetMaintenanceMonitors(ctx context.Context, request *SetMai
 // Set status pages for a maintenance window.
 //
 // PUT /maintenance/{maintenanceId}/status-pages
-func (c *Client) SetMaintenanceStatusPages(ctx context.Context, request *SetMaintenanceStatusPagesReq, params SetMaintenanceStatusPagesParams) error {
-	_, err := c.sendSetMaintenanceStatusPages(ctx, request, params)
-	return err
+func (c *Client) SetMaintenanceStatusPages(ctx context.Context, request *SetMaintenanceStatusPagesReq, params SetMaintenanceStatusPagesParams) (SetMaintenanceStatusPagesRes, error) {
+	res, err := c.sendSetMaintenanceStatusPages(ctx, request, params)
+	return res, err
 }
 
-func (c *Client) sendSetMaintenanceStatusPages(ctx context.Context, request *SetMaintenanceStatusPagesReq, params SetMaintenanceStatusPagesParams) (res *SetMaintenanceStatusPagesOK, err error) {
+func (c *Client) sendSetMaintenanceStatusPages(ctx context.Context, request *SetMaintenanceStatusPagesReq, params SetMaintenanceStatusPagesParams) (res SetMaintenanceStatusPagesRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("setMaintenanceStatusPages"),
 		semconv.HTTPRequestMethodKey.String("PUT"),
@@ -8923,12 +8922,12 @@ func (c *Client) sendSetup(ctx context.Context, request *SetupReq) (res SetupRes
 // Shrink database (vacuum).
 //
 // POST /database/shrink
-func (c *Client) ShrinkDatabase(ctx context.Context) (*MessageResponse, error) {
+func (c *Client) ShrinkDatabase(ctx context.Context) (ShrinkDatabaseRes, error) {
 	res, err := c.sendShrinkDatabase(ctx)
 	return res, err
 }
 
-func (c *Client) sendShrinkDatabase(ctx context.Context) (res *MessageResponse, err error) {
+func (c *Client) sendShrinkDatabase(ctx context.Context) (res ShrinkDatabaseRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("shrinkDatabase"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -9030,12 +9029,12 @@ func (c *Client) sendShrinkDatabase(ctx context.Context) (res *MessageResponse, 
 // Send a test notification.
 //
 // POST /notifications/{notificationId}/test
-func (c *Client) TestNotification(ctx context.Context, params TestNotificationParams) (*MessageResponse, error) {
+func (c *Client) TestNotification(ctx context.Context, params TestNotificationParams) (TestNotificationRes, error) {
 	res, err := c.sendTestNotification(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendTestNotification(ctx context.Context, params TestNotificationParams) (res *MessageResponse, err error) {
+func (c *Client) sendTestNotification(ctx context.Context, params TestNotificationParams) (res TestNotificationRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("testNotification"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -9156,12 +9155,12 @@ func (c *Client) sendTestNotification(ctx context.Context, params TestNotificati
 // Unpin an incident from the status page.
 //
 // POST /status-pages/{slug}/incidents/{incidentId}/unpin
-func (c *Client) UnpinIncident(ctx context.Context, params UnpinIncidentParams) (*MessageResponse, error) {
+func (c *Client) UnpinIncident(ctx context.Context, params UnpinIncidentParams) (UnpinIncidentRes, error) {
 	res, err := c.sendUnpinIncident(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendUnpinIncident(ctx context.Context, params UnpinIncidentParams) (res *MessageResponse, err error) {
+func (c *Client) sendUnpinIncident(ctx context.Context, params UnpinIncidentParams) (res UnpinIncidentRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("unpinIncident"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -9301,12 +9300,12 @@ func (c *Client) sendUnpinIncident(ctx context.Context, params UnpinIncidentPara
 // Update an incident.
 //
 // PUT /status-pages/{slug}/incidents/{incidentId}
-func (c *Client) UpdateIncident(ctx context.Context, request *IncidentInput, params UpdateIncidentParams) (*Incident, error) {
+func (c *Client) UpdateIncident(ctx context.Context, request *IncidentInput, params UpdateIncidentParams) (UpdateIncidentRes, error) {
 	res, err := c.sendUpdateIncident(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendUpdateIncident(ctx context.Context, request *IncidentInput, params UpdateIncidentParams) (res *Incident, err error) {
+func (c *Client) sendUpdateIncident(ctx context.Context, request *IncidentInput, params UpdateIncidentParams) (res UpdateIncidentRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("updateIncident"),
 		semconv.HTTPRequestMethodKey.String("PUT"),
@@ -9448,12 +9447,12 @@ func (c *Client) sendUpdateIncident(ctx context.Context, request *IncidentInput,
 // Update a maintenance window.
 //
 // PUT /maintenance/{maintenanceId}
-func (c *Client) UpdateMaintenance(ctx context.Context, request *MaintenanceInput, params UpdateMaintenanceParams) (*Maintenance, error) {
+func (c *Client) UpdateMaintenance(ctx context.Context, request *MaintenanceInput, params UpdateMaintenanceParams) (UpdateMaintenanceRes, error) {
 	res, err := c.sendUpdateMaintenance(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendUpdateMaintenance(ctx context.Context, request *MaintenanceInput, params UpdateMaintenanceParams) (res *Maintenance, err error) {
+func (c *Client) sendUpdateMaintenance(ctx context.Context, request *MaintenanceInput, params UpdateMaintenanceParams) (res UpdateMaintenanceRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("updateMaintenance"),
 		semconv.HTTPRequestMethodKey.String("PUT"),
@@ -9704,12 +9703,12 @@ func (c *Client) sendUpdateMonitor(ctx context.Context, request *MonitorInput, p
 // Update a monitor tag value.
 //
 // PUT /monitors/{monitorId}/tags/{tagId}
-func (c *Client) UpdateMonitorTag(ctx context.Context, request *UpdateMonitorTagReq, params UpdateMonitorTagParams) error {
-	_, err := c.sendUpdateMonitorTag(ctx, request, params)
-	return err
+func (c *Client) UpdateMonitorTag(ctx context.Context, request *UpdateMonitorTagReq, params UpdateMonitorTagParams) (UpdateMonitorTagRes, error) {
+	res, err := c.sendUpdateMonitorTag(ctx, request, params)
+	return res, err
 }
 
-func (c *Client) sendUpdateMonitorTag(ctx context.Context, request *UpdateMonitorTagReq, params UpdateMonitorTagParams) (res *UpdateMonitorTagOK, err error) {
+func (c *Client) sendUpdateMonitorTag(ctx context.Context, request *UpdateMonitorTagReq, params UpdateMonitorTagParams) (res UpdateMonitorTagRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("updateMonitorTag"),
 		semconv.HTTPRequestMethodKey.String("PUT"),
@@ -9851,12 +9850,12 @@ func (c *Client) sendUpdateMonitorTag(ctx context.Context, request *UpdateMonito
 // Update a notification provider.
 //
 // PUT /notifications/{notificationId}
-func (c *Client) UpdateNotification(ctx context.Context, request *NotificationInput, params UpdateNotificationParams) (*Notification, error) {
+func (c *Client) UpdateNotification(ctx context.Context, request *NotificationInput, params UpdateNotificationParams) (UpdateNotificationRes, error) {
 	res, err := c.sendUpdateNotification(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendUpdateNotification(ctx context.Context, request *NotificationInput, params UpdateNotificationParams) (res *Notification, err error) {
+func (c *Client) sendUpdateNotification(ctx context.Context, request *NotificationInput, params UpdateNotificationParams) (res UpdateNotificationRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("updateNotification"),
 		semconv.HTTPRequestMethodKey.String("PUT"),
@@ -9979,12 +9978,12 @@ func (c *Client) sendUpdateNotification(ctx context.Context, request *Notificati
 // Update a proxy.
 //
 // PUT /proxies/{proxyId}
-func (c *Client) UpdateProxy(ctx context.Context, request *ProxyInput, params UpdateProxyParams) error {
-	_, err := c.sendUpdateProxy(ctx, request, params)
-	return err
+func (c *Client) UpdateProxy(ctx context.Context, request *ProxyInput, params UpdateProxyParams) (UpdateProxyRes, error) {
+	res, err := c.sendUpdateProxy(ctx, request, params)
+	return res, err
 }
 
-func (c *Client) sendUpdateProxy(ctx context.Context, request *ProxyInput, params UpdateProxyParams) (res *UpdateProxyOK, err error) {
+func (c *Client) sendUpdateProxy(ctx context.Context, request *ProxyInput, params UpdateProxyParams) (res UpdateProxyRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("updateProxy"),
 		semconv.HTTPRequestMethodKey.String("PUT"),
@@ -10107,12 +10106,12 @@ func (c *Client) sendUpdateProxy(ctx context.Context, request *ProxyInput, param
 // Update application settings.
 //
 // PATCH /settings
-func (c *Client) UpdateSettings(ctx context.Context, request *Settings) (*MessageResponse, error) {
+func (c *Client) UpdateSettings(ctx context.Context, request *Settings) (UpdateSettingsRes, error) {
 	res, err := c.sendUpdateSettings(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendUpdateSettings(ctx context.Context, request *Settings) (res *MessageResponse, err error) {
+func (c *Client) sendUpdateSettings(ctx context.Context, request *Settings) (res UpdateSettingsRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("updateSettings"),
 		semconv.HTTPRequestMethodKey.String("PATCH"),
@@ -10217,12 +10216,12 @@ func (c *Client) sendUpdateSettings(ctx context.Context, request *Settings) (res
 // Update a status page.
 //
 // PUT /status-pages/{slug}
-func (c *Client) UpdateStatusPage(ctx context.Context, request *StatusPageInput, params UpdateStatusPageParams) (*StatusPage, error) {
+func (c *Client) UpdateStatusPage(ctx context.Context, request *StatusPageInput, params UpdateStatusPageParams) (UpdateStatusPageRes, error) {
 	res, err := c.sendUpdateStatusPage(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendUpdateStatusPage(ctx context.Context, request *StatusPageInput, params UpdateStatusPageParams) (res *StatusPage, err error) {
+func (c *Client) sendUpdateStatusPage(ctx context.Context, request *StatusPageInput, params UpdateStatusPageParams) (res UpdateStatusPageRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("updateStatusPage"),
 		semconv.HTTPRequestMethodKey.String("PUT"),
@@ -10345,12 +10344,12 @@ func (c *Client) sendUpdateStatusPage(ctx context.Context, request *StatusPageIn
 // Update a tag.
 //
 // PUT /tags/{tagId}
-func (c *Client) UpdateTag(ctx context.Context, request *TagInput, params UpdateTagParams) (*Tag, error) {
+func (c *Client) UpdateTag(ctx context.Context, request *TagInput, params UpdateTagParams) (UpdateTagRes, error) {
 	res, err := c.sendUpdateTag(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendUpdateTag(ctx context.Context, request *TagInput, params UpdateTagParams) (res *Tag, err error) {
+func (c *Client) sendUpdateTag(ctx context.Context, request *TagInput, params UpdateTagParams) (res UpdateTagRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("updateTag"),
 		semconv.HTTPRequestMethodKey.String("PUT"),

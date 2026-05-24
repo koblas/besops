@@ -99,8 +99,8 @@ func isInRecurringWeekday(m *Maintenance, now time.Time) bool {
 		return false
 	}
 
-	weekdays := parseIntList(m.Weekdays)
-	todayWeekday := int(now.Weekday())
+	weekdays := parseInt32List(m.Weekdays)
+	todayWeekday := int32(now.Weekday()) //nolint:gosec // weekday is 0-6
 
 	found := false
 	for _, wd := range weekdays {
@@ -117,8 +117,8 @@ func isInRecurringWeekday(m *Maintenance, now time.Time) bool {
 }
 
 func isInRecurringDayOfMonth(m *Maintenance, now time.Time) bool {
-	days := parseIntList(m.DaysOfMonth)
-	todayDay := now.Day()
+	days := parseInt32List(m.DaysOfMonth)
+	todayDay := int32(now.Day()) //nolint:gosec // day is 1-31
 
 	found := false
 	for _, d := range days {
@@ -203,4 +203,3 @@ func parseHHMM(s string) (int, int) {
 	m, _ := strconv.Atoi(parts[1])
 	return h, m
 }
-

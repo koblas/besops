@@ -9,7 +9,7 @@ func (s *HttpMonitorConfig) setDefaults() {
 		s.Method.SetTo(val)
 	}
 	{
-		val := int(10)
+		val := int32(10)
 		s.MaxRedirects.SetTo(val)
 	}
 }
@@ -33,23 +33,23 @@ func (s *MaintenanceInput) setDefaults() {
 // setDefaults set default value of fields.
 func (s *Monitor) setDefaults() {
 	{
-		val := int(60)
+		val := int32(60)
 		s.Interval.SetTo(val)
 	}
 	{
-		val := int(48)
+		val := int32(48)
 		s.Timeout.SetTo(val)
 	}
 	{
-		val := int(0)
+		val := int32(0)
 		s.MaxRetries.SetTo(val)
 	}
 	{
-		val := int(60)
+		val := int32(60)
 		s.RetryInterval.SetTo(val)
 	}
 	{
-		val := int(0)
+		val := int32(0)
 		s.ResendInterval.SetTo(val)
 	}
 }
@@ -61,23 +61,23 @@ func (s *MonitorInput) setDefaults() {
 		s.Active.SetTo(val)
 	}
 	{
-		val := int(60)
+		val := int32(60)
 		s.Interval.SetTo(val)
 	}
 	{
-		val := int(48)
+		val := int32(48)
 		s.Timeout.SetTo(val)
 	}
 	{
-		val := int(0)
+		val := int32(0)
 		s.MaxRetries.SetTo(val)
 	}
 	{
-		val := int(60)
+		val := int32(60)
 		s.RetryInterval.SetTo(val)
 	}
 	{
-		val := int(0)
+		val := int32(0)
 		s.ResendInterval.SetTo(val)
 	}
 }
@@ -97,7 +97,7 @@ func (s *NotificationInput) setDefaults() {
 // setDefaults set default value of fields.
 func (s *PingMonitorConfig) setDefaults() {
 	{
-		val := int(56)
+		val := int32(56)
 		s.PacketSize.SetTo(val)
 	}
 }

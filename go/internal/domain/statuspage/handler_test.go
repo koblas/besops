@@ -145,18 +145,20 @@ func TestGetStatusPageHeartbeats_UnionsExplicitAndTagMonitors(t *testing.T) {
 
 	h := NewHandler(repo, hbReader, nil, WithMonitorResolver(resolver))
 
-	result, err := h.GetStatusPageHeartbeats(t.Context(), oas.GetStatusPageHeartbeatsParams{Slug: "prod"})
+	res, err := h.GetStatusPageHeartbeats(t.Context(), oas.GetStatusPageHeartbeatsParams{Slug: "prod"})
 	require.NoError(t, err)
+	result := res.(*oas.GetStatusPageHeartbeatsOK)
 
-	hbList := result.HeartbeatList.Value
+	hbList := result.HeartbeatList
 	// Should have all 3 unique monitors (explicit + tagged, with sharedMon deduplicated)
 	assert.Len(t, hbList, 3)
-	_, hasExplicit := hbList[explicitMon]
-	_, hasTagged := hbList[taggedMon]
-	_, hasShared := hbList[sharedMon]
-	assert.True(t, hasExplicit, "explicit monitor should be in heartbeat list")
-	assert.True(t, hasTagged, "tag-resolved monitor should be in heartbeat list")
-	assert.True(t, hasShared, "shared monitor should appear once (deduplicated)")
+	hbIDs := make(map[string]bool)
+	for _, item := range hbList {
+		hbIDs[item.MonitorId.String()] = true
+	}
+	assert.True(t, hbIDs[explicitMon], "explicit monitor should be in heartbeat list")
+	assert.True(t, hbIDs[taggedMon], "tag-resolved monitor should be in heartbeat list")
+	assert.True(t, hbIDs[sharedMon], "shared monitor should appear once (deduplicated)")
 }
 
 // mockRepo implements Repository for testing.
@@ -174,10 +176,10 @@ func (m *mockRepo) FindBySlug(_ context.Context, _ string) (*StatusPage, error) 
 	}
 	return nil, fmt.Errorf("not found")
 }
-func (m *mockRepo) Create(_ context.Context, _ *StatusPage) (string, error)       { return "", nil }
-func (m *mockRepo) Update(_ context.Context, _ *StatusPage) error                 { return nil }
-func (m *mockRepo) Delete(_ context.Context, _ string) error                      { return nil }
-func (m *mockRepo) GetGroups(_ context.Context, _ string) ([]*Group, error)       { return m.groups, nil }
+func (m *mockRepo) Create(_ context.Context, _ *StatusPage) (string, error) { return "", nil }
+func (m *mockRepo) Update(_ context.Context, _ *StatusPage) error           { return nil }
+func (m *mockRepo) Delete(_ context.Context, _ string) error                { return nil }
+func (m *mockRepo) GetGroups(_ context.Context, _ string) ([]*Group, error) { return m.groups, nil }
 func (m *mockRepo) SaveGroups(_ context.Context, _ string, groups []*Group) error {
 	m.savedGroups = groups
 	return nil

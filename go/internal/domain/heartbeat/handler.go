@@ -35,17 +35,17 @@ func NewHandler(repo Repository, chartRepo ChartRepository) *Handler {
 	return &Handler{repo: repo, chartRepo: chartRepo}
 }
 
-func (h *Handler) GetHeartbeats(ctx context.Context, params oas.GetHeartbeatsParams) ([]oas.Heartbeat, error) {
+func (h *Handler) GetHeartbeats(ctx context.Context, params oas.GetHeartbeatsParams) (oas.GetHeartbeatsRes, error) {
 	var limit int
 	if params.Count.IsSet() {
-		limit = params.Count.Value
+		limit = int(params.Count.Value)
 		if limit > 500 {
 			limit = 500
 		}
 	} else {
 		hours := 24
 		if params.Hours.IsSet() {
-			hours = params.Hours.Value
+			hours = int(params.Hours.Value)
 		}
 		limit = hours * 60
 	}
@@ -55,21 +55,21 @@ func (h *Handler) GetHeartbeats(ctx context.Context, params oas.GetHeartbeatsPar
 		return nil, fmt.Errorf("getting heartbeats: %w", err)
 	}
 
-	result := make([]oas.Heartbeat, 0, len(hbs))
+	result := make(oas.GetHeartbeatsOKApplicationJSON, 0, len(hbs))
 	for _, hb := range hbs {
 		result = append(result, heartbeatToOAS(hb))
 	}
-	return result, nil
+	return &result, nil
 }
 
-func (h *Handler) GetImportantHeartbeats(ctx context.Context, params oas.GetImportantHeartbeatsParams) (*oas.GetImportantHeartbeatsOK, error) {
+func (h *Handler) GetImportantHeartbeats(ctx context.Context, params oas.GetImportantHeartbeatsParams) (oas.GetImportantHeartbeatsRes, error) {
 	limit := 100
 	if params.Limit.IsSet() {
-		limit = params.Limit.Value
+		limit = int(params.Limit.Value)
 	}
 	offset := 0
 	if params.Offset.IsSet() {
-		offset = params.Offset.Value
+		offset = int(params.Offset.Value)
 	}
 
 	hbs, total, err := h.repo.GetImportantByMonitor(ctx, params.MonitorId.String(), offset, limit)
@@ -87,24 +87,24 @@ func (h *Handler) GetImportantHeartbeats(ctx context.Context, params oas.GetImpo
 	}, nil
 }
 
-func (h *Handler) ClearHeartbeats(ctx context.Context, params oas.ClearHeartbeatsParams) error {
+func (h *Handler) ClearHeartbeats(ctx context.Context, params oas.ClearHeartbeatsParams) (oas.ClearHeartbeatsRes, error) {
 	if err := h.repo.ClearByMonitor(ctx, params.MonitorId.String()); err != nil {
-		return fmt.Errorf("clearing heartbeats: %w", err)
+		return nil, fmt.Errorf("clearing heartbeats: %w", err)
 	}
-	return nil
+	return &oas.ClearHeartbeatsNoContent{}, nil
 }
 
-func (h *Handler) ClearEvents(ctx context.Context, params oas.ClearEventsParams) error {
+func (h *Handler) ClearEvents(ctx context.Context, params oas.ClearEventsParams) (oas.ClearEventsRes, error) {
 	if err := h.repo.ClearByMonitor(ctx, params.MonitorId.String()); err != nil {
-		return fmt.Errorf("clearing events: %w", err)
+		return nil, fmt.Errorf("clearing events: %w", err)
 	}
-	return nil
+	return &oas.ClearEventsNoContent{}, nil
 }
 
-func (h *Handler) GetChartData(ctx context.Context, params oas.GetChartDataParams) ([]oas.ChartPoint, error) {
+func (h *Handler) GetChartData(ctx context.Context, params oas.GetChartDataParams) (oas.GetChartDataRes, error) {
 	hours := 24
 	if params.Hours.IsSet() {
-		hours = params.Hours.Value
+		hours = int(params.Hours.Value)
 	}
 
 	since := time.Now().Add(-time.Duration(hours) * time.Hour).Unix()
@@ -123,25 +123,24 @@ func (h *Handler) GetChartData(ctx context.Context, params oas.GetChartDataParam
 		return nil, fmt.Errorf("getting chart data: %w", err)
 	}
 
-	result := make([]oas.ChartPoint, 0, len(points))
+	result := make(oas.GetChartDataOKApplicationJSON, 0, len(points))
 	for _, p := range points {
 		result = append(result, oas.ChartPoint{
-			Timestamp: oas.NewOptInt64(p.Timestamp),
-			Up:        oas.NewOptInt(p.Up),
-			Down:      oas.NewOptInt(p.Down),
+			Timestamp:  oas.NewOptInt64(p.Timestamp),
+			Up:         oas.NewOptInt32(int32(p.Up)),   //nolint:gosec // counter value, no overflow
+			Down:       oas.NewOptInt32(int32(p.Down)), //nolint:gosec // counter value, no overflow
 			Latency:    oas.NewOptFloat64(p.Latency),
-			LatencyMin: oas.NewOptInt(int(p.LatencyMin)),
-			LatencyMax: oas.NewOptInt(int(p.LatencyMax)),
+			LatencyMin: oas.NewOptInt32(int32(p.LatencyMin)), //nolint:gosec // latency in ms, fits int32
+			LatencyMax: oas.NewOptInt32(int32(p.LatencyMax)), //nolint:gosec // latency in ms, fits int32
 		})
 	}
-	return result, nil
+	return &result, nil
 }
 
-
-func (h *Handler) ListRecentEvents(ctx context.Context, params oas.ListRecentEventsParams) (*oas.ListRecentEventsOK, error) {
+func (h *Handler) ListRecentEvents(ctx context.Context, params oas.ListRecentEventsParams) (oas.ListRecentEventsRes, error) {
 	limit := 25
 	if params.Limit.IsSet() {
-		limit = params.Limit.Value
+		limit = int(params.Limit.Value)
 	}
 
 	hbs, total, err := h.repo.GetAllImportant(ctx, limit)
@@ -163,7 +162,7 @@ func heartbeatToOAS(hb *Heartbeat) oas.Heartbeat {
 	result := oas.Heartbeat{
 		ID:        oasutil.MustParseUUID(hb.ID),
 		MonitorId: oasutil.MustParseUUID(hb.MonitorID),
-		Status:    oas.HeartbeatStatus(hb.Status),
+		Status:    oas.HeartbeatStatus(hb.Status), //nolint:gosec // status is a small enum value
 		Time:      time.Time(hb.Time),
 	}
 	if hb.Msg != "" {

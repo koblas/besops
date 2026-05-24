@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/go-faster/errors"
-	"github.com/google/uuid"
 	ht "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/middleware"
 	"github.com/ogen-go/ogen/ogenerrors"
@@ -182,7 +181,7 @@ func (s *Server) handleAddMonitorTagRequest(args [1]string, argsEscaped bool, w 
 		}
 	}()
 
-	var response *AddMonitorTagCreated
+	var response AddMonitorTagRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -203,7 +202,7 @@ func (s *Server) handleAddMonitorTagRequest(args [1]string, argsEscaped bool, w 
 		type (
 			Request  = *AddMonitorTagReq
 			Params   = AddMonitorTagParams
-			Response = *AddMonitorTagCreated
+			Response = AddMonitorTagRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -214,12 +213,12 @@ func (s *Server) handleAddMonitorTagRequest(args [1]string, argsEscaped bool, w 
 			mreq,
 			unpackAddMonitorTagParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				err = s.h.AddMonitorTag(ctx, request, params)
+				response, err = s.h.AddMonitorTag(ctx, request, params)
 				return response, err
 			},
 		)
 	} else {
-		err = s.h.AddMonitorTag(ctx, request, params)
+		response, err = s.h.AddMonitorTag(ctx, request, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -556,7 +555,7 @@ func (s *Server) handleCheckDomainRequest(args [1]string, argsEscaped bool, w ht
 
 	var rawBody []byte
 
-	var response *CheckDomainOK
+	var response CheckDomainRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -577,7 +576,7 @@ func (s *Server) handleCheckDomainRequest(args [1]string, argsEscaped bool, w ht
 		type (
 			Request  = struct{}
 			Params   = CheckDomainParams
-			Response = *CheckDomainOK
+			Response = CheckDomainRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -743,7 +742,7 @@ func (s *Server) handleClearEventsRequest(args [1]string, argsEscaped bool, w ht
 
 	var rawBody []byte
 
-	var response *ClearEventsNoContent
+	var response ClearEventsRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -764,7 +763,7 @@ func (s *Server) handleClearEventsRequest(args [1]string, argsEscaped bool, w ht
 		type (
 			Request  = struct{}
 			Params   = ClearEventsParams
-			Response = *ClearEventsNoContent
+			Response = ClearEventsRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -775,12 +774,12 @@ func (s *Server) handleClearEventsRequest(args [1]string, argsEscaped bool, w ht
 			mreq,
 			unpackClearEventsParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				err = s.h.ClearEvents(ctx, params)
+				response, err = s.h.ClearEvents(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		err = s.h.ClearEvents(ctx, params)
+		response, err = s.h.ClearEvents(ctx, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -930,7 +929,7 @@ func (s *Server) handleClearHeartbeatsRequest(args [1]string, argsEscaped bool, 
 
 	var rawBody []byte
 
-	var response *ClearHeartbeatsNoContent
+	var response ClearHeartbeatsRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -951,7 +950,7 @@ func (s *Server) handleClearHeartbeatsRequest(args [1]string, argsEscaped bool, 
 		type (
 			Request  = struct{}
 			Params   = ClearHeartbeatsParams
-			Response = *ClearHeartbeatsNoContent
+			Response = ClearHeartbeatsRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -962,12 +961,12 @@ func (s *Server) handleClearHeartbeatsRequest(args [1]string, argsEscaped bool, 
 			mreq,
 			unpackClearHeartbeatsParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				err = s.h.ClearHeartbeats(ctx, params)
+				response, err = s.h.ClearHeartbeats(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		err = s.h.ClearHeartbeats(ctx, params)
+		response, err = s.h.ClearHeartbeats(ctx, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -1107,7 +1106,7 @@ func (s *Server) handleClearStatisticsRequest(args [0]string, argsEscaped bool, 
 
 	var rawBody []byte
 
-	var response *ClearStatisticsNoContent
+	var response ClearStatisticsRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -1123,7 +1122,7 @@ func (s *Server) handleClearStatisticsRequest(args [0]string, argsEscaped bool, 
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = *ClearStatisticsNoContent
+			Response = ClearStatisticsRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -1134,12 +1133,12 @@ func (s *Server) handleClearStatisticsRequest(args [0]string, argsEscaped bool, 
 			mreq,
 			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				err = s.h.ClearStatistics(ctx)
+				response, err = s.h.ClearStatistics(ctx)
 				return response, err
 			},
 		)
 	} else {
-		err = s.h.ClearStatistics(ctx)
+		response, err = s.h.ClearStatistics(ctx)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -1294,7 +1293,7 @@ func (s *Server) handleCreateAPIKeyRequest(args [0]string, argsEscaped bool, w h
 		}
 	}()
 
-	var response *CreateAPIKeyCreated
+	var response CreateAPIKeyRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -1310,7 +1309,7 @@ func (s *Server) handleCreateAPIKeyRequest(args [0]string, argsEscaped bool, w h
 		type (
 			Request  = *APIKeyInput
 			Params   = struct{}
-			Response = *CreateAPIKeyCreated
+			Response = CreateAPIKeyRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -1491,7 +1490,7 @@ func (s *Server) handleCreateIncidentRequest(args [1]string, argsEscaped bool, w
 		}
 	}()
 
-	var response *Incident
+	var response CreateIncidentRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -1512,7 +1511,7 @@ func (s *Server) handleCreateIncidentRequest(args [1]string, argsEscaped bool, w
 		type (
 			Request  = *IncidentInput
 			Params   = CreateIncidentParams
-			Response = *Incident
+			Response = CreateIncidentRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -1683,7 +1682,7 @@ func (s *Server) handleCreateMaintenanceRequest(args [0]string, argsEscaped bool
 		}
 	}()
 
-	var response *CreateMaintenanceCreated
+	var response CreateMaintenanceRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -1699,7 +1698,7 @@ func (s *Server) handleCreateMaintenanceRequest(args [0]string, argsEscaped bool
 		type (
 			Request  = *MaintenanceInput
 			Params   = struct{}
-			Response = *CreateMaintenanceCreated
+			Response = CreateMaintenanceRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -1870,7 +1869,7 @@ func (s *Server) handleCreateMonitorRequest(args [0]string, argsEscaped bool, w 
 		}
 	}()
 
-	var response *CreateMonitorCreated
+	var response CreateMonitorRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -1886,7 +1885,7 @@ func (s *Server) handleCreateMonitorRequest(args [0]string, argsEscaped bool, w 
 		type (
 			Request  = *MonitorInput
 			Params   = struct{}
-			Response = *CreateMonitorCreated
+			Response = CreateMonitorRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -2057,7 +2056,7 @@ func (s *Server) handleCreateNotificationRequest(args [0]string, argsEscaped boo
 		}
 	}()
 
-	var response *CreateNotificationCreated
+	var response CreateNotificationRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -2073,7 +2072,7 @@ func (s *Server) handleCreateNotificationRequest(args [0]string, argsEscaped boo
 		type (
 			Request  = *NotificationInput
 			Params   = struct{}
-			Response = *CreateNotificationCreated
+			Response = CreateNotificationRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -2244,7 +2243,7 @@ func (s *Server) handleCreateProxyRequest(args [0]string, argsEscaped bool, w ht
 		}
 	}()
 
-	var response *CreateProxyCreated
+	var response CreateProxyRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -2260,7 +2259,7 @@ func (s *Server) handleCreateProxyRequest(args [0]string, argsEscaped bool, w ht
 		type (
 			Request  = *ProxyInput
 			Params   = struct{}
-			Response = *CreateProxyCreated
+			Response = CreateProxyRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -2431,7 +2430,7 @@ func (s *Server) handleCreateStatusPageRequest(args [0]string, argsEscaped bool,
 		}
 	}()
 
-	var response *CreateStatusPageCreated
+	var response CreateStatusPageRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -2447,7 +2446,7 @@ func (s *Server) handleCreateStatusPageRequest(args [0]string, argsEscaped bool,
 		type (
 			Request  = *StatusPageInput
 			Params   = struct{}
-			Response = *CreateStatusPageCreated
+			Response = CreateStatusPageRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -2618,7 +2617,7 @@ func (s *Server) handleCreateTagRequest(args [0]string, argsEscaped bool, w http
 		}
 	}()
 
-	var response *Tag
+	var response CreateTagRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -2634,7 +2633,7 @@ func (s *Server) handleCreateTagRequest(args [0]string, argsEscaped bool, w http
 		type (
 			Request  = *TagInput
 			Params   = struct{}
-			Response = *Tag
+			Response = CreateTagRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -2800,7 +2799,7 @@ func (s *Server) handleDeleteAPIKeyRequest(args [1]string, argsEscaped bool, w h
 
 	var rawBody []byte
 
-	var response *DeleteAPIKeyNoContent
+	var response DeleteAPIKeyRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -2821,7 +2820,7 @@ func (s *Server) handleDeleteAPIKeyRequest(args [1]string, argsEscaped bool, w h
 		type (
 			Request  = struct{}
 			Params   = DeleteAPIKeyParams
-			Response = *DeleteAPIKeyNoContent
+			Response = DeleteAPIKeyRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -2832,12 +2831,12 @@ func (s *Server) handleDeleteAPIKeyRequest(args [1]string, argsEscaped bool, w h
 			mreq,
 			unpackDeleteAPIKeyParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				err = s.h.DeleteAPIKey(ctx, params)
+				response, err = s.h.DeleteAPIKey(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		err = s.h.DeleteAPIKey(ctx, params)
+		response, err = s.h.DeleteAPIKey(ctx, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -2987,7 +2986,7 @@ func (s *Server) handleDeleteIncidentRequest(args [2]string, argsEscaped bool, w
 
 	var rawBody []byte
 
-	var response *DeleteIncidentNoContent
+	var response DeleteIncidentRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -3012,7 +3011,7 @@ func (s *Server) handleDeleteIncidentRequest(args [2]string, argsEscaped bool, w
 		type (
 			Request  = struct{}
 			Params   = DeleteIncidentParams
-			Response = *DeleteIncidentNoContent
+			Response = DeleteIncidentRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -3023,12 +3022,12 @@ func (s *Server) handleDeleteIncidentRequest(args [2]string, argsEscaped bool, w
 			mreq,
 			unpackDeleteIncidentParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				err = s.h.DeleteIncident(ctx, params)
+				response, err = s.h.DeleteIncident(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		err = s.h.DeleteIncident(ctx, params)
+		response, err = s.h.DeleteIncident(ctx, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -3178,7 +3177,7 @@ func (s *Server) handleDeleteMaintenanceRequest(args [1]string, argsEscaped bool
 
 	var rawBody []byte
 
-	var response *DeleteMaintenanceNoContent
+	var response DeleteMaintenanceRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -3199,7 +3198,7 @@ func (s *Server) handleDeleteMaintenanceRequest(args [1]string, argsEscaped bool
 		type (
 			Request  = struct{}
 			Params   = DeleteMaintenanceParams
-			Response = *DeleteMaintenanceNoContent
+			Response = DeleteMaintenanceRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -3210,12 +3209,12 @@ func (s *Server) handleDeleteMaintenanceRequest(args [1]string, argsEscaped bool
 			mreq,
 			unpackDeleteMaintenanceParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				err = s.h.DeleteMaintenance(ctx, params)
+				response, err = s.h.DeleteMaintenance(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		err = s.h.DeleteMaintenance(ctx, params)
+		response, err = s.h.DeleteMaintenance(ctx, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -3556,7 +3555,7 @@ func (s *Server) handleDeleteMonitorTagRequest(args [2]string, argsEscaped bool,
 
 	var rawBody []byte
 
-	var response *DeleteMonitorTagNoContent
+	var response DeleteMonitorTagRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -3581,7 +3580,7 @@ func (s *Server) handleDeleteMonitorTagRequest(args [2]string, argsEscaped bool,
 		type (
 			Request  = struct{}
 			Params   = DeleteMonitorTagParams
-			Response = *DeleteMonitorTagNoContent
+			Response = DeleteMonitorTagRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -3592,12 +3591,12 @@ func (s *Server) handleDeleteMonitorTagRequest(args [2]string, argsEscaped bool,
 			mreq,
 			unpackDeleteMonitorTagParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				err = s.h.DeleteMonitorTag(ctx, params)
+				response, err = s.h.DeleteMonitorTag(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		err = s.h.DeleteMonitorTag(ctx, params)
+		response, err = s.h.DeleteMonitorTag(ctx, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -3747,7 +3746,7 @@ func (s *Server) handleDeleteNotificationRequest(args [1]string, argsEscaped boo
 
 	var rawBody []byte
 
-	var response *DeleteNotificationNoContent
+	var response DeleteNotificationRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -3768,7 +3767,7 @@ func (s *Server) handleDeleteNotificationRequest(args [1]string, argsEscaped boo
 		type (
 			Request  = struct{}
 			Params   = DeleteNotificationParams
-			Response = *DeleteNotificationNoContent
+			Response = DeleteNotificationRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -3779,12 +3778,12 @@ func (s *Server) handleDeleteNotificationRequest(args [1]string, argsEscaped boo
 			mreq,
 			unpackDeleteNotificationParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				err = s.h.DeleteNotification(ctx, params)
+				response, err = s.h.DeleteNotification(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		err = s.h.DeleteNotification(ctx, params)
+		response, err = s.h.DeleteNotification(ctx, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -3934,7 +3933,7 @@ func (s *Server) handleDeleteProxyRequest(args [1]string, argsEscaped bool, w ht
 
 	var rawBody []byte
 
-	var response *DeleteProxyNoContent
+	var response DeleteProxyRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -3955,7 +3954,7 @@ func (s *Server) handleDeleteProxyRequest(args [1]string, argsEscaped bool, w ht
 		type (
 			Request  = struct{}
 			Params   = DeleteProxyParams
-			Response = *DeleteProxyNoContent
+			Response = DeleteProxyRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -3966,12 +3965,12 @@ func (s *Server) handleDeleteProxyRequest(args [1]string, argsEscaped bool, w ht
 			mreq,
 			unpackDeleteProxyParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				err = s.h.DeleteProxy(ctx, params)
+				response, err = s.h.DeleteProxy(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		err = s.h.DeleteProxy(ctx, params)
+		response, err = s.h.DeleteProxy(ctx, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -4121,7 +4120,7 @@ func (s *Server) handleDeleteStatusPageRequest(args [1]string, argsEscaped bool,
 
 	var rawBody []byte
 
-	var response *DeleteStatusPageNoContent
+	var response DeleteStatusPageRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -4142,7 +4141,7 @@ func (s *Server) handleDeleteStatusPageRequest(args [1]string, argsEscaped bool,
 		type (
 			Request  = struct{}
 			Params   = DeleteStatusPageParams
-			Response = *DeleteStatusPageNoContent
+			Response = DeleteStatusPageRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -4153,12 +4152,12 @@ func (s *Server) handleDeleteStatusPageRequest(args [1]string, argsEscaped bool,
 			mreq,
 			unpackDeleteStatusPageParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				err = s.h.DeleteStatusPage(ctx, params)
+				response, err = s.h.DeleteStatusPage(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		err = s.h.DeleteStatusPage(ctx, params)
+		response, err = s.h.DeleteStatusPage(ctx, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -4308,7 +4307,7 @@ func (s *Server) handleDeleteTagRequest(args [1]string, argsEscaped bool, w http
 
 	var rawBody []byte
 
-	var response *DeleteTagNoContent
+	var response DeleteTagRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -4329,7 +4328,7 @@ func (s *Server) handleDeleteTagRequest(args [1]string, argsEscaped bool, w http
 		type (
 			Request  = struct{}
 			Params   = DeleteTagParams
-			Response = *DeleteTagNoContent
+			Response = DeleteTagRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -4340,12 +4339,12 @@ func (s *Server) handleDeleteTagRequest(args [1]string, argsEscaped bool, w http
 			mreq,
 			unpackDeleteTagParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				err = s.h.DeleteTag(ctx, params)
+				response, err = s.h.DeleteTag(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		err = s.h.DeleteTag(ctx, params)
+		response, err = s.h.DeleteTag(ctx, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -4500,7 +4499,7 @@ func (s *Server) handleDisable2FARequest(args [0]string, argsEscaped bool, w htt
 		}
 	}()
 
-	var response *MessageResponse
+	var response Disable2FARes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -4516,7 +4515,7 @@ func (s *Server) handleDisable2FARequest(args [0]string, argsEscaped bool, w htt
 		type (
 			Request  = *Disable2FAReq
 			Params   = struct{}
-			Response = *MessageResponse
+			Response = Disable2FARes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -4682,7 +4681,7 @@ func (s *Server) handleDisableAPIKeyRequest(args [1]string, argsEscaped bool, w 
 
 	var rawBody []byte
 
-	var response *MessageResponse
+	var response DisableAPIKeyRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -4703,7 +4702,7 @@ func (s *Server) handleDisableAPIKeyRequest(args [1]string, argsEscaped bool, w 
 		type (
 			Request  = struct{}
 			Params   = DisableAPIKeyParams
-			Response = *MessageResponse
+			Response = DisableAPIKeyRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -4874,7 +4873,7 @@ func (s *Server) handleEnable2FARequest(args [0]string, argsEscaped bool, w http
 		}
 	}()
 
-	var response *MessageResponse
+	var response Enable2FARes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -4890,7 +4889,7 @@ func (s *Server) handleEnable2FARequest(args [0]string, argsEscaped bool, w http
 		type (
 			Request  = *Enable2FAReq
 			Params   = struct{}
-			Response = *MessageResponse
+			Response = Enable2FARes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -5056,7 +5055,7 @@ func (s *Server) handleEnableAPIKeyRequest(args [1]string, argsEscaped bool, w h
 
 	var rawBody []byte
 
-	var response *MessageResponse
+	var response EnableAPIKeyRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -5077,7 +5076,7 @@ func (s *Server) handleEnableAPIKeyRequest(args [1]string, argsEscaped bool, w h
 		type (
 			Request  = struct{}
 			Params   = EnableAPIKeyParams
-			Response = *MessageResponse
+			Response = EnableAPIKeyRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -5233,7 +5232,7 @@ func (s *Server) handleGet2FAStatusRequest(args [0]string, argsEscaped bool, w h
 
 	var rawBody []byte
 
-	var response *Get2FAStatusOK
+	var response Get2FAStatusRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -5249,7 +5248,7 @@ func (s *Server) handleGet2FAStatusRequest(args [0]string, argsEscaped bool, w h
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = *Get2FAStatusOK
+			Response = Get2FAStatusRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -5371,7 +5370,7 @@ func (s *Server) handleGetCertExpiryBadgeRequest(args [1]string, argsEscaped boo
 
 	var rawBody []byte
 
-	var response SVGBadge
+	var response GetCertExpiryBadgeRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -5396,7 +5395,7 @@ func (s *Server) handleGetCertExpiryBadgeRequest(args [1]string, argsEscaped boo
 		type (
 			Request  = struct{}
 			Params   = GetCertExpiryBadgeParams
-			Response = SVGBadge
+			Response = GetCertExpiryBadgeRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -5562,7 +5561,7 @@ func (s *Server) handleGetChartDataRequest(args [1]string, argsEscaped bool, w h
 
 	var rawBody []byte
 
-	var response []ChartPoint
+	var response GetChartDataRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -5587,7 +5586,7 @@ func (s *Server) handleGetChartDataRequest(args [1]string, argsEscaped bool, w h
 		type (
 			Request  = struct{}
 			Params   = GetChartDataParams
-			Response = []ChartPoint
+			Response = GetChartDataRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -5743,7 +5742,7 @@ func (s *Server) handleGetDatabaseSizeRequest(args [0]string, argsEscaped bool, 
 
 	var rawBody []byte
 
-	var response *GetDatabaseSizeOK
+	var response GetDatabaseSizeRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -5759,7 +5758,7 @@ func (s *Server) handleGetDatabaseSizeRequest(args [0]string, argsEscaped bool, 
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = *GetDatabaseSizeOK
+			Response = GetDatabaseSizeRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -5926,7 +5925,7 @@ func (s *Server) handleGetHeartbeatsRequest(args [1]string, argsEscaped bool, w 
 
 	var rawBody []byte
 
-	var response []Heartbeat
+	var response GetHeartbeatsRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -5955,7 +5954,7 @@ func (s *Server) handleGetHeartbeatsRequest(args [1]string, argsEscaped bool, w 
 		type (
 			Request  = struct{}
 			Params   = GetHeartbeatsParams
-			Response = []Heartbeat
+			Response = GetHeartbeatsRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -6121,7 +6120,7 @@ func (s *Server) handleGetImportantHeartbeatsRequest(args [1]string, argsEscaped
 
 	var rawBody []byte
 
-	var response *GetImportantHeartbeatsOK
+	var response GetImportantHeartbeatsRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -6150,7 +6149,7 @@ func (s *Server) handleGetImportantHeartbeatsRequest(args [1]string, argsEscaped
 		type (
 			Request  = struct{}
 			Params   = GetImportantHeartbeatsParams
-			Response = *GetImportantHeartbeatsOK
+			Response = GetImportantHeartbeatsRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -6258,7 +6257,7 @@ func (s *Server) handleGetInfoRequest(args [0]string, argsEscaped bool, w http.R
 
 	var rawBody []byte
 
-	var response *GetInfoOK
+	var response GetInfoRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -6274,7 +6273,7 @@ func (s *Server) handleGetInfoRequest(args [0]string, argsEscaped bool, w http.R
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = *GetInfoOK
+			Response = GetInfoRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -6396,7 +6395,7 @@ func (s *Server) handleGetLatencyBadgeRequest(args [1]string, argsEscaped bool, 
 
 	var rawBody []byte
 
-	var response SVGBadge
+	var response GetLatencyBadgeRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -6425,7 +6424,7 @@ func (s *Server) handleGetLatencyBadgeRequest(args [1]string, argsEscaped bool, 
 		type (
 			Request  = struct{}
 			Params   = GetLatencyBadgeParams
-			Response = SVGBadge
+			Response = GetLatencyBadgeRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -6591,7 +6590,7 @@ func (s *Server) handleGetMaintenanceRequest(args [1]string, argsEscaped bool, w
 
 	var rawBody []byte
 
-	var response *Maintenance
+	var response GetMaintenanceRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -6612,7 +6611,7 @@ func (s *Server) handleGetMaintenanceRequest(args [1]string, argsEscaped bool, w
 		type (
 			Request  = struct{}
 			Params   = GetMaintenanceParams
-			Response = *Maintenance
+			Response = GetMaintenanceRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -6778,7 +6777,7 @@ func (s *Server) handleGetMaintenanceMonitorsRequest(args [1]string, argsEscaped
 
 	var rawBody []byte
 
-	var response []uuid.UUID
+	var response GetMaintenanceMonitorsRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -6799,7 +6798,7 @@ func (s *Server) handleGetMaintenanceMonitorsRequest(args [1]string, argsEscaped
 		type (
 			Request  = struct{}
 			Params   = GetMaintenanceMonitorsParams
-			Response = []uuid.UUID
+			Response = GetMaintenanceMonitorsRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -6965,7 +6964,7 @@ func (s *Server) handleGetMaintenanceStatusPagesRequest(args [1]string, argsEsca
 
 	var rawBody []byte
 
-	var response []uuid.UUID
+	var response GetMaintenanceStatusPagesRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -6986,7 +6985,7 @@ func (s *Server) handleGetMaintenanceStatusPagesRequest(args [1]string, argsEsca
 		type (
 			Request  = struct{}
 			Params   = GetMaintenanceStatusPagesParams
-			Response = []uuid.UUID
+			Response = GetMaintenanceStatusPagesRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -7329,7 +7328,7 @@ func (s *Server) handleGetMonitorUptimesRequest(args [0]string, argsEscaped bool
 
 	var rawBody []byte
 
-	var response GetMonitorUptimesOK
+	var response GetMonitorUptimesRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -7345,7 +7344,7 @@ func (s *Server) handleGetMonitorUptimesRequest(args [0]string, argsEscaped bool
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = GetMonitorUptimesOK
+			Response = GetMonitorUptimesRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -7467,7 +7466,7 @@ func (s *Server) handleGetResponseBadgeRequest(args [1]string, argsEscaped bool,
 
 	var rawBody []byte
 
-	var response SVGBadge
+	var response GetResponseBadgeRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -7492,7 +7491,7 @@ func (s *Server) handleGetResponseBadgeRequest(args [1]string, argsEscaped bool,
 		type (
 			Request  = struct{}
 			Params   = GetResponseBadgeParams
-			Response = SVGBadge
+			Response = GetResponseBadgeRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -7648,7 +7647,7 @@ func (s *Server) handleGetSettingsRequest(args [0]string, argsEscaped bool, w ht
 
 	var rawBody []byte
 
-	var response *Settings
+	var response GetSettingsRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -7664,7 +7663,7 @@ func (s *Server) handleGetSettingsRequest(args [0]string, argsEscaped bool, w ht
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = *Settings
+			Response = GetSettingsRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -7786,7 +7785,7 @@ func (s *Server) handleGetStatusBadgeRequest(args [1]string, argsEscaped bool, w
 
 	var rawBody []byte
 
-	var response SVGBadge
+	var response GetStatusBadgeRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -7811,7 +7810,7 @@ func (s *Server) handleGetStatusBadgeRequest(args [1]string, argsEscaped bool, w
 		type (
 			Request  = struct{}
 			Params   = GetStatusBadgeParams
-			Response = SVGBadge
+			Response = GetStatusBadgeRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -8076,7 +8075,7 @@ func (s *Server) handleGetStatusPageBadgeRequest(args [1]string, argsEscaped boo
 
 	var rawBody []byte
 
-	var response GetStatusPageBadgeOK
+	var response GetStatusPageBadgeRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -8101,7 +8100,7 @@ func (s *Server) handleGetStatusPageBadgeRequest(args [1]string, argsEscaped boo
 		type (
 			Request  = struct{}
 			Params   = GetStatusPageBadgeParams
-			Response = GetStatusPageBadgeOK
+			Response = GetStatusPageBadgeRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -8223,7 +8222,7 @@ func (s *Server) handleGetStatusPageEventStreamRequest(args [1]string, argsEscap
 
 	var rawBody []byte
 
-	var response GetStatusPageEventStreamOK
+	var response GetStatusPageEventStreamRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -8244,7 +8243,7 @@ func (s *Server) handleGetStatusPageEventStreamRequest(args [1]string, argsEscap
 		type (
 			Request  = struct{}
 			Params   = GetStatusPageEventStreamParams
-			Response = GetStatusPageEventStreamOK
+			Response = GetStatusPageEventStreamRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -8366,7 +8365,7 @@ func (s *Server) handleGetStatusPageHeartbeatsRequest(args [1]string, argsEscape
 
 	var rawBody []byte
 
-	var response *GetStatusPageHeartbeatsOK
+	var response GetStatusPageHeartbeatsRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -8387,7 +8386,7 @@ func (s *Server) handleGetStatusPageHeartbeatsRequest(args [1]string, argsEscape
 		type (
 			Request  = struct{}
 			Params   = GetStatusPageHeartbeatsParams
-			Response = *GetStatusPageHeartbeatsOK
+			Response = GetStatusPageHeartbeatsRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -8509,7 +8508,7 @@ func (s *Server) handleGetUptimeBadgeRequest(args [1]string, argsEscaped bool, w
 
 	var rawBody []byte
 
-	var response SVGBadge
+	var response GetUptimeBadgeRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -8538,7 +8537,7 @@ func (s *Server) handleGetUptimeBadgeRequest(args [1]string, argsEscaped bool, w
 		type (
 			Request  = struct{}
 			Params   = GetUptimeBadgeParams
-			Response = SVGBadge
+			Response = GetUptimeBadgeRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -8646,7 +8645,7 @@ func (s *Server) handleHealthCheckRequest(args [0]string, argsEscaped bool, w ht
 
 	var rawBody []byte
 
-	var response *HealthCheckOK
+	var response HealthCheckRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -8662,7 +8661,7 @@ func (s *Server) handleHealthCheckRequest(args [0]string, argsEscaped bool, w ht
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = *HealthCheckOK
+			Response = HealthCheckRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -8818,7 +8817,7 @@ func (s *Server) handleListAPIKeysRequest(args [0]string, argsEscaped bool, w ht
 
 	var rawBody []byte
 
-	var response []APIKey
+	var response ListAPIKeysRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -8834,7 +8833,7 @@ func (s *Server) handleListAPIKeysRequest(args [0]string, argsEscaped bool, w ht
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = []APIKey
+			Response = ListAPIKeysRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -8956,7 +8955,7 @@ func (s *Server) handleListIncidentsRequest(args [1]string, argsEscaped bool, w 
 
 	var rawBody []byte
 
-	var response *ListIncidentsOK
+	var response ListIncidentsRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -8981,7 +8980,7 @@ func (s *Server) handleListIncidentsRequest(args [1]string, argsEscaped bool, w 
 		type (
 			Request  = struct{}
 			Params   = ListIncidentsParams
-			Response = *ListIncidentsOK
+			Response = ListIncidentsRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -9137,7 +9136,7 @@ func (s *Server) handleListMaintenanceRequest(args [0]string, argsEscaped bool, 
 
 	var rawBody []byte
 
-	var response []Maintenance
+	var response ListMaintenanceRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -9153,7 +9152,7 @@ func (s *Server) handleListMaintenanceRequest(args [0]string, argsEscaped bool, 
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = []Maintenance
+			Response = ListMaintenanceRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -9309,7 +9308,7 @@ func (s *Server) handleListMonitorsRequest(args [0]string, argsEscaped bool, w h
 
 	var rawBody []byte
 
-	var response []Monitor
+	var response ListMonitorsRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -9325,7 +9324,7 @@ func (s *Server) handleListMonitorsRequest(args [0]string, argsEscaped bool, w h
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = []Monitor
+			Response = ListMonitorsRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -9481,7 +9480,7 @@ func (s *Server) handleListNotificationsRequest(args [0]string, argsEscaped bool
 
 	var rawBody []byte
 
-	var response []Notification
+	var response ListNotificationsRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -9497,7 +9496,7 @@ func (s *Server) handleListNotificationsRequest(args [0]string, argsEscaped bool
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = []Notification
+			Response = ListNotificationsRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -9653,7 +9652,7 @@ func (s *Server) handleListProxiesRequest(args [0]string, argsEscaped bool, w ht
 
 	var rawBody []byte
 
-	var response []Proxy
+	var response ListProxiesRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -9669,7 +9668,7 @@ func (s *Server) handleListProxiesRequest(args [0]string, argsEscaped bool, w ht
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = []Proxy
+			Response = ListProxiesRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -9835,7 +9834,7 @@ func (s *Server) handleListRecentEventsRequest(args [0]string, argsEscaped bool,
 
 	var rawBody []byte
 
-	var response *ListRecentEventsOK
+	var response ListRecentEventsRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -9856,7 +9855,7 @@ func (s *Server) handleListRecentEventsRequest(args [0]string, argsEscaped bool,
 		type (
 			Request  = struct{}
 			Params   = ListRecentEventsParams
-			Response = *ListRecentEventsOK
+			Response = ListRecentEventsRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -10012,7 +10011,7 @@ func (s *Server) handleListStatusPagesRequest(args [0]string, argsEscaped bool, 
 
 	var rawBody []byte
 
-	var response []StatusPage
+	var response ListStatusPagesRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -10028,7 +10027,7 @@ func (s *Server) handleListStatusPagesRequest(args [0]string, argsEscaped bool, 
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = []StatusPage
+			Response = ListStatusPagesRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -10184,7 +10183,7 @@ func (s *Server) handleListTagsRequest(args [0]string, argsEscaped bool, w http.
 
 	var rawBody []byte
 
-	var response []Tag
+	var response ListTagsRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -10200,7 +10199,7 @@ func (s *Server) handleListTagsRequest(args [0]string, argsEscaped bool, w http.
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = []Tag
+			Response = ListTagsRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -10499,7 +10498,7 @@ func (s *Server) handleLogoutRequest(args [0]string, argsEscaped bool, w http.Re
 
 	var rawBody []byte
 
-	var response *LogoutNoContent
+	var response LogoutRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -10515,7 +10514,7 @@ func (s *Server) handleLogoutRequest(args [0]string, argsEscaped bool, w http.Re
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = *LogoutNoContent
+			Response = LogoutRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -10526,12 +10525,12 @@ func (s *Server) handleLogoutRequest(args [0]string, argsEscaped bool, w http.Re
 			mreq,
 			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				err = s.h.Logout(ctx)
+				response, err = s.h.Logout(ctx)
 				return response, err
 			},
 		)
 	} else {
-		err = s.h.Logout(ctx)
+		response, err = s.h.Logout(ctx)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -10623,7 +10622,7 @@ func (s *Server) handleNeedSetupRequest(args [0]string, argsEscaped bool, w http
 
 	var rawBody []byte
 
-	var response *NeedSetupOK
+	var response NeedSetupRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -10639,7 +10638,7 @@ func (s *Server) handleNeedSetupRequest(args [0]string, argsEscaped bool, w http
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = *NeedSetupOK
+			Response = NeedSetupRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -10805,7 +10804,7 @@ func (s *Server) handlePauseMaintenanceRequest(args [1]string, argsEscaped bool,
 
 	var rawBody []byte
 
-	var response *MessageResponse
+	var response PauseMaintenanceRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -10826,7 +10825,7 @@ func (s *Server) handlePauseMaintenanceRequest(args [1]string, argsEscaped bool,
 		type (
 			Request  = struct{}
 			Params   = PauseMaintenanceParams
-			Response = *MessageResponse
+			Response = PauseMaintenanceRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -10992,7 +10991,7 @@ func (s *Server) handlePauseMonitorRequest(args [1]string, argsEscaped bool, w h
 
 	var rawBody []byte
 
-	var response *MessageResponse
+	var response PauseMonitorRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -11013,7 +11012,7 @@ func (s *Server) handlePauseMonitorRequest(args [1]string, argsEscaped bool, w h
 		type (
 			Request  = struct{}
 			Params   = PauseMonitorParams
-			Response = *MessageResponse
+			Response = PauseMonitorRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -11184,7 +11183,7 @@ func (s *Server) handlePrepare2FARequest(args [0]string, argsEscaped bool, w htt
 		}
 	}()
 
-	var response *Prepare2FAOK
+	var response Prepare2FARes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -11200,7 +11199,7 @@ func (s *Server) handlePrepare2FARequest(args [0]string, argsEscaped bool, w htt
 		type (
 			Request  = *Prepare2FAReq
 			Params   = struct{}
-			Response = *Prepare2FAOK
+			Response = Prepare2FARes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -11509,7 +11508,7 @@ func (s *Server) handleResolveIncidentRequest(args [2]string, argsEscaped bool, 
 
 	var rawBody []byte
 
-	var response *Incident
+	var response ResolveIncidentRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -11534,7 +11533,7 @@ func (s *Server) handleResolveIncidentRequest(args [2]string, argsEscaped bool, 
 		type (
 			Request  = struct{}
 			Params   = ResolveIncidentParams
-			Response = *Incident
+			Response = ResolveIncidentRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -11700,7 +11699,7 @@ func (s *Server) handleResumeMaintenanceRequest(args [1]string, argsEscaped bool
 
 	var rawBody []byte
 
-	var response *MessageResponse
+	var response ResumeMaintenanceRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -11721,7 +11720,7 @@ func (s *Server) handleResumeMaintenanceRequest(args [1]string, argsEscaped bool
 		type (
 			Request  = struct{}
 			Params   = ResumeMaintenanceParams
-			Response = *MessageResponse
+			Response = ResumeMaintenanceRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -11887,7 +11886,7 @@ func (s *Server) handleResumeMonitorRequest(args [1]string, argsEscaped bool, w 
 
 	var rawBody []byte
 
-	var response *MessageResponse
+	var response ResumeMonitorRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -11908,7 +11907,7 @@ func (s *Server) handleResumeMonitorRequest(args [1]string, argsEscaped bool, w 
 		type (
 			Request  = struct{}
 			Params   = ResumeMonitorParams
-			Response = *MessageResponse
+			Response = ResumeMonitorRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -12089,7 +12088,7 @@ func (s *Server) handleSetMaintenanceMonitorsRequest(args [1]string, argsEscaped
 		}
 	}()
 
-	var response *SetMaintenanceMonitorsOK
+	var response SetMaintenanceMonitorsRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -12110,7 +12109,7 @@ func (s *Server) handleSetMaintenanceMonitorsRequest(args [1]string, argsEscaped
 		type (
 			Request  = *SetMaintenanceMonitorsReq
 			Params   = SetMaintenanceMonitorsParams
-			Response = *SetMaintenanceMonitorsOK
+			Response = SetMaintenanceMonitorsRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -12121,12 +12120,12 @@ func (s *Server) handleSetMaintenanceMonitorsRequest(args [1]string, argsEscaped
 			mreq,
 			unpackSetMaintenanceMonitorsParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				err = s.h.SetMaintenanceMonitors(ctx, request, params)
+				response, err = s.h.SetMaintenanceMonitors(ctx, request, params)
 				return response, err
 			},
 		)
 	} else {
-		err = s.h.SetMaintenanceMonitors(ctx, request, params)
+		response, err = s.h.SetMaintenanceMonitors(ctx, request, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -12291,7 +12290,7 @@ func (s *Server) handleSetMaintenanceStatusPagesRequest(args [1]string, argsEsca
 		}
 	}()
 
-	var response *SetMaintenanceStatusPagesOK
+	var response SetMaintenanceStatusPagesRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -12312,7 +12311,7 @@ func (s *Server) handleSetMaintenanceStatusPagesRequest(args [1]string, argsEsca
 		type (
 			Request  = *SetMaintenanceStatusPagesReq
 			Params   = SetMaintenanceStatusPagesParams
-			Response = *SetMaintenanceStatusPagesOK
+			Response = SetMaintenanceStatusPagesRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -12323,12 +12322,12 @@ func (s *Server) handleSetMaintenanceStatusPagesRequest(args [1]string, argsEsca
 			mreq,
 			unpackSetMaintenanceStatusPagesParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				err = s.h.SetMaintenanceStatusPages(ctx, request, params)
+				response, err = s.h.SetMaintenanceStatusPages(ctx, request, params)
 				return response, err
 			},
 		)
 	} else {
-		err = s.h.SetMaintenanceStatusPages(ctx, request, params)
+		response, err = s.h.SetMaintenanceStatusPages(ctx, request, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -12611,7 +12610,7 @@ func (s *Server) handleShrinkDatabaseRequest(args [0]string, argsEscaped bool, w
 
 	var rawBody []byte
 
-	var response *MessageResponse
+	var response ShrinkDatabaseRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -12627,7 +12626,7 @@ func (s *Server) handleShrinkDatabaseRequest(args [0]string, argsEscaped bool, w
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = *MessageResponse
+			Response = ShrinkDatabaseRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -12793,7 +12792,7 @@ func (s *Server) handleTestNotificationRequest(args [1]string, argsEscaped bool,
 
 	var rawBody []byte
 
-	var response *MessageResponse
+	var response TestNotificationRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -12814,7 +12813,7 @@ func (s *Server) handleTestNotificationRequest(args [1]string, argsEscaped bool,
 		type (
 			Request  = struct{}
 			Params   = TestNotificationParams
-			Response = *MessageResponse
+			Response = TestNotificationRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -12980,7 +12979,7 @@ func (s *Server) handleUnpinIncidentRequest(args [2]string, argsEscaped bool, w 
 
 	var rawBody []byte
 
-	var response *MessageResponse
+	var response UnpinIncidentRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -13005,7 +13004,7 @@ func (s *Server) handleUnpinIncidentRequest(args [2]string, argsEscaped bool, w 
 		type (
 			Request  = struct{}
 			Params   = UnpinIncidentParams
-			Response = *MessageResponse
+			Response = UnpinIncidentRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -13186,7 +13185,7 @@ func (s *Server) handleUpdateIncidentRequest(args [2]string, argsEscaped bool, w
 		}
 	}()
 
-	var response *Incident
+	var response UpdateIncidentRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -13211,7 +13210,7 @@ func (s *Server) handleUpdateIncidentRequest(args [2]string, argsEscaped bool, w
 		type (
 			Request  = *IncidentInput
 			Params   = UpdateIncidentParams
-			Response = *Incident
+			Response = UpdateIncidentRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -13392,7 +13391,7 @@ func (s *Server) handleUpdateMaintenanceRequest(args [1]string, argsEscaped bool
 		}
 	}()
 
-	var response *Maintenance
+	var response UpdateMaintenanceRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -13413,7 +13412,7 @@ func (s *Server) handleUpdateMaintenanceRequest(args [1]string, argsEscaped bool
 		type (
 			Request  = *MaintenanceInput
 			Params   = UpdateMaintenanceParams
-			Response = *Maintenance
+			Response = UpdateMaintenanceRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -13796,7 +13795,7 @@ func (s *Server) handleUpdateMonitorTagRequest(args [2]string, argsEscaped bool,
 		}
 	}()
 
-	var response *UpdateMonitorTagOK
+	var response UpdateMonitorTagRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -13821,7 +13820,7 @@ func (s *Server) handleUpdateMonitorTagRequest(args [2]string, argsEscaped bool,
 		type (
 			Request  = *UpdateMonitorTagReq
 			Params   = UpdateMonitorTagParams
-			Response = *UpdateMonitorTagOK
+			Response = UpdateMonitorTagRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -13832,12 +13831,12 @@ func (s *Server) handleUpdateMonitorTagRequest(args [2]string, argsEscaped bool,
 			mreq,
 			unpackUpdateMonitorTagParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				err = s.h.UpdateMonitorTag(ctx, request, params)
+				response, err = s.h.UpdateMonitorTag(ctx, request, params)
 				return response, err
 			},
 		)
 	} else {
-		err = s.h.UpdateMonitorTag(ctx, request, params)
+		response, err = s.h.UpdateMonitorTag(ctx, request, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -14002,7 +14001,7 @@ func (s *Server) handleUpdateNotificationRequest(args [1]string, argsEscaped boo
 		}
 	}()
 
-	var response *Notification
+	var response UpdateNotificationRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -14023,7 +14022,7 @@ func (s *Server) handleUpdateNotificationRequest(args [1]string, argsEscaped boo
 		type (
 			Request  = *NotificationInput
 			Params   = UpdateNotificationParams
-			Response = *Notification
+			Response = UpdateNotificationRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -14204,7 +14203,7 @@ func (s *Server) handleUpdateProxyRequest(args [1]string, argsEscaped bool, w ht
 		}
 	}()
 
-	var response *UpdateProxyOK
+	var response UpdateProxyRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -14225,7 +14224,7 @@ func (s *Server) handleUpdateProxyRequest(args [1]string, argsEscaped bool, w ht
 		type (
 			Request  = *ProxyInput
 			Params   = UpdateProxyParams
-			Response = *UpdateProxyOK
+			Response = UpdateProxyRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -14236,12 +14235,12 @@ func (s *Server) handleUpdateProxyRequest(args [1]string, argsEscaped bool, w ht
 			mreq,
 			unpackUpdateProxyParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				err = s.h.UpdateProxy(ctx, request, params)
+				response, err = s.h.UpdateProxy(ctx, request, params)
 				return response, err
 			},
 		)
 	} else {
-		err = s.h.UpdateProxy(ctx, request, params)
+		response, err = s.h.UpdateProxy(ctx, request, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -14396,7 +14395,7 @@ func (s *Server) handleUpdateSettingsRequest(args [0]string, argsEscaped bool, w
 		}
 	}()
 
-	var response *MessageResponse
+	var response UpdateSettingsRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -14412,7 +14411,7 @@ func (s *Server) handleUpdateSettingsRequest(args [0]string, argsEscaped bool, w
 		type (
 			Request  = *Settings
 			Params   = struct{}
-			Response = *MessageResponse
+			Response = UpdateSettingsRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -14593,7 +14592,7 @@ func (s *Server) handleUpdateStatusPageRequest(args [1]string, argsEscaped bool,
 		}
 	}()
 
-	var response *StatusPage
+	var response UpdateStatusPageRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -14614,7 +14613,7 @@ func (s *Server) handleUpdateStatusPageRequest(args [1]string, argsEscaped bool,
 		type (
 			Request  = *StatusPageInput
 			Params   = UpdateStatusPageParams
-			Response = *StatusPage
+			Response = UpdateStatusPageRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -14795,7 +14794,7 @@ func (s *Server) handleUpdateTagRequest(args [1]string, argsEscaped bool, w http
 		}
 	}()
 
-	var response *Tag
+	var response UpdateTagRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -14816,7 +14815,7 @@ func (s *Server) handleUpdateTagRequest(args [1]string, argsEscaped bool, w http
 		type (
 			Request  = *TagInput
 			Params   = UpdateTagParams
-			Response = *Tag
+			Response = UpdateTagRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,

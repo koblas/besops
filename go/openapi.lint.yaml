@@ -1,0 +1,30 @@
+extends: all
+
+rules:
+  # Noisy OWASP rules — address incrementally, not gate CI
+  - id: owasp-rate-limit
+    disabled: true
+  - id: owasp-rate-limit-retry-after
+    disabled: true
+  - id: owasp-define-error-responses-401
+    disabled: true
+  - id: owasp-define-error-responses-429
+    disabled: true
+  - id: owasp-define-error-responses-500
+    disabled: true
+  - id: owasp-define-error-validation
+    disabled: true
+  - id: owasp-additional-properties-constrained
+    disabled: true
+  - id: owasp-security-hosts-https-oas3
+    disabled: true
+  - id: owasp-jwt-best-practices
+    disabled: true
+
+  # Documentation hints — too noisy for CI
+  - id: oas3-example-missing
+    disabled: true
+  - id: style-info-license
+    disabled: true
+  - id: style-info-contact
+    disabled: true

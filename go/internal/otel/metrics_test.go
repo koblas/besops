@@ -31,7 +31,7 @@ func TestMetricsExporterRecord(t *testing.T) {
 	exporter.Record(ctx, &testMonitorInfo{
 		id: "mon-1", name: "My Monitor", typ: "http",
 		groupName: "Production",
-		tags: []string{"env", "critical"},
+		tags:      []string{"env", "critical"},
 	}, true, 42)
 	exporter.Record(ctx, &testMonitorInfo{id: "mon-2", name: "DNS Check", typ: "dns"}, false, 0)
 	exporter.Record(ctx, &testMonitorInfo{id: "mon-3", name: "Ping Test", typ: "ping", groupName: "Production"}, true, 5)

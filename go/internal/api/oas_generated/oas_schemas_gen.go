@@ -4,6 +4,7 @@ package oas
 
 import (
 	"io"
+	"net/url"
 	"time"
 
 	"github.com/go-faster/errors"
@@ -108,6 +109,8 @@ func (s *APIKeyInput) SetExpires(val OptDateTime) {
 
 // AddMonitorTagCreated is response for AddMonitorTag operation.
 type AddMonitorTagCreated struct{}
+
+func (*AddMonitorTagCreated) addMonitorTagRes() {}
 
 type AddMonitorTagReq struct {
 	TagId uuid.UUID `json:"tagId"`
@@ -252,15 +255,15 @@ type ChartPoint struct {
 	// Unix timestamp (seconds) for the start of this interval.
 	Timestamp OptInt64 `json:"timestamp"`
 	// Number of successful checks in this interval.
-	Up OptInt `json:"up"`
+	Up OptInt32 `json:"up"`
 	// Number of failed checks in this interval.
-	Down OptInt `json:"down"`
+	Down OptInt32 `json:"down"`
 	// Average response time in milliseconds for this interval.
 	Latency OptFloat64 `json:"latency"`
 	// Minimum response time in milliseconds for this interval.
-	LatencyMin OptInt `json:"latencyMin"`
+	LatencyMin OptInt32 `json:"latencyMin"`
 	// Maximum response time in milliseconds for this interval.
-	LatencyMax OptInt `json:"latencyMax"`
+	LatencyMax OptInt32 `json:"latencyMax"`
 }
 
 // GetTimestamp returns the value of Timestamp.
@@ -269,12 +272,12 @@ func (s *ChartPoint) GetTimestamp() OptInt64 {
 }
 
 // GetUp returns the value of Up.
-func (s *ChartPoint) GetUp() OptInt {
+func (s *ChartPoint) GetUp() OptInt32 {
 	return s.Up
 }
 
 // GetDown returns the value of Down.
-func (s *ChartPoint) GetDown() OptInt {
+func (s *ChartPoint) GetDown() OptInt32 {
 	return s.Down
 }
 
@@ -284,12 +287,12 @@ func (s *ChartPoint) GetLatency() OptFloat64 {
 }
 
 // GetLatencyMin returns the value of LatencyMin.
-func (s *ChartPoint) GetLatencyMin() OptInt {
+func (s *ChartPoint) GetLatencyMin() OptInt32 {
 	return s.LatencyMin
 }
 
 // GetLatencyMax returns the value of LatencyMax.
-func (s *ChartPoint) GetLatencyMax() OptInt {
+func (s *ChartPoint) GetLatencyMax() OptInt32 {
 	return s.LatencyMax
 }
 
@@ -299,12 +302,12 @@ func (s *ChartPoint) SetTimestamp(val OptInt64) {
 }
 
 // SetUp sets the value of Up.
-func (s *ChartPoint) SetUp(val OptInt) {
+func (s *ChartPoint) SetUp(val OptInt32) {
 	s.Up = val
 }
 
 // SetDown sets the value of Down.
-func (s *ChartPoint) SetDown(val OptInt) {
+func (s *ChartPoint) SetDown(val OptInt32) {
 	s.Down = val
 }
 
@@ -314,12 +317,12 @@ func (s *ChartPoint) SetLatency(val OptFloat64) {
 }
 
 // SetLatencyMin sets the value of LatencyMin.
-func (s *ChartPoint) SetLatencyMin(val OptInt) {
+func (s *ChartPoint) SetLatencyMin(val OptInt32) {
 	s.LatencyMin = val
 }
 
 // SetLatencyMax sets the value of LatencyMax.
-func (s *ChartPoint) SetLatencyMax(val OptInt) {
+func (s *ChartPoint) SetLatencyMax(val OptInt32) {
 	s.LatencyMax = val
 }
 
@@ -348,14 +351,22 @@ func (s *CheckDomainOK) SetTld(val OptString) {
 	s.Tld = val
 }
 
+func (*CheckDomainOK) checkDomainRes() {}
+
 // ClearEventsNoContent is response for ClearEvents operation.
 type ClearEventsNoContent struct{}
+
+func (*ClearEventsNoContent) clearEventsRes() {}
 
 // ClearHeartbeatsNoContent is response for ClearHeartbeats operation.
 type ClearHeartbeatsNoContent struct{}
 
+func (*ClearHeartbeatsNoContent) clearHeartbeatsRes() {}
+
 // ClearStatisticsNoContent is response for ClearStatistics operation.
 type ClearStatisticsNoContent struct{}
+
+func (*ClearStatisticsNoContent) clearStatisticsRes() {}
 
 type CreateAPIKeyCreated struct {
 	ID  uuid.UUID `json:"id"`
@@ -382,6 +393,8 @@ func (s *CreateAPIKeyCreated) SetKey(val string) {
 	s.Key = val
 }
 
+func (*CreateAPIKeyCreated) createAPIKeyRes() {}
+
 type CreateMaintenanceCreated struct {
 	ID uuid.UUID `json:"id"`
 }
@@ -395,6 +408,8 @@ func (s *CreateMaintenanceCreated) GetID() uuid.UUID {
 func (s *CreateMaintenanceCreated) SetID(val uuid.UUID) {
 	s.ID = val
 }
+
+func (*CreateMaintenanceCreated) createMaintenanceRes() {}
 
 type CreateMonitorCreated struct {
 	ID uuid.UUID `json:"id"`
@@ -410,6 +425,8 @@ func (s *CreateMonitorCreated) SetID(val uuid.UUID) {
 	s.ID = val
 }
 
+func (*CreateMonitorCreated) createMonitorRes() {}
+
 type CreateNotificationCreated struct {
 	ID uuid.UUID `json:"id"`
 }
@@ -423,6 +440,8 @@ func (s *CreateNotificationCreated) GetID() uuid.UUID {
 func (s *CreateNotificationCreated) SetID(val uuid.UUID) {
 	s.ID = val
 }
+
+func (*CreateNotificationCreated) createNotificationRes() {}
 
 type CreateProxyCreated struct {
 	ID uuid.UUID `json:"id"`
@@ -438,6 +457,8 @@ func (s *CreateProxyCreated) SetID(val uuid.UUID) {
 	s.ID = val
 }
 
+func (*CreateProxyCreated) createProxyRes() {}
+
 type CreateStatusPageCreated struct {
 	Slug string `json:"slug"`
 }
@@ -452,14 +473,22 @@ func (s *CreateStatusPageCreated) SetSlug(val string) {
 	s.Slug = val
 }
 
+func (*CreateStatusPageCreated) createStatusPageRes() {}
+
 // DeleteAPIKeyNoContent is response for DeleteAPIKey operation.
 type DeleteAPIKeyNoContent struct{}
+
+func (*DeleteAPIKeyNoContent) deleteAPIKeyRes() {}
 
 // DeleteIncidentNoContent is response for DeleteIncident operation.
 type DeleteIncidentNoContent struct{}
 
+func (*DeleteIncidentNoContent) deleteIncidentRes() {}
+
 // DeleteMaintenanceNoContent is response for DeleteMaintenance operation.
 type DeleteMaintenanceNoContent struct{}
+
+func (*DeleteMaintenanceNoContent) deleteMaintenanceRes() {}
 
 // DeleteMonitorNoContent is response for DeleteMonitor operation.
 type DeleteMonitorNoContent struct{}
@@ -469,17 +498,27 @@ func (*DeleteMonitorNoContent) deleteMonitorRes() {}
 // DeleteMonitorTagNoContent is response for DeleteMonitorTag operation.
 type DeleteMonitorTagNoContent struct{}
 
+func (*DeleteMonitorTagNoContent) deleteMonitorTagRes() {}
+
 // DeleteNotificationNoContent is response for DeleteNotification operation.
 type DeleteNotificationNoContent struct{}
+
+func (*DeleteNotificationNoContent) deleteNotificationRes() {}
 
 // DeleteProxyNoContent is response for DeleteProxy operation.
 type DeleteProxyNoContent struct{}
 
+func (*DeleteProxyNoContent) deleteProxyRes() {}
+
 // DeleteStatusPageNoContent is response for DeleteStatusPage operation.
 type DeleteStatusPageNoContent struct{}
 
+func (*DeleteStatusPageNoContent) deleteStatusPageRes() {}
+
 // DeleteTagNoContent is response for DeleteTag operation.
 type DeleteTagNoContent struct{}
+
+func (*DeleteTagNoContent) deleteTagRes() {}
 
 type Disable2FAReq struct {
 	CurrentPassword string `json:"currentPassword"`
@@ -495,11 +534,12 @@ func (s *Disable2FAReq) SetCurrentPassword(val string) {
 	s.CurrentPassword = val
 }
 
+// Configuration for DNS resolution checks.
 // Ref: #/components/schemas/DnsMonitorConfig
 type DnsMonitorConfig struct {
 	Kind             DnsMonitorConfigKind              `json:"kind"`
 	Hostname         OptString                         `json:"hostname"`
-	Port             OptInt                            `json:"port"`
+	Port             OptInt32                          `json:"port"`
 	DnsResolveType   OptDnsMonitorConfigDnsResolveType `json:"dnsResolveType"`
 	DnsResolveServer OptString                         `json:"dnsResolveServer"`
 }
@@ -515,7 +555,7 @@ func (s *DnsMonitorConfig) GetHostname() OptString {
 }
 
 // GetPort returns the value of Port.
-func (s *DnsMonitorConfig) GetPort() OptInt {
+func (s *DnsMonitorConfig) GetPort() OptInt32 {
 	return s.Port
 }
 
@@ -540,7 +580,7 @@ func (s *DnsMonitorConfig) SetHostname(val OptString) {
 }
 
 // SetPort sets the value of Port.
-func (s *DnsMonitorConfig) SetPort(val OptInt) {
+func (s *DnsMonitorConfig) SetPort(val OptInt32) {
 	s.Port = val
 }
 
@@ -740,12 +780,87 @@ func (s *ErrorResponse) SetError(val string) {
 	s.Error = val
 }
 
-func (*ErrorResponse) changePasswordRes() {}
-func (*ErrorResponse) deleteMonitorRes()  {}
-func (*ErrorResponse) getMonitorRes()     {}
-func (*ErrorResponse) getStatusPageRes()  {}
-func (*ErrorResponse) refreshTokenRes()   {}
-func (*ErrorResponse) updateMonitorRes()  {}
+func (*ErrorResponse) addMonitorTagRes()             {}
+func (*ErrorResponse) changePasswordRes()            {}
+func (*ErrorResponse) checkDomainRes()               {}
+func (*ErrorResponse) clearEventsRes()               {}
+func (*ErrorResponse) clearHeartbeatsRes()           {}
+func (*ErrorResponse) clearStatisticsRes()           {}
+func (*ErrorResponse) createAPIKeyRes()              {}
+func (*ErrorResponse) createIncidentRes()            {}
+func (*ErrorResponse) createMaintenanceRes()         {}
+func (*ErrorResponse) createMonitorRes()             {}
+func (*ErrorResponse) createNotificationRes()        {}
+func (*ErrorResponse) createProxyRes()               {}
+func (*ErrorResponse) createStatusPageRes()          {}
+func (*ErrorResponse) createTagRes()                 {}
+func (*ErrorResponse) deleteAPIKeyRes()              {}
+func (*ErrorResponse) deleteIncidentRes()            {}
+func (*ErrorResponse) deleteMaintenanceRes()         {}
+func (*ErrorResponse) deleteMonitorRes()             {}
+func (*ErrorResponse) deleteMonitorTagRes()          {}
+func (*ErrorResponse) deleteNotificationRes()        {}
+func (*ErrorResponse) deleteProxyRes()               {}
+func (*ErrorResponse) deleteStatusPageRes()          {}
+func (*ErrorResponse) deleteTagRes()                 {}
+func (*ErrorResponse) disable2FARes()                {}
+func (*ErrorResponse) disableAPIKeyRes()             {}
+func (*ErrorResponse) enable2FARes()                 {}
+func (*ErrorResponse) enableAPIKeyRes()              {}
+func (*ErrorResponse) get2FAStatusRes()              {}
+func (*ErrorResponse) getCertExpiryBadgeRes()        {}
+func (*ErrorResponse) getChartDataRes()              {}
+func (*ErrorResponse) getDatabaseSizeRes()           {}
+func (*ErrorResponse) getHeartbeatsRes()             {}
+func (*ErrorResponse) getImportantHeartbeatsRes()    {}
+func (*ErrorResponse) getInfoRes()                   {}
+func (*ErrorResponse) getLatencyBadgeRes()           {}
+func (*ErrorResponse) getMaintenanceMonitorsRes()    {}
+func (*ErrorResponse) getMaintenanceRes()            {}
+func (*ErrorResponse) getMaintenanceStatusPagesRes() {}
+func (*ErrorResponse) getMonitorRes()                {}
+func (*ErrorResponse) getMonitorUptimesRes()         {}
+func (*ErrorResponse) getResponseBadgeRes()          {}
+func (*ErrorResponse) getSettingsRes()               {}
+func (*ErrorResponse) getStatusBadgeRes()            {}
+func (*ErrorResponse) getStatusPageBadgeRes()        {}
+func (*ErrorResponse) getStatusPageEventStreamRes()  {}
+func (*ErrorResponse) getStatusPageHeartbeatsRes()   {}
+func (*ErrorResponse) getStatusPageRes()             {}
+func (*ErrorResponse) getUptimeBadgeRes()            {}
+func (*ErrorResponse) healthCheckRes()               {}
+func (*ErrorResponse) listAPIKeysRes()               {}
+func (*ErrorResponse) listIncidentsRes()             {}
+func (*ErrorResponse) listMaintenanceRes()           {}
+func (*ErrorResponse) listMonitorsRes()              {}
+func (*ErrorResponse) listNotificationsRes()         {}
+func (*ErrorResponse) listProxiesRes()               {}
+func (*ErrorResponse) listRecentEventsRes()          {}
+func (*ErrorResponse) listStatusPagesRes()           {}
+func (*ErrorResponse) listTagsRes()                  {}
+func (*ErrorResponse) logoutRes()                    {}
+func (*ErrorResponse) needSetupRes()                 {}
+func (*ErrorResponse) pauseMaintenanceRes()          {}
+func (*ErrorResponse) pauseMonitorRes()              {}
+func (*ErrorResponse) prepare2FARes()                {}
+func (*ErrorResponse) refreshTokenRes()              {}
+func (*ErrorResponse) resolveIncidentRes()           {}
+func (*ErrorResponse) resumeMaintenanceRes()         {}
+func (*ErrorResponse) resumeMonitorRes()             {}
+func (*ErrorResponse) setMaintenanceMonitorsRes()    {}
+func (*ErrorResponse) setMaintenanceStatusPagesRes() {}
+func (*ErrorResponse) shrinkDatabaseRes()            {}
+func (*ErrorResponse) testNotificationRes()          {}
+func (*ErrorResponse) unpinIncidentRes()             {}
+func (*ErrorResponse) updateIncidentRes()            {}
+func (*ErrorResponse) updateMaintenanceRes()         {}
+func (*ErrorResponse) updateMonitorRes()             {}
+func (*ErrorResponse) updateMonitorTagRes()          {}
+func (*ErrorResponse) updateNotificationRes()        {}
+func (*ErrorResponse) updateProxyRes()               {}
+func (*ErrorResponse) updateSettingsRes()            {}
+func (*ErrorResponse) updateStatusPageRes()          {}
+func (*ErrorResponse) updateTagRes()                 {}
 
 // Machine-readable error code following gRPC status conventions (e.g. NOT_FOUND, INVALID_ARGUMENT,
 // INTERNAL).
@@ -909,6 +1024,12 @@ func (s *Get2FAStatusOK) SetEnabled(val bool) {
 	s.Enabled = val
 }
 
+func (*Get2FAStatusOK) get2FAStatusRes() {}
+
+type GetChartDataOKApplicationJSON []ChartPoint
+
+func (*GetChartDataOKApplicationJSON) getChartDataRes() {}
+
 type GetDatabaseSizeOK struct {
 	// Size in bytes.
 	Size int64 `json:"size"`
@@ -923,6 +1044,12 @@ func (s *GetDatabaseSizeOK) GetSize() int64 {
 func (s *GetDatabaseSizeOK) SetSize(val int64) {
 	s.Size = val
 }
+
+func (*GetDatabaseSizeOK) getDatabaseSizeRes() {}
+
+type GetHeartbeatsOKApplicationJSON []Heartbeat
+
+func (*GetHeartbeatsOKApplicationJSON) getHeartbeatsRes() {}
 
 type GetImportantHeartbeatsOK struct {
 	Data  []Heartbeat `json:"data"`
@@ -949,10 +1076,12 @@ func (s *GetImportantHeartbeatsOK) SetTotal(val int64) {
 	s.Total = val
 }
 
+func (*GetImportantHeartbeatsOK) getImportantHeartbeatsRes() {}
+
 type GetInfoOK struct {
 	Version              OptString `json:"version"`
 	LatestVersion        OptString `json:"latestVersion"`
-	PrimaryBaseURL       OptString `json:"primaryBaseURL"`
+	PrimaryBaseURL       OptURI    `json:"primaryBaseURL"`
 	ServerTimezone       OptString `json:"serverTimezone"`
 	ServerTimezoneOffset OptString `json:"serverTimezoneOffset"`
 }
@@ -968,7 +1097,7 @@ func (s *GetInfoOK) GetLatestVersion() OptString {
 }
 
 // GetPrimaryBaseURL returns the value of PrimaryBaseURL.
-func (s *GetInfoOK) GetPrimaryBaseURL() OptString {
+func (s *GetInfoOK) GetPrimaryBaseURL() OptURI {
 	return s.PrimaryBaseURL
 }
 
@@ -993,7 +1122,7 @@ func (s *GetInfoOK) SetLatestVersion(val OptString) {
 }
 
 // SetPrimaryBaseURL sets the value of PrimaryBaseURL.
-func (s *GetInfoOK) SetPrimaryBaseURL(val OptString) {
+func (s *GetInfoOK) SetPrimaryBaseURL(val OptURI) {
 	s.PrimaryBaseURL = val
 }
 
@@ -1007,15 +1136,43 @@ func (s *GetInfoOK) SetServerTimezoneOffset(val OptString) {
 	s.ServerTimezoneOffset = val
 }
 
-type GetMonitorUptimesOK map[string]float64
+func (*GetInfoOK) getInfoRes() {}
 
-func (s *GetMonitorUptimesOK) init() GetMonitorUptimesOK {
-	m := *s
-	if m == nil {
-		m = map[string]float64{}
-		*s = m
-	}
-	return m
+type GetMaintenanceMonitorsOKApplicationJSON []uuid.UUID
+
+func (*GetMaintenanceMonitorsOKApplicationJSON) getMaintenanceMonitorsRes() {}
+
+type GetMaintenanceStatusPagesOKApplicationJSON []uuid.UUID
+
+func (*GetMaintenanceStatusPagesOKApplicationJSON) getMaintenanceStatusPagesRes() {}
+
+type GetMonitorUptimesOKApplicationJSON []GetMonitorUptimesOKItem
+
+func (*GetMonitorUptimesOKApplicationJSON) getMonitorUptimesRes() {}
+
+type GetMonitorUptimesOKItem struct {
+	MonitorId uuid.UUID `json:"monitorId"`
+	Uptime    float64   `json:"uptime"`
+}
+
+// GetMonitorId returns the value of MonitorId.
+func (s *GetMonitorUptimesOKItem) GetMonitorId() uuid.UUID {
+	return s.MonitorId
+}
+
+// GetUptime returns the value of Uptime.
+func (s *GetMonitorUptimesOKItem) GetUptime() float64 {
+	return s.Uptime
+}
+
+// SetMonitorId sets the value of MonitorId.
+func (s *GetMonitorUptimesOKItem) SetMonitorId(val uuid.UUID) {
+	s.MonitorId = val
+}
+
+// SetUptime sets the value of Uptime.
+func (s *GetMonitorUptimesOKItem) SetUptime(val float64) {
+	s.Uptime = val
 }
 
 type GetStatusPageBadgeOK struct {
@@ -1031,6 +1188,8 @@ func (s GetStatusPageBadgeOK) Read(p []byte) (n int, err error) {
 	}
 	return s.Data.Read(p)
 }
+
+func (*GetStatusPageBadgeOK) getStatusPageBadgeRes() {}
 
 type GetStatusPageBadgeStyle string
 
@@ -1108,77 +1267,123 @@ func (s GetStatusPageEventStreamOK) Read(p []byte) (n int, err error) {
 	return s.Data.Read(p)
 }
 
+func (*GetStatusPageEventStreamOK) getStatusPageEventStreamRes() {}
+
 type GetStatusPageHeartbeatsOK struct {
-	HeartbeatList OptGetStatusPageHeartbeatsOKHeartbeatList `json:"heartbeatList"`
-	UptimeList    OptGetStatusPageHeartbeatsOKUptimeList    `json:"uptimeList"`
-	// Map of monitor ID to display name.
-	MonitorNames OptGetStatusPageHeartbeatsOKMonitorNames `json:"monitorNames"`
+	HeartbeatList []GetStatusPageHeartbeatsOKHeartbeatListItem `json:"heartbeatList"`
+	UptimeList    []GetStatusPageHeartbeatsOKUptimeListItem    `json:"uptimeList"`
+	// Monitor ID to display name.
+	MonitorNames []GetStatusPageHeartbeatsOKMonitorNamesItem `json:"monitorNames"`
 }
 
 // GetHeartbeatList returns the value of HeartbeatList.
-func (s *GetStatusPageHeartbeatsOK) GetHeartbeatList() OptGetStatusPageHeartbeatsOKHeartbeatList {
+func (s *GetStatusPageHeartbeatsOK) GetHeartbeatList() []GetStatusPageHeartbeatsOKHeartbeatListItem {
 	return s.HeartbeatList
 }
 
 // GetUptimeList returns the value of UptimeList.
-func (s *GetStatusPageHeartbeatsOK) GetUptimeList() OptGetStatusPageHeartbeatsOKUptimeList {
+func (s *GetStatusPageHeartbeatsOK) GetUptimeList() []GetStatusPageHeartbeatsOKUptimeListItem {
 	return s.UptimeList
 }
 
 // GetMonitorNames returns the value of MonitorNames.
-func (s *GetStatusPageHeartbeatsOK) GetMonitorNames() OptGetStatusPageHeartbeatsOKMonitorNames {
+func (s *GetStatusPageHeartbeatsOK) GetMonitorNames() []GetStatusPageHeartbeatsOKMonitorNamesItem {
 	return s.MonitorNames
 }
 
 // SetHeartbeatList sets the value of HeartbeatList.
-func (s *GetStatusPageHeartbeatsOK) SetHeartbeatList(val OptGetStatusPageHeartbeatsOKHeartbeatList) {
+func (s *GetStatusPageHeartbeatsOK) SetHeartbeatList(val []GetStatusPageHeartbeatsOKHeartbeatListItem) {
 	s.HeartbeatList = val
 }
 
 // SetUptimeList sets the value of UptimeList.
-func (s *GetStatusPageHeartbeatsOK) SetUptimeList(val OptGetStatusPageHeartbeatsOKUptimeList) {
+func (s *GetStatusPageHeartbeatsOK) SetUptimeList(val []GetStatusPageHeartbeatsOKUptimeListItem) {
 	s.UptimeList = val
 }
 
 // SetMonitorNames sets the value of MonitorNames.
-func (s *GetStatusPageHeartbeatsOK) SetMonitorNames(val OptGetStatusPageHeartbeatsOKMonitorNames) {
+func (s *GetStatusPageHeartbeatsOK) SetMonitorNames(val []GetStatusPageHeartbeatsOKMonitorNamesItem) {
 	s.MonitorNames = val
 }
 
-type GetStatusPageHeartbeatsOKHeartbeatList map[string][]Heartbeat
+func (*GetStatusPageHeartbeatsOK) getStatusPageHeartbeatsRes() {}
 
-func (s *GetStatusPageHeartbeatsOKHeartbeatList) init() GetStatusPageHeartbeatsOKHeartbeatList {
-	m := *s
-	if m == nil {
-		m = map[string][]Heartbeat{}
-		*s = m
-	}
-	return m
+type GetStatusPageHeartbeatsOKHeartbeatListItem struct {
+	MonitorId  uuid.UUID   `json:"monitorId"`
+	Heartbeats []Heartbeat `json:"heartbeats"`
 }
 
-// Map of monitor ID to display name.
-type GetStatusPageHeartbeatsOKMonitorNames map[string]string
-
-func (s *GetStatusPageHeartbeatsOKMonitorNames) init() GetStatusPageHeartbeatsOKMonitorNames {
-	m := *s
-	if m == nil {
-		m = map[string]string{}
-		*s = m
-	}
-	return m
+// GetMonitorId returns the value of MonitorId.
+func (s *GetStatusPageHeartbeatsOKHeartbeatListItem) GetMonitorId() uuid.UUID {
+	return s.MonitorId
 }
 
-type GetStatusPageHeartbeatsOKUptimeList map[string]float64
-
-func (s *GetStatusPageHeartbeatsOKUptimeList) init() GetStatusPageHeartbeatsOKUptimeList {
-	m := *s
-	if m == nil {
-		m = map[string]float64{}
-		*s = m
-	}
-	return m
+// GetHeartbeats returns the value of Heartbeats.
+func (s *GetStatusPageHeartbeatsOKHeartbeatListItem) GetHeartbeats() []Heartbeat {
+	return s.Heartbeats
 }
 
+// SetMonitorId sets the value of MonitorId.
+func (s *GetStatusPageHeartbeatsOKHeartbeatListItem) SetMonitorId(val uuid.UUID) {
+	s.MonitorId = val
+}
+
+// SetHeartbeats sets the value of Heartbeats.
+func (s *GetStatusPageHeartbeatsOKHeartbeatListItem) SetHeartbeats(val []Heartbeat) {
+	s.Heartbeats = val
+}
+
+type GetStatusPageHeartbeatsOKMonitorNamesItem struct {
+	MonitorId uuid.UUID `json:"monitorId"`
+	Name      string    `json:"name"`
+}
+
+// GetMonitorId returns the value of MonitorId.
+func (s *GetStatusPageHeartbeatsOKMonitorNamesItem) GetMonitorId() uuid.UUID {
+	return s.MonitorId
+}
+
+// GetName returns the value of Name.
+func (s *GetStatusPageHeartbeatsOKMonitorNamesItem) GetName() string {
+	return s.Name
+}
+
+// SetMonitorId sets the value of MonitorId.
+func (s *GetStatusPageHeartbeatsOKMonitorNamesItem) SetMonitorId(val uuid.UUID) {
+	s.MonitorId = val
+}
+
+// SetName sets the value of Name.
+func (s *GetStatusPageHeartbeatsOKMonitorNamesItem) SetName(val string) {
+	s.Name = val
+}
+
+type GetStatusPageHeartbeatsOKUptimeListItem struct {
+	MonitorId uuid.UUID `json:"monitorId"`
+	Uptime    float64   `json:"uptime"`
+}
+
+// GetMonitorId returns the value of MonitorId.
+func (s *GetStatusPageHeartbeatsOKUptimeListItem) GetMonitorId() uuid.UUID {
+	return s.MonitorId
+}
+
+// GetUptime returns the value of Uptime.
+func (s *GetStatusPageHeartbeatsOKUptimeListItem) GetUptime() float64 {
+	return s.Uptime
+}
+
+// SetMonitorId sets the value of MonitorId.
+func (s *GetStatusPageHeartbeatsOKUptimeListItem) SetMonitorId(val uuid.UUID) {
+	s.MonitorId = val
+}
+
+// SetUptime sets the value of Uptime.
+func (s *GetStatusPageHeartbeatsOKUptimeListItem) SetUptime(val float64) {
+	s.Uptime = val
+}
+
+// Configuration for a group monitor that aggregates the status of member monitors.
 // Ref: #/components/schemas/GroupMonitorConfig
 type GroupMonitorConfig struct {
 	Kind GroupMonitorConfigKind `json:"kind"`
@@ -1240,10 +1445,11 @@ func (s *GroupMonitorConfigKind) UnmarshalText(data []byte) error {
 	}
 }
 
+// Configuration for gRPC health checks with keyword matching.
 // Ref: #/components/schemas/GrpcMonitorConfig
 type GrpcMonitorConfig struct {
 	Kind            GrpcMonitorConfigKind `json:"kind"`
-	GrpcUrl         OptString             `json:"grpcUrl"`
+	GrpcUrl         OptURI                `json:"grpcUrl"`
 	GrpcServiceName OptString             `json:"grpcServiceName"`
 	GrpcMethod      OptString             `json:"grpcMethod"`
 	GrpcEnableTls   OptBool               `json:"grpcEnableTls"`
@@ -1256,7 +1462,7 @@ func (s *GrpcMonitorConfig) GetKind() GrpcMonitorConfigKind {
 }
 
 // GetGrpcUrl returns the value of GrpcUrl.
-func (s *GrpcMonitorConfig) GetGrpcUrl() OptString {
+func (s *GrpcMonitorConfig) GetGrpcUrl() OptURI {
 	return s.GrpcUrl
 }
 
@@ -1286,7 +1492,7 @@ func (s *GrpcMonitorConfig) SetKind(val GrpcMonitorConfigKind) {
 }
 
 // SetGrpcUrl sets the value of GrpcUrl.
-func (s *GrpcMonitorConfig) SetGrpcUrl(val OptString) {
+func (s *GrpcMonitorConfig) SetGrpcUrl(val OptURI) {
 	s.GrpcUrl = val
 }
 
@@ -1357,6 +1563,8 @@ func (s *HealthCheckOK) GetStatus() HealthCheckOKStatus {
 func (s *HealthCheckOK) SetStatus(val HealthCheckOKStatus) {
 	s.Status = val
 }
+
+func (*HealthCheckOK) healthCheckRes() {}
 
 type HealthCheckOKStatus string
 
@@ -1494,7 +1702,7 @@ func (s *Heartbeat) SetDuration(val OptInt64) {
 }
 
 // Monitor status at this point in time: 0=DOWN, 1=UP, 2=PENDING, 3=MAINTENANCE.
-type HeartbeatStatus int
+type HeartbeatStatus int32
 
 const (
 	HeartbeatStatus0 HeartbeatStatus = 0
@@ -1513,16 +1721,17 @@ func (HeartbeatStatus) AllValues() []HeartbeatStatus {
 	}
 }
 
+// Configuration for HTTP/HTTPS monitor checks including keyword and JSON path matching.
 // Ref: #/components/schemas/HttpMonitorConfig
 type HttpMonitorConfig struct {
 	Kind                HttpMonitorConfigKind          `json:"kind"`
-	URL                 OptString                      `json:"url"`
+	URL                 OptURI                         `json:"url"`
 	Method              OptHttpMonitorConfigMethod     `json:"method"`
 	Headers             []HttpMonitorConfigHeadersItem `json:"headers"`
 	Body                OptString                      `json:"body"`
 	BasicAuthUser       OptString                      `json:"basicAuthUser"`
 	BasicAuthPass       OptString                      `json:"basicAuthPass"`
-	MaxRedirects        OptInt                         `json:"maxRedirects"`
+	MaxRedirects        OptInt32                       `json:"maxRedirects"`
 	AcceptedStatusCodes []string                       `json:"acceptedStatusCodes"`
 	IgnoreTls           OptBool                        `json:"ignoreTls"`
 	Keyword             OptString                      `json:"keyword"`
@@ -1538,7 +1747,7 @@ func (s *HttpMonitorConfig) GetKind() HttpMonitorConfigKind {
 }
 
 // GetURL returns the value of URL.
-func (s *HttpMonitorConfig) GetURL() OptString {
+func (s *HttpMonitorConfig) GetURL() OptURI {
 	return s.URL
 }
 
@@ -1568,7 +1777,7 @@ func (s *HttpMonitorConfig) GetBasicAuthPass() OptString {
 }
 
 // GetMaxRedirects returns the value of MaxRedirects.
-func (s *HttpMonitorConfig) GetMaxRedirects() OptInt {
+func (s *HttpMonitorConfig) GetMaxRedirects() OptInt32 {
 	return s.MaxRedirects
 }
 
@@ -1613,7 +1822,7 @@ func (s *HttpMonitorConfig) SetKind(val HttpMonitorConfigKind) {
 }
 
 // SetURL sets the value of URL.
-func (s *HttpMonitorConfig) SetURL(val OptString) {
+func (s *HttpMonitorConfig) SetURL(val OptURI) {
 	s.URL = val
 }
 
@@ -1643,7 +1852,7 @@ func (s *HttpMonitorConfig) SetBasicAuthPass(val OptString) {
 }
 
 // SetMaxRedirects sets the value of MaxRedirects.
-func (s *HttpMonitorConfig) SetMaxRedirects(val OptInt) {
+func (s *HttpMonitorConfig) SetMaxRedirects(val OptInt32) {
 	s.MaxRedirects = val
 }
 
@@ -1918,6 +2127,10 @@ func (s *Incident) SetResolved(val OptBool) {
 	s.Resolved = val
 }
 
+func (*Incident) createIncidentRes()  {}
+func (*Incident) resolveIncidentRes() {}
+func (*Incident) updateIncidentRes()  {}
+
 // Input for creating or updating an incident on a status page.
 // Ref: #/components/schemas/IncidentInput
 type IncidentInput struct {
@@ -2111,6 +2324,10 @@ func (s *IncidentStyle) UnmarshalText(data []byte) error {
 	}
 }
 
+type ListAPIKeysOKApplicationJSON []APIKey
+
+func (*ListAPIKeysOKApplicationJSON) listAPIKeysRes() {}
+
 type ListIncidentsOK struct {
 	Incidents  []Incident `json:"incidents"`
 	NextCursor OptString  `json:"nextCursor"`
@@ -2136,6 +2353,24 @@ func (s *ListIncidentsOK) SetNextCursor(val OptString) {
 	s.NextCursor = val
 }
 
+func (*ListIncidentsOK) listIncidentsRes() {}
+
+type ListMaintenanceOKApplicationJSON []Maintenance
+
+func (*ListMaintenanceOKApplicationJSON) listMaintenanceRes() {}
+
+type ListMonitorsOKApplicationJSON []Monitor
+
+func (*ListMonitorsOKApplicationJSON) listMonitorsRes() {}
+
+type ListNotificationsOKApplicationJSON []Notification
+
+func (*ListNotificationsOKApplicationJSON) listNotificationsRes() {}
+
+type ListProxiesOKApplicationJSON []Proxy
+
+func (*ListProxiesOKApplicationJSON) listProxiesRes() {}
+
 type ListRecentEventsOK struct {
 	Data  []Heartbeat `json:"data"`
 	Total int64       `json:"total"`
@@ -2160,6 +2395,16 @@ func (s *ListRecentEventsOK) SetData(val []Heartbeat) {
 func (s *ListRecentEventsOK) SetTotal(val int64) {
 	s.Total = val
 }
+
+func (*ListRecentEventsOK) listRecentEventsRes() {}
+
+type ListStatusPagesOKApplicationJSON []StatusPage
+
+func (*ListStatusPagesOKApplicationJSON) listStatusPagesRes() {}
+
+type ListTagsOKApplicationJSON []Tag
+
+func (*ListTagsOKApplicationJSON) listTagsRes() {}
 
 // Credentials for authenticating a user session.
 // Ref: #/components/schemas/LoginRequest
@@ -2256,6 +2501,8 @@ func (*LoginUnauthorized) loginRes() {}
 // LogoutNoContent is response for Logout operation.
 type LogoutNoContent struct{}
 
+func (*LogoutNoContent) logoutRes() {}
+
 // A scheduled maintenance window during which monitors are expected to be offline. Notifications are
 // suppressed and uptime is not affected during maintenance.
 // Ref: #/components/schemas/Maintenance
@@ -2280,15 +2527,15 @@ type Maintenance struct {
 	// Daily end time in HH:MM format for recurring maintenance.
 	EndTime OptString `json:"endTime"`
 	// Days of the week (0=Sunday, 6=Saturday) for recurring-weekday strategy.
-	Weekdays []int `json:"weekdays"`
+	Weekdays []int32 `json:"weekdays"`
 	// Days of the month (1-31) for recurring-day-of-month strategy.
-	DaysOfMonth []int `json:"daysOfMonth"`
+	DaysOfMonth []int32 `json:"daysOfMonth"`
 	// Interval in days between recurrences for recurring-interval strategy.
-	IntervalDay OptInt `json:"intervalDay"`
+	IntervalDay OptInt32 `json:"intervalDay"`
 	// Cron expression for cron-based scheduling strategy.
 	Cron OptString `json:"cron"`
 	// Duration of each maintenance window in minutes.
-	DurationMinutes OptInt `json:"durationMinutes"`
+	DurationMinutes OptInt32 `json:"durationMinutes"`
 	// IANA timezone identifier for scheduling (e.g., 'America/New_York').
 	TimezoneOption OptString `json:"timezoneOption"`
 }
@@ -2339,17 +2586,17 @@ func (s *Maintenance) GetEndTime() OptString {
 }
 
 // GetWeekdays returns the value of Weekdays.
-func (s *Maintenance) GetWeekdays() []int {
+func (s *Maintenance) GetWeekdays() []int32 {
 	return s.Weekdays
 }
 
 // GetDaysOfMonth returns the value of DaysOfMonth.
-func (s *Maintenance) GetDaysOfMonth() []int {
+func (s *Maintenance) GetDaysOfMonth() []int32 {
 	return s.DaysOfMonth
 }
 
 // GetIntervalDay returns the value of IntervalDay.
-func (s *Maintenance) GetIntervalDay() OptInt {
+func (s *Maintenance) GetIntervalDay() OptInt32 {
 	return s.IntervalDay
 }
 
@@ -2359,7 +2606,7 @@ func (s *Maintenance) GetCron() OptString {
 }
 
 // GetDurationMinutes returns the value of DurationMinutes.
-func (s *Maintenance) GetDurationMinutes() OptInt {
+func (s *Maintenance) GetDurationMinutes() OptInt32 {
 	return s.DurationMinutes
 }
 
@@ -2414,17 +2661,17 @@ func (s *Maintenance) SetEndTime(val OptString) {
 }
 
 // SetWeekdays sets the value of Weekdays.
-func (s *Maintenance) SetWeekdays(val []int) {
+func (s *Maintenance) SetWeekdays(val []int32) {
 	s.Weekdays = val
 }
 
 // SetDaysOfMonth sets the value of DaysOfMonth.
-func (s *Maintenance) SetDaysOfMonth(val []int) {
+func (s *Maintenance) SetDaysOfMonth(val []int32) {
 	s.DaysOfMonth = val
 }
 
 // SetIntervalDay sets the value of IntervalDay.
-func (s *Maintenance) SetIntervalDay(val OptInt) {
+func (s *Maintenance) SetIntervalDay(val OptInt32) {
 	s.IntervalDay = val
 }
 
@@ -2434,7 +2681,7 @@ func (s *Maintenance) SetCron(val OptString) {
 }
 
 // SetDurationMinutes sets the value of DurationMinutes.
-func (s *Maintenance) SetDurationMinutes(val OptInt) {
+func (s *Maintenance) SetDurationMinutes(val OptInt32) {
 	s.DurationMinutes = val
 }
 
@@ -2442,6 +2689,9 @@ func (s *Maintenance) SetDurationMinutes(val OptInt) {
 func (s *Maintenance) SetTimezoneOption(val OptString) {
 	s.TimezoneOption = val
 }
+
+func (*Maintenance) getMaintenanceRes()    {}
+func (*Maintenance) updateMaintenanceRes() {}
 
 // Input for creating or updating a maintenance window.
 // Ref: #/components/schemas/MaintenanceInput
@@ -2463,15 +2713,15 @@ type MaintenanceInput struct {
 	// Daily end time in HH:MM format for recurring maintenance.
 	EndTime OptString `json:"endTime"`
 	// Days of the week (0=Sunday, 6=Saturday) for recurring-weekday strategy.
-	Weekdays []int `json:"weekdays"`
+	Weekdays []int32 `json:"weekdays"`
 	// Days of the month (1-31) for recurring-day-of-month strategy.
-	DaysOfMonth []int `json:"daysOfMonth"`
+	DaysOfMonth []int32 `json:"daysOfMonth"`
 	// Interval in days between recurrences.
-	IntervalDay OptInt `json:"intervalDay"`
+	IntervalDay OptInt32 `json:"intervalDay"`
 	// Cron expression for cron-based scheduling.
 	Cron OptString `json:"cron"`
 	// Duration of each maintenance window in minutes.
-	DurationMinutes OptInt `json:"durationMinutes"`
+	DurationMinutes OptInt32 `json:"durationMinutes"`
 	// IANA timezone identifier for scheduling (e.g., 'America/New_York').
 	TimezoneOption OptString `json:"timezoneOption"`
 }
@@ -2517,17 +2767,17 @@ func (s *MaintenanceInput) GetEndTime() OptString {
 }
 
 // GetWeekdays returns the value of Weekdays.
-func (s *MaintenanceInput) GetWeekdays() []int {
+func (s *MaintenanceInput) GetWeekdays() []int32 {
 	return s.Weekdays
 }
 
 // GetDaysOfMonth returns the value of DaysOfMonth.
-func (s *MaintenanceInput) GetDaysOfMonth() []int {
+func (s *MaintenanceInput) GetDaysOfMonth() []int32 {
 	return s.DaysOfMonth
 }
 
 // GetIntervalDay returns the value of IntervalDay.
-func (s *MaintenanceInput) GetIntervalDay() OptInt {
+func (s *MaintenanceInput) GetIntervalDay() OptInt32 {
 	return s.IntervalDay
 }
 
@@ -2537,7 +2787,7 @@ func (s *MaintenanceInput) GetCron() OptString {
 }
 
 // GetDurationMinutes returns the value of DurationMinutes.
-func (s *MaintenanceInput) GetDurationMinutes() OptInt {
+func (s *MaintenanceInput) GetDurationMinutes() OptInt32 {
 	return s.DurationMinutes
 }
 
@@ -2587,17 +2837,17 @@ func (s *MaintenanceInput) SetEndTime(val OptString) {
 }
 
 // SetWeekdays sets the value of Weekdays.
-func (s *MaintenanceInput) SetWeekdays(val []int) {
+func (s *MaintenanceInput) SetWeekdays(val []int32) {
 	s.Weekdays = val
 }
 
 // SetDaysOfMonth sets the value of DaysOfMonth.
-func (s *MaintenanceInput) SetDaysOfMonth(val []int) {
+func (s *MaintenanceInput) SetDaysOfMonth(val []int32) {
 	s.DaysOfMonth = val
 }
 
 // SetIntervalDay sets the value of IntervalDay.
-func (s *MaintenanceInput) SetIntervalDay(val OptInt) {
+func (s *MaintenanceInput) SetIntervalDay(val OptInt32) {
 	s.IntervalDay = val
 }
 
@@ -2607,7 +2857,7 @@ func (s *MaintenanceInput) SetCron(val OptString) {
 }
 
 // SetDurationMinutes sets the value of DurationMinutes.
-func (s *MaintenanceInput) SetDurationMinutes(val OptInt) {
+func (s *MaintenanceInput) SetDurationMinutes(val OptInt32) {
 	s.DurationMinutes = val
 }
 
@@ -2774,7 +3024,19 @@ func (s *MessageResponse) SetMessage(val string) {
 	s.Message = val
 }
 
-func (*MessageResponse) setupRes() {}
+func (*MessageResponse) disable2FARes()        {}
+func (*MessageResponse) disableAPIKeyRes()     {}
+func (*MessageResponse) enable2FARes()         {}
+func (*MessageResponse) enableAPIKeyRes()      {}
+func (*MessageResponse) pauseMaintenanceRes()  {}
+func (*MessageResponse) pauseMonitorRes()      {}
+func (*MessageResponse) resumeMaintenanceRes() {}
+func (*MessageResponse) resumeMonitorRes()     {}
+func (*MessageResponse) setupRes()             {}
+func (*MessageResponse) shrinkDatabaseRes()    {}
+func (*MessageResponse) testNotificationRes()  {}
+func (*MessageResponse) unpinIncidentRes()     {}
+func (*MessageResponse) updateSettingsRes()    {}
 
 // A monitor represents a single endpoint or service being monitored for uptime.
 // Ref: #/components/schemas/Monitor
@@ -2783,15 +3045,15 @@ type Monitor struct {
 	Name               string           `json:"name"`
 	Type               MonitorType      `json:"type"`
 	Active             bool             `json:"active"`
-	Interval           OptInt           `json:"interval"`
-	Timeout            OptInt           `json:"timeout"`
-	MaxRetries         OptInt           `json:"maxRetries"`
-	RetryInterval      OptInt           `json:"retryInterval"`
+	Interval           OptInt32         `json:"interval"`
+	Timeout            OptInt32         `json:"timeout"`
+	MaxRetries         OptInt32         `json:"maxRetries"`
+	RetryInterval      OptInt32         `json:"retryInterval"`
 	Description        OptString        `json:"description"`
 	UpsideDown         OptBool          `json:"upsideDown"`
 	Tags               []MonitorTag     `json:"tags"`
 	NotificationIds    []uuid.UUID      `json:"notificationIds"`
-	ResendInterval     OptInt           `json:"resendInterval"`
+	ResendInterval     OptInt32         `json:"resendInterval"`
 	ExpiryNotification OptBool          `json:"expiryNotification"`
 	Config             OptMonitorConfig `json:"config"`
 }
@@ -2817,22 +3079,22 @@ func (s *Monitor) GetActive() bool {
 }
 
 // GetInterval returns the value of Interval.
-func (s *Monitor) GetInterval() OptInt {
+func (s *Monitor) GetInterval() OptInt32 {
 	return s.Interval
 }
 
 // GetTimeout returns the value of Timeout.
-func (s *Monitor) GetTimeout() OptInt {
+func (s *Monitor) GetTimeout() OptInt32 {
 	return s.Timeout
 }
 
 // GetMaxRetries returns the value of MaxRetries.
-func (s *Monitor) GetMaxRetries() OptInt {
+func (s *Monitor) GetMaxRetries() OptInt32 {
 	return s.MaxRetries
 }
 
 // GetRetryInterval returns the value of RetryInterval.
-func (s *Monitor) GetRetryInterval() OptInt {
+func (s *Monitor) GetRetryInterval() OptInt32 {
 	return s.RetryInterval
 }
 
@@ -2857,7 +3119,7 @@ func (s *Monitor) GetNotificationIds() []uuid.UUID {
 }
 
 // GetResendInterval returns the value of ResendInterval.
-func (s *Monitor) GetResendInterval() OptInt {
+func (s *Monitor) GetResendInterval() OptInt32 {
 	return s.ResendInterval
 }
 
@@ -2892,22 +3154,22 @@ func (s *Monitor) SetActive(val bool) {
 }
 
 // SetInterval sets the value of Interval.
-func (s *Monitor) SetInterval(val OptInt) {
+func (s *Monitor) SetInterval(val OptInt32) {
 	s.Interval = val
 }
 
 // SetTimeout sets the value of Timeout.
-func (s *Monitor) SetTimeout(val OptInt) {
+func (s *Monitor) SetTimeout(val OptInt32) {
 	s.Timeout = val
 }
 
 // SetMaxRetries sets the value of MaxRetries.
-func (s *Monitor) SetMaxRetries(val OptInt) {
+func (s *Monitor) SetMaxRetries(val OptInt32) {
 	s.MaxRetries = val
 }
 
 // SetRetryInterval sets the value of RetryInterval.
-func (s *Monitor) SetRetryInterval(val OptInt) {
+func (s *Monitor) SetRetryInterval(val OptInt32) {
 	s.RetryInterval = val
 }
 
@@ -2932,7 +3194,7 @@ func (s *Monitor) SetNotificationIds(val []uuid.UUID) {
 }
 
 // SetResendInterval sets the value of ResendInterval.
-func (s *Monitor) SetResendInterval(val OptInt) {
+func (s *Monitor) SetResendInterval(val OptInt32) {
 	s.ResendInterval = val
 }
 
@@ -2949,10 +3211,37 @@ func (s *Monitor) SetConfig(val OptMonitorConfig) {
 func (*Monitor) getMonitorRes()    {}
 func (*Monitor) updateMonitorRes() {}
 
+// Type-specific configuration for a monitor, discriminated by the kind field.
 // Ref: #/components/schemas/MonitorConfig
-// MonitorConfig represents sum type.
 type MonitorConfig struct {
-	Type                       MonitorConfigType // switch on this field
+	// Discriminator field identifying the monitor configuration type.
+	Kind  string `json:"kind"`
+	OneOf MonitorConfigSum
+}
+
+// GetKind returns the value of Kind.
+func (s *MonitorConfig) GetKind() string {
+	return s.Kind
+}
+
+// GetOneOf returns the value of OneOf.
+func (s *MonitorConfig) GetOneOf() MonitorConfigSum {
+	return s.OneOf
+}
+
+// SetKind sets the value of Kind.
+func (s *MonitorConfig) SetKind(val string) {
+	s.Kind = val
+}
+
+// SetOneOf sets the value of OneOf.
+func (s *MonitorConfig) SetOneOf(val MonitorConfigSum) {
+	s.OneOf = val
+}
+
+// MonitorConfigSum represents sum type.
+type MonitorConfigSum struct {
+	Type                       MonitorConfigSumType // switch on this field
 	HttpMonitorConfig          HttpMonitorConfig
 	PortMonitorConfig          PortMonitorConfig
 	PingMonitorConfig          PingMonitorConfig
@@ -2965,261 +3254,279 @@ type MonitorConfig struct {
 	GroupMonitorConfig         GroupMonitorConfig
 }
 
-// MonitorConfigType is oneOf type of MonitorConfig.
-type MonitorConfigType string
+// MonitorConfigSumType is oneOf type of MonitorConfigSum.
+type MonitorConfigSumType string
 
-// Possible values for MonitorConfigType.
+// Possible values for MonitorConfigSumType.
 const (
-	HttpMonitorConfigMonitorConfig          MonitorConfigType = "http"
-	PortMonitorConfigMonitorConfig          MonitorConfigType = "port"
-	PingMonitorConfigMonitorConfig          MonitorConfigType = "ping"
-	DnsMonitorConfigMonitorConfig           MonitorConfigType = "dns"
-	GrpcMonitorConfigMonitorConfig          MonitorConfigType = "grpc-keyword"
-	MqttMonitorConfigMonitorConfig          MonitorConfigType = "mqtt"
-	RedisMonitorConfigMonitorConfig         MonitorConfigType = "redis"
-	SmtpMonitorConfigMonitorConfig          MonitorConfigType = "smtp"
-	TailscalePingMonitorConfigMonitorConfig MonitorConfigType = "tailscale-ping"
-	GroupMonitorConfigMonitorConfig         MonitorConfigType = "group"
+	HttpMonitorConfigMonitorConfigSum          MonitorConfigSumType = "http"
+	PortMonitorConfigMonitorConfigSum          MonitorConfigSumType = "port"
+	PingMonitorConfigMonitorConfigSum          MonitorConfigSumType = "ping"
+	DnsMonitorConfigMonitorConfigSum           MonitorConfigSumType = "dns"
+	GrpcMonitorConfigMonitorConfigSum          MonitorConfigSumType = "grpc-keyword"
+	MqttMonitorConfigMonitorConfigSum          MonitorConfigSumType = "mqtt"
+	RedisMonitorConfigMonitorConfigSum         MonitorConfigSumType = "redis"
+	SmtpMonitorConfigMonitorConfigSum          MonitorConfigSumType = "smtp"
+	TailscalePingMonitorConfigMonitorConfigSum MonitorConfigSumType = "tailscale-ping"
+	GroupMonitorConfigMonitorConfigSum         MonitorConfigSumType = "group"
 )
 
-// IsHttpMonitorConfig reports whether MonitorConfig is HttpMonitorConfig.
-func (s MonitorConfig) IsHttpMonitorConfig() bool { return s.Type == HttpMonitorConfigMonitorConfig }
-
-// IsPortMonitorConfig reports whether MonitorConfig is PortMonitorConfig.
-func (s MonitorConfig) IsPortMonitorConfig() bool { return s.Type == PortMonitorConfigMonitorConfig }
-
-// IsPingMonitorConfig reports whether MonitorConfig is PingMonitorConfig.
-func (s MonitorConfig) IsPingMonitorConfig() bool { return s.Type == PingMonitorConfigMonitorConfig }
-
-// IsDnsMonitorConfig reports whether MonitorConfig is DnsMonitorConfig.
-func (s MonitorConfig) IsDnsMonitorConfig() bool { return s.Type == DnsMonitorConfigMonitorConfig }
-
-// IsGrpcMonitorConfig reports whether MonitorConfig is GrpcMonitorConfig.
-func (s MonitorConfig) IsGrpcMonitorConfig() bool { return s.Type == GrpcMonitorConfigMonitorConfig }
-
-// IsMqttMonitorConfig reports whether MonitorConfig is MqttMonitorConfig.
-func (s MonitorConfig) IsMqttMonitorConfig() bool { return s.Type == MqttMonitorConfigMonitorConfig }
-
-// IsRedisMonitorConfig reports whether MonitorConfig is RedisMonitorConfig.
-func (s MonitorConfig) IsRedisMonitorConfig() bool { return s.Type == RedisMonitorConfigMonitorConfig }
-
-// IsSmtpMonitorConfig reports whether MonitorConfig is SmtpMonitorConfig.
-func (s MonitorConfig) IsSmtpMonitorConfig() bool { return s.Type == SmtpMonitorConfigMonitorConfig }
-
-// IsTailscalePingMonitorConfig reports whether MonitorConfig is TailscalePingMonitorConfig.
-func (s MonitorConfig) IsTailscalePingMonitorConfig() bool {
-	return s.Type == TailscalePingMonitorConfigMonitorConfig
+// IsHttpMonitorConfig reports whether MonitorConfigSum is HttpMonitorConfig.
+func (s MonitorConfigSum) IsHttpMonitorConfig() bool {
+	return s.Type == HttpMonitorConfigMonitorConfigSum
 }
 
-// IsGroupMonitorConfig reports whether MonitorConfig is GroupMonitorConfig.
-func (s MonitorConfig) IsGroupMonitorConfig() bool { return s.Type == GroupMonitorConfigMonitorConfig }
+// IsPortMonitorConfig reports whether MonitorConfigSum is PortMonitorConfig.
+func (s MonitorConfigSum) IsPortMonitorConfig() bool {
+	return s.Type == PortMonitorConfigMonitorConfigSum
+}
 
-// SetHttpMonitorConfig sets MonitorConfig to HttpMonitorConfig.
-func (s *MonitorConfig) SetHttpMonitorConfig(v HttpMonitorConfig) {
-	s.Type = HttpMonitorConfigMonitorConfig
+// IsPingMonitorConfig reports whether MonitorConfigSum is PingMonitorConfig.
+func (s MonitorConfigSum) IsPingMonitorConfig() bool {
+	return s.Type == PingMonitorConfigMonitorConfigSum
+}
+
+// IsDnsMonitorConfig reports whether MonitorConfigSum is DnsMonitorConfig.
+func (s MonitorConfigSum) IsDnsMonitorConfig() bool {
+	return s.Type == DnsMonitorConfigMonitorConfigSum
+}
+
+// IsGrpcMonitorConfig reports whether MonitorConfigSum is GrpcMonitorConfig.
+func (s MonitorConfigSum) IsGrpcMonitorConfig() bool {
+	return s.Type == GrpcMonitorConfigMonitorConfigSum
+}
+
+// IsMqttMonitorConfig reports whether MonitorConfigSum is MqttMonitorConfig.
+func (s MonitorConfigSum) IsMqttMonitorConfig() bool {
+	return s.Type == MqttMonitorConfigMonitorConfigSum
+}
+
+// IsRedisMonitorConfig reports whether MonitorConfigSum is RedisMonitorConfig.
+func (s MonitorConfigSum) IsRedisMonitorConfig() bool {
+	return s.Type == RedisMonitorConfigMonitorConfigSum
+}
+
+// IsSmtpMonitorConfig reports whether MonitorConfigSum is SmtpMonitorConfig.
+func (s MonitorConfigSum) IsSmtpMonitorConfig() bool {
+	return s.Type == SmtpMonitorConfigMonitorConfigSum
+}
+
+// IsTailscalePingMonitorConfig reports whether MonitorConfigSum is TailscalePingMonitorConfig.
+func (s MonitorConfigSum) IsTailscalePingMonitorConfig() bool {
+	return s.Type == TailscalePingMonitorConfigMonitorConfigSum
+}
+
+// IsGroupMonitorConfig reports whether MonitorConfigSum is GroupMonitorConfig.
+func (s MonitorConfigSum) IsGroupMonitorConfig() bool {
+	return s.Type == GroupMonitorConfigMonitorConfigSum
+}
+
+// SetHttpMonitorConfig sets MonitorConfigSum to HttpMonitorConfig.
+func (s *MonitorConfigSum) SetHttpMonitorConfig(v HttpMonitorConfig) {
+	s.Type = HttpMonitorConfigMonitorConfigSum
 	s.HttpMonitorConfig = v
 }
 
-// GetHttpMonitorConfig returns HttpMonitorConfig and true boolean if MonitorConfig is HttpMonitorConfig.
-func (s MonitorConfig) GetHttpMonitorConfig() (v HttpMonitorConfig, ok bool) {
+// GetHttpMonitorConfig returns HttpMonitorConfig and true boolean if MonitorConfigSum is HttpMonitorConfig.
+func (s MonitorConfigSum) GetHttpMonitorConfig() (v HttpMonitorConfig, ok bool) {
 	if !s.IsHttpMonitorConfig() {
 		return v, false
 	}
 	return s.HttpMonitorConfig, true
 }
 
-// NewHttpMonitorConfigMonitorConfig returns new MonitorConfig from HttpMonitorConfig.
-func NewHttpMonitorConfigMonitorConfig(v HttpMonitorConfig) MonitorConfig {
-	var s MonitorConfig
+// NewHttpMonitorConfigMonitorConfigSum returns new MonitorConfigSum from HttpMonitorConfig.
+func NewHttpMonitorConfigMonitorConfigSum(v HttpMonitorConfig) MonitorConfigSum {
+	var s MonitorConfigSum
 	s.SetHttpMonitorConfig(v)
 	return s
 }
 
-// SetPortMonitorConfig sets MonitorConfig to PortMonitorConfig.
-func (s *MonitorConfig) SetPortMonitorConfig(v PortMonitorConfig) {
-	s.Type = PortMonitorConfigMonitorConfig
+// SetPortMonitorConfig sets MonitorConfigSum to PortMonitorConfig.
+func (s *MonitorConfigSum) SetPortMonitorConfig(v PortMonitorConfig) {
+	s.Type = PortMonitorConfigMonitorConfigSum
 	s.PortMonitorConfig = v
 }
 
-// GetPortMonitorConfig returns PortMonitorConfig and true boolean if MonitorConfig is PortMonitorConfig.
-func (s MonitorConfig) GetPortMonitorConfig() (v PortMonitorConfig, ok bool) {
+// GetPortMonitorConfig returns PortMonitorConfig and true boolean if MonitorConfigSum is PortMonitorConfig.
+func (s MonitorConfigSum) GetPortMonitorConfig() (v PortMonitorConfig, ok bool) {
 	if !s.IsPortMonitorConfig() {
 		return v, false
 	}
 	return s.PortMonitorConfig, true
 }
 
-// NewPortMonitorConfigMonitorConfig returns new MonitorConfig from PortMonitorConfig.
-func NewPortMonitorConfigMonitorConfig(v PortMonitorConfig) MonitorConfig {
-	var s MonitorConfig
+// NewPortMonitorConfigMonitorConfigSum returns new MonitorConfigSum from PortMonitorConfig.
+func NewPortMonitorConfigMonitorConfigSum(v PortMonitorConfig) MonitorConfigSum {
+	var s MonitorConfigSum
 	s.SetPortMonitorConfig(v)
 	return s
 }
 
-// SetPingMonitorConfig sets MonitorConfig to PingMonitorConfig.
-func (s *MonitorConfig) SetPingMonitorConfig(v PingMonitorConfig) {
-	s.Type = PingMonitorConfigMonitorConfig
+// SetPingMonitorConfig sets MonitorConfigSum to PingMonitorConfig.
+func (s *MonitorConfigSum) SetPingMonitorConfig(v PingMonitorConfig) {
+	s.Type = PingMonitorConfigMonitorConfigSum
 	s.PingMonitorConfig = v
 }
 
-// GetPingMonitorConfig returns PingMonitorConfig and true boolean if MonitorConfig is PingMonitorConfig.
-func (s MonitorConfig) GetPingMonitorConfig() (v PingMonitorConfig, ok bool) {
+// GetPingMonitorConfig returns PingMonitorConfig and true boolean if MonitorConfigSum is PingMonitorConfig.
+func (s MonitorConfigSum) GetPingMonitorConfig() (v PingMonitorConfig, ok bool) {
 	if !s.IsPingMonitorConfig() {
 		return v, false
 	}
 	return s.PingMonitorConfig, true
 }
 
-// NewPingMonitorConfigMonitorConfig returns new MonitorConfig from PingMonitorConfig.
-func NewPingMonitorConfigMonitorConfig(v PingMonitorConfig) MonitorConfig {
-	var s MonitorConfig
+// NewPingMonitorConfigMonitorConfigSum returns new MonitorConfigSum from PingMonitorConfig.
+func NewPingMonitorConfigMonitorConfigSum(v PingMonitorConfig) MonitorConfigSum {
+	var s MonitorConfigSum
 	s.SetPingMonitorConfig(v)
 	return s
 }
 
-// SetDnsMonitorConfig sets MonitorConfig to DnsMonitorConfig.
-func (s *MonitorConfig) SetDnsMonitorConfig(v DnsMonitorConfig) {
-	s.Type = DnsMonitorConfigMonitorConfig
+// SetDnsMonitorConfig sets MonitorConfigSum to DnsMonitorConfig.
+func (s *MonitorConfigSum) SetDnsMonitorConfig(v DnsMonitorConfig) {
+	s.Type = DnsMonitorConfigMonitorConfigSum
 	s.DnsMonitorConfig = v
 }
 
-// GetDnsMonitorConfig returns DnsMonitorConfig and true boolean if MonitorConfig is DnsMonitorConfig.
-func (s MonitorConfig) GetDnsMonitorConfig() (v DnsMonitorConfig, ok bool) {
+// GetDnsMonitorConfig returns DnsMonitorConfig and true boolean if MonitorConfigSum is DnsMonitorConfig.
+func (s MonitorConfigSum) GetDnsMonitorConfig() (v DnsMonitorConfig, ok bool) {
 	if !s.IsDnsMonitorConfig() {
 		return v, false
 	}
 	return s.DnsMonitorConfig, true
 }
 
-// NewDnsMonitorConfigMonitorConfig returns new MonitorConfig from DnsMonitorConfig.
-func NewDnsMonitorConfigMonitorConfig(v DnsMonitorConfig) MonitorConfig {
-	var s MonitorConfig
+// NewDnsMonitorConfigMonitorConfigSum returns new MonitorConfigSum from DnsMonitorConfig.
+func NewDnsMonitorConfigMonitorConfigSum(v DnsMonitorConfig) MonitorConfigSum {
+	var s MonitorConfigSum
 	s.SetDnsMonitorConfig(v)
 	return s
 }
 
-// SetGrpcMonitorConfig sets MonitorConfig to GrpcMonitorConfig.
-func (s *MonitorConfig) SetGrpcMonitorConfig(v GrpcMonitorConfig) {
-	s.Type = GrpcMonitorConfigMonitorConfig
+// SetGrpcMonitorConfig sets MonitorConfigSum to GrpcMonitorConfig.
+func (s *MonitorConfigSum) SetGrpcMonitorConfig(v GrpcMonitorConfig) {
+	s.Type = GrpcMonitorConfigMonitorConfigSum
 	s.GrpcMonitorConfig = v
 }
 
-// GetGrpcMonitorConfig returns GrpcMonitorConfig and true boolean if MonitorConfig is GrpcMonitorConfig.
-func (s MonitorConfig) GetGrpcMonitorConfig() (v GrpcMonitorConfig, ok bool) {
+// GetGrpcMonitorConfig returns GrpcMonitorConfig and true boolean if MonitorConfigSum is GrpcMonitorConfig.
+func (s MonitorConfigSum) GetGrpcMonitorConfig() (v GrpcMonitorConfig, ok bool) {
 	if !s.IsGrpcMonitorConfig() {
 		return v, false
 	}
 	return s.GrpcMonitorConfig, true
 }
 
-// NewGrpcMonitorConfigMonitorConfig returns new MonitorConfig from GrpcMonitorConfig.
-func NewGrpcMonitorConfigMonitorConfig(v GrpcMonitorConfig) MonitorConfig {
-	var s MonitorConfig
+// NewGrpcMonitorConfigMonitorConfigSum returns new MonitorConfigSum from GrpcMonitorConfig.
+func NewGrpcMonitorConfigMonitorConfigSum(v GrpcMonitorConfig) MonitorConfigSum {
+	var s MonitorConfigSum
 	s.SetGrpcMonitorConfig(v)
 	return s
 }
 
-// SetMqttMonitorConfig sets MonitorConfig to MqttMonitorConfig.
-func (s *MonitorConfig) SetMqttMonitorConfig(v MqttMonitorConfig) {
-	s.Type = MqttMonitorConfigMonitorConfig
+// SetMqttMonitorConfig sets MonitorConfigSum to MqttMonitorConfig.
+func (s *MonitorConfigSum) SetMqttMonitorConfig(v MqttMonitorConfig) {
+	s.Type = MqttMonitorConfigMonitorConfigSum
 	s.MqttMonitorConfig = v
 }
 
-// GetMqttMonitorConfig returns MqttMonitorConfig and true boolean if MonitorConfig is MqttMonitorConfig.
-func (s MonitorConfig) GetMqttMonitorConfig() (v MqttMonitorConfig, ok bool) {
+// GetMqttMonitorConfig returns MqttMonitorConfig and true boolean if MonitorConfigSum is MqttMonitorConfig.
+func (s MonitorConfigSum) GetMqttMonitorConfig() (v MqttMonitorConfig, ok bool) {
 	if !s.IsMqttMonitorConfig() {
 		return v, false
 	}
 	return s.MqttMonitorConfig, true
 }
 
-// NewMqttMonitorConfigMonitorConfig returns new MonitorConfig from MqttMonitorConfig.
-func NewMqttMonitorConfigMonitorConfig(v MqttMonitorConfig) MonitorConfig {
-	var s MonitorConfig
+// NewMqttMonitorConfigMonitorConfigSum returns new MonitorConfigSum from MqttMonitorConfig.
+func NewMqttMonitorConfigMonitorConfigSum(v MqttMonitorConfig) MonitorConfigSum {
+	var s MonitorConfigSum
 	s.SetMqttMonitorConfig(v)
 	return s
 }
 
-// SetRedisMonitorConfig sets MonitorConfig to RedisMonitorConfig.
-func (s *MonitorConfig) SetRedisMonitorConfig(v RedisMonitorConfig) {
-	s.Type = RedisMonitorConfigMonitorConfig
+// SetRedisMonitorConfig sets MonitorConfigSum to RedisMonitorConfig.
+func (s *MonitorConfigSum) SetRedisMonitorConfig(v RedisMonitorConfig) {
+	s.Type = RedisMonitorConfigMonitorConfigSum
 	s.RedisMonitorConfig = v
 }
 
-// GetRedisMonitorConfig returns RedisMonitorConfig and true boolean if MonitorConfig is RedisMonitorConfig.
-func (s MonitorConfig) GetRedisMonitorConfig() (v RedisMonitorConfig, ok bool) {
+// GetRedisMonitorConfig returns RedisMonitorConfig and true boolean if MonitorConfigSum is RedisMonitorConfig.
+func (s MonitorConfigSum) GetRedisMonitorConfig() (v RedisMonitorConfig, ok bool) {
 	if !s.IsRedisMonitorConfig() {
 		return v, false
 	}
 	return s.RedisMonitorConfig, true
 }
 
-// NewRedisMonitorConfigMonitorConfig returns new MonitorConfig from RedisMonitorConfig.
-func NewRedisMonitorConfigMonitorConfig(v RedisMonitorConfig) MonitorConfig {
-	var s MonitorConfig
+// NewRedisMonitorConfigMonitorConfigSum returns new MonitorConfigSum from RedisMonitorConfig.
+func NewRedisMonitorConfigMonitorConfigSum(v RedisMonitorConfig) MonitorConfigSum {
+	var s MonitorConfigSum
 	s.SetRedisMonitorConfig(v)
 	return s
 }
 
-// SetSmtpMonitorConfig sets MonitorConfig to SmtpMonitorConfig.
-func (s *MonitorConfig) SetSmtpMonitorConfig(v SmtpMonitorConfig) {
-	s.Type = SmtpMonitorConfigMonitorConfig
+// SetSmtpMonitorConfig sets MonitorConfigSum to SmtpMonitorConfig.
+func (s *MonitorConfigSum) SetSmtpMonitorConfig(v SmtpMonitorConfig) {
+	s.Type = SmtpMonitorConfigMonitorConfigSum
 	s.SmtpMonitorConfig = v
 }
 
-// GetSmtpMonitorConfig returns SmtpMonitorConfig and true boolean if MonitorConfig is SmtpMonitorConfig.
-func (s MonitorConfig) GetSmtpMonitorConfig() (v SmtpMonitorConfig, ok bool) {
+// GetSmtpMonitorConfig returns SmtpMonitorConfig and true boolean if MonitorConfigSum is SmtpMonitorConfig.
+func (s MonitorConfigSum) GetSmtpMonitorConfig() (v SmtpMonitorConfig, ok bool) {
 	if !s.IsSmtpMonitorConfig() {
 		return v, false
 	}
 	return s.SmtpMonitorConfig, true
 }
 
-// NewSmtpMonitorConfigMonitorConfig returns new MonitorConfig from SmtpMonitorConfig.
-func NewSmtpMonitorConfigMonitorConfig(v SmtpMonitorConfig) MonitorConfig {
-	var s MonitorConfig
+// NewSmtpMonitorConfigMonitorConfigSum returns new MonitorConfigSum from SmtpMonitorConfig.
+func NewSmtpMonitorConfigMonitorConfigSum(v SmtpMonitorConfig) MonitorConfigSum {
+	var s MonitorConfigSum
 	s.SetSmtpMonitorConfig(v)
 	return s
 }
 
-// SetTailscalePingMonitorConfig sets MonitorConfig to TailscalePingMonitorConfig.
-func (s *MonitorConfig) SetTailscalePingMonitorConfig(v TailscalePingMonitorConfig) {
-	s.Type = TailscalePingMonitorConfigMonitorConfig
+// SetTailscalePingMonitorConfig sets MonitorConfigSum to TailscalePingMonitorConfig.
+func (s *MonitorConfigSum) SetTailscalePingMonitorConfig(v TailscalePingMonitorConfig) {
+	s.Type = TailscalePingMonitorConfigMonitorConfigSum
 	s.TailscalePingMonitorConfig = v
 }
 
-// GetTailscalePingMonitorConfig returns TailscalePingMonitorConfig and true boolean if MonitorConfig is TailscalePingMonitorConfig.
-func (s MonitorConfig) GetTailscalePingMonitorConfig() (v TailscalePingMonitorConfig, ok bool) {
+// GetTailscalePingMonitorConfig returns TailscalePingMonitorConfig and true boolean if MonitorConfigSum is TailscalePingMonitorConfig.
+func (s MonitorConfigSum) GetTailscalePingMonitorConfig() (v TailscalePingMonitorConfig, ok bool) {
 	if !s.IsTailscalePingMonitorConfig() {
 		return v, false
 	}
 	return s.TailscalePingMonitorConfig, true
 }
 
-// NewTailscalePingMonitorConfigMonitorConfig returns new MonitorConfig from TailscalePingMonitorConfig.
-func NewTailscalePingMonitorConfigMonitorConfig(v TailscalePingMonitorConfig) MonitorConfig {
-	var s MonitorConfig
+// NewTailscalePingMonitorConfigMonitorConfigSum returns new MonitorConfigSum from TailscalePingMonitorConfig.
+func NewTailscalePingMonitorConfigMonitorConfigSum(v TailscalePingMonitorConfig) MonitorConfigSum {
+	var s MonitorConfigSum
 	s.SetTailscalePingMonitorConfig(v)
 	return s
 }
 
-// SetGroupMonitorConfig sets MonitorConfig to GroupMonitorConfig.
-func (s *MonitorConfig) SetGroupMonitorConfig(v GroupMonitorConfig) {
-	s.Type = GroupMonitorConfigMonitorConfig
+// SetGroupMonitorConfig sets MonitorConfigSum to GroupMonitorConfig.
+func (s *MonitorConfigSum) SetGroupMonitorConfig(v GroupMonitorConfig) {
+	s.Type = GroupMonitorConfigMonitorConfigSum
 	s.GroupMonitorConfig = v
 }
 
-// GetGroupMonitorConfig returns GroupMonitorConfig and true boolean if MonitorConfig is GroupMonitorConfig.
-func (s MonitorConfig) GetGroupMonitorConfig() (v GroupMonitorConfig, ok bool) {
+// GetGroupMonitorConfig returns GroupMonitorConfig and true boolean if MonitorConfigSum is GroupMonitorConfig.
+func (s MonitorConfigSum) GetGroupMonitorConfig() (v GroupMonitorConfig, ok bool) {
 	if !s.IsGroupMonitorConfig() {
 		return v, false
 	}
 	return s.GroupMonitorConfig, true
 }
 
-// NewGroupMonitorConfigMonitorConfig returns new MonitorConfig from GroupMonitorConfig.
-func NewGroupMonitorConfigMonitorConfig(v GroupMonitorConfig) MonitorConfig {
-	var s MonitorConfig
+// NewGroupMonitorConfigMonitorConfigSum returns new MonitorConfigSum from GroupMonitorConfig.
+func NewGroupMonitorConfigMonitorConfigSum(v GroupMonitorConfig) MonitorConfigSum {
+	var s MonitorConfigSum
 	s.SetGroupMonitorConfig(v)
 	return s
 }
@@ -3230,14 +3537,14 @@ type MonitorInput struct {
 	Name               string        `json:"name"`
 	Type               string        `json:"type"`
 	Active             OptBool       `json:"active"`
-	Interval           OptInt        `json:"interval"`
-	Timeout            OptInt        `json:"timeout"`
-	MaxRetries         OptInt        `json:"maxRetries"`
-	RetryInterval      OptInt        `json:"retryInterval"`
+	Interval           OptInt32      `json:"interval"`
+	Timeout            OptInt32      `json:"timeout"`
+	MaxRetries         OptInt32      `json:"maxRetries"`
+	RetryInterval      OptInt32      `json:"retryInterval"`
 	Description        OptString     `json:"description"`
 	UpsideDown         OptBool       `json:"upsideDown"`
 	NotificationIds    []uuid.UUID   `json:"notificationIds"`
-	ResendInterval     OptInt        `json:"resendInterval"`
+	ResendInterval     OptInt32      `json:"resendInterval"`
 	ExpiryNotification OptBool       `json:"expiryNotification"`
 	Config             MonitorConfig `json:"config"`
 }
@@ -3258,22 +3565,22 @@ func (s *MonitorInput) GetActive() OptBool {
 }
 
 // GetInterval returns the value of Interval.
-func (s *MonitorInput) GetInterval() OptInt {
+func (s *MonitorInput) GetInterval() OptInt32 {
 	return s.Interval
 }
 
 // GetTimeout returns the value of Timeout.
-func (s *MonitorInput) GetTimeout() OptInt {
+func (s *MonitorInput) GetTimeout() OptInt32 {
 	return s.Timeout
 }
 
 // GetMaxRetries returns the value of MaxRetries.
-func (s *MonitorInput) GetMaxRetries() OptInt {
+func (s *MonitorInput) GetMaxRetries() OptInt32 {
 	return s.MaxRetries
 }
 
 // GetRetryInterval returns the value of RetryInterval.
-func (s *MonitorInput) GetRetryInterval() OptInt {
+func (s *MonitorInput) GetRetryInterval() OptInt32 {
 	return s.RetryInterval
 }
 
@@ -3293,7 +3600,7 @@ func (s *MonitorInput) GetNotificationIds() []uuid.UUID {
 }
 
 // GetResendInterval returns the value of ResendInterval.
-func (s *MonitorInput) GetResendInterval() OptInt {
+func (s *MonitorInput) GetResendInterval() OptInt32 {
 	return s.ResendInterval
 }
 
@@ -3323,22 +3630,22 @@ func (s *MonitorInput) SetActive(val OptBool) {
 }
 
 // SetInterval sets the value of Interval.
-func (s *MonitorInput) SetInterval(val OptInt) {
+func (s *MonitorInput) SetInterval(val OptInt32) {
 	s.Interval = val
 }
 
 // SetTimeout sets the value of Timeout.
-func (s *MonitorInput) SetTimeout(val OptInt) {
+func (s *MonitorInput) SetTimeout(val OptInt32) {
 	s.Timeout = val
 }
 
 // SetMaxRetries sets the value of MaxRetries.
-func (s *MonitorInput) SetMaxRetries(val OptInt) {
+func (s *MonitorInput) SetMaxRetries(val OptInt32) {
 	s.MaxRetries = val
 }
 
 // SetRetryInterval sets the value of RetryInterval.
-func (s *MonitorInput) SetRetryInterval(val OptInt) {
+func (s *MonitorInput) SetRetryInterval(val OptInt32) {
 	s.RetryInterval = val
 }
 
@@ -3358,7 +3665,7 @@ func (s *MonitorInput) SetNotificationIds(val []uuid.UUID) {
 }
 
 // SetResendInterval sets the value of ResendInterval.
-func (s *MonitorInput) SetResendInterval(val OptInt) {
+func (s *MonitorInput) SetResendInterval(val OptInt32) {
 	s.ResendInterval = val
 }
 
@@ -3606,11 +3913,12 @@ func (s *MonitorType) UnmarshalText(data []byte) error {
 	}
 }
 
+// Configuration for MQTT broker connectivity and message checks.
 // Ref: #/components/schemas/MqttMonitorConfig
 type MqttMonitorConfig struct {
 	Kind               MqttMonitorConfigKind `json:"kind"`
 	Hostname           OptString             `json:"hostname"`
-	Port               OptInt                `json:"port"`
+	Port               OptInt32              `json:"port"`
 	MqttTopic          OptString             `json:"mqttTopic"`
 	MqttSuccessMessage OptString             `json:"mqttSuccessMessage"`
 	MqttUsername       OptString             `json:"mqttUsername"`
@@ -3629,7 +3937,7 @@ func (s *MqttMonitorConfig) GetHostname() OptString {
 }
 
 // GetPort returns the value of Port.
-func (s *MqttMonitorConfig) GetPort() OptInt {
+func (s *MqttMonitorConfig) GetPort() OptInt32 {
 	return s.Port
 }
 
@@ -3669,7 +3977,7 @@ func (s *MqttMonitorConfig) SetHostname(val OptString) {
 }
 
 // SetPort sets the value of Port.
-func (s *MqttMonitorConfig) SetPort(val OptInt) {
+func (s *MqttMonitorConfig) SetPort(val OptInt32) {
 	s.Port = val
 }
 
@@ -3746,6 +4054,8 @@ func (s *NeedSetupOK) SetNeedSetup(val bool) {
 	s.NeedSetup = val
 }
 
+func (*NeedSetupOK) needSetupRes() {}
+
 // A configured notification provider that can receive alerts when monitors change status.
 // Ref: #/components/schemas/Notification
 type Notification struct {
@@ -3759,7 +4069,7 @@ type Notification struct {
 	Active bool `json:"active"`
 	// Provider-specific configuration (e.g., webhook URL, API token, channel). Shape depends on the
 	// provider type.
-	Config OptNotificationConfig `json:"config"`
+	Config jx.Raw `json:"config"`
 }
 
 // GetID returns the value of ID.
@@ -3783,7 +4093,7 @@ func (s *Notification) GetActive() bool {
 }
 
 // GetConfig returns the value of Config.
-func (s *Notification) GetConfig() OptNotificationConfig {
+func (s *Notification) GetConfig() jx.Raw {
 	return s.Config
 }
 
@@ -3808,22 +4118,11 @@ func (s *Notification) SetActive(val bool) {
 }
 
 // SetConfig sets the value of Config.
-func (s *Notification) SetConfig(val OptNotificationConfig) {
+func (s *Notification) SetConfig(val jx.Raw) {
 	s.Config = val
 }
 
-// Provider-specific configuration (e.g., webhook URL, API token, channel). Shape depends on the
-// provider type.
-type NotificationConfig map[string]jx.Raw
-
-func (s *NotificationConfig) init() NotificationConfig {
-	m := *s
-	if m == nil {
-		m = map[string]jx.Raw{}
-		*s = m
-	}
-	return m
-}
+func (*Notification) updateNotificationRes() {}
 
 // Input for creating or updating a notification provider configuration.
 // Ref: #/components/schemas/NotificationInput
@@ -3835,7 +4134,7 @@ type NotificationInput struct {
 	// Whether this notification provider should be active immediately.
 	Active OptBool `json:"active"`
 	// Provider-specific configuration. Required fields depend on the provider type.
-	Config NotificationInputConfig `json:"config"`
+	Config jx.Raw `json:"config"`
 	// If true, automatically link this notification to all existing monitors.
 	ApplyExisting OptBool `json:"applyExisting"`
 }
@@ -3856,7 +4155,7 @@ func (s *NotificationInput) GetActive() OptBool {
 }
 
 // GetConfig returns the value of Config.
-func (s *NotificationInput) GetConfig() NotificationInputConfig {
+func (s *NotificationInput) GetConfig() jx.Raw {
 	return s.Config
 }
 
@@ -3881,25 +4180,13 @@ func (s *NotificationInput) SetActive(val OptBool) {
 }
 
 // SetConfig sets the value of Config.
-func (s *NotificationInput) SetConfig(val NotificationInputConfig) {
+func (s *NotificationInput) SetConfig(val jx.Raw) {
 	s.Config = val
 }
 
 // SetApplyExisting sets the value of ApplyExisting.
 func (s *NotificationInput) SetApplyExisting(val OptBool) {
 	s.ApplyExisting = val
-}
-
-// Provider-specific configuration. Required fields depend on the provider type.
-type NotificationInputConfig map[string]jx.Raw
-
-func (s *NotificationInputConfig) init() NotificationInputConfig {
-	m := *s
-	if m == nil {
-		m = map[string]jx.Raw{}
-		*s = m
-	}
-	return m
 }
 
 // NewOptBadgeStyle returns new OptBadgeStyle with value set to v.
@@ -4178,144 +4465,6 @@ func (o OptGetStatusPageBadgeStyle) Or(d GetStatusPageBadgeStyle) GetStatusPageB
 	return d
 }
 
-// NewOptGetStatusPageHeartbeatsOKHeartbeatList returns new OptGetStatusPageHeartbeatsOKHeartbeatList with value set to v.
-func NewOptGetStatusPageHeartbeatsOKHeartbeatList(v GetStatusPageHeartbeatsOKHeartbeatList) OptGetStatusPageHeartbeatsOKHeartbeatList {
-	return OptGetStatusPageHeartbeatsOKHeartbeatList{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptGetStatusPageHeartbeatsOKHeartbeatList is optional GetStatusPageHeartbeatsOKHeartbeatList.
-type OptGetStatusPageHeartbeatsOKHeartbeatList struct {
-	Value GetStatusPageHeartbeatsOKHeartbeatList
-	Set   bool
-}
-
-// IsSet returns true if OptGetStatusPageHeartbeatsOKHeartbeatList was set.
-func (o OptGetStatusPageHeartbeatsOKHeartbeatList) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptGetStatusPageHeartbeatsOKHeartbeatList) Reset() {
-	var v GetStatusPageHeartbeatsOKHeartbeatList
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptGetStatusPageHeartbeatsOKHeartbeatList) SetTo(v GetStatusPageHeartbeatsOKHeartbeatList) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptGetStatusPageHeartbeatsOKHeartbeatList) Get() (v GetStatusPageHeartbeatsOKHeartbeatList, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptGetStatusPageHeartbeatsOKHeartbeatList) Or(d GetStatusPageHeartbeatsOKHeartbeatList) GetStatusPageHeartbeatsOKHeartbeatList {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptGetStatusPageHeartbeatsOKMonitorNames returns new OptGetStatusPageHeartbeatsOKMonitorNames with value set to v.
-func NewOptGetStatusPageHeartbeatsOKMonitorNames(v GetStatusPageHeartbeatsOKMonitorNames) OptGetStatusPageHeartbeatsOKMonitorNames {
-	return OptGetStatusPageHeartbeatsOKMonitorNames{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptGetStatusPageHeartbeatsOKMonitorNames is optional GetStatusPageHeartbeatsOKMonitorNames.
-type OptGetStatusPageHeartbeatsOKMonitorNames struct {
-	Value GetStatusPageHeartbeatsOKMonitorNames
-	Set   bool
-}
-
-// IsSet returns true if OptGetStatusPageHeartbeatsOKMonitorNames was set.
-func (o OptGetStatusPageHeartbeatsOKMonitorNames) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptGetStatusPageHeartbeatsOKMonitorNames) Reset() {
-	var v GetStatusPageHeartbeatsOKMonitorNames
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptGetStatusPageHeartbeatsOKMonitorNames) SetTo(v GetStatusPageHeartbeatsOKMonitorNames) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptGetStatusPageHeartbeatsOKMonitorNames) Get() (v GetStatusPageHeartbeatsOKMonitorNames, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptGetStatusPageHeartbeatsOKMonitorNames) Or(d GetStatusPageHeartbeatsOKMonitorNames) GetStatusPageHeartbeatsOKMonitorNames {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptGetStatusPageHeartbeatsOKUptimeList returns new OptGetStatusPageHeartbeatsOKUptimeList with value set to v.
-func NewOptGetStatusPageHeartbeatsOKUptimeList(v GetStatusPageHeartbeatsOKUptimeList) OptGetStatusPageHeartbeatsOKUptimeList {
-	return OptGetStatusPageHeartbeatsOKUptimeList{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptGetStatusPageHeartbeatsOKUptimeList is optional GetStatusPageHeartbeatsOKUptimeList.
-type OptGetStatusPageHeartbeatsOKUptimeList struct {
-	Value GetStatusPageHeartbeatsOKUptimeList
-	Set   bool
-}
-
-// IsSet returns true if OptGetStatusPageHeartbeatsOKUptimeList was set.
-func (o OptGetStatusPageHeartbeatsOKUptimeList) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptGetStatusPageHeartbeatsOKUptimeList) Reset() {
-	var v GetStatusPageHeartbeatsOKUptimeList
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptGetStatusPageHeartbeatsOKUptimeList) SetTo(v GetStatusPageHeartbeatsOKUptimeList) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptGetStatusPageHeartbeatsOKUptimeList) Get() (v GetStatusPageHeartbeatsOKUptimeList, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptGetStatusPageHeartbeatsOKUptimeList) Or(d GetStatusPageHeartbeatsOKUptimeList) GetStatusPageHeartbeatsOKUptimeList {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptHttpMonitorConfigMethod returns new OptHttpMonitorConfigMethod with value set to v.
 func NewOptHttpMonitorConfigMethod(v HttpMonitorConfigMethod) OptHttpMonitorConfigMethod {
 	return OptHttpMonitorConfigMethod{
@@ -4362,38 +4511,38 @@ func (o OptHttpMonitorConfigMethod) Or(d HttpMonitorConfigMethod) HttpMonitorCon
 	return d
 }
 
-// NewOptInt returns new OptInt with value set to v.
-func NewOptInt(v int) OptInt {
-	return OptInt{
+// NewOptInt32 returns new OptInt32 with value set to v.
+func NewOptInt32(v int32) OptInt32 {
+	return OptInt32{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptInt is optional int.
-type OptInt struct {
-	Value int
+// OptInt32 is optional int32.
+type OptInt32 struct {
+	Value int32
 	Set   bool
 }
 
-// IsSet returns true if OptInt was set.
-func (o OptInt) IsSet() bool { return o.Set }
+// IsSet returns true if OptInt32 was set.
+func (o OptInt32) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptInt) Reset() {
-	var v int
+func (o *OptInt32) Reset() {
+	var v int32
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptInt) SetTo(v int) {
+func (o *OptInt32) SetTo(v int32) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptInt) Get() (v int, ok bool) {
+func (o OptInt32) Get() (v int32, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -4401,7 +4550,7 @@ func (o OptInt) Get() (v int, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptInt) Or(d int) int {
+func (o OptInt32) Or(d int32) int32 {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -4494,52 +4643,6 @@ func (o OptMonitorConfig) Get() (v MonitorConfig, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptMonitorConfig) Or(d MonitorConfig) MonitorConfig {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNotificationConfig returns new OptNotificationConfig with value set to v.
-func NewOptNotificationConfig(v NotificationConfig) OptNotificationConfig {
-	return OptNotificationConfig{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNotificationConfig is optional NotificationConfig.
-type OptNotificationConfig struct {
-	Value NotificationConfig
-	Set   bool
-}
-
-// IsSet returns true if OptNotificationConfig was set.
-func (o OptNotificationConfig) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNotificationConfig) Reset() {
-	var v NotificationConfig
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptNotificationConfig) SetTo(v NotificationConfig) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNotificationConfig) Get() (v NotificationConfig, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNotificationConfig) Or(d NotificationConfig) NotificationConfig {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -4730,6 +4833,52 @@ func (o OptString) Or(d string) string {
 	return d
 }
 
+// NewOptURI returns new OptURI with value set to v.
+func NewOptURI(v url.URL) OptURI {
+	return OptURI{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptURI is optional url.URL.
+type OptURI struct {
+	Value url.URL
+	Set   bool
+}
+
+// IsSet returns true if OptURI was set.
+func (o OptURI) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptURI) Reset() {
+	var v url.URL
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptURI) SetTo(v url.URL) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptURI) Get() (v url.URL, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptURI) Or(d url.URL) url.URL {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptUUID returns new OptUUID with value set to v.
 func NewOptUUID(v uuid.UUID) OptUUID {
 	return OptUUID{
@@ -4776,11 +4925,12 @@ func (o OptUUID) Or(d uuid.UUID) uuid.UUID {
 	return d
 }
 
+// Configuration for ICMP ping checks.
 // Ref: #/components/schemas/PingMonitorConfig
 type PingMonitorConfig struct {
 	Kind       PingMonitorConfigKind `json:"kind"`
 	Hostname   OptString             `json:"hostname"`
-	PacketSize OptInt                `json:"packetSize"`
+	PacketSize OptInt32              `json:"packetSize"`
 }
 
 // GetKind returns the value of Kind.
@@ -4794,7 +4944,7 @@ func (s *PingMonitorConfig) GetHostname() OptString {
 }
 
 // GetPacketSize returns the value of PacketSize.
-func (s *PingMonitorConfig) GetPacketSize() OptInt {
+func (s *PingMonitorConfig) GetPacketSize() OptInt32 {
 	return s.PacketSize
 }
 
@@ -4809,7 +4959,7 @@ func (s *PingMonitorConfig) SetHostname(val OptString) {
 }
 
 // SetPacketSize sets the value of PacketSize.
-func (s *PingMonitorConfig) SetPacketSize(val OptInt) {
+func (s *PingMonitorConfig) SetPacketSize(val OptInt32) {
 	s.PacketSize = val
 }
 
@@ -4847,11 +4997,12 @@ func (s *PingMonitorConfigKind) UnmarshalText(data []byte) error {
 	}
 }
 
+// Configuration for TCP port connectivity checks.
 // Ref: #/components/schemas/PortMonitorConfig
 type PortMonitorConfig struct {
 	Kind      PortMonitorConfigKind `json:"kind"`
 	Hostname  OptString             `json:"hostname"`
-	Port      OptInt                `json:"port"`
+	Port      OptInt32              `json:"port"`
 	IgnoreTls OptBool               `json:"ignoreTls"`
 }
 
@@ -4866,7 +5017,7 @@ func (s *PortMonitorConfig) GetHostname() OptString {
 }
 
 // GetPort returns the value of Port.
-func (s *PortMonitorConfig) GetPort() OptInt {
+func (s *PortMonitorConfig) GetPort() OptInt32 {
 	return s.Port
 }
 
@@ -4886,7 +5037,7 @@ func (s *PortMonitorConfig) SetHostname(val OptString) {
 }
 
 // SetPort sets the value of Port.
-func (s *PortMonitorConfig) SetPort(val OptInt) {
+func (s *PortMonitorConfig) SetPort(val OptInt32) {
 	s.Port = val
 }
 
@@ -4930,18 +5081,20 @@ func (s *PortMonitorConfigKind) UnmarshalText(data []byte) error {
 }
 
 type Prepare2FAOK struct {
-	URI string `json:"uri"`
+	URI url.URL `json:"uri"`
 }
 
 // GetURI returns the value of URI.
-func (s *Prepare2FAOK) GetURI() string {
+func (s *Prepare2FAOK) GetURI() url.URL {
 	return s.URI
 }
 
 // SetURI sets the value of URI.
-func (s *Prepare2FAOK) SetURI(val string) {
+func (s *Prepare2FAOK) SetURI(val url.URL) {
 	s.URI = val
 }
+
+func (*Prepare2FAOK) prepare2FARes() {}
 
 type Prepare2FAReq struct {
 	CurrentPassword string `json:"currentPassword"`
@@ -4967,7 +5120,7 @@ type Proxy struct {
 	// Proxy server hostname or IP address.
 	Host string `json:"host"`
 	// Proxy server port number.
-	Port int `json:"port"`
+	Port int32 `json:"port"`
 	// Whether this proxy is currently available for use.
 	Active bool `json:"active"`
 	// If true, this proxy is used by default for all monitors that don't specify a proxy.
@@ -4998,7 +5151,7 @@ func (s *Proxy) GetHost() string {
 }
 
 // GetPort returns the value of Port.
-func (s *Proxy) GetPort() int {
+func (s *Proxy) GetPort() int32 {
 	return s.Port
 }
 
@@ -5048,7 +5201,7 @@ func (s *Proxy) SetHost(val string) {
 }
 
 // SetPort sets the value of Port.
-func (s *Proxy) SetPort(val int) {
+func (s *Proxy) SetPort(val int32) {
 	s.Port = val
 }
 
@@ -5090,7 +5243,7 @@ type ProxyInput struct {
 	// Proxy server hostname or IP address.
 	Host string `json:"host"`
 	// Proxy server port number.
-	Port int `json:"port"`
+	Port int32 `json:"port"`
 	// Whether this proxy should be available for use immediately.
 	Active OptBool `json:"active"`
 	// If true, use this proxy by default for all new monitors.
@@ -5116,7 +5269,7 @@ func (s *ProxyInput) GetHost() string {
 }
 
 // GetPort returns the value of Port.
-func (s *ProxyInput) GetPort() int {
+func (s *ProxyInput) GetPort() int32 {
 	return s.Port
 }
 
@@ -5161,7 +5314,7 @@ func (s *ProxyInput) SetHost(val string) {
 }
 
 // SetPort sets the value of Port.
-func (s *ProxyInput) SetPort(val int) {
+func (s *ProxyInput) SetPort(val int32) {
 	s.Port = val
 }
 
@@ -5335,11 +5488,12 @@ func (s *ProxyProtocol) UnmarshalText(data []byte) error {
 	}
 }
 
+// Configuration for Redis connectivity checks.
 // Ref: #/components/schemas/RedisMonitorConfig
 type RedisMonitorConfig struct {
 	Kind          RedisMonitorConfigKind `json:"kind"`
 	Hostname      OptString              `json:"hostname"`
-	Port          OptInt                 `json:"port"`
+	Port          OptInt32               `json:"port"`
 	DatabaseQuery OptString              `json:"databaseQuery"`
 }
 
@@ -5354,7 +5508,7 @@ func (s *RedisMonitorConfig) GetHostname() OptString {
 }
 
 // GetPort returns the value of Port.
-func (s *RedisMonitorConfig) GetPort() OptInt {
+func (s *RedisMonitorConfig) GetPort() OptInt32 {
 	return s.Port
 }
 
@@ -5374,7 +5528,7 @@ func (s *RedisMonitorConfig) SetHostname(val OptString) {
 }
 
 // SetPort sets the value of Port.
-func (s *RedisMonitorConfig) SetPort(val OptInt) {
+func (s *RedisMonitorConfig) SetPort(val OptInt32) {
 	s.Port = val
 }
 
@@ -5448,8 +5602,16 @@ func (s SVGBadge) Read(p []byte) (n int, err error) {
 	return s.Data.Read(p)
 }
 
+func (*SVGBadge) getCertExpiryBadgeRes() {}
+func (*SVGBadge) getLatencyBadgeRes()    {}
+func (*SVGBadge) getResponseBadgeRes()   {}
+func (*SVGBadge) getStatusBadgeRes()     {}
+func (*SVGBadge) getUptimeBadgeRes()     {}
+
 // SetMaintenanceMonitorsOK is response for SetMaintenanceMonitors operation.
 type SetMaintenanceMonitorsOK struct{}
+
+func (*SetMaintenanceMonitorsOK) setMaintenanceMonitorsRes() {}
 
 type SetMaintenanceMonitorsReq struct {
 	MonitorIds []uuid.UUID `json:"monitorIds"`
@@ -5467,6 +5629,8 @@ func (s *SetMaintenanceMonitorsReq) SetMonitorIds(val []uuid.UUID) {
 
 // SetMaintenanceStatusPagesOK is response for SetMaintenanceStatusPages operation.
 type SetMaintenanceStatusPagesOK struct{}
+
+func (*SetMaintenanceStatusPagesOK) setMaintenanceStatusPagesRes() {}
 
 type SetMaintenanceStatusPagesReq struct {
 	StatusPageIds []uuid.UUID `json:"statusPageIds"`
@@ -5486,7 +5650,7 @@ func (s *SetMaintenanceStatusPagesReq) SetStatusPageIds(val []uuid.UUID) {
 // Ref: #/components/schemas/Settings
 type Settings struct {
 	// The public-facing base URL of this instance (used in notifications and badges).
-	PrimaryBaseURL OptString `json:"primaryBaseURL"`
+	PrimaryBaseURL OptURI `json:"primaryBaseURL"`
 	// IANA timezone identifier for server-side time display (e.g., 'America/New_York').
 	ServerTimezone OptString `json:"serverTimezone"`
 	// Default page shown when users navigate to the root URL.
@@ -5498,13 +5662,13 @@ type Settings struct {
 	// Whether API key authentication is enabled for programmatic access.
 	ApiKeysEnabled OptBool `json:"apiKeysEnabled"`
 	// Number of days to retain heartbeat data before automatic cleanup.
-	KeepDataPeriodDays OptInt `json:"keepDataPeriodDays"`
+	KeepDataPeriodDays OptInt32 `json:"keepDataPeriodDays"`
 	// Slug of the default status page shown when entryPage is 'statusPage'.
 	StatusPageSlug OptString `json:"statusPageSlug"`
 }
 
 // GetPrimaryBaseURL returns the value of PrimaryBaseURL.
-func (s *Settings) GetPrimaryBaseURL() OptString {
+func (s *Settings) GetPrimaryBaseURL() OptURI {
 	return s.PrimaryBaseURL
 }
 
@@ -5534,7 +5698,7 @@ func (s *Settings) GetApiKeysEnabled() OptBool {
 }
 
 // GetKeepDataPeriodDays returns the value of KeepDataPeriodDays.
-func (s *Settings) GetKeepDataPeriodDays() OptInt {
+func (s *Settings) GetKeepDataPeriodDays() OptInt32 {
 	return s.KeepDataPeriodDays
 }
 
@@ -5544,7 +5708,7 @@ func (s *Settings) GetStatusPageSlug() OptString {
 }
 
 // SetPrimaryBaseURL sets the value of PrimaryBaseURL.
-func (s *Settings) SetPrimaryBaseURL(val OptString) {
+func (s *Settings) SetPrimaryBaseURL(val OptURI) {
 	s.PrimaryBaseURL = val
 }
 
@@ -5574,7 +5738,7 @@ func (s *Settings) SetApiKeysEnabled(val OptBool) {
 }
 
 // SetKeepDataPeriodDays sets the value of KeepDataPeriodDays.
-func (s *Settings) SetKeepDataPeriodDays(val OptInt) {
+func (s *Settings) SetKeepDataPeriodDays(val OptInt32) {
 	s.KeepDataPeriodDays = val
 }
 
@@ -5582,6 +5746,8 @@ func (s *Settings) SetKeepDataPeriodDays(val OptInt) {
 func (s *Settings) SetStatusPageSlug(val OptString) {
 	s.StatusPageSlug = val
 }
+
+func (*Settings) getSettingsRes() {}
 
 // Default page shown when users navigate to the root URL.
 type SettingsEntryPage string
@@ -5655,11 +5821,12 @@ func (s *SetupReq) SetPassword(val string) {
 	s.Password = val
 }
 
+// Configuration for SMTP server connectivity checks.
 // Ref: #/components/schemas/SmtpMonitorConfig
 type SmtpMonitorConfig struct {
 	Kind      SmtpMonitorConfigKind `json:"kind"`
 	Hostname  OptString             `json:"hostname"`
-	Port      OptInt                `json:"port"`
+	Port      OptInt32              `json:"port"`
 	IgnoreTls OptBool               `json:"ignoreTls"`
 }
 
@@ -5674,7 +5841,7 @@ func (s *SmtpMonitorConfig) GetHostname() OptString {
 }
 
 // GetPort returns the value of Port.
-func (s *SmtpMonitorConfig) GetPort() OptInt {
+func (s *SmtpMonitorConfig) GetPort() OptInt32 {
 	return s.Port
 }
 
@@ -5694,7 +5861,7 @@ func (s *SmtpMonitorConfig) SetHostname(val OptString) {
 }
 
 // SetPort sets the value of Port.
-func (s *SmtpMonitorConfig) SetPort(val OptInt) {
+func (s *SmtpMonitorConfig) SetPort(val OptInt32) {
 	s.Port = val
 }
 
@@ -5899,7 +6066,8 @@ func (s *StatusPage) SetGroups(val []StatusPageGroup) {
 	s.Groups = val
 }
 
-func (*StatusPage) getStatusPageRes() {}
+func (*StatusPage) getStatusPageRes()    {}
+func (*StatusPage) updateStatusPageRes() {}
 
 // A named group of monitors displayed together on a status page.
 // Ref: #/components/schemas/StatusPageGroup
@@ -5909,7 +6077,7 @@ type StatusPageGroup struct {
 	// Display name of the group.
 	Name string `json:"name"`
 	// Sort order weight (lower values appear first).
-	Weight OptInt `json:"weight"`
+	Weight OptInt32 `json:"weight"`
 	// IDs of monitors to include in this group.
 	MonitorIds []uuid.UUID `json:"monitorIds"`
 	// Tag IDs used to dynamically include monitors. Unioned with monitorIds.
@@ -5927,7 +6095,7 @@ func (s *StatusPageGroup) GetName() string {
 }
 
 // GetWeight returns the value of Weight.
-func (s *StatusPageGroup) GetWeight() OptInt {
+func (s *StatusPageGroup) GetWeight() OptInt32 {
 	return s.Weight
 }
 
@@ -5952,7 +6120,7 @@ func (s *StatusPageGroup) SetName(val string) {
 }
 
 // SetWeight sets the value of Weight.
-func (s *StatusPageGroup) SetWeight(val OptInt) {
+func (s *StatusPageGroup) SetWeight(val OptInt32) {
 	s.Weight = val
 }
 
@@ -6266,6 +6434,9 @@ func (s *Tag) SetColor(val string) {
 	s.Color = val
 }
 
+func (*Tag) createTagRes() {}
+func (*Tag) updateTagRes() {}
+
 // Input for creating or updating a tag.
 // Ref: #/components/schemas/TagInput
 type TagInput struct {
@@ -6295,6 +6466,7 @@ func (s *TagInput) SetColor(val string) {
 	s.Color = val
 }
 
+// Configuration for Tailscale DERP ping checks.
 // Ref: #/components/schemas/TailscalePingMonitorConfig
 type TailscalePingMonitorConfig struct {
 	Kind     TailscalePingMonitorConfigKind `json:"kind"`
@@ -6378,6 +6550,8 @@ func (*TokenResponse) refreshTokenRes()   {}
 // UpdateMonitorTagOK is response for UpdateMonitorTag operation.
 type UpdateMonitorTagOK struct{}
 
+func (*UpdateMonitorTagOK) updateMonitorTagRes() {}
+
 type UpdateMonitorTagReq struct {
 	Value OptString `json:"value"`
 }
@@ -6394,3 +6568,5 @@ func (s *UpdateMonitorTagReq) SetValue(val OptString) {
 
 // UpdateProxyOK is response for UpdateProxy operation.
 type UpdateProxyOK struct{}
+
+func (*UpdateProxyOK) updateProxyRes() {}

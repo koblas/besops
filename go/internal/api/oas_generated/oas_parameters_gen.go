@@ -281,6 +281,7 @@ func decodeClearHeartbeatsParams(args [1]string, argsEscaped bool, r *http.Reque
 
 // CreateIncidentParams is parameters of createIncident operation.
 type CreateIncidentParams struct {
+	// URL-safe identifier of the status page.
 	Slug string
 }
 
@@ -338,7 +339,7 @@ func decodeCreateIncidentParams(args [1]string, argsEscaped bool, r *http.Reques
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[a-z0-9]([a-z0-9-]*[a-z0-9])?$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -366,6 +367,7 @@ func decodeCreateIncidentParams(args [1]string, argsEscaped bool, r *http.Reques
 
 // DeleteAPIKeyParams is parameters of deleteAPIKey operation.
 type DeleteAPIKeyParams struct {
+	// Unique identifier of the API key.
 	KeyId uuid.UUID
 }
 
@@ -431,7 +433,9 @@ func decodeDeleteAPIKeyParams(args [1]string, argsEscaped bool, r *http.Request)
 
 // DeleteIncidentParams is parameters of deleteIncident operation.
 type DeleteIncidentParams struct {
-	Slug       string
+	// URL-safe identifier of the status page.
+	Slug string
+	// Unique identifier of the incident.
 	IncidentId uuid.UUID
 }
 
@@ -496,7 +500,7 @@ func decodeDeleteIncidentParams(args [2]string, argsEscaped bool, r *http.Reques
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[a-z0-9]([a-z0-9-]*[a-z0-9])?$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -569,6 +573,7 @@ func decodeDeleteIncidentParams(args [2]string, argsEscaped bool, r *http.Reques
 
 // DeleteMaintenanceParams is parameters of deleteMaintenance operation.
 type DeleteMaintenanceParams struct {
+	// Unique identifier of the maintenance window.
 	MaintenanceId uuid.UUID
 }
 
@@ -634,6 +639,7 @@ func decodeDeleteMaintenanceParams(args [1]string, argsEscaped bool, r *http.Req
 
 // DeleteMonitorParams is parameters of deleteMonitor operation.
 type DeleteMonitorParams struct {
+	// Whether to also delete child monitors in a group.
 	DeleteChildren OptBool `json:",omitempty,omitzero"`
 	// Unique identifier of the monitor.
 	MonitorId uuid.UUID
@@ -759,7 +765,8 @@ func decodeDeleteMonitorParams(args [1]string, argsEscaped bool, r *http.Request
 type DeleteMonitorTagParams struct {
 	// Unique identifier of the monitor.
 	MonitorId uuid.UUID
-	TagId     uuid.UUID
+	// Unique identifier of the tag.
+	TagId uuid.UUID
 }
 
 func unpackDeleteMonitorTagParams(packed middleware.Parameters) (params DeleteMonitorTagParams) {
@@ -876,6 +883,7 @@ func decodeDeleteMonitorTagParams(args [2]string, argsEscaped bool, r *http.Requ
 
 // DeleteNotificationParams is parameters of deleteNotification operation.
 type DeleteNotificationParams struct {
+	// Unique identifier of the notification provider.
 	NotificationId uuid.UUID
 }
 
@@ -941,6 +949,7 @@ func decodeDeleteNotificationParams(args [1]string, argsEscaped bool, r *http.Re
 
 // DeleteProxyParams is parameters of deleteProxy operation.
 type DeleteProxyParams struct {
+	// Unique identifier of the proxy.
 	ProxyId uuid.UUID
 }
 
@@ -1006,6 +1015,7 @@ func decodeDeleteProxyParams(args [1]string, argsEscaped bool, r *http.Request) 
 
 // DeleteStatusPageParams is parameters of deleteStatusPage operation.
 type DeleteStatusPageParams struct {
+	// URL-safe identifier of the status page.
 	Slug string
 }
 
@@ -1063,7 +1073,7 @@ func decodeDeleteStatusPageParams(args [1]string, argsEscaped bool, r *http.Requ
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[a-z0-9]([a-z0-9-]*[a-z0-9])?$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -1091,6 +1101,7 @@ func decodeDeleteStatusPageParams(args [1]string, argsEscaped bool, r *http.Requ
 
 // DeleteTagParams is parameters of deleteTag operation.
 type DeleteTagParams struct {
+	// Unique identifier of the tag.
 	TagId uuid.UUID
 }
 
@@ -1156,6 +1167,7 @@ func decodeDeleteTagParams(args [1]string, argsEscaped bool, r *http.Request) (p
 
 // DisableAPIKeyParams is parameters of disableAPIKey operation.
 type DisableAPIKeyParams struct {
+	// Unique identifier of the API key.
 	KeyId uuid.UUID
 }
 
@@ -1221,6 +1233,7 @@ func decodeDisableAPIKeyParams(args [1]string, argsEscaped bool, r *http.Request
 
 // EnableAPIKeyParams is parameters of enableAPIKey operation.
 type EnableAPIKeyParams struct {
+	// Unique identifier of the API key.
 	KeyId uuid.UUID
 }
 
@@ -1425,7 +1438,8 @@ func decodeGetCertExpiryBadgeParams(args [1]string, argsEscaped bool, r *http.Re
 
 // GetChartDataParams is parameters of getChartData operation.
 type GetChartDataParams struct {
-	Hours OptInt `json:",omitempty,omitzero"`
+	// Number of hours of chart data to return.
+	Hours OptInt32 `json:",omitempty,omitzero"`
 	// Unique identifier of the monitor.
 	MonitorId uuid.UUID
 }
@@ -1437,7 +1451,7 @@ func unpackGetChartDataParams(packed middleware.Parameters) (params GetChartData
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.Hours = v.(OptInt)
+			params.Hours = v.(OptInt32)
 		}
 	}
 	{
@@ -1454,7 +1468,7 @@ func decodeGetChartDataParams(args [1]string, argsEscaped bool, r *http.Request)
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Set default value for query: hours.
 	{
-		val := int(24)
+		val := int32(24)
 		params.Hours.SetTo(val)
 	}
 	// Decode query: hours.
@@ -1467,14 +1481,14 @@ func decodeGetChartDataParams(args [1]string, argsEscaped bool, r *http.Request)
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotHoursVal int
+				var paramsDotHoursVal int32
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
 						return err
 					}
 
-					c, err := conv.ToInt(val)
+					c, err := conv.ToInt32(val)
 					if err != nil {
 						return err
 					}
@@ -1574,9 +1588,9 @@ func decodeGetChartDataParams(args [1]string, argsEscaped bool, r *http.Request)
 // GetHeartbeatsParams is parameters of getHeartbeats operation.
 type GetHeartbeatsParams struct {
 	// Number of hours of history to return.
-	Hours OptInt `json:",omitempty,omitzero"`
+	Hours OptInt32 `json:",omitempty,omitzero"`
 	// Number of most recent heartbeats to return.
-	Count OptInt `json:",omitempty,omitzero"`
+	Count OptInt32 `json:",omitempty,omitzero"`
 	// Unique identifier of the monitor.
 	MonitorId uuid.UUID
 }
@@ -1588,7 +1602,7 @@ func unpackGetHeartbeatsParams(packed middleware.Parameters) (params GetHeartbea
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.Hours = v.(OptInt)
+			params.Hours = v.(OptInt32)
 		}
 	}
 	{
@@ -1597,7 +1611,7 @@ func unpackGetHeartbeatsParams(packed middleware.Parameters) (params GetHeartbea
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.Count = v.(OptInt)
+			params.Count = v.(OptInt32)
 		}
 	}
 	{
@@ -1622,14 +1636,14 @@ func decodeGetHeartbeatsParams(args [1]string, argsEscaped bool, r *http.Request
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotHoursVal int
+				var paramsDotHoursVal int32
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
 						return err
 					}
 
-					c, err := conv.ToInt(val)
+					c, err := conv.ToInt32(val)
 					if err != nil {
 						return err
 					}
@@ -1688,14 +1702,14 @@ func decodeGetHeartbeatsParams(args [1]string, argsEscaped bool, r *http.Request
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotCountVal int
+				var paramsDotCountVal int32
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
 						return err
 					}
 
-					c, err := conv.ToInt(val)
+					c, err := conv.ToInt32(val)
 					if err != nil {
 						return err
 					}
@@ -1794,8 +1808,10 @@ func decodeGetHeartbeatsParams(args [1]string, argsEscaped bool, r *http.Request
 
 // GetImportantHeartbeatsParams is parameters of getImportantHeartbeats operation.
 type GetImportantHeartbeatsParams struct {
-	Offset OptInt `json:",omitempty,omitzero"`
-	Limit  OptInt `json:",omitempty,omitzero"`
+	// Number of records to skip for pagination.
+	Offset OptInt32 `json:",omitempty,omitzero"`
+	// Maximum number of records to return.
+	Limit OptInt32 `json:",omitempty,omitzero"`
 	// Unique identifier of the monitor.
 	MonitorId uuid.UUID
 }
@@ -1807,7 +1823,7 @@ func unpackGetImportantHeartbeatsParams(packed middleware.Parameters) (params Ge
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.Offset = v.(OptInt)
+			params.Offset = v.(OptInt32)
 		}
 	}
 	{
@@ -1816,7 +1832,7 @@ func unpackGetImportantHeartbeatsParams(packed middleware.Parameters) (params Ge
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.Limit = v.(OptInt)
+			params.Limit = v.(OptInt32)
 		}
 	}
 	{
@@ -1833,7 +1849,7 @@ func decodeGetImportantHeartbeatsParams(args [1]string, argsEscaped bool, r *htt
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Set default value for query: offset.
 	{
-		val := int(0)
+		val := int32(0)
 		params.Offset.SetTo(val)
 	}
 	// Decode query: offset.
@@ -1846,14 +1862,14 @@ func decodeGetImportantHeartbeatsParams(args [1]string, argsEscaped bool, r *htt
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotOffsetVal int
+				var paramsDotOffsetVal int32
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
 						return err
 					}
 
-					c, err := conv.ToInt(val)
+					c, err := conv.ToInt32(val)
 					if err != nil {
 						return err
 					}
@@ -1874,8 +1890,8 @@ func decodeGetImportantHeartbeatsParams(args [1]string, argsEscaped bool, r *htt
 						if err := (validate.Int{
 							MinSet:        true,
 							Min:           0,
-							MaxSet:        false,
-							Max:           0,
+							MaxSet:        true,
+							Max:           2147483647,
 							MinExclusive:  false,
 							MaxExclusive:  false,
 							MultipleOfSet: false,
@@ -1904,7 +1920,7 @@ func decodeGetImportantHeartbeatsParams(args [1]string, argsEscaped bool, r *htt
 	}
 	// Set default value for query: limit.
 	{
-		val := int(25)
+		val := int32(25)
 		params.Limit.SetTo(val)
 	}
 	// Decode query: limit.
@@ -1917,14 +1933,14 @@ func decodeGetImportantHeartbeatsParams(args [1]string, argsEscaped bool, r *htt
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotLimitVal int
+				var paramsDotLimitVal int32
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
 						return err
 					}
 
-					c, err := conv.ToInt(val)
+					c, err := conv.ToInt32(val)
 					if err != nil {
 						return err
 					}
@@ -2023,7 +2039,8 @@ func decodeGetImportantHeartbeatsParams(args [1]string, argsEscaped bool, r *htt
 
 // GetLatencyBadgeParams is parameters of getLatencyBadge operation.
 type GetLatencyBadgeParams struct {
-	Duration OptInt `json:",omitempty,omitzero"`
+	// Duration in hours for latency calculation.
+	Duration OptInt32 `json:",omitempty,omitzero"`
 	// Visual style of the rendered SVG badge.
 	Style OptBadgeStyle `json:",omitempty,omitzero"`
 	// Unique identifier of the monitor.
@@ -2037,7 +2054,7 @@ func unpackGetLatencyBadgeParams(packed middleware.Parameters) (params GetLatenc
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.Duration = v.(OptInt)
+			params.Duration = v.(OptInt32)
 		}
 	}
 	{
@@ -2063,7 +2080,7 @@ func decodeGetLatencyBadgeParams(args [1]string, argsEscaped bool, r *http.Reque
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Set default value for query: duration.
 	{
-		val := int(24)
+		val := int32(24)
 		params.Duration.SetTo(val)
 	}
 	// Decode query: duration.
@@ -2076,14 +2093,14 @@ func decodeGetLatencyBadgeParams(args [1]string, argsEscaped bool, r *http.Reque
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotDurationVal int
+				var paramsDotDurationVal int32
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
 						return err
 					}
 
-					c, err := conv.ToInt(val)
+					c, err := conv.ToInt32(val)
 					if err != nil {
 						return err
 					}
@@ -2243,6 +2260,7 @@ func decodeGetLatencyBadgeParams(args [1]string, argsEscaped bool, r *http.Reque
 
 // GetMaintenanceParams is parameters of getMaintenance operation.
 type GetMaintenanceParams struct {
+	// Unique identifier of the maintenance window.
 	MaintenanceId uuid.UUID
 }
 
@@ -2308,6 +2326,7 @@ func decodeGetMaintenanceParams(args [1]string, argsEscaped bool, r *http.Reques
 
 // GetMaintenanceMonitorsParams is parameters of getMaintenanceMonitors operation.
 type GetMaintenanceMonitorsParams struct {
+	// Unique identifier of the maintenance window.
 	MaintenanceId uuid.UUID
 }
 
@@ -2373,6 +2392,7 @@ func decodeGetMaintenanceMonitorsParams(args [1]string, argsEscaped bool, r *htt
 
 // GetMaintenanceStatusPagesParams is parameters of getMaintenanceStatusPages operation.
 type GetMaintenanceStatusPagesParams struct {
+	// Unique identifier of the maintenance window.
 	MaintenanceId uuid.UUID
 }
 
@@ -2782,6 +2802,7 @@ func decodeGetStatusBadgeParams(args [1]string, argsEscaped bool, r *http.Reques
 
 // GetStatusPageParams is parameters of getStatusPage operation.
 type GetStatusPageParams struct {
+	// URL-safe identifier of the status page.
 	Slug string
 }
 
@@ -2839,7 +2860,7 @@ func decodeGetStatusPageParams(args [1]string, argsEscaped bool, r *http.Request
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[a-z0-9]([a-z0-9-]*[a-z0-9])?$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -2867,8 +2888,10 @@ func decodeGetStatusPageParams(args [1]string, argsEscaped bool, r *http.Request
 
 // GetStatusPageBadgeParams is parameters of getStatusPageBadge operation.
 type GetStatusPageBadgeParams struct {
+	// Visual style of the rendered SVG badge.
 	Style OptGetStatusPageBadgeStyle `json:",omitempty,omitzero"`
-	Slug  string
+	// URL-safe identifier of the status page.
+	Slug string
 }
 
 func unpackGetStatusPageBadgeParams(packed middleware.Parameters) (params GetStatusPageBadgeParams) {
@@ -2991,7 +3014,7 @@ func decodeGetStatusPageBadgeParams(args [1]string, argsEscaped bool, r *http.Re
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[a-z0-9]([a-z0-9-]*[a-z0-9])?$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -3019,6 +3042,7 @@ func decodeGetStatusPageBadgeParams(args [1]string, argsEscaped bool, r *http.Re
 
 // GetStatusPageEventStreamParams is parameters of getStatusPageEventStream operation.
 type GetStatusPageEventStreamParams struct {
+	// URL-safe identifier of the status page.
 	Slug string
 }
 
@@ -3076,7 +3100,7 @@ func decodeGetStatusPageEventStreamParams(args [1]string, argsEscaped bool, r *h
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[a-z0-9]([a-z0-9-]*[a-z0-9])?$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -3104,6 +3128,7 @@ func decodeGetStatusPageEventStreamParams(args [1]string, argsEscaped bool, r *h
 
 // GetStatusPageHeartbeatsParams is parameters of getStatusPageHeartbeats operation.
 type GetStatusPageHeartbeatsParams struct {
+	// URL-safe identifier of the status page.
 	Slug string
 }
 
@@ -3161,7 +3186,7 @@ func decodeGetStatusPageHeartbeatsParams(args [1]string, argsEscaped bool, r *ht
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[a-z0-9]([a-z0-9-]*[a-z0-9])?$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -3189,7 +3214,8 @@ func decodeGetStatusPageHeartbeatsParams(args [1]string, argsEscaped bool, r *ht
 
 // GetUptimeBadgeParams is parameters of getUptimeBadge operation.
 type GetUptimeBadgeParams struct {
-	Duration OptInt `json:",omitempty,omitzero"`
+	// Duration in hours for uptime calculation.
+	Duration OptInt32 `json:",omitempty,omitzero"`
 	// Visual style of the rendered SVG badge.
 	Style OptBadgeStyle `json:",omitempty,omitzero"`
 	// Unique identifier of the monitor.
@@ -3203,7 +3229,7 @@ func unpackGetUptimeBadgeParams(packed middleware.Parameters) (params GetUptimeB
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.Duration = v.(OptInt)
+			params.Duration = v.(OptInt32)
 		}
 	}
 	{
@@ -3229,7 +3255,7 @@ func decodeGetUptimeBadgeParams(args [1]string, argsEscaped bool, r *http.Reques
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Set default value for query: duration.
 	{
-		val := int(24)
+		val := int32(24)
 		params.Duration.SetTo(val)
 	}
 	// Decode query: duration.
@@ -3242,14 +3268,14 @@ func decodeGetUptimeBadgeParams(args [1]string, argsEscaped bool, r *http.Reques
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotDurationVal int
+				var paramsDotDurationVal int32
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
 						return err
 					}
 
-					c, err := conv.ToInt(val)
+					c, err := conv.ToInt32(val)
 					if err != nil {
 						return err
 					}
@@ -3409,8 +3435,10 @@ func decodeGetUptimeBadgeParams(args [1]string, argsEscaped bool, r *http.Reques
 
 // ListIncidentsParams is parameters of listIncidents operation.
 type ListIncidentsParams struct {
+	// Pagination cursor for fetching the next page of results.
 	Cursor OptString `json:",omitempty,omitzero"`
-	Slug   string
+	// URL-safe identifier of the status page.
+	Slug string
 }
 
 func unpackListIncidentsParams(packed middleware.Parameters) (params ListIncidentsParams) {
@@ -3477,7 +3505,7 @@ func decodeListIncidentsParams(args [1]string, argsEscaped bool, r *http.Request
 							MaxLengthSet:  true,
 							Email:         false,
 							Hostname:      false,
-							Regex:         nil,
+							Regex:         regexMap["^[\\s\\S]*$"],
 							MinNumeric:    0,
 							MinNumericSet: false,
 							MaxNumeric:    0,
@@ -3545,7 +3573,7 @@ func decodeListIncidentsParams(args [1]string, argsEscaped bool, r *http.Request
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[a-z0-9]([a-z0-9-]*[a-z0-9])?$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -3573,7 +3601,8 @@ func decodeListIncidentsParams(args [1]string, argsEscaped bool, r *http.Request
 
 // ListRecentEventsParams is parameters of listRecentEvents operation.
 type ListRecentEventsParams struct {
-	Limit OptInt `json:",omitempty,omitzero"`
+	// Maximum number of records to return.
+	Limit OptInt32 `json:",omitempty,omitzero"`
 }
 
 func unpackListRecentEventsParams(packed middleware.Parameters) (params ListRecentEventsParams) {
@@ -3583,7 +3612,7 @@ func unpackListRecentEventsParams(packed middleware.Parameters) (params ListRece
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.Limit = v.(OptInt)
+			params.Limit = v.(OptInt32)
 		}
 	}
 	return params
@@ -3593,7 +3622,7 @@ func decodeListRecentEventsParams(args [0]string, argsEscaped bool, r *http.Requ
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Set default value for query: limit.
 	{
-		val := int(25)
+		val := int32(25)
 		params.Limit.SetTo(val)
 	}
 	// Decode query: limit.
@@ -3606,14 +3635,14 @@ func decodeListRecentEventsParams(args [0]string, argsEscaped bool, r *http.Requ
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotLimitVal int
+				var paramsDotLimitVal int32
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
 						return err
 					}
 
-					c, err := conv.ToInt(val)
+					c, err := conv.ToInt32(val)
 					if err != nil {
 						return err
 					}
@@ -3667,6 +3696,7 @@ func decodeListRecentEventsParams(args [0]string, argsEscaped bool, r *http.Requ
 
 // PauseMaintenanceParams is parameters of pauseMaintenance operation.
 type PauseMaintenanceParams struct {
+	// Unique identifier of the maintenance window.
 	MaintenanceId uuid.UUID
 }
 
@@ -3798,7 +3828,9 @@ func decodePauseMonitorParams(args [1]string, argsEscaped bool, r *http.Request)
 
 // ResolveIncidentParams is parameters of resolveIncident operation.
 type ResolveIncidentParams struct {
-	Slug       string
+	// URL-safe identifier of the status page.
+	Slug string
+	// Unique identifier of the incident.
 	IncidentId uuid.UUID
 }
 
@@ -3863,7 +3895,7 @@ func decodeResolveIncidentParams(args [2]string, argsEscaped bool, r *http.Reque
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[a-z0-9]([a-z0-9-]*[a-z0-9])?$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -3936,6 +3968,7 @@ func decodeResolveIncidentParams(args [2]string, argsEscaped bool, r *http.Reque
 
 // ResumeMaintenanceParams is parameters of resumeMaintenance operation.
 type ResumeMaintenanceParams struct {
+	// Unique identifier of the maintenance window.
 	MaintenanceId uuid.UUID
 }
 
@@ -4067,6 +4100,7 @@ func decodeResumeMonitorParams(args [1]string, argsEscaped bool, r *http.Request
 
 // SetMaintenanceMonitorsParams is parameters of setMaintenanceMonitors operation.
 type SetMaintenanceMonitorsParams struct {
+	// Unique identifier of the maintenance window.
 	MaintenanceId uuid.UUID
 }
 
@@ -4132,6 +4166,7 @@ func decodeSetMaintenanceMonitorsParams(args [1]string, argsEscaped bool, r *htt
 
 // SetMaintenanceStatusPagesParams is parameters of setMaintenanceStatusPages operation.
 type SetMaintenanceStatusPagesParams struct {
+	// Unique identifier of the maintenance window.
 	MaintenanceId uuid.UUID
 }
 
@@ -4197,6 +4232,7 @@ func decodeSetMaintenanceStatusPagesParams(args [1]string, argsEscaped bool, r *
 
 // TestNotificationParams is parameters of testNotification operation.
 type TestNotificationParams struct {
+	// Unique identifier of the notification provider.
 	NotificationId uuid.UUID
 }
 
@@ -4262,7 +4298,9 @@ func decodeTestNotificationParams(args [1]string, argsEscaped bool, r *http.Requ
 
 // UnpinIncidentParams is parameters of unpinIncident operation.
 type UnpinIncidentParams struct {
-	Slug       string
+	// URL-safe identifier of the status page.
+	Slug string
+	// Unique identifier of the incident.
 	IncidentId uuid.UUID
 }
 
@@ -4327,7 +4365,7 @@ func decodeUnpinIncidentParams(args [2]string, argsEscaped bool, r *http.Request
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[a-z0-9]([a-z0-9-]*[a-z0-9])?$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -4400,7 +4438,9 @@ func decodeUnpinIncidentParams(args [2]string, argsEscaped bool, r *http.Request
 
 // UpdateIncidentParams is parameters of updateIncident operation.
 type UpdateIncidentParams struct {
-	Slug       string
+	// URL-safe identifier of the status page.
+	Slug string
+	// Unique identifier of the incident.
 	IncidentId uuid.UUID
 }
 
@@ -4465,7 +4505,7 @@ func decodeUpdateIncidentParams(args [2]string, argsEscaped bool, r *http.Reques
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[a-z0-9]([a-z0-9-]*[a-z0-9])?$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -4538,6 +4578,7 @@ func decodeUpdateIncidentParams(args [2]string, argsEscaped bool, r *http.Reques
 
 // UpdateMaintenanceParams is parameters of updateMaintenance operation.
 type UpdateMaintenanceParams struct {
+	// Unique identifier of the maintenance window.
 	MaintenanceId uuid.UUID
 }
 
@@ -4671,7 +4712,8 @@ func decodeUpdateMonitorParams(args [1]string, argsEscaped bool, r *http.Request
 type UpdateMonitorTagParams struct {
 	// Unique identifier of the monitor.
 	MonitorId uuid.UUID
-	TagId     uuid.UUID
+	// Unique identifier of the tag.
+	TagId uuid.UUID
 }
 
 func unpackUpdateMonitorTagParams(packed middleware.Parameters) (params UpdateMonitorTagParams) {
@@ -4788,6 +4830,7 @@ func decodeUpdateMonitorTagParams(args [2]string, argsEscaped bool, r *http.Requ
 
 // UpdateNotificationParams is parameters of updateNotification operation.
 type UpdateNotificationParams struct {
+	// Unique identifier of the notification provider.
 	NotificationId uuid.UUID
 }
 
@@ -4853,6 +4896,7 @@ func decodeUpdateNotificationParams(args [1]string, argsEscaped bool, r *http.Re
 
 // UpdateProxyParams is parameters of updateProxy operation.
 type UpdateProxyParams struct {
+	// Unique identifier of the proxy.
 	ProxyId uuid.UUID
 }
 
@@ -4918,6 +4962,7 @@ func decodeUpdateProxyParams(args [1]string, argsEscaped bool, r *http.Request) 
 
 // UpdateStatusPageParams is parameters of updateStatusPage operation.
 type UpdateStatusPageParams struct {
+	// URL-safe identifier of the status page.
 	Slug string
 }
 
@@ -4975,7 +5020,7 @@ func decodeUpdateStatusPageParams(args [1]string, argsEscaped bool, r *http.Requ
 					MaxLengthSet:  true,
 					Email:         false,
 					Hostname:      false,
-					Regex:         nil,
+					Regex:         regexMap["^[a-z0-9]([a-z0-9-]*[a-z0-9])?$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,
@@ -5003,6 +5048,7 @@ func decodeUpdateStatusPageParams(args [1]string, argsEscaped bool, r *http.Requ
 
 // UpdateTagParams is parameters of updateTag operation.
 type UpdateTagParams struct {
+	// Unique identifier of the tag.
 	TagId uuid.UUID
 }
 

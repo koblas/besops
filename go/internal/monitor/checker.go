@@ -39,11 +39,11 @@ type Config struct {
 	IgnoreTLS     bool
 	Keyword       string
 	KeywordType   string
-	JsonPath      string
+	JSONPath      string
 	ExpectedValue string
-	ProxyID *string
-	Tags    []string
-	GroupTagIDs []string
+	ProxyID       *string
+	Tags          []string
+	GroupTagIDs   []string
 
 	HTTP  HTTPConfig
 	DNS   DNSConfig

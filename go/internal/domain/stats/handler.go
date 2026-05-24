@@ -29,13 +29,25 @@ func (h *Handler) ClearAll(ctx context.Context) error {
 }
 
 func (h *Handler) GetMinutely(ctx context.Context, monitorID string, since int64) ([]*StatMinutely, error) {
-	return h.repo.GetMinutely(ctx, monitorID, since)
+	rows, err := h.repo.GetMinutely(ctx, monitorID, since)
+	if err != nil {
+		return nil, fmt.Errorf("getting minutely stats: %w", err)
+	}
+	return rows, nil
 }
 
 func (h *Handler) GetHourly(ctx context.Context, monitorID string, since int64) ([]*StatHourly, error) {
-	return h.repo.GetHourly(ctx, monitorID, since)
+	rows, err := h.repo.GetHourly(ctx, monitorID, since)
+	if err != nil {
+		return nil, fmt.Errorf("getting hourly stats: %w", err)
+	}
+	return rows, nil
 }
 
 func (h *Handler) GetDaily(ctx context.Context, monitorID string, since int64) ([]*StatDaily, error) {
-	return h.repo.GetDaily(ctx, monitorID, since)
+	rows, err := h.repo.GetDaily(ctx, monitorID, since)
+	if err != nil {
+		return nil, fmt.Errorf("getting daily stats: %w", err)
+	}
+	return rows, nil
 }

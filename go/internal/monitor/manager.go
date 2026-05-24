@@ -156,7 +156,7 @@ func modelToConfig(mon *domainmonitor.Monitor) *Config {
 	cfg.Port = jsonInt(raw, "port")
 	cfg.IgnoreTLS = jsonBool(raw, "ignoreTls")
 	cfg.Keyword = jsonString(raw, "keyword")
-	cfg.JsonPath = jsonString(raw, "jsonPath")
+	cfg.JSONPath = jsonString(raw, "jsonPath")
 	cfg.ExpectedValue = jsonString(raw, "expectedValue")
 
 	if v := jsonString(raw, "proxyId"); v != "" {

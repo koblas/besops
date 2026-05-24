@@ -3,6 +3,7 @@ package settings
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"strconv"
 
 	oas "github.com/koblas/besops/internal/api/oas_generated"
@@ -19,7 +20,7 @@ func NewHandler(repo Repository) *Handler {
 }
 
 // GetSettings returns all application settings.
-func (h *Handler) GetSettings(ctx context.Context) (*oas.Settings, error) {
+func (h *Handler) GetSettings(ctx context.Context) (oas.GetSettingsRes, error) {
 	all, err := h.repo.GetAll(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("getting settings: %w", err)
@@ -27,7 +28,9 @@ func (h *Handler) GetSettings(ctx context.Context) (*oas.Settings, error) {
 
 	result := &oas.Settings{}
 	if v, ok := all["primaryBaseURL"]; ok {
-		result.PrimaryBaseURL = oas.NewOptString(v)
+		if u, parseErr := url.Parse(v); parseErr == nil {
+			result.PrimaryBaseURL = oas.NewOptURI(*u)
+		}
 	}
 	if v, ok := all["serverTimezone"]; ok {
 		result.ServerTimezone = oas.NewOptString(v)
@@ -46,7 +49,7 @@ func (h *Handler) GetSettings(ctx context.Context) (*oas.Settings, error) {
 	}
 	if v, ok := all["keepDataPeriodDays"]; ok {
 		if days, parseErr := strconv.Atoi(v); parseErr == nil {
-			result.KeepDataPeriodDays = oas.NewOptInt(days)
+			result.KeepDataPeriodDays = oas.NewOptInt32(int32(days)) //nolint:gosec // days value is a small positive integer
 		}
 	}
 	if v, ok := all["statusPageSlug"]; ok {
@@ -56,9 +59,9 @@ func (h *Handler) GetSettings(ctx context.Context) (*oas.Settings, error) {
 }
 
 // UpdateSettings persists the provided settings values.
-func (h *Handler) UpdateSettings(ctx context.Context, req *oas.Settings) (*oas.MessageResponse, error) {
+func (h *Handler) UpdateSettings(ctx context.Context, req *oas.Settings) (oas.UpdateSettingsRes, error) {
 	if req.PrimaryBaseURL.IsSet() {
-		if err := h.repo.Set(ctx, "primaryBaseURL", req.PrimaryBaseURL.Value); err != nil {
+		if err := h.repo.Set(ctx, "primaryBaseURL", req.PrimaryBaseURL.Value.String()); err != nil {
 			return nil, fmt.Errorf("setting primaryBaseURL: %w", err)
 		}
 	}
@@ -88,7 +91,7 @@ func (h *Handler) UpdateSettings(ctx context.Context, req *oas.Settings) (*oas.M
 		}
 	}
 	if req.KeepDataPeriodDays.IsSet() {
-		if err := h.repo.Set(ctx, "keepDataPeriodDays", strconv.Itoa(req.KeepDataPeriodDays.Value)); err != nil {
+		if err := h.repo.Set(ctx, "keepDataPeriodDays", strconv.Itoa(int(req.KeepDataPeriodDays.Value))); err != nil {
 			return nil, fmt.Errorf("setting keepDataPeriodDays: %w", err)
 		}
 	}

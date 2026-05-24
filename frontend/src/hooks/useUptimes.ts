@@ -8,7 +8,12 @@ export function useUptimes() {
     queryKey: ['uptimes'],
     queryFn: async (): Promise<UptimeMap> => {
       const { data } = await api.GET('/monitors/uptimes');
-      return data ?? {};
+      if (!data) return {};
+      const map: UptimeMap = {};
+      for (const item of data) {
+        map[item.monitorId] = item.uptime;
+      }
+      return map;
     },
     refetchInterval: 60_000,
   });

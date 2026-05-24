@@ -58,13 +58,13 @@ func WithMonitorResolver(r MonitorResolver) HandlerOption {
 	return func(h *Handler) { h.monitorResolver = r }
 }
 
-func (h *Handler) ListStatusPages(ctx context.Context) ([]oas.StatusPage, error) {
+func (h *Handler) ListStatusPages(ctx context.Context) (oas.ListStatusPagesRes, error) {
 	pages, err := h.repo.FindAll(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("listing status pages: %w", err)
 	}
 
-	result := make([]oas.StatusPage, len(pages))
+	result := make(oas.ListStatusPagesOKApplicationJSON, len(pages))
 	for i, sp := range pages {
 		groups, groupErr := h.loadGroups(ctx, sp.ID)
 		if groupErr != nil {
@@ -72,7 +72,7 @@ func (h *Handler) ListStatusPages(ctx context.Context) ([]oas.StatusPage, error)
 		}
 		result[i] = statusPageToOAS(sp, groups)
 	}
-	return result, nil
+	return &result, nil
 }
 
 func (h *Handler) GetStatusPage(ctx context.Context, params oas.GetStatusPageParams) (oas.GetStatusPageRes, error) {
@@ -90,7 +90,7 @@ func (h *Handler) GetStatusPage(ctx context.Context, params oas.GetStatusPagePar
 	return &result, nil
 }
 
-func (h *Handler) CreateStatusPage(ctx context.Context, req *oas.StatusPageInput) (*oas.CreateStatusPageCreated, error) {
+func (h *Handler) CreateStatusPage(ctx context.Context, req *oas.StatusPageInput) (oas.CreateStatusPageRes, error) {
 	sp := statusPageFromInput(req)
 
 	id, err := h.repo.Create(ctx, sp)
@@ -105,7 +105,7 @@ func (h *Handler) CreateStatusPage(ctx context.Context, req *oas.StatusPageInput
 	return &oas.CreateStatusPageCreated{Slug: req.Slug}, nil
 }
 
-func (h *Handler) UpdateStatusPage(ctx context.Context, req *oas.StatusPageInput, params oas.UpdateStatusPageParams) (*oas.StatusPage, error) {
+func (h *Handler) UpdateStatusPage(ctx context.Context, req *oas.StatusPageInput, params oas.UpdateStatusPageParams) (oas.UpdateStatusPageRes, error) {
 	existing, err := h.repo.FindBySlug(ctx, params.Slug)
 	if err != nil {
 		return nil, fmt.Errorf("finding status page: %w", err)
@@ -131,25 +131,76 @@ func (h *Handler) UpdateStatusPage(ctx context.Context, req *oas.StatusPageInput
 	return &result, nil
 }
 
-func (h *Handler) DeleteStatusPage(ctx context.Context, params oas.DeleteStatusPageParams) error {
+func (h *Handler) DeleteStatusPage(ctx context.Context, params oas.DeleteStatusPageParams) (oas.DeleteStatusPageRes, error) {
 	sp, err := h.repo.FindBySlug(ctx, params.Slug)
 	if err != nil {
-		return fmt.Errorf("finding status page for delete: %w", err)
+		return nil, fmt.Errorf("finding status page for delete: %w", err)
 	}
 
 	if deleteErr := h.repo.Delete(ctx, sp.ID); deleteErr != nil {
-		return fmt.Errorf("deleting status page: %w", deleteErr)
+		return nil, fmt.Errorf("deleting status page: %w", deleteErr)
 	}
-	return nil
+	return &oas.DeleteStatusPageNoContent{}, nil
 }
 
-func (h *Handler) GetStatusPageHeartbeats(ctx context.Context, params oas.GetStatusPageHeartbeatsParams) (*oas.GetStatusPageHeartbeatsOK, error) {
+func (h *Handler) GetStatusPageHeartbeats(ctx context.Context, params oas.GetStatusPageHeartbeatsParams) (oas.GetStatusPageHeartbeatsRes, error) {
 	sp, err := h.repo.FindBySlug(ctx, params.Slug)
 	if err != nil {
 		return nil, fmt.Errorf("finding status page: %w", err)
 	}
 
-	groups, err := h.repo.GetGroups(ctx, sp.ID)
+	monitorIDs, err := h.collectStatusPageMonitorIDs(ctx, sp.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	hbList := make([]oas.GetStatusPageHeartbeatsOKHeartbeatListItem, 0, len(monitorIDs))
+	uptimeList := make([]oas.GetStatusPageHeartbeatsOKUptimeListItem, 0, len(monitorIDs))
+	nameList := make([]oas.GetStatusPageHeartbeatsOKMonitorNamesItem, 0, len(monitorIDs))
+
+	for _, mid := range monitorIDs {
+		beats, hbErr := h.hbReader.GetByMonitorPaged(ctx, mid, 0, 50)
+		if hbErr != nil {
+			continue
+		}
+
+		oasBeats := make([]oas.Heartbeat, len(beats))
+		for i, hb := range beats {
+			oasBeats[i] = hbToOAS(hb)
+		}
+		hbList = append(hbList, oas.GetStatusPageHeartbeatsOKHeartbeatListItem{
+			MonitorId:  oasutil.MustParseUUID(mid),
+			Heartbeats: oasBeats,
+		})
+
+		uptime, uptimeErr := h.hbReader.GetUptime(ctx, mid, 24)
+		if uptimeErr == nil {
+			uptimeList = append(uptimeList, oas.GetStatusPageHeartbeatsOKUptimeListItem{
+				MonitorId: oasutil.MustParseUUID(mid),
+				Uptime:    uptime,
+			})
+		}
+
+		if h.monitorNam != nil {
+			name, nameErr := h.monitorNam.FindNameByID(ctx, mid)
+			if nameErr == nil {
+				nameList = append(nameList, oas.GetStatusPageHeartbeatsOKMonitorNamesItem{
+					MonitorId: oasutil.MustParseUUID(mid),
+					Name:      name,
+				})
+			}
+		}
+	}
+
+	return &oas.GetStatusPageHeartbeatsOK{
+		HeartbeatList: hbList,
+		UptimeList:    uptimeList,
+		MonitorNames:  nameList,
+	}, nil
+}
+
+func (h *Handler) collectStatusPageMonitorIDs(ctx context.Context, statusPageID string) ([]string, error) {
+	groups, err := h.repo.GetGroups(ctx, statusPageID)
 	if err != nil {
 		return nil, fmt.Errorf("loading groups: %w", err)
 	}
@@ -182,48 +233,14 @@ func (h *Handler) GetStatusPageHeartbeats(ctx context.Context, params oas.GetSta
 			}
 		}
 	}
-
-	hbList := make(oas.GetStatusPageHeartbeatsOKHeartbeatList)
-	uptimeList := make(oas.GetStatusPageHeartbeatsOKUptimeList)
-	nameMap := make(oas.GetStatusPageHeartbeatsOKMonitorNames)
-
-	for _, mid := range monitorIDs {
-		beats, hbErr := h.hbReader.GetByMonitorPaged(ctx, mid, 0, 50)
-		if hbErr != nil {
-			continue
-		}
-
-		oasBeats := make([]oas.Heartbeat, len(beats))
-		for i, hb := range beats {
-			oasBeats[i] = hbToOAS(hb)
-		}
-		hbList[mid] = oasBeats
-
-		uptime, uptimeErr := h.hbReader.GetUptime(ctx, mid, 24)
-		if uptimeErr == nil {
-			uptimeList[mid+"_24"] = uptime
-		}
-
-		if h.monitorNam != nil {
-			name, nameErr := h.monitorNam.FindNameByID(ctx, mid)
-			if nameErr == nil {
-				nameMap[mid] = name
-			}
-		}
-	}
-
-	return &oas.GetStatusPageHeartbeatsOK{
-		HeartbeatList: oas.NewOptGetStatusPageHeartbeatsOKHeartbeatList(hbList),
-		UptimeList:    oas.NewOptGetStatusPageHeartbeatsOKUptimeList(uptimeList),
-		MonitorNames:  oas.NewOptGetStatusPageHeartbeatsOKMonitorNames(nameMap),
-	}, nil
+	return monitorIDs, nil
 }
 
 func hbToOAS(hb *heartbeat.Heartbeat) oas.Heartbeat {
 	result := oas.Heartbeat{
 		ID:        oasutil.MustParseUUID(hb.ID),
 		MonitorId: oasutil.MustParseUUID(hb.MonitorID),
-		Status:    oas.HeartbeatStatus(hb.Status),
+		Status:    oas.HeartbeatStatus(hb.Status), //nolint:gosec // status is a small enum value
 		Time:      time.Time(hb.Time),
 		Important: oas.NewOptBool(hb.Important),
 	}
@@ -239,17 +256,17 @@ func hbToOAS(hb *heartbeat.Heartbeat) oas.Heartbeat {
 	return result
 }
 
-func (h *Handler) GetStatusPageBadge(_ context.Context, _ oas.GetStatusPageBadgeParams) (oas.GetStatusPageBadgeOK, error) {
-	return oas.GetStatusPageBadgeOK{Data: strings.NewReader("")}, nil
+func (h *Handler) GetStatusPageBadge(_ context.Context, _ oas.GetStatusPageBadgeParams) (oas.GetStatusPageBadgeRes, error) {
+	return &oas.GetStatusPageBadgeOK{Data: strings.NewReader("")}, nil
 }
 
-func (h *Handler) GetStatusPageEventStream(_ context.Context, _ oas.GetStatusPageEventStreamParams) (oas.GetStatusPageEventStreamOK, error) {
-	return oas.GetStatusPageEventStreamOK{Data: strings.NewReader("")}, nil
+func (h *Handler) GetStatusPageEventStream(_ context.Context, _ oas.GetStatusPageEventStreamParams) (oas.GetStatusPageEventStreamRes, error) {
+	return &oas.GetStatusPageEventStreamOK{Data: strings.NewReader("")}, nil
 }
 
 // --- Incidents ---
 
-func (h *Handler) ListIncidents(ctx context.Context, params oas.ListIncidentsParams) (*oas.ListIncidentsOK, error) {
+func (h *Handler) ListIncidents(ctx context.Context, params oas.ListIncidentsParams) (oas.ListIncidentsRes, error) {
 	sp, err := h.repo.FindBySlug(ctx, params.Slug)
 	if err != nil {
 		return nil, fmt.Errorf("finding status page: %w", err)
@@ -268,7 +285,7 @@ func (h *Handler) ListIncidents(ctx context.Context, params oas.ListIncidentsPar
 	return &oas.ListIncidentsOK{Incidents: oasIncidents}, nil
 }
 
-func (h *Handler) CreateIncident(ctx context.Context, req *oas.IncidentInput, params oas.CreateIncidentParams) (*oas.Incident, error) {
+func (h *Handler) CreateIncident(ctx context.Context, req *oas.IncidentInput, params oas.CreateIncidentParams) (oas.CreateIncidentRes, error) {
 	sp, err := h.repo.FindBySlug(ctx, params.Slug)
 	if err != nil {
 		return nil, fmt.Errorf("finding status page: %w", err)
@@ -291,7 +308,7 @@ func (h *Handler) CreateIncident(ctx context.Context, req *oas.IncidentInput, pa
 	return &result, nil
 }
 
-func (h *Handler) UpdateIncident(ctx context.Context, req *oas.IncidentInput, params oas.UpdateIncidentParams) (*oas.Incident, error) {
+func (h *Handler) UpdateIncident(ctx context.Context, req *oas.IncidentInput, params oas.UpdateIncidentParams) (oas.UpdateIncidentRes, error) {
 	existing, err := h.repo.FindIncidentByID(ctx, params.IncidentId.String())
 	if err != nil {
 		return nil, fmt.Errorf("finding incident: %w", err)
@@ -312,14 +329,14 @@ func (h *Handler) UpdateIncident(ctx context.Context, req *oas.IncidentInput, pa
 	return &result, nil
 }
 
-func (h *Handler) DeleteIncident(ctx context.Context, params oas.DeleteIncidentParams) error {
+func (h *Handler) DeleteIncident(ctx context.Context, params oas.DeleteIncidentParams) (oas.DeleteIncidentRes, error) {
 	if err := h.repo.DeleteIncident(ctx, params.IncidentId.String()); err != nil {
-		return fmt.Errorf("deleting incident: %w", err)
+		return nil, fmt.Errorf("deleting incident: %w", err)
 	}
-	return nil
+	return &oas.DeleteIncidentNoContent{}, nil
 }
 
-func (h *Handler) ResolveIncident(ctx context.Context, params oas.ResolveIncidentParams) (*oas.Incident, error) {
+func (h *Handler) ResolveIncident(ctx context.Context, params oas.ResolveIncidentParams) (oas.ResolveIncidentRes, error) {
 	inc, err := h.repo.FindIncidentByID(ctx, params.IncidentId.String())
 	if err != nil {
 		return nil, fmt.Errorf("finding incident: %w", err)
@@ -337,7 +354,7 @@ func (h *Handler) ResolveIncident(ctx context.Context, params oas.ResolveInciden
 	return &result, nil
 }
 
-func (h *Handler) UnpinIncident(ctx context.Context, params oas.UnpinIncidentParams) (*oas.MessageResponse, error) {
+func (h *Handler) UnpinIncident(ctx context.Context, params oas.UnpinIncidentParams) (oas.UnpinIncidentRes, error) {
 	inc, err := h.repo.FindIncidentByID(ctx, params.IncidentId.String())
 	if err != nil {
 		return nil, fmt.Errorf("finding incident: %w", err)
@@ -377,7 +394,7 @@ func (h *Handler) loadGroups(ctx context.Context, statusPageID string) ([]oas.St
 		result[i] = oas.StatusPageGroup{
 			ID:         oas.NewOptUUID(uuid.MustParse(g.ID)),
 			Name:       g.Name,
-			Weight:     oas.NewOptInt(int(g.Weight)),
+			Weight:     oas.NewOptInt32(int32(g.Weight)), //nolint:gosec // weight is a small ordering value
 			MonitorIds: monitorIDs,
 			TagIds:     parseTagIDs(g.TagIDs),
 		}

@@ -118,49 +118,56 @@ func (c *HTTPChecker) Check(ctx context.Context, cfg *monitor.Config) (monitor.C
 		return result, nil
 	}
 
-	// Keyword check
-	if cfg.Keyword != "" {
-		bodyStr := string(body)
-		found := strings.Contains(bodyStr, cfg.Keyword)
-		if cfg.KeywordType == "not contain" {
-			found = !found
-		}
-		if !found {
-			result.Status = status.Down
-			if cfg.KeywordType == "not contain" {
-				result.Message = fmt.Sprintf("keyword %q found (should not contain)", cfg.Keyword)
-			} else {
-				result.Message = fmt.Sprintf("keyword %q not found in response", cfg.Keyword)
-			}
-			return result, nil
-		}
+	if msg, ok := checkKeyword(cfg, body); !ok {
+		result.Status = status.Down
+		result.Message = msg
+		return result, nil
 	}
 
-	// JSON path check
-	if cfg.JsonPath != "" {
-		bodyStr := string(body)
-		if !gjson.Valid(bodyStr) {
-			result.Status = status.Down
-			result.Message = "response body is not valid JSON"
-			return result, nil
-		}
-
-		got := gjson.Get(bodyStr, cfg.JsonPath)
-		if !got.Exists() {
-			result.Status = status.Down
-			result.Message = fmt.Sprintf("JSON path %q not found in response", cfg.JsonPath)
-			return result, nil
-		}
-
-		if cfg.ExpectedValue != "" && got.String() != cfg.ExpectedValue {
-			result.Status = status.Down
-			result.Message = fmt.Sprintf("JSON path %q returned %q, expected %q", cfg.JsonPath, got.String(), cfg.ExpectedValue)
-			return result, nil
-		}
+	if msg, ok := checkJSONPath(cfg, body); !ok {
+		result.Status = status.Down
+		result.Message = msg
+		return result, nil
 	}
 
 	result.Status = status.Up
 	return result, nil
+}
+
+func checkKeyword(cfg *monitor.Config, body []byte) (string, bool) {
+	if cfg.Keyword == "" {
+		return "", true
+	}
+	bodyStr := string(body)
+	found := strings.Contains(bodyStr, cfg.Keyword)
+	if cfg.KeywordType == "not contain" {
+		found = !found
+	}
+	if !found {
+		if cfg.KeywordType == "not contain" {
+			return fmt.Sprintf("keyword %q found (should not contain)", cfg.Keyword), false
+		}
+		return fmt.Sprintf("keyword %q not found in response", cfg.Keyword), false
+	}
+	return "", true
+}
+
+func checkJSONPath(cfg *monitor.Config, body []byte) (string, bool) {
+	if cfg.JSONPath == "" {
+		return "", true
+	}
+	bodyStr := string(body)
+	if !gjson.Valid(bodyStr) {
+		return "response body is not valid JSON", false
+	}
+	got := gjson.Get(bodyStr, cfg.JSONPath)
+	if !got.Exists() {
+		return fmt.Sprintf("JSON path %q not found in response", cfg.JSONPath), false
+	}
+	if cfg.ExpectedValue != "" && got.String() != cfg.ExpectedValue {
+		return fmt.Sprintf("JSON path %q returned %q, expected %q", cfg.JSONPath, got.String(), cfg.ExpectedValue), false
+	}
+	return "", true
 }
 
 func isAcceptedStatus(code int, accepted []string) bool {
