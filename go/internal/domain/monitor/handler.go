@@ -74,7 +74,7 @@ func (h *Handler) GetMonitor(ctx context.Context, params oas.GetMonitorParams) (
 	m, err := h.repo.FindByID(ctx, params.MonitorId.String())
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return &oas.ErrorResponse{Error: "monitor not found"}, nil
+			return &oas.GetMonitorNotFound{Error: "monitor not found"}, nil
 		}
 		return nil, fmt.Errorf("finding monitor: %w", err)
 	}
@@ -108,7 +108,7 @@ func (h *Handler) UpdateMonitor(ctx context.Context, req *oas.MonitorInput, para
 	existing, err := h.repo.FindByID(ctx, params.MonitorId.String())
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return &oas.ErrorResponse{Error: "monitor not found"}, nil
+			return &oas.UpdateMonitorNotFound{Error: "monitor not found"}, nil
 		}
 		return nil, fmt.Errorf("finding monitor: %w", err)
 	}

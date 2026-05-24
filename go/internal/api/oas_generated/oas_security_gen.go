@@ -14,7 +14,7 @@ import (
 // SecurityHandler is handler for security parameters.
 type SecurityHandler interface {
 	// HandleBearerAuth handles bearerAuth security.
-	// JWT bearer token for authenticating API requests.
+	// JWT bearer token for authenticating API requests. Conforms to RFC8725.
 	HandleBearerAuth(ctx context.Context, operationName OperationName, t BearerAuth) (context.Context, error)
 }
 
@@ -145,7 +145,7 @@ func (s *Server) securityBearerAuth(ctx context.Context, operationName Operation
 // SecuritySource is provider of security values (tokens, passwords, etc.).
 type SecuritySource interface {
 	// BearerAuth provides bearerAuth security value.
-	// JWT bearer token for authenticating API requests.
+	// JWT bearer token for authenticating API requests. Conforms to RFC8725.
 	BearerAuth(ctx context.Context, operationName OperationName) (BearerAuth, error)
 }
 

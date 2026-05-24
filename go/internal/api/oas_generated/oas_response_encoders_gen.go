@@ -20,10 +20,36 @@ func encodeAddMonitorTagResponse(response AddMonitorTagRes, w http.ResponseWrite
 
 		return nil
 
-	case *ErrorResponse:
+	case *AddMonitorTagUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *AddMonitorTagNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *AddMonitorTagTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -53,10 +79,23 @@ func encodeChangePasswordResponse(response ChangePasswordRes, w http.ResponseWri
 
 		return nil
 
-	case *ErrorResponse:
+	case *ChangePasswordUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ChangePasswordTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -86,10 +125,36 @@ func encodeCheckDomainResponse(response CheckDomainRes, w http.ResponseWriter, s
 
 		return nil
 
-	case *ErrorResponse:
+	case *CheckDomainUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *CheckDomainNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *CheckDomainTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -112,10 +177,36 @@ func encodeClearEventsResponse(response ClearEventsRes, w http.ResponseWriter, s
 
 		return nil
 
-	case *ErrorResponse:
+	case *ClearEventsUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ClearEventsNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ClearEventsTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -138,10 +229,36 @@ func encodeClearHeartbeatsResponse(response ClearHeartbeatsRes, w http.ResponseW
 
 		return nil
 
-	case *ErrorResponse:
+	case *ClearHeartbeatsUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ClearHeartbeatsNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ClearHeartbeatsTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -164,10 +281,23 @@ func encodeClearStatisticsResponse(response ClearStatisticsRes, w http.ResponseW
 
 		return nil
 
-	case *ErrorResponse:
+	case *ClearStatisticsUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ClearStatisticsTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -197,10 +327,23 @@ func encodeCreateAPIKeyResponse(response CreateAPIKeyRes, w http.ResponseWriter,
 
 		return nil
 
-	case *ErrorResponse:
+	case *CreateAPIKeyUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *CreateAPIKeyTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -230,10 +373,23 @@ func encodeCreateIncidentResponse(response CreateIncidentRes, w http.ResponseWri
 
 		return nil
 
-	case *ErrorResponse:
+	case *CreateIncidentUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *CreateIncidentTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -263,10 +419,23 @@ func encodeCreateMaintenanceResponse(response CreateMaintenanceRes, w http.Respo
 
 		return nil
 
-	case *ErrorResponse:
+	case *CreateMaintenanceUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *CreateMaintenanceTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -296,10 +465,23 @@ func encodeCreateMonitorResponse(response CreateMonitorRes, w http.ResponseWrite
 
 		return nil
 
-	case *ErrorResponse:
+	case *CreateMonitorUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *CreateMonitorTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -329,10 +511,23 @@ func encodeCreateNotificationResponse(response CreateNotificationRes, w http.Res
 
 		return nil
 
-	case *ErrorResponse:
+	case *CreateNotificationUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *CreateNotificationTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -362,10 +557,23 @@ func encodeCreateProxyResponse(response CreateProxyRes, w http.ResponseWriter, s
 
 		return nil
 
-	case *ErrorResponse:
+	case *CreateProxyUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *CreateProxyTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -395,10 +603,23 @@ func encodeCreateStatusPageResponse(response CreateStatusPageRes, w http.Respons
 
 		return nil
 
-	case *ErrorResponse:
+	case *CreateStatusPageUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *CreateStatusPageTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -428,10 +649,23 @@ func encodeCreateTagResponse(response CreateTagRes, w http.ResponseWriter, span 
 
 		return nil
 
-	case *ErrorResponse:
+	case *CreateTagUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *CreateTagTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -454,10 +688,36 @@ func encodeDeleteAPIKeyResponse(response DeleteAPIKeyRes, w http.ResponseWriter,
 
 		return nil
 
-	case *ErrorResponse:
+	case *DeleteAPIKeyUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *DeleteAPIKeyNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *DeleteAPIKeyTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -480,10 +740,36 @@ func encodeDeleteIncidentResponse(response DeleteIncidentRes, w http.ResponseWri
 
 		return nil
 
-	case *ErrorResponse:
+	case *DeleteIncidentUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *DeleteIncidentNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *DeleteIncidentTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -506,10 +792,36 @@ func encodeDeleteMaintenanceResponse(response DeleteMaintenanceRes, w http.Respo
 
 		return nil
 
-	case *ErrorResponse:
+	case *DeleteMaintenanceUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *DeleteMaintenanceNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *DeleteMaintenanceTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -532,10 +844,36 @@ func encodeDeleteMonitorResponse(response DeleteMonitorRes, w http.ResponseWrite
 
 		return nil
 
-	case *ErrorResponse:
+	case *DeleteMonitorUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *DeleteMonitorNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *DeleteMonitorTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -558,10 +896,36 @@ func encodeDeleteMonitorTagResponse(response DeleteMonitorTagRes, w http.Respons
 
 		return nil
 
-	case *ErrorResponse:
+	case *DeleteMonitorTagUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *DeleteMonitorTagNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *DeleteMonitorTagTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -584,10 +948,36 @@ func encodeDeleteNotificationResponse(response DeleteNotificationRes, w http.Res
 
 		return nil
 
-	case *ErrorResponse:
+	case *DeleteNotificationUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *DeleteNotificationNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *DeleteNotificationTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -610,10 +1000,36 @@ func encodeDeleteProxyResponse(response DeleteProxyRes, w http.ResponseWriter, s
 
 		return nil
 
-	case *ErrorResponse:
+	case *DeleteProxyUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *DeleteProxyNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *DeleteProxyTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -636,10 +1052,36 @@ func encodeDeleteStatusPageResponse(response DeleteStatusPageRes, w http.Respons
 
 		return nil
 
-	case *ErrorResponse:
+	case *DeleteStatusPageUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *DeleteStatusPageNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *DeleteStatusPageTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -662,10 +1104,36 @@ func encodeDeleteTagResponse(response DeleteTagRes, w http.ResponseWriter, span 
 
 		return nil
 
-	case *ErrorResponse:
+	case *DeleteTagUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *DeleteTagNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *DeleteTagTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -695,10 +1163,23 @@ func encodeDisable2FAResponse(response Disable2FARes, w http.ResponseWriter, spa
 
 		return nil
 
-	case *ErrorResponse:
+	case *Disable2FAUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *Disable2FATooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -728,10 +1209,36 @@ func encodeDisableAPIKeyResponse(response DisableAPIKeyRes, w http.ResponseWrite
 
 		return nil
 
-	case *ErrorResponse:
+	case *DisableAPIKeyUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *DisableAPIKeyNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *DisableAPIKeyTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -761,10 +1268,23 @@ func encodeEnable2FAResponse(response Enable2FARes, w http.ResponseWriter, span 
 
 		return nil
 
-	case *ErrorResponse:
+	case *Enable2FAUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *Enable2FATooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -794,10 +1314,36 @@ func encodeEnableAPIKeyResponse(response EnableAPIKeyRes, w http.ResponseWriter,
 
 		return nil
 
-	case *ErrorResponse:
+	case *EnableAPIKeyUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *EnableAPIKeyNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *EnableAPIKeyTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -827,10 +1373,23 @@ func encodeGet2FAStatusResponse(response Get2FAStatusRes, w http.ResponseWriter,
 
 		return nil
 
-	case *ErrorResponse:
+	case *Get2FAStatusUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *Get2FAStatusTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -862,10 +1421,36 @@ func encodeGetCertExpiryBadgeResponse(response GetCertExpiryBadgeRes, w http.Res
 
 		return nil
 
-	case *ErrorResponse:
+	case *GetCertExpiryBadgeUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetCertExpiryBadgeNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetCertExpiryBadgeTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -895,10 +1480,36 @@ func encodeGetChartDataResponse(response GetChartDataRes, w http.ResponseWriter,
 
 		return nil
 
-	case *ErrorResponse:
+	case *GetChartDataUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetChartDataNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetChartDataTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -928,10 +1539,23 @@ func encodeGetDatabaseSizeResponse(response GetDatabaseSizeRes, w http.ResponseW
 
 		return nil
 
-	case *ErrorResponse:
+	case *GetDatabaseSizeUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetDatabaseSizeTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -961,10 +1585,36 @@ func encodeGetHeartbeatsResponse(response GetHeartbeatsRes, w http.ResponseWrite
 
 		return nil
 
-	case *ErrorResponse:
+	case *GetHeartbeatsUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetHeartbeatsNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetHeartbeatsTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -994,10 +1644,36 @@ func encodeGetImportantHeartbeatsResponse(response GetImportantHeartbeatsRes, w 
 
 		return nil
 
-	case *ErrorResponse:
+	case *GetImportantHeartbeatsUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetImportantHeartbeatsNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetImportantHeartbeatsTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1027,10 +1703,36 @@ func encodeGetInfoResponse(response GetInfoRes, w http.ResponseWriter, span trac
 
 		return nil
 
-	case *ErrorResponse:
+	case *GetInfoBadRequest:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetInfoUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetInfoTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1062,10 +1764,36 @@ func encodeGetLatencyBadgeResponse(response GetLatencyBadgeRes, w http.ResponseW
 
 		return nil
 
-	case *ErrorResponse:
+	case *GetLatencyBadgeUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetLatencyBadgeNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetLatencyBadgeTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1095,10 +1823,36 @@ func encodeGetMaintenanceResponse(response GetMaintenanceRes, w http.ResponseWri
 
 		return nil
 
-	case *ErrorResponse:
+	case *GetMaintenanceUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetMaintenanceNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetMaintenanceTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1128,10 +1882,36 @@ func encodeGetMaintenanceMonitorsResponse(response GetMaintenanceMonitorsRes, w 
 
 		return nil
 
-	case *ErrorResponse:
+	case *GetMaintenanceMonitorsUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetMaintenanceMonitorsNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetMaintenanceMonitorsTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1161,10 +1941,36 @@ func encodeGetMaintenanceStatusPagesResponse(response GetMaintenanceStatusPagesR
 
 		return nil
 
-	case *ErrorResponse:
+	case *GetMaintenanceStatusPagesUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetMaintenanceStatusPagesNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetMaintenanceStatusPagesTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1194,10 +2000,36 @@ func encodeGetMonitorResponse(response GetMonitorRes, w http.ResponseWriter, spa
 
 		return nil
 
-	case *ErrorResponse:
+	case *GetMonitorUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetMonitorNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetMonitorTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1227,10 +2059,23 @@ func encodeGetMonitorUptimesResponse(response GetMonitorUptimesRes, w http.Respo
 
 		return nil
 
-	case *ErrorResponse:
+	case *GetMonitorUptimesUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetMonitorUptimesTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1262,10 +2107,36 @@ func encodeGetResponseBadgeResponse(response GetResponseBadgeRes, w http.Respons
 
 		return nil
 
-	case *ErrorResponse:
+	case *GetResponseBadgeUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetResponseBadgeNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetResponseBadgeTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1295,10 +2166,23 @@ func encodeGetSettingsResponse(response GetSettingsRes, w http.ResponseWriter, s
 
 		return nil
 
-	case *ErrorResponse:
+	case *GetSettingsUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetSettingsTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1330,10 +2214,36 @@ func encodeGetStatusBadgeResponse(response GetStatusBadgeRes, w http.ResponseWri
 
 		return nil
 
-	case *ErrorResponse:
+	case *GetStatusBadgeUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetStatusBadgeNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetStatusBadgeTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1363,10 +2273,36 @@ func encodeGetStatusPageResponse(response GetStatusPageRes, w http.ResponseWrite
 
 		return nil
 
-	case *ErrorResponse:
+	case *GetStatusPageUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetStatusPageNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetStatusPageTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1398,10 +2334,36 @@ func encodeGetStatusPageBadgeResponse(response GetStatusPageBadgeRes, w http.Res
 
 		return nil
 
-	case *ErrorResponse:
+	case *GetStatusPageBadgeUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetStatusPageBadgeNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetStatusPageBadgeTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1433,10 +2395,36 @@ func encodeGetStatusPageEventStreamResponse(response GetStatusPageEventStreamRes
 
 		return nil
 
-	case *ErrorResponse:
+	case *GetStatusPageEventStreamUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetStatusPageEventStreamNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetStatusPageEventStreamTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1466,10 +2454,36 @@ func encodeGetStatusPageHeartbeatsResponse(response GetStatusPageHeartbeatsRes, 
 
 		return nil
 
-	case *ErrorResponse:
+	case *GetStatusPageHeartbeatsUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetStatusPageHeartbeatsNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetStatusPageHeartbeatsTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1501,10 +2515,36 @@ func encodeGetUptimeBadgeResponse(response GetUptimeBadgeRes, w http.ResponseWri
 
 		return nil
 
-	case *ErrorResponse:
+	case *GetUptimeBadgeUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetUptimeBadgeNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetUptimeBadgeTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1534,10 +2574,36 @@ func encodeHealthCheckResponse(response HealthCheckRes, w http.ResponseWriter, s
 
 		return nil
 
-	case *ErrorResponse:
+	case *HealthCheckBadRequest:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *HealthCheckUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *HealthCheckTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1567,10 +2633,23 @@ func encodeListAPIKeysResponse(response ListAPIKeysRes, w http.ResponseWriter, s
 
 		return nil
 
-	case *ErrorResponse:
+	case *ListAPIKeysUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ListAPIKeysTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1600,10 +2679,36 @@ func encodeListIncidentsResponse(response ListIncidentsRes, w http.ResponseWrite
 
 		return nil
 
-	case *ErrorResponse:
+	case *ListIncidentsUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ListIncidentsNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ListIncidentsTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1633,10 +2738,23 @@ func encodeListMaintenanceResponse(response ListMaintenanceRes, w http.ResponseW
 
 		return nil
 
-	case *ErrorResponse:
+	case *ListMaintenanceUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ListMaintenanceTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1666,10 +2784,23 @@ func encodeListMonitorsResponse(response ListMonitorsRes, w http.ResponseWriter,
 
 		return nil
 
-	case *ErrorResponse:
+	case *ListMonitorsUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ListMonitorsTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1699,10 +2830,23 @@ func encodeListNotificationsResponse(response ListNotificationsRes, w http.Respo
 
 		return nil
 
-	case *ErrorResponse:
+	case *ListNotificationsUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ListNotificationsTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1732,10 +2876,23 @@ func encodeListProxiesResponse(response ListProxiesRes, w http.ResponseWriter, s
 
 		return nil
 
-	case *ErrorResponse:
+	case *ListProxiesUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ListProxiesTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1765,10 +2922,23 @@ func encodeListRecentEventsResponse(response ListRecentEventsRes, w http.Respons
 
 		return nil
 
-	case *ErrorResponse:
+	case *ListRecentEventsUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ListRecentEventsTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1798,10 +2968,23 @@ func encodeListStatusPagesResponse(response ListStatusPagesRes, w http.ResponseW
 
 		return nil
 
-	case *ErrorResponse:
+	case *ListStatusPagesUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ListStatusPagesTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1831,10 +3014,23 @@ func encodeListTagsResponse(response ListTagsRes, w http.ResponseWriter, span tr
 
 		return nil
 
-	case *ErrorResponse:
+	case *ListTagsUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ListTagsTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1903,10 +3099,23 @@ func encodeLogoutResponse(response LogoutRes, w http.ResponseWriter, span trace.
 
 		return nil
 
-	case *ErrorResponse:
+	case *LogoutUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *LogoutTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1936,10 +3145,36 @@ func encodeNeedSetupResponse(response NeedSetupRes, w http.ResponseWriter, span 
 
 		return nil
 
-	case *ErrorResponse:
+	case *NeedSetupBadRequest:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *NeedSetupUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *NeedSetupTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -1969,10 +3204,36 @@ func encodePauseMaintenanceResponse(response PauseMaintenanceRes, w http.Respons
 
 		return nil
 
-	case *ErrorResponse:
+	case *PauseMaintenanceUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *PauseMaintenanceNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *PauseMaintenanceTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -2002,10 +3263,36 @@ func encodePauseMonitorResponse(response PauseMonitorRes, w http.ResponseWriter,
 
 		return nil
 
-	case *ErrorResponse:
+	case *PauseMonitorUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *PauseMonitorNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *PauseMonitorTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -2035,10 +3322,23 @@ func encodePrepare2FAResponse(response Prepare2FARes, w http.ResponseWriter, spa
 
 		return nil
 
-	case *ErrorResponse:
+	case *Prepare2FAUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *Prepare2FATooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -2068,10 +3368,23 @@ func encodeRefreshTokenResponse(response RefreshTokenRes, w http.ResponseWriter,
 
 		return nil
 
-	case *ErrorResponse:
+	case *RefreshTokenUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *RefreshTokenTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -2101,10 +3414,36 @@ func encodeResolveIncidentResponse(response ResolveIncidentRes, w http.ResponseW
 
 		return nil
 
-	case *ErrorResponse:
+	case *ResolveIncidentUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ResolveIncidentNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ResolveIncidentTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -2134,10 +3473,36 @@ func encodeResumeMaintenanceResponse(response ResumeMaintenanceRes, w http.Respo
 
 		return nil
 
-	case *ErrorResponse:
+	case *ResumeMaintenanceUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ResumeMaintenanceNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ResumeMaintenanceTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -2167,10 +3532,36 @@ func encodeResumeMonitorResponse(response ResumeMonitorRes, w http.ResponseWrite
 
 		return nil
 
-	case *ErrorResponse:
+	case *ResumeMonitorUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ResumeMonitorNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ResumeMonitorTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -2193,10 +3584,36 @@ func encodeSetMaintenanceMonitorsResponse(response SetMaintenanceMonitorsRes, w 
 
 		return nil
 
-	case *ErrorResponse:
+	case *SetMaintenanceMonitorsUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *SetMaintenanceMonitorsNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *SetMaintenanceMonitorsTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -2219,10 +3636,36 @@ func encodeSetMaintenanceStatusPagesResponse(response SetMaintenanceStatusPagesR
 
 		return nil
 
-	case *ErrorResponse:
+	case *SetMaintenanceStatusPagesUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *SetMaintenanceStatusPagesNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *SetMaintenanceStatusPagesTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -2252,9 +3695,35 @@ func encodeSetupResponse(response SetupRes, w http.ResponseWriter, span trace.Sp
 
 		return nil
 
+	case *SetupUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
 	case *SetupConflict:
 		w.WriteHeader(409)
 		span.SetStatus(codes.Error, http.StatusText(409))
+
+		return nil
+
+	case *SetupTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
 
 		return nil
 
@@ -2278,10 +3747,23 @@ func encodeShrinkDatabaseResponse(response ShrinkDatabaseRes, w http.ResponseWri
 
 		return nil
 
-	case *ErrorResponse:
+	case *ShrinkDatabaseUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ShrinkDatabaseTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -2311,10 +3793,36 @@ func encodeTestNotificationResponse(response TestNotificationRes, w http.Respons
 
 		return nil
 
-	case *ErrorResponse:
+	case *TestNotificationUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *TestNotificationNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *TestNotificationTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -2344,10 +3852,36 @@ func encodeUnpinIncidentResponse(response UnpinIncidentRes, w http.ResponseWrite
 
 		return nil
 
-	case *ErrorResponse:
+	case *UnpinIncidentUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *UnpinIncidentNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *UnpinIncidentTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -2377,10 +3911,36 @@ func encodeUpdateIncidentResponse(response UpdateIncidentRes, w http.ResponseWri
 
 		return nil
 
-	case *ErrorResponse:
+	case *UpdateIncidentUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *UpdateIncidentNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *UpdateIncidentTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -2410,10 +3970,36 @@ func encodeUpdateMaintenanceResponse(response UpdateMaintenanceRes, w http.Respo
 
 		return nil
 
-	case *ErrorResponse:
+	case *UpdateMaintenanceUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *UpdateMaintenanceNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *UpdateMaintenanceTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -2443,10 +4029,36 @@ func encodeUpdateMonitorResponse(response UpdateMonitorRes, w http.ResponseWrite
 
 		return nil
 
-	case *ErrorResponse:
+	case *UpdateMonitorUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *UpdateMonitorNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *UpdateMonitorTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -2469,10 +4081,36 @@ func encodeUpdateMonitorTagResponse(response UpdateMonitorTagRes, w http.Respons
 
 		return nil
 
-	case *ErrorResponse:
+	case *UpdateMonitorTagUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *UpdateMonitorTagNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *UpdateMonitorTagTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -2502,10 +4140,36 @@ func encodeUpdateNotificationResponse(response UpdateNotificationRes, w http.Res
 
 		return nil
 
-	case *ErrorResponse:
+	case *UpdateNotificationUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *UpdateNotificationNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *UpdateNotificationTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -2528,10 +4192,36 @@ func encodeUpdateProxyResponse(response UpdateProxyRes, w http.ResponseWriter, s
 
 		return nil
 
-	case *ErrorResponse:
+	case *UpdateProxyUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *UpdateProxyNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *UpdateProxyTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -2561,10 +4251,23 @@ func encodeUpdateSettingsResponse(response UpdateSettingsRes, w http.ResponseWri
 
 		return nil
 
-	case *ErrorResponse:
+	case *UpdateSettingsUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *UpdateSettingsTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -2594,10 +4297,36 @@ func encodeUpdateStatusPageResponse(response UpdateStatusPageRes, w http.Respons
 
 		return nil
 
-	case *ErrorResponse:
+	case *UpdateStatusPageUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *UpdateStatusPageNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *UpdateStatusPageTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -2627,10 +4356,36 @@ func encodeUpdateTagResponse(response UpdateTagRes, w http.ResponseWriter, span 
 
 		return nil
 
-	case *ErrorResponse:
+	case *UpdateTagUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *UpdateTagNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *UpdateTagTooManyRequests:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(429)
+		span.SetStatus(codes.Error, http.StatusText(429))
 
 		e := new(jx.Encoder)
 		response.Encode(e)

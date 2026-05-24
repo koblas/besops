@@ -78,7 +78,7 @@ func (h *Handler) ListStatusPages(ctx context.Context) (oas.ListStatusPagesRes, 
 func (h *Handler) GetStatusPage(ctx context.Context, params oas.GetStatusPageParams) (oas.GetStatusPageRes, error) {
 	sp, err := h.repo.FindBySlug(ctx, params.Slug)
 	if err != nil {
-		return &oas.ErrorResponse{Error: "status page not found"}, nil //nolint:nilerr
+		return &oas.GetStatusPageNotFound{Error: "status page not found"}, nil //nolint:nilerr
 	}
 
 	groups, groupErr := h.loadGroups(ctx, sp.ID)
