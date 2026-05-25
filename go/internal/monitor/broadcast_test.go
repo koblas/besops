@@ -35,10 +35,11 @@ func TestResultRecorderPublishesToHub(t *testing.T) {
 	select {
 	case ev := <-sub:
 		assert.Equal(t, "heartbeat", ev.Type)
-		hb, ok := ev.Data.(*heartbeat.Heartbeat)
-		require.True(t, ok, "expected *heartbeat.Heartbeat, got %T", ev.Data)
+		hb, ok := ev.Data.(wsHeartbeat)
+		require.True(t, ok, "expected wsHeartbeat, got %T", ev.Data)
 		assert.Equal(t, "m1", hb.MonitorID)
-		assert.Equal(t, int(status.Up), hb.Status)
+		assert.Equal(t, status.Up.String(), hb.Status)
+		require.NotNil(t, hb.Latency)
 		assert.Equal(t, int64(12), *hb.Latency)
 	case <-time.After(time.Second):
 		t.Fatal("timed out waiting for broadcast event")
@@ -64,10 +65,10 @@ func TestManagerPublishesOnCheck(t *testing.T) {
 	select {
 	case ev := <-sub:
 		assert.Equal(t, "heartbeat", ev.Type)
-		hb, ok := ev.Data.(*heartbeat.Heartbeat)
-		require.True(t, ok)
+		hb, ok := ev.Data.(wsHeartbeat)
+		require.True(t, ok, "expected wsHeartbeat, got %T", ev.Data)
 		assert.Equal(t, "m1", hb.MonitorID)
-		assert.Equal(t, int(status.Up), hb.Status)
+		assert.Equal(t, status.Up.String(), hb.Status)
 	case <-time.After(2 * time.Second):
 		t.Fatal("timed out waiting for broadcast from monitor manager")
 	}

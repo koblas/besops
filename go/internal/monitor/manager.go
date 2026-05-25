@@ -326,7 +326,7 @@ func (r *resultRecorder) HandleResult(ctx context.Context, monitorID string, res
 	if r.publisher != nil {
 		r.publisher.Publish(broadcast.Event{
 			Type: "heartbeat",
-			Data: hb,
+			Data: heartbeatEvent(hb),
 		})
 	}
 
@@ -337,6 +337,30 @@ func (r *resultRecorder) HandleResult(ctx context.Context, monitorID string, res
 	if prevStatus != recordedStatus && prevErr == nil && r.notify != nil {
 		slog.DebugContext(ctx, "status changed, dispatching notification", slog.String("monitor", monitorID), slog.String("from", prevStatus.String()), slog.String("to", recordedStatus.String()))
 		r.notify.Dispatch(ctx, monitorID, recordedStatus, prevStatus, result.Message)
+	}
+}
+
+type wsHeartbeat struct {
+	ID        string `json:"id"`
+	MonitorID string `json:"monitorId"`
+	Status    string `json:"status"`
+	Time      string `json:"time"`
+	Msg       string `json:"msg,omitempty"`
+	Latency   *int64 `json:"latency,omitempty"`
+	Important bool   `json:"important,omitempty"`
+	Duration  int64  `json:"duration,omitempty"`
+}
+
+func heartbeatEvent(hb *heartbeat.Heartbeat) wsHeartbeat {
+	return wsHeartbeat{
+		ID:        hb.ID,
+		MonitorID: hb.MonitorID,
+		Status:    status.Status(hb.Status).String(),
+		Time:      time.Time(hb.Time).UTC().Format(time.RFC3339),
+		Msg:       hb.Msg,
+		Latency:   hb.Latency,
+		Important: hb.Important,
+		Duration:  hb.Duration,
 	}
 }
 
